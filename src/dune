@@ -1,0 +1,4 @@
+(library
+    (name michelson)
+    (libraries zarith)
+    (synopsis "Michelson front end for Softcheck."))
