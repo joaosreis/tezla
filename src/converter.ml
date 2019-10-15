@@ -1,9 +1,9 @@
 open Env
 
-let string_to_expr s = Michelscil.E_ident s
+let string_to_expr s = Michelson_scil.E_ident s
 
 let join_envs_if s_t env_t s_f env_f =
-  let open Michelscil in
+  let open Michelson_scil in
   let env = join string_to_expr env_t env_f in
   let decls =
     List.fold_left
@@ -28,7 +28,7 @@ let join_envs_if s_t env_t s_f env_f =
   (env, s_t', s_f')
 
 let join_envs_while s env =
-  let open Michelscil in
+  let open Michelson_scil in
   let env' = join string_to_expr env env in
   let decls =
     List.fold_left
@@ -46,8 +46,8 @@ let join_envs_while s env =
   (env', s')
 
 let rec data_to_expr =
-  let open Ast in
-  let open Michelscil in
+  let open Michelson_ast in
+  let open Michelson_scil in
   function
   | D_int i ->
       E_int i
@@ -92,8 +92,8 @@ let rec data_to_expr =
       E_stmt s
 
 and convert env =
-  let open Ast in
-  let open Michelscil in
+  let open Michelson_ast in
+  let open Michelson_scil in
   function
   | I_seq (i_1, i_2) ->
       let s_1, env_1 = convert env i_1 in
@@ -107,12 +107,12 @@ and convert env =
   | I_swap ->
       let env' = swap env in
       (S_skip, env')
-  | I_push (t, x) ->
+  | I_push (_, x) ->
       (S_skip, push (data_to_expr x) env)
   | I_some ->
       let x, env' = pop env in
       (S_skip, push (E_some x) env')
-  | I_none t ->
+  | I_none _ ->
       (S_skip, push E_none env)
   | I_unit ->
       (S_skip, push E_unit env)
@@ -133,7 +133,7 @@ and convert env =
   | I_cdr ->
       let x, env' = pop env in
       (S_skip, push (E_unop (Snd, x)) env')
-  | I_left t ->
+  | I_left _ ->
       let x, env' = pop env in
       (S_skip, push (E_left x) env')
   | I_right _ ->
@@ -157,7 +157,7 @@ and convert env =
       let s_f, env_f = convert env' i_f in
       let env', s_t', s_f' = join_envs_if s_t env_t s_f env_f in
       (S_if (c, s_t', s_f'), env')
-  | I_nil t ->
+  | I_nil _ ->
       (S_skip, push (E_list []) env)
   | I_cons ->
       let x_1, env' = pop env in
@@ -179,7 +179,7 @@ and convert env =
   | I_empty_map _ ->
       (S_skip, push (E_map []) env)
   | I_map i ->
-      let s = convert empty_env i in
+      let _ = convert empty_env i in
       (S_todo, env)
   | I_iter _ ->
       (S_todo, env)
@@ -217,7 +217,7 @@ and convert env =
       let env' = push e' env' in
       let env', s' = join_envs_while s env' in
       (S_while (c, s'), env')
-  | I_lambda (t_1, t_2, i) ->
+  | I_lambda (_, _, i) ->
       let s, _ = convert empty_env i in
       (S_skip, push (E_stmt s) env)
   | I_exec ->
