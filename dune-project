@@ -1,18 +1,27 @@
-(lang dune 1.11)
-(name michelscil)
+(lang dune 2.03)
+
+(name tezla)
 
 (generate_opam_files true)
 
-(source (uri "git+https://gitlab.com/releaselab/fresco/michelscil.git"))
-(bug_reports "https://gitlab.com/releaselab/fresco/michelscil/issues")
-(homepage "https://gitlab.com/releaselab/fresco/michelscil")
+(source
+ (uri "git+https://gitlab.com/releaselab/fresco/tezla.git"))
+
+(bug_reports "https://gitlab.com/releaselab/fresco/tezla/issues")
+
+(homepage "https://gitlab.com/releaselab/fresco/tezla")
+
 (license MIT)
-(authors "João Santos Reis <joaosreis@outlook.pt>")
-(maintainers "João Santos Reis <joaosreis@outlook.pt>")
+
+(authors "Jo\195\163o Santos Reis <joao.reis@ubi.pt>")
+
+(maintainers "Jo\195\163o Santos Reis <joao.reis@ubi.pt>")
 
 (package
- (name michelscil)
- (synopsis "An instantiation of SCIL for the Michelson language")
+ (name tezla)
+ (synopsis "An intermediate representation of the Michelson language")
  (depends
   (dune :build)
-  (zarith (> 1.0))))
+  (zarith :build)
+  (batteries :build)
+  (michelson :build)))

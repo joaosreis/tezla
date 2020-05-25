@@ -1,6 +1,0 @@
-(library
-    (name michelscil)
-    (public_name michelscil)
-    (libraries zarith)
-    (synopsis "Michelson front end for Softcheck.")
-    (modules_without_implementation michelson_ast michelson_scil))
