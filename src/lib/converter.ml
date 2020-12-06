@@ -34,8 +34,8 @@ let unlift_option_t t =
   | T_option t -> t
   | _ ->
       let () =
-        Format.fprintf Format.err_formatter "Expected: option 'a but got %a\n"
-          Pp.typ t
+        Format.fprintf Format.err_formatter "Expected: option 'a but got %s\n"
+          (Pp.string_of_typ t)
       in
       assert false
 
@@ -45,8 +45,8 @@ let car_t t =
   | T_pair (t, _) -> t
   | _ ->
       let () =
-        Format.fprintf Format.err_formatter "Expected: pair 'a 'b but got %a\n"
-          Pp.typ t
+        Format.fprintf Format.err_formatter "Expected: pair 'a 'b but got %s\n"
+          (Pp.string_of_typ t)
       in
       assert false
 
@@ -56,8 +56,8 @@ let cdr_t t =
   | T_pair (_, t) -> t
   | _ ->
       let () =
-        Format.fprintf Format.err_formatter "Expected: pair 'a 'b but got %a\n"
-          Pp.typ t
+        Format.fprintf Format.err_formatter "Expected: pair 'a 'b but got %s\n"
+          (Pp.string_of_typ t)
       in
       assert false
 
@@ -67,8 +67,8 @@ let unlift_left_t t =
   | T_or (t, _) -> t
   | _ ->
       let () =
-        Format.fprintf Format.err_formatter "Expected: or 'a 'b but got %a\n"
-          Pp.typ t
+        Format.fprintf Format.err_formatter "Expected: or 'a 'b but got %s\n"
+          (Pp.string_of_typ t)
       in
       assert false
 
@@ -78,8 +78,8 @@ let unlift_right_t t =
   | T_or (_, t) -> t
   | _ ->
       let () =
-        Format.fprintf Format.err_formatter "Expected: or 'a 'b but got %a\n"
-          Pp.typ t
+        Format.fprintf Format.err_formatter "Expected: or 'a 'b but got %s\n"
+          (Pp.string_of_typ t)
       in
       assert false
 
@@ -89,8 +89,8 @@ let list_elem_t t =
   | T_list t -> t
   | _ ->
       let () =
-        Format.fprintf Format.err_formatter "Expected: list 'a but got %a\n"
-          Pp.typ t
+        Format.fprintf Format.err_formatter "Expected: list 'a but got %s\n"
+          (Pp.string_of_typ t)
       in
       assert false
 
@@ -103,7 +103,8 @@ let map_iter_elem_t t =
   | _ ->
       let () =
         Format.fprintf Format.err_formatter
-          "Expected: list 'a or set 'a or map 'a 'b but got %a" Pp.typ t
+          "Expected: list 'a or set 'a or map 'a 'b but got %s"
+          (Pp.string_of_typ t)
       in
       assert false
 
@@ -114,7 +115,7 @@ let lambda_t t =
   | _ ->
       let () =
         Format.fprintf Format.err_formatter
-          "Expected: lambda 'a 'b but got %a\n" Pp.typ t
+          "Expected: lambda 'a 'b but got %s\n" (Pp.string_of_typ t)
       in
       assert false
 
