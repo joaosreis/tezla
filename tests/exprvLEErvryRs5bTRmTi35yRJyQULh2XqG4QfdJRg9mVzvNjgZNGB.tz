@@ -1,0 +1,9 @@
+{ parameter
+    (map %update
+       (string :assetcode)
+       (pair signature
+             (pair (timestamp %start)
+                   (pair (timestamp %end)
+                         (pair (nat %open) (pair (nat %high) (pair (nat %low) (pair (nat %close) (nat %volume))))))))) ;
+  storage (string :placeholder) ;
+  code { CDR ; NIL operation ; PAIR } }

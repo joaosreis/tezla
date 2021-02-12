@@ -1,0 +1,42 @@
+{ parameter (or (or (int %decrement) (int %increment)) (unit %reset)) ;
+  storage int ;
+  code { DUP ;
+         CDR ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DUP ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SUB ;
+                 DIP { DROP 2 } }
+               { DUP ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 ADD ;
+                 DIP { DROP 2 } } ;
+             DIP { DROP } }
+           { DROP ; PUSH int 0 } ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 2 } } }

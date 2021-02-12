@@ -1,0 +1,44 @@
+{ parameter unit ;
+  storage int ;
+  code { PUSH int 0 ;
+         LAMBDA
+           int
+           (pair bool int)
+           { PUSH bool True ;
+             IF { DUP ;
+                  PUSH int 1 ;
+                  DIG 2 ;
+                  DUP ;
+                  DUG 3 ;
+                  ADD ;
+                  DIP { DROP } ;
+                  DIG 1 ;
+                  DUP ;
+                  DUG 2 ;
+                  DIG 1 ;
+                  DUP ;
+                  DUG 2 ;
+                  DIP { DROP 2 } ;
+                  PUSH bool True ;
+                  PAIR }
+                { DUP ; PUSH bool False ; PAIR } ;
+             DIP { DROP } } ;
+         SWAP ;
+         PUSH bool True ;
+         LOOP { DIP { DUP } ; EXEC ; DUP ; CDR ; SWAP ; CAR } ;
+         SWAP ;
+         DROP ;
+         PUSH int 3 ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         COMPARE ;
+         EQ ;
+         NOT ;
+         IF { PUSH string "ko" ; FAILWITH } { PUSH unit Unit } ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 3 } } }

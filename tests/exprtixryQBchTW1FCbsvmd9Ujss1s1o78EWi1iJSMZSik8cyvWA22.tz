@@ -1,0 +1,99 @@
+{ storage (pair (option %myFunc (lambda int int)) (int %value)) ;
+  parameter
+    (or (or (int %callMyFunc) (address %setAdd))
+        (or (address %setAddInOther) (unit %setMyFunc))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CAR ;
+                   DIG 2 ;
+                   CAR ;
+                   IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                   DIG 2 ;
+                   EXEC ;
+                   SWAP ;
+                   PAIR ;
+                   NIL operation } }
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   LAMBDA
+                     int
+                     int
+                     { { DUP ;
+                         PUSH int 0 ;
+                         SWAP ;
+                         COMPARE ;
+                         GE ;
+                         IF { {} } { { PUSH string "x must be greater than 0" ; FAILWITH } } ;
+                         PUSH int 322 ;
+                         ADD } } ;
+                   DIG 3 ;
+                   DROP ;
+                   SOME ;
+                   PAIR ;
+                   SWAP ;
+                   DUP ;
+                   CONTRACT (lambda int int) ;
+                   NIL operation ;
+                   SWAP ;
+                   IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                   PUSH mutez 0 ;
+                   LAMBDA
+                     int
+                     int
+                     { { DUP ;
+                         PUSH int 0 ;
+                         SWAP ;
+                         COMPARE ;
+                         GE ;
+                         IF { {} } { { PUSH string "x must be greater than 0" ; FAILWITH } } ;
+                         PUSH int 322 ;
+                         ADD } } ;
+                   DIG 4 ;
+                   DROP ;
+                   TRANSFER_TOKENS ;
+                   CONS } } }
+           { IF_LEFT
+               { { CONTRACT (lambda int int) ;
+                   NIL operation ;
+                   SWAP ;
+                   IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                   PUSH mutez 0 ;
+                   DIG 3 ;
+                   DUP ;
+                   DUG 4 ;
+                   CAR ;
+                   IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                   TRANSFER_TOKENS ;
+                   CONS } }
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   LAMBDA
+                     int
+                     int
+                     { { DUP ;
+                         PUSH int 0 ;
+                         SWAP ;
+                         COMPARE ;
+                         GE ;
+                         IF { {} } { { PUSH string "x must be greater than 0" ; FAILWITH } } ;
+                         PUSH int 322 ;
+                         MUL } } ;
+                   DIG 3 ;
+                   DROP ;
+                   DIG 2 ;
+                   DROP ;
+                   SOME ;
+                   PAIR ;
+                   NIL operation } } } ;
+         PAIR } }

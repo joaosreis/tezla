@@ -1,0 +1,66 @@
+{ parameter (or (pair %permitParam key (pair signature bytes)) (nat %wrappedParam)) ;
+  storage (pair (big_map (pair bytes address) unit) (pair nat address)) ;
+  code { DUP ;
+         CAR ;
+         DIP { CDR } ;
+         IF_LEFT
+           { DUP ;
+             CAR ;
+             DIP { CDR } ;
+             DIP { DIP { DUP ; CDR ; CAR } ;
+                   DUP ;
+                   CAR ;
+                   DIP { CDR ;
+                         DUP ;
+                         DIG 2 ;
+                         PAIR ;
+                         SELF ;
+                         ADDRESS ;
+                         CHAIN_ID ;
+                         PAIR ;
+                         PAIR ;
+                         PACK } } ;
+             DUP ;
+             DIP { DIP { DIP { DUP } } ;
+                   CHECK_SIGNATURE ;
+                   IF { DROP } { PUSH string "missigned" ; PAIR ; FAILWITH } } ;
+             HASH_KEY ;
+             IMPLICIT_ACCOUNT ;
+             ADDRESS ;
+             SWAP ;
+             PAIR ;
+             DIP { DUP ; CAR ; DIP { CDR } } ;
+             DIP { UNIT ; SOME } ;
+             UPDATE ;
+             DIP { DUP ; CAR ; DIP { CDR } ; PUSH nat 1 ; ADD ; PAIR } ;
+             PAIR ;
+             NIL operation ;
+             PAIR }
+           { LAMBDA
+               (pair (big_map (pair bytes address) unit) (pair bytes address))
+               (big_map (pair bytes address) unit)
+               { DUP ;
+                 CAR ;
+                 DIP { CDR } ;
+                 DIP { DUP ; CAR ; DIP { CDR } ; BLAKE2B ; PAIR } ;
+                 DUP ;
+                 DIG 2 ;
+                 DUP ;
+                 DIP { MEM ; IF {} { PUSH string "no permit" ; FAILWITH } ; NONE unit } ;
+                 UPDATE } ;
+             DIP { DUP ;
+                   PUSH nat 42 ;
+                   COMPARE ;
+                   EQ ;
+                   IF {} { PUSH string "not 42" ; FAILWITH } ;
+                   PACK ;
+                   DIP { DUP ; CAR ; DIP { CDR ; DUP ; CAR ; DIP { CDR } ; SWAP ; DUP } } ;
+                   SWAP ;
+                   DIP { PAIR } ;
+                   PAIR } ;
+             SWAP ;
+             EXEC ;
+             DIP { SWAP ; PAIR } ;
+             PAIR ;
+             NIL operation ;
+             PAIR } } }

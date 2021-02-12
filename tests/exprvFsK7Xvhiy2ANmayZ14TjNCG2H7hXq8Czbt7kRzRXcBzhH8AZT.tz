@@ -1,0 +1,62 @@
+{ storage (map string (pair (mutez %balance) (pair (string %name) (nat %phoneNumber)))) ;
+  parameter
+    (pair (pair (mutez %balance) (string %id)) (pair (string %name) (nat %phoneNumber))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUP ;
+         CAR ;
+         CDR ;
+         PUSH string "" ;
+         COMPARE ;
+         NEQ ;
+         IF { {} }
+            { { PUSH string "WrongCondition: params.id != ''" ; FAILWITH } } ;
+         DUP ;
+         CDR ;
+         CAR ;
+         PUSH string "" ;
+         COMPARE ;
+         NEQ ;
+         IF { {} }
+            { { PUSH string "WrongCondition: params.name != ''" ; FAILWITH } } ;
+         DUP ;
+         CDR ;
+         CDR ;
+         PUSH nat 0 ;
+         COMPARE ;
+         LT ;
+         IF { {} }
+            { { PUSH string "WrongCondition: params.phoneNumber > 0" ; FAILWITH } } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         CDR ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CDR ;
+         CAR ;
+         PAIR %name %phoneNumber ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CAR ;
+         CAR ;
+         PAIR %balance ;
+         SOME ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CAR ;
+         CDR ;
+         UPDATE ;
+         DUG 2 ;
+         DROP 2 ;
+         NIL operation ;
+         PAIR } }

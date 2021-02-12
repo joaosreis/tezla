@@ -1,0 +1,129 @@
+{ storage (pair (option %myFunc (lambda int int)) (pair (bytes %packedFunc) (int %value))) ;
+  parameter
+    (or (or (int %callMyFunc) (int %callMyFunc2))
+        (or (unit %callMyFunc3) (or (unit %setAdd) (address %setAddInOther)))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { IF_LEFT
+                 { { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     SWAP ;
+                     CDR ;
+                     CAR ;
+                     DIG 3 ;
+                     CAR ;
+                     IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                     DIG 3 ;
+                     EXEC ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } }
+                 { { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     SWAP ;
+                     CDR ;
+                     CAR ;
+                     DIG 3 ;
+                     CDR ;
+                     CAR ;
+                     UNPACK (lambda int int) ;
+                     IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                     DIG 3 ;
+                     EXEC ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } } ;
+               NIL operation } }
+           { IF_LEFT
+               { { DROP ;
+                   DUP ;
+                   DUP ;
+                   CAR ;
+                   SWAP ;
+                   CDR ;
+                   CAR ;
+                   PUSH int 322 ;
+                   DIG 3 ;
+                   CDR ;
+                   CDR ;
+                   ADD ;
+                   SWAP ;
+                   PAIR ;
+                   SWAP ;
+                   PAIR ;
+                   NIL operation } }
+               { IF_LEFT
+                   { { SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       CDR ;
+                       LAMBDA
+                         int
+                         int
+                         { { DUP ;
+                             PUSH int 0 ;
+                             SWAP ;
+                             COMPARE ;
+                             GE ;
+                             IF { {} } { { PUSH string "x must be greater than 0" ; FAILWITH } } ;
+                             PUSH int 322 ;
+                             ADD } } ;
+                       DIG 3 ;
+                       DROP ;
+                       SOME ;
+                       PAIR ;
+                       SWAP ;
+                       SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       DUP ;
+                       CAR ;
+                       SWAP ;
+                       CDR ;
+                       CDR ;
+                       LAMBDA
+                         int
+                         int
+                         { { DUP ;
+                             PUSH int 0 ;
+                             SWAP ;
+                             COMPARE ;
+                             GE ;
+                             IF { {} } { { PUSH string "x must be greater than 0" ; FAILWITH } } ;
+                             PUSH int 322 ;
+                             ADD } } ;
+                       DIG 4 ;
+                       DROP ;
+                       DIG 3 ;
+                       DROP ;
+                       SOME ;
+                       IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                       PACK ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       NIL operation } }
+                   { { CONTRACT (lambda int int) ;
+                       NIL operation ;
+                       SWAP ;
+                       IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                       PUSH mutez 0 ;
+                       DIG 3 ;
+                       DUP ;
+                       DUG 4 ;
+                       CAR ;
+                       IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                       TRANSFER_TOKENS ;
+                       CONS } } } } ;
+         PAIR } }

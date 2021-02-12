@@ -1,0 +1,43 @@
+{ storage
+    (pair int
+          (pair (big_map nat (lambda (pair unit int) (pair (list operation) int)))
+                (big_map nat (lambda (pair unit int) (pair (list operation) int))))) ;
+  parameter (or (unit %add) (unit %multiply)) ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DIG 2 ;
+         IF_LEFT
+           { { PAIR ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               CAR ;
+               PUSH nat 0 ;
+               GET ;
+               IF_NONE { { PUSH string "missing entry point" ; FAILWITH } } {} ;
+               SWAP ;
+               EXEC } }
+           { { PAIR ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               CDR ;
+               PUSH nat 0 ;
+               GET ;
+               IF_NONE { { PUSH string "missing entry point" ; FAILWITH } } {} ;
+               SWAP ;
+               EXEC } } ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUG 2 ;
+         PAIR ;
+         SWAP ;
+         PAIR } }

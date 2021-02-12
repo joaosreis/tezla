@@ -1,0 +1,28 @@
+{ storage (map string int) ;
+  parameter string ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         DUG 2 ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         MEM ;
+         IF { { SWAP ;
+                DUP ;
+                PUSH int 1 ;
+                SWAP ;
+                DIG 3 ;
+                DUP ;
+                DUG 4 ;
+                GET ;
+                IF_NONE { { PUSH string "Get-item:8" ; FAILWITH } } {} ;
+                ADD ;
+                SOME ;
+                DIG 2 ;
+                UPDATE } }
+            { { SWAP ; PUSH (option int) (Some 1) ; DIG 2 ; UPDATE } } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,19 @@
+{ parameter (or string address) ;
+  storage address ;
+  code { DUP ;
+         DUP ;
+         CAR ;
+         IF_LEFT
+           { SWAP ;
+             CDR ;
+             CONTRACT string ;
+             IF_NONE
+               { DROP ; NIL operation ; DIP { CDR } }
+               { SWAP ;
+                 DIP { PUSH mutez 0 } ;
+                 TRANSFER_TOKENS ;
+                 DIP { NIL operation } ;
+                 CONS ;
+                 DIP { CDR } } }
+           { SWAP ; DROP ; SWAP ; DROP ; NIL operation } ;
+         PAIR } }

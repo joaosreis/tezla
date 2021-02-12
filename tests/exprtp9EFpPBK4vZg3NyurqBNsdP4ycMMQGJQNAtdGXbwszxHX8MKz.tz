@@ -1,0 +1,8 @@
+{ parameter (or (int %increment) (int %decrement)) ;
+  storage int ;
+  code { DUP ;
+         DIP { CDR @storage } ;
+         CAR @parameter ;
+         IF_LEFT { ADD } { SUB } ;
+         NIL operation ;
+         PAIR } }

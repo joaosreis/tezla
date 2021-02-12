@@ -1,0 +1,3 @@
+{ storage (pair (map %l int int) (big_map %x int int)) ;
+  parameter unit ;
+  code { CDR ; NIL operation ; PAIR } }

@@ -1,0 +1,26 @@
+{ parameter (or (or (nat %divide) (unit %double)) (nat %replace)) ;
+  storage nat ;
+  code { { DUP ;
+           CDR ;
+           SWAP ;
+           CAR ;
+           IF_LEFT
+             { { IF_LEFT
+                   { { DUP ;
+                       PUSH nat 5 ;
+                       COMPARE ;
+                       LT ;
+                       IF {} { { PUSH string "WrongCondition: params.divisor > 5" ; FAILWITH } } ;
+                       DUP ;
+                       DIG 2 ;
+                       DUP ;
+                       DUG 3 ;
+                       EDIV ;
+                       { IF_NONE { { PUSH string "division by zero" ; FAILWITH } } { { CAR } } } ;
+                       DUG 2 ;
+                       DROP ;
+                       DROP } }
+                   { { PUSH nat 2 ; DIG 2 ; DUP ; DUG 3 ; MUL ; DUG 2 ; DROP ; DROP } } } }
+             { { SWAP ; DROP } } ;
+           NIL operation ;
+           PAIR } } }

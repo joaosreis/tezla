@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (map string string) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

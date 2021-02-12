@@ -1,0 +1,290 @@
+{ parameter
+    (or (pair %makeOrder
+           (pair (pair (nat %amount_from) (nat %amount_to))
+                 (pair (timestamp %deadline) (address %sender)))
+           (pair (address %token_from) (address %token_to)))
+        (pair %takeOrder (nat %order_id) (address %take_for))) ;
+  storage
+    (pair (pair (nat %counter)
+                (big_map %order_book
+                   nat
+                   (pair (pair (pair (pair (nat %amount_from) (nat %amount_to))
+                                     (pair (timestamp %deadline) (address %sender)))
+                               (pair (address %token_from) (address %token_to)))
+                         nat)))
+          (address %owner)) ;
+  code { PUSH address "tz1burnburnburnburnburnburnburjAYjjX" ;
+         PUSH string "63" ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CDR ;
+         DIG 3 ;
+         CAR ;
+         IF_LEFT
+           { SWAP ;
+             DIG 3 ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             CAR ;
+             COMPARE ;
+             EQ ;
+             IF { PUSH bool True } { PUSH bool False } ;
+             IF { DIG 2 ;
+                  PUSH mutez 1000000 ;
+                  DIG 3 ;
+                  DUP ;
+                  DUG 4 ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  MUL ;
+                  AMOUNT ;
+                  COMPARE ;
+                  EQ ;
+                  LAMBDA
+                    (pair bool string)
+                    unit
+                    { DUP ; CDR ; SWAP ; CAR ; IF { DROP ; PUSH unit Unit } { FAILWITH } } ;
+                  SWAP ;
+                  APPLY ;
+                  SWAP ;
+                  EXEC }
+                { DIG 2 ; DROP ; PUSH unit Unit } ;
+             DROP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             CDR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             DIG 5 ;
+             PAIR ;
+             SOME ;
+             DIG 3 ;
+             UPDATE ;
+             PUSH nat 1 ;
+             DIG 3 ;
+             CAR ;
+             CAR ;
+             ADD ;
+             PAIR ;
+             PAIR ;
+             NIL operation ;
+             PAIR }
+           { DUP ;
+             DUG 2 ;
+             CDR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             AND ;
+             IF { PUSH string "64" ; FAILWITH } { UNIT } ;
+             DROP ;
+             DUP ;
+             CAR ;
+             CDR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             GET ;
+             IF_NONE { PUSH string "61" ; FAILWITH } {} ;
+             CAR ;
+             PUSH string "62" ;
+             NOW ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             COMPARE ;
+             GE ;
+             LAMBDA
+               (pair bool string)
+               unit
+               { DUP ; CDR ; SWAP ; CAR ; IF { DROP ; PUSH unit Unit } { FAILWITH } } ;
+             SWAP ;
+             APPLY ;
+             SWAP ;
+             EXEC ;
+             DROP ;
+             DIG 4 ;
+             DUP ;
+             DUG 5 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CAR ;
+             COMPARE ;
+             EQ ;
+             IF { PUSH bool True } { PUSH bool False } ;
+             IF { DIG 2 ;
+                  DUP ;
+                  DUG 3 ;
+                  CDR ;
+                  CONTRACT unit ;
+                  IF_NONE { PUSH string "No contract" ; FAILWITH } {} ;
+                  PUSH mutez 1000000 ;
+                  DIG 2 ;
+                  DUP ;
+                  DUG 3 ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  MUL ;
+                  UNIT ;
+                  TRANSFER_TOKENS }
+                { DUP ;
+                  CDR ;
+                  CAR ;
+                  CONTRACT %transferFrom
+                    (list (pair (pair (nat %amount) (address %tr_from)) (address %tr_to))) ;
+                  IF_NONE
+                    { PUSH string "bad address for get_entrypoint (%transferFrom)" ; FAILWITH }
+                    {} ;
+                  PUSH mutez 0 ;
+                  NIL (pair (pair nat address) address) ;
+                  DIG 5 ;
+                  DUP ;
+                  DUG 6 ;
+                  CDR ;
+                  DIG 4 ;
+                  DUP ;
+                  DUG 5 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  DIG 5 ;
+                  DUP ;
+                  DUG 6 ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  PAIR ;
+                  CONS ;
+                  TRANSFER_TOKENS } ;
+             DIG 5 ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             CDR ;
+             COMPARE ;
+             EQ ;
+             IF { PUSH bool True } { PUSH bool False } ;
+             IF { SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CONTRACT unit ;
+                  IF_NONE { PUSH string "No contract" ; FAILWITH } {} ;
+                  DIG 5 ;
+                  PUSH mutez 1000000 ;
+                  DIG 4 ;
+                  DUP ;
+                  DUG 5 ;
+                  CAR ;
+                  CAR ;
+                  CDR ;
+                  MUL ;
+                  AMOUNT ;
+                  COMPARE ;
+                  EQ ;
+                  LAMBDA
+                    (pair bool string)
+                    unit
+                    { DUP ; CDR ; SWAP ; CAR ; IF { DROP ; PUSH unit Unit } { FAILWITH } } ;
+                  SWAP ;
+                  APPLY ;
+                  SWAP ;
+                  EXEC ;
+                  DROP ;
+                  PUSH mutez 1000000 ;
+                  DIG 3 ;
+                  CAR ;
+                  CAR ;
+                  CDR ;
+                  MUL ;
+                  UNIT ;
+                  TRANSFER_TOKENS }
+                { DIG 4 ;
+                  DROP ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  CDR ;
+                  CONTRACT %transferFrom
+                    (list (pair (pair (nat %amount) (address %tr_from)) (address %tr_to))) ;
+                  IF_NONE
+                    { PUSH string "bad address for get_entrypoint (%transferFrom)" ; FAILWITH }
+                    {} ;
+                  PUSH mutez 0 ;
+                  NIL (pair (pair nat address) address) ;
+                  DIG 4 ;
+                  DUP ;
+                  DUG 5 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  DIG 7 ;
+                  DUP ;
+                  DUG 8 ;
+                  CDR ;
+                  DIG 6 ;
+                  CAR ;
+                  CAR ;
+                  CDR ;
+                  PAIR ;
+                  PAIR ;
+                  CONS ;
+                  TRANSFER_TOKENS } ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             CAR ;
+             CDR ;
+             DIG 5 ;
+             CAR ;
+             NONE (pair (pair (pair (pair nat nat) (pair timestamp address)) (pair address address)) nat) ;
+             SWAP ;
+             UPDATE ;
+             DIG 4 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR ;
+             NIL operation ;
+             DIG 2 ;
+             CONS ;
+             DIG 2 ;
+             CONS ;
+             PAIR } } }

@@ -1,0 +1,27 @@
+{ storage (pair (bytes %x1) (pair (bytes %x2) (bytes %y))) ;
+  parameter key_hash ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         CAR ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         PACK ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         DUG 2 ;
+         DROP ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

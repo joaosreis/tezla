@@ -1,0 +1,9 @@
+{ parameter (or (unit %depositFunds) (unit %entry2Deposit)) ;
+  storage unit ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT { DROP } { DROP } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,74 @@
+{ parameter (or (or (list %setList nat) (map %setMap nat mutez)) (set %setSet nat)) ;
+  storage (pair (pair (list %list1 nat) (map %map1 nat mutez)) (set %set1 nat)) ;
+  code { LAMBDA
+           (pair (pair (pair (list nat) (map nat mutez)) (set nat)) (set nat))
+           (pair (pair (list nat) (map nat mutez)) (set nat))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DIP { DUP } ;
+             SWAP ;
+             DIP { DROP 3 } } ;
+         LAMBDA
+           (pair (pair (pair (list nat) (map nat mutez)) (set nat)) (map nat mutez))
+           (pair (pair (list nat) (map nat mutez)) (set nat))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DIP { DUP } ;
+             SWAP ;
+             DIP { DROP 3 } } ;
+         LAMBDA
+           (pair (pair (pair (list nat) (map nat mutez)) (set nat)) (list nat))
+           (pair (pair (list nat) (map nat mutez)) (set nat))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DIP { DUP } ;
+             SWAP ;
+             DIP { DROP 3 } } ;
+         DIP 3 { DUP } ;
+         DIG 3 ;
+         CAR ;
+         DIP 4 { DUP } ;
+         DIG 4 ;
+         CDR ;
+         DIP { DUP } ;
+         SWAP ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DUP ;
+                 DIP 3 { DUP } ;
+                 DIG 3 ;
+                 DIP { DUP } ;
+                 PAIR ;
+                 DIP { DIP 5 { DUP } ; DIG 5 } ;
+                 EXEC ;
+                 DIP { DROP 2 } }
+               { DUP ;
+                 DIP 3 { DUP } ;
+                 DIG 3 ;
+                 DIP { DUP } ;
+                 PAIR ;
+                 DIP { DIP 6 { DUP } ; DIG 6 } ;
+                 EXEC ;
+                 DIP { DROP 2 } } ;
+             DIP { DROP } }
+           { DUP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             DIP { DUP } ;
+             PAIR ;
+             DIP { DIP 6 { DUP } ; DIG 6 } ;
+             EXEC ;
+             DIP { DROP 2 } } ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 6 } } }

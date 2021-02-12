@@ -7,13 +7,17 @@ license: "MIT"
 homepage: "https://gitlab.com/releaselab/fresco/tezla"
 bug-reports: "https://gitlab.com/releaselab/fresco/tezla/issues"
 depends: [
-  "dune" {build}
-  "zarith" {build}
-  "batteries" {build}
-  "michelson" {build}
+  "dune" {>= "2.8" & build}
+  "bisect_ppx" {with-test}
+  "ppx_inline_test" {with-test}
+  "alcotest" {with-test}
+  "zarith"
+  "batteries"
+  "michelson"
+  "odoc" {with-doc}
 ]
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   [
     "dune"
     "build"
@@ -27,3 +31,6 @@ build: [
   ]
 ]
 dev-repo: "git+https://gitlab.com/releaselab/fresco/tezla.git"
+pin-depends: [
+    "michelson.dev" "git+https://gitlab.com/releaselab/fresco/michelson.git#carthage"
+]

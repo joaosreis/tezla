@@ -1,0 +1,12 @@
+{ parameter
+    (big_map %update
+       (string :assetcode)
+       (pair (timestamp %start)
+             (pair (timestamp %end)
+                   (pair (nat %open) (pair (nat %high) (pair (nat %low) (pair (nat %close) (nat %volume)))))))) ;
+  storage
+    (pair (pair (string %assetCode) (pair (nat %computedPrice) (timestamp %lastUpdateTime)))
+          (pair (pair (int %numDataPoints) (address %oracleContract))
+                (pair (pair %prices (pair (int %first) (int %last)) (pair (map %saved int nat) (nat %sum)))
+                      (pair %volumes (pair (int %first) (int %last)) (pair (map %saved int nat) (nat %sum)))))) ;
+  code { CDR ; NIL operation ; PAIR } }

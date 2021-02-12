@@ -1,0 +1,45 @@
+{ storage (pair (address %admin) (nat %storedValue)) ;
+  parameter
+    (or (nat %divide) (or (pair %double (bool %boolParam) (nat %value)) (nat %replace))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             PUSH nat 5 ;
+             COMPARE ;
+             LT ;
+             IF {} { PUSH string "WrongCondition: params.divisor > 5" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             SWAP ;
+             CDR ;
+             DIG 2 ;
+             SWAP ;
+             EDIV ;
+             IF_NONE { PUSH int 24 ; FAILWITH } { CAR } ;
+             SWAP ;
+             PAIR }
+           { IF_LEFT
+               { DUP ;
+                 CAR ;
+                 PUSH bool True ;
+                 COMPARE ;
+                 EQ ;
+                 IF { SWAP ; DUP ; CAR ; SWAP ; CDR ; DIG 2 ; CDR ; MUL ; SWAP ; PAIR }
+                    { SWAP ; DUP ; CAR ; SWAP ; CDR ; DIG 2 ; CDR ; ADD ; SWAP ; PAIR } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Not allowed." ; FAILWITH } ;
+                 SWAP ;
+                 CAR ;
+                 PAIR } } ;
+         NIL operation ;
+         PAIR } }

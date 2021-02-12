@@ -1,0 +1,35 @@
+{ parameter
+    (or :message
+       (bytes %Invoke)
+       (lambda %Update (pair bytes bytes) (pair (list operation) bytes))) ;
+  storage (pair :store (bytes %wfunc) (bytes %wstore)) ;
+  code { {} ;
+         { DUP ; CDR ; DIP { CAR } } ;
+         { { DUP ; CAR } ;
+           { { DIG 1 ; DUP ; DUG 2 } ; CDR } ;
+           { DIG 3 ; DUP ; DUG 4 } ;
+           IF_LEFT
+             { { { { DIG 2 ; DUP ; DUG 3 } ;
+                   UNPACK (lambda (pair bytes bytes) (pair (list operation) bytes)) } ;
+                 DUP ;
+                 IF_NONE
+                   { PUSH string "wfunc cannot be unpacked" ; FAILWITH }
+                   { DUP ; DIP { DROP } } ;
+                 DIP { DROP } } ;
+               { DUP ;
+                 { DIG 3 ; DUP ; DUG 4 } ;
+                 { DIG 3 ; DUP ; DUG 4 } ;
+                 PAIR ;
+                 EXEC } ;
+               { DUP ; CAR } ;
+               { { DIG 1 ; DUP ; DUG 2 } ; CDR } ;
+               DUP ;
+               { DIG 8 ; DUP ; DUG 9 } ;
+               CAR ;
+               PAIR ;
+               { DIG 2 ; DUP ; DUG 3 } ;
+               PAIR ;
+               DIP { DROP 5 } }
+             { PUSH string "not implemented" ; FAILWITH } ;
+           DIP { DROP 2 } } ;
+         DIP { DROP 2 } } }

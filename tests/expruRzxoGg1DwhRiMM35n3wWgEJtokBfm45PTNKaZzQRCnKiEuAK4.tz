@@ -1,0 +1,9 @@
+{ storage unit ;
+  parameter (or (unit %cashReceived) (or (unit %cashSent) (unit %forgeTokenCreated))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT { { DROP } } { IF_LEFT { { DROP } } { { DROP } } } ;
+         NIL operation ;
+         PAIR } }

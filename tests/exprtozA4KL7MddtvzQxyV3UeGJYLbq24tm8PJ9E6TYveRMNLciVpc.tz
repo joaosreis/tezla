@@ -1,0 +1,1643 @@
+{ parameter
+    (or (or (or (or string string) (or (pair string address) address))
+            (or (or (pair (pair address (pair nat (option timestamp)))
+                          (pair (option nat) (pair (option string) (option timestamp))))
+                    (pair address nat))
+                (or (pair address nat) (pair address (pair address nat)))))
+        (or (or address (or (pair address nat) address)) bool)) ;
+  storage
+    (pair (big_map
+             bytes
+             (or (or (pair (pair nat address)
+                           (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                     (pair string (pair address address)))
+                 (or (or nat (or nat (map address nat))) nat)))
+          (pair (pair (pair (pair string (pair string nat)) nat) (pair nat (pair nat nat)))
+                (pair address bool))) ;
+  code { DUP ;
+         CAR ;
+         DIP { CDR } ;
+         IF_LEFT
+           { IF_LEFT
+               { DIP { DUP ; CAR ; DIP { CDR } } ;
+                 DIP { DIP { DUP } ; SWAP } ;
+                 SWAP ;
+                 DIP { DIP { DIP { DROP } } } ;
+                 DIP { IF_LEFT
+                         { IF_LEFT
+                             { DIP { DUP } ;
+                               SWAP ;
+                               SENDER ;
+                               PUSH nat 5 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE nat }
+                                 { IF_LEFT
+                                     { PUSH nat 0 ; FAILWITH }
+                                     { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 0 } {} ;
+                               PUSH nat 7 ;
+                               AND ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               NOT ;
+                               IF {} { PUSH nat 1 ; FAILWITH } ;
+                               DIP { PUSH nat 0 ;
+                                     DIP { SENDER } ;
+                                     PAIR ;
+                                     DIP { NONE string ;
+                                           DIP { SENDER ;
+                                                 DIP { EMPTY_MAP nat (pair nat (pair timestamp (option bytes))) } ;
+                                                 PAIR } ;
+                                           PAIR } ;
+                                     PAIR } ;
+                               DIP { DIP { DUP } ; SWAP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               PUSH nat 0 ;
+                               PAIR ;
+                               PACK ;
+                               MEM ;
+                               IF { DROP ;
+                                    PUSH (or (or (or unit unit) (or unit unit)) (or (or unit unit) (or nat (or (or unit unit) unit))))
+                                         (Left (Left (Right Unit))) ;
+                                    FAILWITH }
+                                  { PUSH nat 0 ;
+                                    PAIR ;
+                                    PACK ;
+                                    DIP { LEFT (pair string (pair address address)) ;
+                                          LEFT (or (or nat (or nat (map address nat))) nat) ;
+                                          SOME } ;
+                                    UPDATE } ;
+                               NIL operation }
+                             { DIP { DUP } ;
+                               SWAP ;
+                               SENDER ;
+                               PUSH nat 5 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE nat }
+                                 { IF_LEFT
+                                     { PUSH nat 0 ; FAILWITH }
+                                     { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 0 } {} ;
+                               PUSH nat 7 ;
+                               AND ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               NOT ;
+                               IF {} { PUSH nat 1 ; FAILWITH } ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               PUSH nat 0 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE (pair (pair nat address)
+                                              (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes))))))) }
+                                 { IF_LEFT
+                                     { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                     { PUSH nat 0 ; FAILWITH } ;
+                                   SOME } ;
+                               IF_NONE
+                                 { PUSH nat 2 ; FAILWITH }
+                                 { CAR ;
+                                   CDR ;
+                                   DIP { SENDER ;
+                                         PUSH nat 5 ;
+                                         PAIR ;
+                                         PACK ;
+                                         GET ;
+                                         IF_NONE
+                                           { NONE nat }
+                                           { IF_LEFT
+                                               { PUSH nat 0 ; FAILWITH }
+                                               { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                                             SOME } ;
+                                         IF_NONE { PUSH nat 0 } {} ;
+                                         PUSH nat 4 ;
+                                         COMPARE ;
+                                         EQ } ;
+                                   SENDER ;
+                                   COMPARE ;
+                                   EQ ;
+                                   NOT ;
+                                   AND ;
+                                   IF { PUSH nat 3 ; FAILWITH } {} } ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DUP ;
+                               DIP { SWAP } ;
+                               PUSH nat 0 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE (pair (pair nat address)
+                                              (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes))))))) }
+                                 { IF_LEFT
+                                     { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                     { PUSH nat 0 ; FAILWITH } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 2 ; FAILWITH } { DIP { DROP } } ;
+                               CAR ;
+                               CAR ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               IF {} { PUSH nat 4 ; FAILWITH } ;
+                               PUSH nat 0 ;
+                               PAIR ;
+                               PACK ;
+                               DIP { NONE (or (or (pair (pair nat address)
+                                                        (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                  (pair string (pair address address)))
+                                              (or (or nat (or nat (map address nat))) nat)) } ;
+                               UPDATE ;
+                               NIL operation } }
+                         { IF_LEFT
+                             { DUP ;
+                               CAR ;
+                               DIP { CDR } ;
+                               DIP { DIP { DUP } ; SWAP } ;
+                               SWAP ;
+                               SENDER ;
+                               PUSH nat 5 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE nat }
+                                 { IF_LEFT
+                                     { PUSH nat 0 ; FAILWITH }
+                                     { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 0 } {} ;
+                               PUSH nat 7 ;
+                               AND ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               NOT ;
+                               IF {} { PUSH nat 1 ; FAILWITH } ;
+                               DIP { DUP ; DROP ; PUSH bool False ; IF { PUSH nat 5 ; FAILWITH } {} } ;
+                               DUP ;
+                               DIP { SWAP ;
+                                     DIP { DUP ; DIP { SENDER ; DIP { SENDER } ; PAIR } ; PAIR } ;
+                                     DIP { DIP { DROP } } ;
+                                     DIP { DIP { DUP } ; SWAP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 1 ;
+                                     PAIR ;
+                                     PACK ;
+                                     MEM ;
+                                     IF { DROP ;
+                                          PUSH (or (or (or unit unit) (or unit unit)) (or (or unit unit) (or nat (or (or unit unit) unit))))
+                                               (Left (Right (Right Unit))) ;
+                                          FAILWITH }
+                                        { PUSH nat 1 ;
+                                          PAIR ;
+                                          PACK ;
+                                          DIP { RIGHT
+                                                  (pair (pair nat address)
+                                                        (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes))))))) ;
+                                                LEFT (or (or nat (or nat (map address nat))) nat) ;
+                                                SOME } ;
+                                          UPDATE } } ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DUP ;
+                               DIP { SWAP } ;
+                               PUSH nat 0 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE (pair (pair nat address)
+                                              (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes))))))) }
+                                 { IF_LEFT
+                                     { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                     { PUSH nat 0 ; FAILWITH } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 2 ; FAILWITH } { DIP { DROP } } ;
+                               DUP ;
+                               CAR ;
+                               CAR ;
+                               PUSH nat 1 ;
+                               ADD ;
+                               DIP { DUP ; DIP { CDR } ; CAR } ;
+                               DIP { DUP ; DIP { CDR } ; CAR } ;
+                               DIP { DROP } ;
+                               PAIR ;
+                               PAIR ;
+                               SWAP ;
+                               PUSH nat 0 ;
+                               PAIR ;
+                               PACK ;
+                               DIP { LEFT (pair string (pair address address)) ;
+                                     LEFT (or (or nat (or nat (map address nat))) nat) ;
+                                     SOME } ;
+                               UPDATE ;
+                               NIL operation }
+                             { DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               PUSH nat 2 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE nat }
+                                 { IF_LEFT
+                                     { PUSH nat 0 ; FAILWITH }
+                                     { IF_LEFT
+                                         { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                         { PUSH nat 0 ; FAILWITH } } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 0 } {} ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               IF {} { PUSH nat 6 ; FAILWITH } ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               SENDER ;
+                               PUSH nat 5 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE nat }
+                                 { IF_LEFT
+                                     { PUSH nat 0 ; FAILWITH }
+                                     { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 0 } {} ;
+                               PUSH nat 7 ;
+                               AND ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               NOT ;
+                               IF {} { PUSH nat 1 ; FAILWITH } ;
+                               DIP { DUP } ;
+                               DUP ;
+                               DIP { PUSH nat 1 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE (pair string (pair address address)) }
+                                       { IF_LEFT
+                                           { IF_LEFT { PUSH nat 0 ; FAILWITH } {} }
+                                           { PUSH nat 0 ; FAILWITH } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 7 ; FAILWITH } { CAR } } ;
+                               DIP { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     DUP ;
+                                     DIP { SWAP } ;
+                                     PUSH nat 0 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE (pair (pair nat address)
+                                                    (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes))))))) }
+                                       { IF_LEFT
+                                           { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                           { PUSH nat 0 ; FAILWITH } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 2 ; FAILWITH } { DIP { DROP } } ;
+                                     DUP ;
+                                     CAR ;
+                                     CAR ;
+                                     PUSH nat 1 ;
+                                     SWAP ;
+                                     SUB ;
+                                     ISNAT ;
+                                     IF_NONE { PUSH nat 8 ; FAILWITH } {} ;
+                                     DIP { DUP ; DIP { CDR } ; CAR } ;
+                                     DIP { DUP ; DIP { CDR } ; CAR } ;
+                                     DIP { DROP } ;
+                                     PAIR ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PUSH nat 0 ;
+                                     PAIR ;
+                                     PACK ;
+                                     DIP { LEFT (pair string (pair address address)) ;
+                                           LEFT (or (or nat (or nat (map address nat))) nat) ;
+                                           SOME } ;
+                                     UPDATE } ;
+                               PUSH nat 1 ;
+                               PAIR ;
+                               PACK ;
+                               DIP { NONE (or (or (pair (pair nat address)
+                                                        (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                  (pair string (pair address address)))
+                                              (or (or nat (or nat (map address nat))) nat)) } ;
+                               UPDATE ;
+                               NIL operation } } } ;
+                 SWAP ;
+                 DIP { SWAP } ;
+                 DIP { PAIR } ;
+                 PAIR }
+               { DIP { DUP ; CAR ; DIP { CDR } } ;
+                 IF_LEFT
+                   { IF_LEFT
+                       { DIP { DUP } ;
+                         SWAP ;
+                         SENDER ;
+                         PUSH nat 5 ;
+                         PAIR ;
+                         PACK ;
+                         GET ;
+                         IF_NONE
+                           { NONE nat }
+                           { IF_LEFT
+                               { PUSH nat 0 ; FAILWITH }
+                               { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                             SOME } ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         PUSH nat 3 ;
+                         AND ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         NOT ;
+                         IF {} { PUSH nat 9 ; FAILWITH } ;
+                         DUP ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         DIP { CAR ; CAR } ;
+                         DUP ;
+                         DIP { DUP ;
+                               DIP { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DIP { DIP { DUP } ; SWAP } ;
+                                           SWAP ;
+                                           DIP { DIP { DUP } ; SWAP } ;
+                                           SWAP ;
+                                           PUSH nat 1 ;
+                                           PAIR ;
+                                           PACK ;
+                                           MEM ;
+                                           IF {} { PUSH nat 7 ; FAILWITH } ;
+                                           DIP { DIP { DUP } ;
+                                                 SWAP ;
+                                                 DIP { DUP } ;
+                                                 SWAP ;
+                                                 PUSH nat 2 ;
+                                                 PAIR ;
+                                                 PACK ;
+                                                 GET ;
+                                                 IF_NONE
+                                                   { NONE nat }
+                                                   { IF_LEFT
+                                                       { PUSH nat 0 ; FAILWITH }
+                                                       { IF_LEFT
+                                                           { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                                           { PUSH nat 0 ; FAILWITH } } ;
+                                                     SOME } ;
+                                                 IF_NONE { PUSH nat 0 } {} } ;
+                                           SWAP ;
+                                           ADD ;
+                                           SWAP ;
+                                           PUSH nat 2 ;
+                                           PAIR ;
+                                           PACK ;
+                                           DIP { LEFT (or nat (map address nat)) ;
+                                                 LEFT nat ;
+                                                 RIGHT
+                                                   (or (pair (pair nat address)
+                                                             (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                       (pair string (pair address address))) ;
+                                                 SOME } ;
+                                           UPDATE } } ;
+                               DIP { DIP { DUP } ;
+                                     PUSH nat 1 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE (pair string (pair address address)) }
+                                       { IF_LEFT
+                                           { IF_LEFT { PUSH nat 0 ; FAILWITH } {} }
+                                           { PUSH nat 0 ; FAILWITH } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 7 ; FAILWITH } { CAR } } ;
+                               DIP { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 3 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE nat }
+                                       { IF_LEFT
+                                           { PUSH nat 0 ; FAILWITH }
+                                           { IF_LEFT
+                                               { IF_LEFT
+                                                   { PUSH nat 0 ; FAILWITH }
+                                                   { IF_LEFT {} { PUSH nat 0 ; FAILWITH } } }
+                                               { PUSH nat 0 ; FAILWITH } } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 0 } {} } ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DIP { SWAP ;
+                                           ADD ;
+                                           SWAP ;
+                                           PUSH nat 3 ;
+                                           PAIR ;
+                                           PACK ;
+                                           DIP { LEFT (map address nat) ;
+                                                 RIGHT nat ;
+                                                 LEFT nat ;
+                                                 RIGHT
+                                                   (or (pair (pair nat address)
+                                                             (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                       (pair string (pair address address))) ;
+                                                 SOME } ;
+                                           UPDATE } } ;
+                               DUP ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               IF { DROP ; DROP }
+                                  { DROP ;
+                                    SWAP ;
+                                    DIP { PUSH nat 0 ;
+                                          COMPARE ;
+                                          EQ ;
+                                          IF { DUP ;
+                                               CAR ;
+                                               DUP ;
+                                               CDR ;
+                                               CDR ;
+                                               CDR ;
+                                               PUSH nat 1 ;
+                                               SWAP ;
+                                               ADD ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DROP } ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               DIP { DUP ; DIP { CDR } ; CAR } ;
+                                               DIP { DROP } ;
+                                               PAIR }
+                                             {} } } } ;
+                         DUP ;
+                         DIP { DIP { DIP { DUP } ; SWAP } ;
+                               SWAP ;
+                               CAR ;
+                               CAR ;
+                               CDR ;
+                               ADD ;
+                               SWAP ;
+                               DIP { DIP { DUP ; CAR } ;
+                                     DIP { DUP ; DIP { CDR } ; CAR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     PAIR ;
+                                     DIP { DUP ; DIP { CDR } ; CAR } ;
+                                     DIP { DROP } ;
+                                     PAIR } } ;
+                         DIP { DIP { DUP } ; SWAP ; CAR ; DUP ; CDR ; CDR ; CAR } ;
+                         ADD ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         CDR ;
+                         CAR ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         COMPARE ;
+                         GT ;
+                         IF { PUSH nat 10 ; FAILWITH } {} ;
+                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                         DIP { DUP ; DIP { CDR } ; CAR } ;
+                         DIP { DROP } ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         DIP { DIP { DUP ; DIP { CDR } ; CAR } ; DIP { DROP } ; PAIR } ;
+                         NIL operation }
+                       { DIP { DUP } ;
+                         SWAP ;
+                         SENDER ;
+                         PUSH nat 5 ;
+                         PAIR ;
+                         PACK ;
+                         GET ;
+                         IF_NONE
+                           { NONE nat }
+                           { IF_LEFT
+                               { PUSH nat 0 ; FAILWITH }
+                               { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                             SOME } ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         PUSH nat 3 ;
+                         AND ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         NOT ;
+                         IF {} { PUSH nat 9 ; FAILWITH } ;
+                         DUP ;
+                         CDR ;
+                         DIP { CAR } ;
+                         DUP ;
+                         DIP { DUP ;
+                               DIP { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DIP { DIP { DUP } ; SWAP } ;
+                                           SWAP ;
+                                           DIP { DIP { DUP } ; SWAP } ;
+                                           SWAP ;
+                                           PUSH nat 1 ;
+                                           PAIR ;
+                                           PACK ;
+                                           MEM ;
+                                           IF {} { PUSH nat 7 ; FAILWITH } ;
+                                           DIP { DIP { DUP } ;
+                                                 SWAP ;
+                                                 DIP { DUP } ;
+                                                 SWAP ;
+                                                 PUSH nat 2 ;
+                                                 PAIR ;
+                                                 PACK ;
+                                                 GET ;
+                                                 IF_NONE
+                                                   { NONE nat }
+                                                   { IF_LEFT
+                                                       { PUSH nat 0 ; FAILWITH }
+                                                       { IF_LEFT
+                                                           { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                                           { PUSH nat 0 ; FAILWITH } } ;
+                                                     SOME } ;
+                                                 IF_NONE { PUSH nat 0 } {} } ;
+                                           SWAP ;
+                                           SUB ;
+                                           ISNAT ;
+                                           IF_NONE { PUSH nat 11 ; FAILWITH } {} ;
+                                           SWAP ;
+                                           PUSH nat 2 ;
+                                           PAIR ;
+                                           PACK ;
+                                           DIP { LEFT (or nat (map address nat)) ;
+                                                 LEFT nat ;
+                                                 RIGHT
+                                                   (or (pair (pair nat address)
+                                                             (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                       (pair string (pair address address))) ;
+                                                 SOME } ;
+                                           UPDATE } } ;
+                               DIP { DIP { DUP } ;
+                                     PUSH nat 1 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE (pair string (pair address address)) }
+                                       { IF_LEFT
+                                           { IF_LEFT { PUSH nat 0 ; FAILWITH } {} }
+                                           { PUSH nat 0 ; FAILWITH } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 7 ; FAILWITH } { CAR } } ;
+                               DIP { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 3 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE nat }
+                                       { IF_LEFT
+                                           { PUSH nat 0 ; FAILWITH }
+                                           { IF_LEFT
+                                               { IF_LEFT
+                                                   { PUSH nat 0 ; FAILWITH }
+                                                   { IF_LEFT {} { PUSH nat 0 ; FAILWITH } } }
+                                               { PUSH nat 0 ; FAILWITH } } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 0 } {} } ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DIP { SWAP ;
+                                           SUB ;
+                                           ISNAT ;
+                                           IF_NONE { PUSH nat 11 ; FAILWITH } {} ;
+                                           SWAP ;
+                                           PUSH nat 3 ;
+                                           PAIR ;
+                                           PACK ;
+                                           DIP { LEFT (map address nat) ;
+                                                 RIGHT nat ;
+                                                 LEFT nat ;
+                                                 RIGHT
+                                                   (or (pair (pair nat address)
+                                                             (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                       (pair string (pair address address))) ;
+                                                 SOME } ;
+                                           UPDATE } } ;
+                               DUP ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               IF { DROP ; DROP }
+                                  { DIP { SWAP } ;
+                                    SWAP ;
+                                    DIP { COMPARE ;
+                                          EQ ;
+                                          IF { DUP ;
+                                               CAR ;
+                                               DUP ;
+                                               CDR ;
+                                               CDR ;
+                                               CDR ;
+                                               PUSH nat 1 ;
+                                               SWAP ;
+                                               SUB ;
+                                               ISNAT ;
+                                               IF_NONE { PUSH nat 12 ; FAILWITH } {} ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DROP } ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               DIP { DUP ; DIP { CDR } ; CAR } ;
+                                               DIP { DROP } ;
+                                               PAIR }
+                                             {} } } } ;
+                         DIP { DIP { DUP } ; SWAP } ;
+                         SWAP ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         SUB ;
+                         ISNAT ;
+                         IF_NONE { PUSH nat 11 ; FAILWITH } {} ;
+                         SWAP ;
+                         DIP { DIP { DUP ; CAR } ;
+                               DIP { DUP ; DIP { CDR } ; CAR } ;
+                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                               DIP { DROP } ;
+                               SWAP ;
+                               PAIR ;
+                               PAIR ;
+                               DIP { DUP ; DIP { CDR } ; CAR } ;
+                               DIP { DROP } ;
+                               PAIR } ;
+                         NIL operation } }
+                   { IF_LEFT
+                       { DIP { DIP { DUP } ; SWAP } ;
+                         SWAP ;
+                         CDR ;
+                         CDR ;
+                         IF { PUSH nat 13 ; FAILWITH } {} ;
+                         DUP ;
+                         DIP { CDR ;
+                               DIP { SENDER } ;
+                               DUP ;
+                               DIP { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DIP { DIP { DUP } ; SWAP } ;
+                                           SWAP ;
+                                           DIP { DIP { DUP } ; SWAP } ;
+                                           SWAP ;
+                                           PUSH nat 1 ;
+                                           PAIR ;
+                                           PACK ;
+                                           MEM ;
+                                           IF {} { PUSH nat 7 ; FAILWITH } ;
+                                           DIP { DIP { DUP } ;
+                                                 SWAP ;
+                                                 DIP { DUP } ;
+                                                 SWAP ;
+                                                 PUSH nat 2 ;
+                                                 PAIR ;
+                                                 PACK ;
+                                                 GET ;
+                                                 IF_NONE
+                                                   { NONE nat }
+                                                   { IF_LEFT
+                                                       { PUSH nat 0 ; FAILWITH }
+                                                       { IF_LEFT
+                                                           { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                                           { PUSH nat 0 ; FAILWITH } } ;
+                                                     SOME } ;
+                                                 IF_NONE { PUSH nat 0 } {} } ;
+                                           SWAP ;
+                                           SUB ;
+                                           ISNAT ;
+                                           IF_NONE { PUSH nat 11 ; FAILWITH } {} ;
+                                           SWAP ;
+                                           PUSH nat 2 ;
+                                           PAIR ;
+                                           PACK ;
+                                           DIP { LEFT (or nat (map address nat)) ;
+                                                 LEFT nat ;
+                                                 RIGHT
+                                                   (or (pair (pair nat address)
+                                                             (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                       (pair string (pair address address))) ;
+                                                 SOME } ;
+                                           UPDATE } } ;
+                               DIP { DIP { DUP } ;
+                                     PUSH nat 1 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE (pair string (pair address address)) }
+                                       { IF_LEFT
+                                           { IF_LEFT { PUSH nat 0 ; FAILWITH } {} }
+                                           { PUSH nat 0 ; FAILWITH } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 7 ; FAILWITH } { CAR } } ;
+                               DIP { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 3 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE nat }
+                                       { IF_LEFT
+                                           { PUSH nat 0 ; FAILWITH }
+                                           { IF_LEFT
+                                               { IF_LEFT
+                                                   { PUSH nat 0 ; FAILWITH }
+                                                   { IF_LEFT {} { PUSH nat 0 ; FAILWITH } } }
+                                               { PUSH nat 0 ; FAILWITH } } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 0 } {} } ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DIP { SWAP ;
+                                           SUB ;
+                                           ISNAT ;
+                                           IF_NONE { PUSH nat 11 ; FAILWITH } {} ;
+                                           SWAP ;
+                                           PUSH nat 3 ;
+                                           PAIR ;
+                                           PACK ;
+                                           DIP { LEFT (map address nat) ;
+                                                 RIGHT nat ;
+                                                 LEFT nat ;
+                                                 RIGHT
+                                                   (or (pair (pair nat address)
+                                                             (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                       (pair string (pair address address))) ;
+                                                 SOME } ;
+                                           UPDATE } } ;
+                               DUP ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               IF { DROP ; DROP }
+                                  { DIP { SWAP } ;
+                                    SWAP ;
+                                    DIP { COMPARE ;
+                                          EQ ;
+                                          IF { DUP ;
+                                               CAR ;
+                                               DUP ;
+                                               CDR ;
+                                               CDR ;
+                                               CDR ;
+                                               PUSH nat 1 ;
+                                               SWAP ;
+                                               SUB ;
+                                               ISNAT ;
+                                               IF_NONE { PUSH nat 12 ; FAILWITH } {} ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DROP } ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               DIP { DUP ; DIP { CDR } ; CAR } ;
+                                               DIP { DROP } ;
+                                               PAIR }
+                                             {} } } } ;
+                         DUP ;
+                         CDR ;
+                         DIP { CAR } ;
+                         DUP ;
+                         DIP { DIP { DUP } ;
+                               SWAP ;
+                               DIP { DIP { DIP { DUP } ; SWAP } ;
+                                     SWAP ;
+                                     DIP { DIP { DUP } ; SWAP } ;
+                                     SWAP ;
+                                     PUSH nat 1 ;
+                                     PAIR ;
+                                     PACK ;
+                                     MEM ;
+                                     IF {} { PUSH nat 7 ; FAILWITH } ;
+                                     DIP { DIP { DUP } ;
+                                           SWAP ;
+                                           DIP { DUP } ;
+                                           SWAP ;
+                                           PUSH nat 2 ;
+                                           PAIR ;
+                                           PACK ;
+                                           GET ;
+                                           IF_NONE
+                                             { NONE nat }
+                                             { IF_LEFT
+                                                 { PUSH nat 0 ; FAILWITH }
+                                                 { IF_LEFT
+                                                     { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                                     { PUSH nat 0 ; FAILWITH } } ;
+                                               SOME } ;
+                                           IF_NONE { PUSH nat 0 } {} } ;
+                                     SWAP ;
+                                     ADD ;
+                                     SWAP ;
+                                     PUSH nat 2 ;
+                                     PAIR ;
+                                     PACK ;
+                                     DIP { LEFT (or nat (map address nat)) ;
+                                           LEFT nat ;
+                                           RIGHT
+                                             (or (pair (pair nat address)
+                                                       (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                 (pair string (pair address address))) ;
+                                           SOME } ;
+                                     UPDATE } } ;
+                         DIP { DIP { DUP } ;
+                               PUSH nat 1 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE (pair string (pair address address)) }
+                                 { IF_LEFT
+                                     { IF_LEFT { PUSH nat 0 ; FAILWITH } {} }
+                                     { PUSH nat 0 ; FAILWITH } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 7 ; FAILWITH } { CAR } } ;
+                         DIP { DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               PUSH nat 3 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE nat }
+                                 { IF_LEFT
+                                     { PUSH nat 0 ; FAILWITH }
+                                     { IF_LEFT
+                                         { IF_LEFT
+                                             { PUSH nat 0 ; FAILWITH }
+                                             { IF_LEFT {} { PUSH nat 0 ; FAILWITH } } }
+                                         { PUSH nat 0 ; FAILWITH } } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 0 } {} } ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         DIP { DIP { SWAP ;
+                                     ADD ;
+                                     SWAP ;
+                                     PUSH nat 3 ;
+                                     PAIR ;
+                                     PACK ;
+                                     DIP { LEFT (map address nat) ;
+                                           RIGHT nat ;
+                                           LEFT nat ;
+                                           RIGHT
+                                             (or (pair (pair nat address)
+                                                       (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                 (pair string (pair address address))) ;
+                                           SOME } ;
+                                     UPDATE } } ;
+                         DUP ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         IF { DROP ; DROP }
+                            { DROP ;
+                              SWAP ;
+                              DIP { PUSH nat 0 ;
+                                    COMPARE ;
+                                    EQ ;
+                                    IF { DUP ;
+                                         CAR ;
+                                         DUP ;
+                                         CDR ;
+                                         CDR ;
+                                         CDR ;
+                                         PUSH nat 1 ;
+                                         SWAP ;
+                                         ADD ;
+                                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                                         DIP { DROP } ;
+                                         SWAP ;
+                                         PAIR ;
+                                         SWAP ;
+                                         PAIR ;
+                                         SWAP ;
+                                         PAIR ;
+                                         DIP { DUP ; DIP { CDR } ; CAR } ;
+                                         DIP { DROP } ;
+                                         PAIR }
+                                       {} } } ;
+                         NIL operation }
+                       { DIP { DUP } ;
+                         SWAP ;
+                         SENDER ;
+                         PUSH nat 5 ;
+                         PAIR ;
+                         PACK ;
+                         GET ;
+                         IF_NONE
+                           { NONE nat }
+                           { IF_LEFT
+                               { PUSH nat 0 ; FAILWITH }
+                               { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                             SOME } ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         PUSH nat 3 ;
+                         AND ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         NOT ;
+                         IF {} { PUSH nat 9 ; FAILWITH } ;
+                         DUP ;
+                         DIP { DUP ;
+                               CDR ;
+                               CDR ;
+                               DIP { CAR } ;
+                               DUP ;
+                               DIP { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DIP { DIP { DUP } ; SWAP } ;
+                                           SWAP ;
+                                           DIP { DIP { DUP } ; SWAP } ;
+                                           SWAP ;
+                                           PUSH nat 1 ;
+                                           PAIR ;
+                                           PACK ;
+                                           MEM ;
+                                           IF {} { PUSH nat 7 ; FAILWITH } ;
+                                           DIP { DIP { DUP } ;
+                                                 SWAP ;
+                                                 DIP { DUP } ;
+                                                 SWAP ;
+                                                 PUSH nat 2 ;
+                                                 PAIR ;
+                                                 PACK ;
+                                                 GET ;
+                                                 IF_NONE
+                                                   { NONE nat }
+                                                   { IF_LEFT
+                                                       { PUSH nat 0 ; FAILWITH }
+                                                       { IF_LEFT
+                                                           { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                                           { PUSH nat 0 ; FAILWITH } } ;
+                                                     SOME } ;
+                                                 IF_NONE { PUSH nat 0 } {} } ;
+                                           SWAP ;
+                                           SUB ;
+                                           ISNAT ;
+                                           IF_NONE { PUSH nat 11 ; FAILWITH } {} ;
+                                           SWAP ;
+                                           PUSH nat 2 ;
+                                           PAIR ;
+                                           PACK ;
+                                           DIP { LEFT (or nat (map address nat)) ;
+                                                 LEFT nat ;
+                                                 RIGHT
+                                                   (or (pair (pair nat address)
+                                                             (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                       (pair string (pair address address))) ;
+                                                 SOME } ;
+                                           UPDATE } } ;
+                               DIP { DIP { DUP } ;
+                                     PUSH nat 1 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE (pair string (pair address address)) }
+                                       { IF_LEFT
+                                           { IF_LEFT { PUSH nat 0 ; FAILWITH } {} }
+                                           { PUSH nat 0 ; FAILWITH } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 7 ; FAILWITH } { CAR } } ;
+                               DIP { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 3 ;
+                                     PAIR ;
+                                     PACK ;
+                                     GET ;
+                                     IF_NONE
+                                       { NONE nat }
+                                       { IF_LEFT
+                                           { PUSH nat 0 ; FAILWITH }
+                                           { IF_LEFT
+                                               { IF_LEFT
+                                                   { PUSH nat 0 ; FAILWITH }
+                                                   { IF_LEFT {} { PUSH nat 0 ; FAILWITH } } }
+                                               { PUSH nat 0 ; FAILWITH } } ;
+                                         SOME } ;
+                                     IF_NONE { PUSH nat 0 } {} } ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               DIP { DIP { SWAP ;
+                                           SUB ;
+                                           ISNAT ;
+                                           IF_NONE { PUSH nat 11 ; FAILWITH } {} ;
+                                           SWAP ;
+                                           PUSH nat 3 ;
+                                           PAIR ;
+                                           PACK ;
+                                           DIP { LEFT (map address nat) ;
+                                                 RIGHT nat ;
+                                                 LEFT nat ;
+                                                 RIGHT
+                                                   (or (pair (pair nat address)
+                                                             (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                       (pair string (pair address address))) ;
+                                                 SOME } ;
+                                           UPDATE } } ;
+                               DUP ;
+                               PUSH nat 0 ;
+                               COMPARE ;
+                               EQ ;
+                               IF { DROP ; DROP }
+                                  { DIP { SWAP } ;
+                                    SWAP ;
+                                    DIP { COMPARE ;
+                                          EQ ;
+                                          IF { DUP ;
+                                               CAR ;
+                                               DUP ;
+                                               CDR ;
+                                               CDR ;
+                                               CDR ;
+                                               PUSH nat 1 ;
+                                               SWAP ;
+                                               SUB ;
+                                               ISNAT ;
+                                               IF_NONE { PUSH nat 12 ; FAILWITH } {} ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DUP ; DIP { CAR } ; CDR } ;
+                                               DIP { DROP } ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               DIP { DUP ; DIP { CDR } ; CAR } ;
+                                               DIP { DROP } ;
+                                               PAIR }
+                                             {} } } } ;
+                         DUP ;
+                         CDR ;
+                         CDR ;
+                         DIP { CDR ; CAR } ;
+                         DUP ;
+                         DIP { DIP { DUP } ;
+                               SWAP ;
+                               DIP { DIP { DIP { DUP } ; SWAP } ;
+                                     SWAP ;
+                                     DIP { DIP { DUP } ; SWAP } ;
+                                     SWAP ;
+                                     PUSH nat 1 ;
+                                     PAIR ;
+                                     PACK ;
+                                     MEM ;
+                                     IF {} { PUSH nat 7 ; FAILWITH } ;
+                                     DIP { DIP { DUP } ;
+                                           SWAP ;
+                                           DIP { DUP } ;
+                                           SWAP ;
+                                           PUSH nat 2 ;
+                                           PAIR ;
+                                           PACK ;
+                                           GET ;
+                                           IF_NONE
+                                             { NONE nat }
+                                             { IF_LEFT
+                                                 { PUSH nat 0 ; FAILWITH }
+                                                 { IF_LEFT
+                                                     { IF_LEFT {} { PUSH nat 0 ; FAILWITH } }
+                                                     { PUSH nat 0 ; FAILWITH } } ;
+                                               SOME } ;
+                                           IF_NONE { PUSH nat 0 } {} } ;
+                                     SWAP ;
+                                     ADD ;
+                                     SWAP ;
+                                     PUSH nat 2 ;
+                                     PAIR ;
+                                     PACK ;
+                                     DIP { LEFT (or nat (map address nat)) ;
+                                           LEFT nat ;
+                                           RIGHT
+                                             (or (pair (pair nat address)
+                                                       (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                 (pair string (pair address address))) ;
+                                           SOME } ;
+                                     UPDATE } } ;
+                         DIP { DIP { DUP } ;
+                               PUSH nat 1 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE (pair string (pair address address)) }
+                                 { IF_LEFT
+                                     { IF_LEFT { PUSH nat 0 ; FAILWITH } {} }
+                                     { PUSH nat 0 ; FAILWITH } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 7 ; FAILWITH } { CAR } } ;
+                         DIP { DIP { DUP } ;
+                               SWAP ;
+                               DIP { DUP } ;
+                               SWAP ;
+                               PUSH nat 3 ;
+                               PAIR ;
+                               PACK ;
+                               GET ;
+                               IF_NONE
+                                 { NONE nat }
+                                 { IF_LEFT
+                                     { PUSH nat 0 ; FAILWITH }
+                                     { IF_LEFT
+                                         { IF_LEFT
+                                             { PUSH nat 0 ; FAILWITH }
+                                             { IF_LEFT {} { PUSH nat 0 ; FAILWITH } } }
+                                         { PUSH nat 0 ; FAILWITH } } ;
+                                   SOME } ;
+                               IF_NONE { PUSH nat 0 } {} } ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         DIP { DIP { SWAP ;
+                                     ADD ;
+                                     SWAP ;
+                                     PUSH nat 3 ;
+                                     PAIR ;
+                                     PACK ;
+                                     DIP { LEFT (map address nat) ;
+                                           RIGHT nat ;
+                                           LEFT nat ;
+                                           RIGHT
+                                             (or (pair (pair nat address)
+                                                       (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                 (pair string (pair address address))) ;
+                                           SOME } ;
+                                     UPDATE } } ;
+                         DUP ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         IF { DROP ; DROP }
+                            { DROP ;
+                              SWAP ;
+                              DIP { PUSH nat 0 ;
+                                    COMPARE ;
+                                    EQ ;
+                                    IF { DUP ;
+                                         CAR ;
+                                         DUP ;
+                                         CDR ;
+                                         CDR ;
+                                         CDR ;
+                                         PUSH nat 1 ;
+                                         SWAP ;
+                                         ADD ;
+                                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                                         DIP { DROP } ;
+                                         SWAP ;
+                                         PAIR ;
+                                         SWAP ;
+                                         PAIR ;
+                                         SWAP ;
+                                         PAIR ;
+                                         DIP { DUP ; DIP { CDR } ; CAR } ;
+                                         DIP { DROP } ;
+                                         PAIR }
+                                       {} } } ;
+                         NIL operation } } ;
+                 DIP { PAIR } ;
+                 PAIR } }
+           { IF_LEFT
+               { DIP { DUP ; CAR ; DIP { CDR } } ;
+                 IF_LEFT
+                   { DIP { DUP } ;
+                     SWAP ;
+                     SENDER ;
+                     PUSH nat 5 ;
+                     PAIR ;
+                     PACK ;
+                     GET ;
+                     IF_NONE
+                       { NONE nat }
+                       { IF_LEFT
+                           { PUSH nat 0 ; FAILWITH }
+                           { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                         SOME } ;
+                     IF_NONE { PUSH nat 0 } {} ;
+                     PUSH nat 1 ;
+                     AND ;
+                     PUSH nat 0 ;
+                     COMPARE ;
+                     EQ ;
+                     NOT ;
+                     IF {} { PUSH nat 14 ; FAILWITH } ;
+                     DIP { PUSH nat 0 ;
+                           DIP { DIP { DUP } ; SWAP } ;
+                           SWAP ;
+                           CDR ;
+                           CAR ;
+                           DIP { DIP { DUP } ; SWAP } ;
+                           SWAP ;
+                           DIP { DUP } ;
+                           SWAP ;
+                           PUSH nat 5 ;
+                           PAIR ;
+                           PACK ;
+                           GET ;
+                           IF_NONE
+                             { NONE nat }
+                             { IF_LEFT
+                                 { PUSH nat 0 ; FAILWITH }
+                                 { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                               SOME } ;
+                           IF_NONE { PUSH nat 0 } {} ;
+                           PUSH nat 0 ;
+                           COMPARE ;
+                           EQ ;
+                           DIP { DIP { DUP } ; SWAP ; PUSH nat 0 ; COMPARE ; EQ } ;
+                           OR ;
+                           IF {} { PUSH nat 15 ; FAILWITH } ;
+                           DIP { DUP } ;
+                           SWAP ;
+                           PUSH nat 0 ;
+                           COMPARE ;
+                           EQ ;
+                           IF { DIP { DROP } ;
+                                PUSH nat 5 ;
+                                PAIR ;
+                                PACK ;
+                                DIP { NONE (or (or (pair (pair nat address)
+                                                         (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                   (pair string (pair address address)))
+                                               (or (or nat (or nat (map address nat))) nat)) } ;
+                                UPDATE }
+                              { PUSH nat 5 ;
+                                PAIR ;
+                                PACK ;
+                                DIP { RIGHT (or nat (or nat (map address nat))) ;
+                                      RIGHT
+                                        (or (pair (pair nat address)
+                                                  (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                            (pair string (pair address address))) ;
+                                      SOME } ;
+                                UPDATE } } ;
+                     DUP ;
+                     DIP { DIP { PUSH nat 1 } ;
+                           DIP { DIP { DUP } ; SWAP } ;
+                           SWAP ;
+                           DIP { DUP } ;
+                           SWAP ;
+                           PUSH nat 5 ;
+                           PAIR ;
+                           PACK ;
+                           GET ;
+                           IF_NONE
+                             { NONE nat }
+                             { IF_LEFT
+                                 { PUSH nat 0 ; FAILWITH }
+                                 { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                               SOME } ;
+                           IF_NONE { PUSH nat 0 } {} ;
+                           PUSH nat 0 ;
+                           COMPARE ;
+                           EQ ;
+                           DIP { DIP { DUP } ; SWAP ; PUSH nat 0 ; COMPARE ; EQ } ;
+                           OR ;
+                           IF {} { PUSH nat 15 ; FAILWITH } ;
+                           DIP { DUP } ;
+                           SWAP ;
+                           PUSH nat 0 ;
+                           COMPARE ;
+                           EQ ;
+                           IF { DIP { DROP } ;
+                                PUSH nat 5 ;
+                                PAIR ;
+                                PACK ;
+                                DIP { NONE (or (or (pair (pair nat address)
+                                                         (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                   (pair string (pair address address)))
+                                               (or (or nat (or nat (map address nat))) nat)) } ;
+                                UPDATE }
+                              { PUSH nat 5 ;
+                                PAIR ;
+                                PACK ;
+                                DIP { RIGHT (or nat (or nat (map address nat))) ;
+                                      RIGHT
+                                        (or (pair (pair nat address)
+                                                  (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                            (pair string (pair address address))) ;
+                                      SOME } ;
+                                UPDATE } } ;
+                     SWAP ;
+                     DIP { DIP { DUP ; CDR ; CAR } ;
+                           DIP { DROP } ;
+                           DIP { DUP ; DIP { CAR } ; CDR } ;
+                           DIP { DUP ; DIP { CDR } ; CAR } ;
+                           DIP { DROP } ;
+                           PAIR ;
+                           SWAP ;
+                           PAIR } ;
+                     NIL operation }
+                   { IF_LEFT
+                       { DIP { DUP } ;
+                         SWAP ;
+                         SENDER ;
+                         PUSH nat 5 ;
+                         PAIR ;
+                         PACK ;
+                         GET ;
+                         IF_NONE
+                           { NONE nat }
+                           { IF_LEFT
+                               { PUSH nat 0 ; FAILWITH }
+                               { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                             SOME } ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         PUSH nat 3 ;
+                         AND ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         NOT ;
+                         IF {} { PUSH nat 9 ; FAILWITH } ;
+                         DUP ;
+                         CAR ;
+                         DIP { CDR } ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         PUSH nat 6 ;
+                         AND ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         NOT ;
+                         IF {} { PUSH nat 16 ; FAILWITH } ;
+                         DIP { DIP { DUP } ; SWAP } ;
+                         SWAP ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         PUSH nat 5 ;
+                         PAIR ;
+                         PACK ;
+                         GET ;
+                         IF_NONE
+                           { NONE nat }
+                           { IF_LEFT
+                               { PUSH nat 0 ; FAILWITH }
+                               { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                             SOME } ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         DIP { DIP { DUP } ; SWAP ; PUSH nat 0 ; COMPARE ; EQ } ;
+                         OR ;
+                         IF {} { PUSH nat 15 ; FAILWITH } ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         IF { DIP { DROP } ;
+                              PUSH nat 5 ;
+                              PAIR ;
+                              PACK ;
+                              DIP { NONE (or (or (pair (pair nat address)
+                                                       (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                 (pair string (pair address address)))
+                                             (or (or nat (or nat (map address nat))) nat)) } ;
+                              UPDATE }
+                            { PUSH nat 5 ;
+                              PAIR ;
+                              PACK ;
+                              DIP { RIGHT (or nat (or nat (map address nat))) ;
+                                    RIGHT
+                                      (or (pair (pair nat address)
+                                                (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                          (pair string (pair address address))) ;
+                                    SOME } ;
+                              UPDATE } ;
+                         NIL operation }
+                       { DIP { DUP } ;
+                         SWAP ;
+                         SENDER ;
+                         PUSH nat 5 ;
+                         PAIR ;
+                         PACK ;
+                         GET ;
+                         IF_NONE
+                           { NONE nat }
+                           { IF_LEFT
+                               { PUSH nat 0 ; FAILWITH }
+                               { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                             SOME } ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         PUSH nat 3 ;
+                         AND ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         NOT ;
+                         IF {} { PUSH nat 9 ; FAILWITH } ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         PUSH nat 5 ;
+                         PAIR ;
+                         PACK ;
+                         GET ;
+                         IF_NONE
+                           { NONE nat }
+                           { IF_LEFT
+                               { PUSH nat 0 ; FAILWITH }
+                               { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                             SOME } ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         PUSH nat 6 ;
+                         AND ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         NOT ;
+                         IF {} { PUSH nat 16 ; FAILWITH } ;
+                         DIP { PUSH nat 0 } ;
+                         DIP { DIP { DUP } ; SWAP } ;
+                         SWAP ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         PUSH nat 5 ;
+                         PAIR ;
+                         PACK ;
+                         GET ;
+                         IF_NONE
+                           { NONE nat }
+                           { IF_LEFT
+                               { PUSH nat 0 ; FAILWITH }
+                               { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                             SOME } ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         DIP { DIP { DUP } ; SWAP ; PUSH nat 0 ; COMPARE ; EQ } ;
+                         OR ;
+                         IF {} { PUSH nat 15 ; FAILWITH } ;
+                         DIP { DUP } ;
+                         SWAP ;
+                         PUSH nat 0 ;
+                         COMPARE ;
+                         EQ ;
+                         IF { DIP { DROP } ;
+                              PUSH nat 5 ;
+                              PAIR ;
+                              PACK ;
+                              DIP { NONE (or (or (pair (pair nat address)
+                                                       (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                                 (pair string (pair address address)))
+                                             (or (or nat (or nat (map address nat))) nat)) } ;
+                              UPDATE }
+                            { PUSH nat 5 ;
+                              PAIR ;
+                              PACK ;
+                              DIP { RIGHT (or nat (or nat (map address nat))) ;
+                                    RIGHT
+                                      (or (pair (pair nat address)
+                                                (pair (option string) (pair address (map nat (pair nat (pair timestamp (option bytes)))))))
+                                          (pair string (pair address address))) ;
+                                    SOME } ;
+                              UPDATE } ;
+                         NIL operation } } ;
+                 DIP { PAIR } ;
+                 PAIR }
+               { DIP { DUP ; CAR ; DIP { CDR } } ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 SENDER ;
+                 PUSH nat 5 ;
+                 PAIR ;
+                 PACK ;
+                 GET ;
+                 IF_NONE
+                   { NONE nat }
+                   { IF_LEFT
+                       { PUSH nat 0 ; FAILWITH }
+                       { IF_LEFT { PUSH nat 0 ; FAILWITH } {} } ;
+                     SOME } ;
+                 IF_NONE { PUSH nat 0 } {} ;
+                 PUSH nat 1 ;
+                 AND ;
+                 PUSH nat 0 ;
+                 COMPARE ;
+                 EQ ;
+                 NOT ;
+                 IF {} { PUSH nat 14 ; FAILWITH } ;
+                 DIP { SWAP ; DUP ; CDR ; CDR ; DUP } ;
+                 DUP ;
+                 DIP { SWAP } ;
+                 COMPARE ;
+                 EQ ;
+                 IF { RIGHT unit ; FAILWITH } {} ;
+                 DIP { DROP } ;
+                 DIP { DUP ; DIP { CAR } ; CDR } ;
+                 DIP { DUP ; DIP { CAR } ; CDR } ;
+                 DIP { DROP } ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 NIL operation ;
+                 DIP { PAIR } ;
+                 PAIR } } } }

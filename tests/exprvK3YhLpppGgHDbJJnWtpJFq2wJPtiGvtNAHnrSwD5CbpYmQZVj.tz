@@ -1,0 +1,3 @@
+{ parameter nat ;
+  storage nat ;
+  code { DUP ; CAR ; NIL operation ; PAIR ; DIP { DROP } } }

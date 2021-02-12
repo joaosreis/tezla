@@ -1,0 +1,17 @@
+{ storage int ;
+  parameter (pair (int %x) (int %y)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         MUL ;
+         DUG 2 ;
+         DROP 2 ;
+         NIL operation ;
+         PAIR } }

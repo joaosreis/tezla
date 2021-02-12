@@ -1,0 +1,123 @@
+{ parameter
+    (or (or (address %register_device) (address %register_user))
+        (or (address %unregister_device) (address %unregister_user))) ;
+  storage
+    (pair (address %administrator) (map %registered_devices address (map address bool))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 SENDER ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.registered_devices.contains(sp.sender)" ;
+                      FAILWITH } ;
+                 PUSH nat 5 ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 SIZE ;
+                 COMPARE ;
+                 LT ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.len(self.data.registered_devices) < 5" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 DUP ;
+                 SENDER ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 29 ; FAILWITH } {} } ;
+                 DIG 4 ;
+                 PUSH (option bool) (Some True) ;
+                 SWAP ;
+                 UPDATE ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 DIG 2 ;
+                 PUSH (option (map address bool)) (Some {}) ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 SENDER ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.registered_devices.contains(sp.sender)" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 DUP ;
+                 SENDER ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 34 ; FAILWITH } {} } ;
+                 NONE bool ;
+                 DIG 5 ;
+                 UPDATE ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 NONE (map address bool) ;
+                 DIG 3 ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR } } ;
+         NIL operation ;
+         PAIR } }

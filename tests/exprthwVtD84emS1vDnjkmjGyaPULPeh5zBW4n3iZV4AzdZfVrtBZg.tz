@@ -1,0 +1,17 @@
+{ storage int ;
+  parameter (pair (int %a) (int %b)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUP ;
+         CDR ;
+         PUSH int 0 ;
+         ADD ;
+         SWAP ;
+         CAR ;
+         COMPARE ;
+         GE ;
+         IF {} { PUSH string "num should be greater than den" ; FAILWITH } ;
+         NIL operation ;
+         PAIR } }

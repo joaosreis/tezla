@@ -1,0 +1,13 @@
+{ storage chain_id ;
+  parameter unit ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         CHAIN_ID ;
+         DIG 2 ;
+         DROP ;
+         SWAP ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

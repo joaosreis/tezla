@@ -1,0 +1,13 @@
+{ parameter int ;
+  storage
+    (pair (pair (big_map %data
+                   string
+                   (pair (set %documentIds bytes)
+                         (map %documents
+                            bytes
+                            (pair (pair (pair (string %checksum) (string %checksumAlgo))
+                                        (pair (string %document) (string %figi)))
+                                  (pair (pair (string %individualId) (string %timestamp)) (string %uri))))))
+                (set %symbols string))
+          (int %x)) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

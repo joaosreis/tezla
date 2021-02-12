@@ -1,0 +1,241 @@
+{ parameter
+    (or (or (pair %setDocumentTest
+               (pair (pair (pair (string %d1_symbol) (string %d2_dealName))
+                           (pair (string %d3_document) (string %d4_uri)))
+                     (pair (pair (string %d5_checksum) (string %d6_checksumAlgo))
+                           (pair (string %d7_timestamp) (string %d8_figi))))
+               (string %d9_individualId))
+            (pair %setDocument_
+               (pair (pair (pair (string %0) (string %1)) (pair (string %2) (string %3)))
+                     (pair (pair (string %4) (string %5)) (pair (string %6) (string %7))))
+               (string %8)))
+        (nat %setSaveDataFlag)) ;
+  storage
+    (pair (pair (big_map %data
+                   string
+                   (pair (set %documentIds bytes)
+                         (map %documents
+                            bytes
+                            (pair (pair (pair (string %checksum) (string %checksumAlgo))
+                                        (pair (string %document) (string %figi)))
+                                  (pair (pair (string %individualId) (string %timestamp)) (string %uri))))))
+                (bool %saveData))
+          (set %symbols string)) ;
+  code { DUP ;
+         DUP ;
+         CDR ;
+         DIP { DUP } ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DIP 2 { DUP } ; DIG 2 ; NIL operation ; PAIR ; DIP { DROP } }
+               { DUP ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 DIP { DUP ; CAR ; CAR ; CAR ; CDR } ;
+                 PAIR ;
+                 DIP { DUP ;
+                       CAR ;
+                       CAR ;
+                       CDR ;
+                       CAR ;
+                       DIP { DUP ; CAR ; CAR ; CDR ; CDR } ;
+                       PAIR } ;
+                 PAIR ;
+                 DIP { DUP ;
+                       CAR ;
+                       CDR ;
+                       CAR ;
+                       CAR ;
+                       DIP { DUP ; CAR ; CDR ; CAR ; CDR } ;
+                       PAIR ;
+                       DIP { DUP ;
+                             CAR ;
+                             CDR ;
+                             CDR ;
+                             CAR ;
+                             DIP { DUP ; CAR ; CDR ; CDR ; CDR } ;
+                             PAIR } ;
+                       PAIR } ;
+                 PAIR ;
+                 DIP { DUP ; CDR ; DIP { DIP 3 { DUP } ; DIG 3 } ; PAIR } ;
+                 PAIR ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 DIP 2 { DUP } ;
+                 DIG 2 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 DIP 3 { DUP } ;
+                 DIG 3 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 DIP 4 { DUP } ;
+                 DIG 4 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 DIP 5 { DUP } ;
+                 DIG 5 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 DIP 6 { DUP } ;
+                 DIG 6 ;
+                 CDR ;
+                 CDR ;
+                 DIP 7 { DUP } ;
+                 DIG 7 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 SIZE ;
+                 PUSH nat 0 ;
+                 SWAP ;
+                 COMPARE ;
+                 EQ ;
+                 DIP { DIP 5 { DUP } ; DIG 5 ; SIZE ; PUSH nat 0 ; SWAP ; COMPARE ; EQ } ;
+                 OR ;
+                 DIP { DIP 4 { DUP } ; DIG 4 ; SIZE ; PUSH nat 0 ; SWAP ; COMPARE ; EQ } ;
+                 OR ;
+                 DIP { DIP 3 { DUP } ; DIG 3 ; SIZE ; PUSH nat 0 ; SWAP ; COMPARE ; EQ } ;
+                 OR ;
+                 DIP { DIP 2 { DUP } ; DIG 2 ; SIZE ; PUSH nat 0 ; SWAP ; COMPARE ; EQ } ;
+                 OR ;
+                 DIP { DIP { DUP } ; SWAP ; SIZE ; PUSH nat 0 ; SWAP ; COMPARE ; EQ } ;
+                 OR ;
+                 IF { PUSH string "Wrong data format" ; FAILWITH } { PUSH unit Unit } ;
+                 DIP 6 { DUP } ;
+                 DIG 6 ;
+                 PACK ;
+                 DIP { DIP 4 { DUP } ; DIG 4 ; PACK } ;
+                 CONCAT ;
+                 SHA256 ;
+                 PUSH nat 4 ;
+                 PUSH nat 0 ;
+                 SLICE ;
+                 IF_NONE { PUSH string "SLICE" ; FAILWITH } {} ;
+                 DIP 2 { DUP } ;
+                 DIG 2 ;
+                 CAR ;
+                 CDR ;
+                 IF { DIP 8 { DUP } ;
+                      DIG 8 ;
+                      DIP { DIP 2 { DUP } ; DIG 2 } ;
+                      PAIR ;
+                      DUP ;
+                      CAR ;
+                      DIP { DUP ; CDR ; CAR ; CAR } ;
+                      GET ;
+                      IF_NONE
+                        { EMPTY_MAP
+                            bytes
+                            (pair (pair (pair (string %checksum) (string %checksumAlgo))
+                                        (pair (string %document) (string %figi)))
+                                  (pair (pair (string %individualId) (string %timestamp)) (string %uri))) ;
+                          EMPTY_SET bytes ;
+                          PAIR }
+                        { DUP ; DIP { DROP } } ;
+                      DIP { DROP } ;
+                      DIP 3 { DUP } ;
+                      DIG 3 ;
+                      DIP 10 { DUP } ;
+                      DIG 10 ;
+                      DIP { DIP { DUP } ;
+                            SWAP ;
+                            DIP 3 { DUP } ;
+                            DIG 3 ;
+                            DIP { DIP 8 { DUP } ;
+                                  DIG 8 ;
+                                  DIP { DIP 7 { DUP } ; DIG 7 } ;
+                                  PAIR ;
+                                  DIP { DIP 10 { DUP } ;
+                                        DIG 10 ;
+                                        DIP { DIP 12 { DUP } ; DIG 12 ; CAR ; CDR ; CDR ; CDR } ;
+                                        PAIR } ;
+                                  PAIR ;
+                                  DIP { DIP 12 { DUP } ;
+                                        DIG 12 ;
+                                        CDR ;
+                                        CAR ;
+                                        DIP { DIP 6 { DUP } ; DIG 6 } ;
+                                        PAIR ;
+                                        DIP { DIP 9 { DUP } ; DIG 9 } ;
+                                        PAIR } ;
+                                  PAIR ;
+                                  SOME ;
+                                  DIP { DIP 2 { DUP } ; DIG 2 ; CDR } } ;
+                            UPDATE ;
+                            SWAP ;
+                            CAR ;
+                            PAIR ;
+                            DIP 3 { DUP } ;
+                            DIG 3 ;
+                            DIP { DIP 2 { DUP } ; DIG 2 ; CAR ; PUSH bool True } ;
+                            UPDATE ;
+                            SWAP ;
+                            CDR ;
+                            SWAP ;
+                            PAIR ;
+                            SOME ;
+                            DIP { DIP 4 { DUP } ; DIG 4 ; CAR ; CAR } } ;
+                      UPDATE ;
+                      DIP { DUP ; CDR ; SWAP ; CAR ; CDR } ;
+                      PAIR ;
+                      PAIR ;
+                      DIP 10 { DUP } ;
+                      DIG 10 ;
+                      DIP { DIP 4 { DUP } ; DIG 4 ; CDR ; PUSH bool True } ;
+                      UPDATE ;
+                      SWAP ;
+                      CAR ;
+                      PAIR ;
+                      DIP { DROP } }
+                    { DIP 2 { DUP } ; DIG 2 } ;
+                 DIP { DROP 10 } ;
+                 NIL operation ;
+                 PAIR ;
+                 DIP { DROP 2 } } ;
+             DIP { DROP } }
+           { DUP ;
+             DIP { DIP { DUP } ; SWAP } ;
+             PAIR ;
+             DUP ;
+             CDR ;
+             DIP { DUP } ;
+             SWAP ;
+             CAR ;
+             PUSH nat 0 ;
+             SWAP ;
+             COMPARE ;
+             NEQ ;
+             DIP { DUP ; CDR ; SWAP ; CAR ; CAR } ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             DIP { DROP } ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP } } ;
+         DIP { DROP 3 } } }

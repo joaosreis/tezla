@@ -1,0 +1,3 @@
+{ parameter address ;
+  storage unit ;
+  code { PUSH string "oops" ; FAILWITH } }

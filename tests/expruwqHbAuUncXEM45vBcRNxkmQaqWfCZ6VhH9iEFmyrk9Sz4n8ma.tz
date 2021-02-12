@@ -1,0 +1,49 @@
+{ storage
+    (pair (big_map %credentials address string)
+          (pair (string %modulus) (set %vote_commitments string))) ;
+  parameter (or (string %add_credential) (string %vote)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               CDR ;
+               SWAP ;
+               CAR ;
+               DIG 2 ;
+               DUP ;
+               DUG 3 ;
+               SOME ;
+               SENDER ;
+               UPDATE ;
+               PAIR ;
+               DUG 2 ;
+               DROP 2 } }
+           { { SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               CAR ;
+               SWAP ;
+               CDR ;
+               DUP ;
+               CAR ;
+               SWAP ;
+               CDR ;
+               PUSH bool True ;
+               DIG 4 ;
+               DUP ;
+               DUG 5 ;
+               UPDATE ;
+               SWAP ;
+               PAIR ;
+               SWAP ;
+               PAIR ;
+               DUG 2 ;
+               DROP 2 } } ;
+         NIL operation ;
+         PAIR } }

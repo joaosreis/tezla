@@ -1,0 +1,3 @@
+{ parameter %root int ;
+  storage int ;
+  code { CAR ; PUSH int 1 ; ADD ; NIL operation ; PAIR } }

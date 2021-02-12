@@ -1,0 +1,212 @@
+{ parameter
+    (or (pair %setSettings
+           nat
+           (lambda
+              (pair (pair (or (or (or (or (pair %divestLiquidity (pair nat nat) nat) (nat %initializeExchange))
+                                      (or (nat %investLiquidity) (pair %setVotesDelegation address bool)))
+                                  (or (or (pair %tezToTokenPayment nat address)
+                                          (pair %tokenToTezPayment (pair nat nat) address))
+                                      (or (pair %tokenToTokenPayment (pair nat nat) (pair address address)) (address %veto))))
+                              (pair %vote address key_hash))
+                          (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                            (pair (nat %feeRate) (nat %invariant)))
+                                      (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                            (pair (nat %tezPool) (address %tokenAddress))))
+                                (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                            (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                      (pair (pair (big_map %vetos key_hash bool)
+                                                  (big_map %voters
+                                                     address
+                                                     (pair (map %allowances address bool) (option %candidate key_hash))))
+                                            (big_map %votes key_hash nat)))))
+                    address)
+              (pair (list operation)
+                    (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                      (pair (nat %feeRate) (nat %invariant)))
+                                (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                      (pair (nat %tezPool) (address %tokenAddress))))
+                          (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                      (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                (pair (pair (big_map %vetos key_hash bool)
+                                            (big_map %voters
+                                               address
+                                               (pair (map %allowances address bool) (option %candidate key_hash))))
+                                      (big_map %votes key_hash nat)))))))
+        (pair %use
+           nat
+           (or (or (or (or (pair %divestLiquidity (pair nat nat) nat) (nat %initializeExchange))
+                       (or (nat %investLiquidity) (pair %setVotesDelegation address bool)))
+                   (or (or (pair %tezToTokenPayment nat address)
+                           (pair %tokenToTezPayment (pair nat nat) address))
+                       (or (pair %tokenToTokenPayment (pair nat nat) (pair address address)) (address %veto))))
+               (pair %vote address key_hash)))) ;
+  storage
+    (pair (big_map %lambdas
+             nat
+             (lambda
+                (pair (pair (or (or (or (or (pair %divestLiquidity (pair nat nat) nat) (nat %initializeExchange))
+                                        (or (nat %investLiquidity) (pair %setVotesDelegation address bool)))
+                                    (or (or (pair %tezToTokenPayment nat address)
+                                            (pair %tokenToTezPayment (pair nat nat) address))
+                                        (or (pair %tokenToTokenPayment (pair nat nat) (pair address address)) (address %veto))))
+                                (pair %vote address key_hash))
+                            (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                              (pair (nat %feeRate) (nat %invariant)))
+                                        (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                              (pair (nat %tezPool) (address %tokenAddress))))
+                                  (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                              (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                        (pair (pair (big_map %vetos key_hash bool)
+                                                    (big_map %voters
+                                                       address
+                                                       (pair (map %allowances address bool) (option %candidate key_hash))))
+                                              (big_map %votes key_hash nat)))))
+                      address)
+                (pair (list operation)
+                      (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                        (pair (nat %feeRate) (nat %invariant)))
+                                  (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                        (pair (nat %tezPool) (address %tokenAddress))))
+                            (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                        (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                  (pair (pair (big_map %vetos key_hash bool)
+                                              (big_map %voters
+                                                 address
+                                                 (pair (map %allowances address bool) (option %candidate key_hash))))
+                                        (big_map %votes key_hash nat)))))))
+          (pair %storage
+             (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                         (pair (nat %feeRate) (nat %invariant)))
+                   (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                         (pair (nat %tezPool) (address %tokenAddress))))
+             (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                         (pair (nat %veto) (big_map %vetoVoters address nat)))
+                   (pair (pair (big_map %vetos key_hash bool)
+                               (big_map %voters
+                                  address
+                                  (pair (map %allowances address bool) (option %candidate key_hash))))
+                         (big_map %votes key_hash nat))))) ;
+  code { DUP ;
+         CDR ;
+         SELF ;
+         ADDRESS ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CAR ;
+         IF_LEFT
+           { DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             PAIR ;
+             DUP ;
+             CAR ;
+             CAR ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             CAR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             GET ;
+             IF_NONE { PUSH unit Unit } { PUSH string "Function exist" ; FAILWITH } ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             DIG 5 ;
+             DUP ;
+             DUG 6 ;
+             CAR ;
+             CDR ;
+             DIG 5 ;
+             DUP ;
+             DUG 6 ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             SWAP ;
+             CDR ;
+             SWAP ;
+             PAIR ;
+             DIP { DROP 4 } ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP } }
+           { DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             PAIR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             PAIR ;
+             PAIR ;
+             DUP ;
+             CDR ;
+             CDR ;
+             DUP ;
+             CAR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             CAR ;
+             GET ;
+             IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             CDR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             DIG 4 ;
+             DUP ;
+             DUG 5 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             EXEC ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             PAIR ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             PAIR ;
+             DIP { DROP 5 } } ;
+         DIP { DROP 3 } } }

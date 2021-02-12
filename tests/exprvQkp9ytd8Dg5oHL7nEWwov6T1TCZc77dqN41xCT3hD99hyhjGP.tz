@@ -1,0 +1,30 @@
+{ parameter address ;
+  storage unit ;
+  code { PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         EQ ;
+         IF { PUSH string "You must send tez to accomplish the transfer" ; FAILWITH }
+            { PUSH unit Unit } ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         CONTRACT unit ;
+         IF_NONE
+           { PUSH string "Not a contract" ; FAILWITH }
+           { DUP ; DIP { DROP } } ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CDR ;
+         NIL operation ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         AMOUNT ;
+         UNIT ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR ;
+         DIP { DROP 3 } } }

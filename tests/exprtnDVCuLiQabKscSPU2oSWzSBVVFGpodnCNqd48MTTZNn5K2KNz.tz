@@ -1,0 +1,46 @@
+{ parameter (option key_hash) ;
+  storage
+    (pair (pair %mgr1 (address %addr) (option %key key_hash))
+          (pair %mgr2 (address %addr) (option %key key_hash))) ;
+  code { DUP ;
+         { CDR ; CAR ; CAR %addr @% } ;
+         SENDER ;
+         PAIR %@ %@ ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         { COMPARE ;
+           EQ ;
+           IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                SWAP ;
+                { DUP ;
+                  DIP { CAR @%% ; { DUP ; CDR %key ; DROP ; CAR @%% ; PAIR %@ %key } } ;
+                  CDR @%% ;
+                  SWAP ;
+                  PAIR %@ %@ @changed_mgr1_key } }
+              { DUP ;
+                { CDR ; CDR ; CAR } ;
+                SENDER ;
+                { COMPARE ;
+                  EQ ;
+                  IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { DUP ;
+                         DIP { CDR @%% ; { DUP ; CDR %key ; DROP ; CAR @%% ; PAIR %@ %key } } ;
+                         CAR @%% ;
+                         PAIR %@ %@ } }
+                     { { UNIT ; FAILWITH } } } } } ;
+         DUP ;
+         { CAR ; CDR } ;
+         DIP { DUP ; { CDR ; CDR } } ;
+         IF_NONE
+           { IF_NONE
+               { NONE key_hash ; SET_DELEGATE ; NIL operation ; SWAP ; CONS }
+               { DROP ; NIL operation } }
+           { SWAP ;
+             { IF_NONE
+                 { DROP ; NIL operation }
+                 { DIP { DUP } ;
+                   { COMPARE ;
+                     EQ ;
+                     IF { SOME ; SET_DELEGATE ; NIL operation ; SWAP ; CONS }
+                        { DROP ; NIL operation } } } } } ;
+         PAIR } }

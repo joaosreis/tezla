@@ -1,0 +1,30 @@
+{ parameter
+    (pair (contract %swapA (list (pair address (pair address (pair nat nat)))))
+          (contract %swapB (list (pair address (pair address (pair nat nat)))))) ;
+  storage (address :seller) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         DUP ;
+         DIP { SWAP ;
+               { { DUP ; CAR ; DIP { CDR } } } ;
+               DIP { DIP { DUP ;
+                           DIP { NIL (pair bool (pair (contract (list (pair address (pair address (pair nat nat))))) address)) } } ;
+                     PAIR ;
+                     PUSH bool True ;
+                     PAIR ;
+                     CONS ;
+                     SWAP } ;
+               PAIR ;
+               PUSH bool False ;
+               PAIR ;
+               CONS ;
+               MAP { { { DUP ; CAR ; DIP { CDR } } } ;
+                     DIP { { { DUP ; CAR ; DIP { CDR } } } ; SWAP ; SENDER } ;
+                     IF {} { SWAP } ;
+                     DIP { DIP { PUSH (pair nat nat) (Pair 0 1) } ; PAIR } ;
+                     PAIR ;
+                     DIP { PUSH mutez 0 ; NIL (pair address (pair address (pair nat nat))) } ;
+                     CONS ;
+                     TRANSFER_TOKENS } } ;
+         SWAP ;
+         PAIR } }

@@ -1,0 +1,6 @@
+{ parameter unit ;
+  storage
+    (pair (pair (map %mymap (pair nat address) (pair (mutez %amount) (int %quantity)))
+                (address %theaddress))
+          (int %thenumber)) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

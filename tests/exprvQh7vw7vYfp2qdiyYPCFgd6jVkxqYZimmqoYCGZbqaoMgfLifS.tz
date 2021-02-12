@@ -1,0 +1,7 @@
+{ parameter unit ;
+  storage mutez ;
+  code { CDR ;
+         DUP ;
+         AMOUNT ;
+         { COMPARE ; LT } ;
+         IF { { UNIT ; FAILWITH } } { NIL operation ; PAIR } } }

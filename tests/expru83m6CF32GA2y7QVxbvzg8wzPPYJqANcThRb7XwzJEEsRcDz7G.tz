@@ -1,0 +1,472 @@
+{ storage
+    (pair (pair (int %abcd) (option %fff (lambda nat nat)))
+          (pair (option %ggg int) (pair (option %myFunc (lambda nat nat)) (nat %value)))) ;
+  parameter
+    (or (or (or (nat %callMyFunc) (unit %comp_test)) (or (unit %f) (unit %flambda)))
+        (or (or (unit %h) (nat %hh)) (or (unit %i) (or (address %setAdd) (unit %setMyFunc))))) ;
+  code { LAMBDA
+           (pair (lambda %f int int) (int %x))
+           int
+           { { DUP ; CAR ; SWAP ; CDR ; EXEC } } ;
+         SWAP ;
+         LAMBDA nat nat { { PUSH nat 322 ; MUL } } ;
+         SWAP ;
+         LAMBDA
+           nat
+           nat
+           { { DUP ;
+               PUSH nat 0 ;
+               SWAP ;
+               COMPARE ;
+               GE ;
+               IF { {} }
+                  { { PUSH string "WrongCondition: lparams_2 >= 0" ; FAILWITH } } ;
+               DUP ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               MUL ;
+               COMPARE ;
+               GT ;
+               LOOP { DUP ;
+                      PUSH nat 2 ;
+                      SWAP ;
+                      DUP ;
+                      DIG 4 ;
+                      DUP ;
+                      DUG 5 ;
+                      EDIV ;
+                      IF_NONE { { PUSH string "division by zero" ; FAILWITH } } { CAR } ;
+                      ADD ;
+                      EDIV ;
+                      IF_NONE { { PUSH string "division by zero" ; FAILWITH } } { CAR } ;
+                      SWAP ;
+                      DROP ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      DUP ;
+                      MUL ;
+                      COMPARE ;
+                      GT } ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               MUL ;
+               COMPARE ;
+               LE ;
+               IF { { DUP ;
+                      PUSH nat 1 ;
+                      ADD ;
+                      PUSH nat 1 ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      ADD ;
+                      MUL ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      COMPARE ;
+                      LT } }
+                  { PUSH bool False } ;
+               IF { {} }
+                  { { PUSH string
+                           "WrongCondition: ((y.value * y.value) <= lparams_2) & (lparams_2 < ((y.value + 1) * (y.value + 1)))" ;
+                      FAILWITH } } ;
+               SWAP ;
+               DROP } } ;
+         SWAP ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { IF_LEFT
+                 { IF_LEFT
+                     { { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         DUP ;
+                         CAR ;
+                         SWAP ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         SWAP ;
+                         CDR ;
+                         CAR ;
+                         DIG 4 ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                         DIG 4 ;
+                         EXEC ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } }
+                     { { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         DUP ;
+                         CDR ;
+                         SWAP ;
+                         CAR ;
+                         CDR ;
+                         DIG 6 ;
+                         DUP ;
+                         DUG 7 ;
+                         PUSH int 2 ;
+                         LAMBDA int int { { PUSH int 3 ; ADD } } ;
+                         DIG 6 ;
+                         DROP ;
+                         DIG 5 ;
+                         DROP ;
+                         PAIR %f %x ;
+                         EXEC ;
+                         PAIR ;
+                         PAIR } } }
+                 { IF_LEFT
+                     { { LAMBDA (pair nat nat) nat { { DUP ; CDR ; SWAP ; CAR ; ADD } } ;
+                         SWAP ;
+                         DROP ;
+                         PUSH nat 5 ;
+                         APPLY ;
+                         SWAP ;
+                         DUP ;
+                         CAR ;
+                         SWAP ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         SWAP ;
+                         CDR ;
+                         CAR ;
+                         DIG 3 ;
+                         PUSH nat 8 ;
+                         EXEC ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } }
+                     { { DROP ;
+                         DUP ;
+                         CAR ;
+                         SWAP ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         SWAP ;
+                         CDR ;
+                         CAR ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         PUSH nat 12345 ;
+                         EXEC ;
+                         DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         DUP ;
+                         PUSH nat 15 ;
+                         EXEC ;
+                         EXEC ;
+                         ADD ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } } } ;
+               NIL operation } }
+           { IF_LEFT
+               { { IF_LEFT
+                     { { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         DUP ;
+                         CDR ;
+                         SWAP ;
+                         CAR ;
+                         CAR ;
+                         LAMBDA
+                           nat
+                           nat
+                           { { DUP ;
+                               PUSH nat 0 ;
+                               SWAP ;
+                               COMPARE ;
+                               GE ;
+                               IF { {} }
+                                  { { PUSH string "WrongCondition: lparams_5 >= 0" ; FAILWITH } } ;
+                               DUP ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               DUP ;
+                               MUL ;
+                               COMPARE ;
+                               GT ;
+                               LOOP { DUP ;
+                                      PUSH nat 2 ;
+                                      SWAP ;
+                                      DUP ;
+                                      DIG 4 ;
+                                      DUP ;
+                                      DUG 5 ;
+                                      EDIV ;
+                                      IF_NONE { { PUSH string "division by zero" ; FAILWITH } } { CAR } ;
+                                      ADD ;
+                                      EDIV ;
+                                      IF_NONE { { PUSH string "division by zero" ; FAILWITH } } { CAR } ;
+                                      SWAP ;
+                                      DROP ;
+                                      SWAP ;
+                                      DUP ;
+                                      DUG 2 ;
+                                      SWAP ;
+                                      DUP ;
+                                      DUG 2 ;
+                                      DUP ;
+                                      MUL ;
+                                      COMPARE ;
+                                      GT } ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               DUP ;
+                               MUL ;
+                               COMPARE ;
+                               LE ;
+                               IF { { DUP ;
+                                      PUSH nat 1 ;
+                                      ADD ;
+                                      PUSH nat 1 ;
+                                      DIG 2 ;
+                                      DUP ;
+                                      DUG 3 ;
+                                      ADD ;
+                                      MUL ;
+                                      DIG 2 ;
+                                      DUP ;
+                                      DUG 3 ;
+                                      COMPARE ;
+                                      LT } }
+                                  { PUSH bool False } ;
+                               IF { {} }
+                                  { { PUSH string
+                                           "WrongCondition: ((y.value * y.value) <= lparams_5) & (lparams_5 < ((y.value + 1) * (y.value + 1)))" ;
+                                      FAILWITH } } ;
+                               SWAP ;
+                               DROP } } ;
+                         DIG 4 ;
+                         DROP ;
+                         DIG 3 ;
+                         DROP ;
+                         SOME ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR } }
+                     { { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         DUP ;
+                         CAR ;
+                         SWAP ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         SWAP ;
+                         CDR ;
+                         CAR ;
+                         DIG 4 ;
+                         CAR ;
+                         CDR ;
+                         IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                         DIG 4 ;
+                         EXEC ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } } ;
+                   NIL operation } }
+               { IF_LEFT
+                   { { LAMBDA
+                         int
+                         unit
+                         { { DUP ;
+                             PUSH int 0 ;
+                             SWAP ;
+                             COMPARE ;
+                             GE ;
+                             IF { {} }
+                                { { PUSH string "WrongCondition: lparams_6 >= 0" ; FAILWITH } } ;
+                             DROP ;
+                             PUSH unit Unit } } ;
+                       LAMBDA
+                         int
+                         int
+                         { { DUP ;
+                             PUSH int 0 ;
+                             SWAP ;
+                             COMPARE ;
+                             GE ;
+                             IF { {} }
+                                { { PUSH string "WrongCondition: lparams_7 >= 0" ; FAILWITH } } ;
+                             PUSH int 2 ;
+                             SWAP ;
+                             SUB } } ;
+                       LAMBDA
+                         int
+                         bool
+                         { { DUP ;
+                             PUSH int 0 ;
+                             SWAP ;
+                             COMPARE ;
+                             GE ;
+                             IF { {} }
+                                { { PUSH string "WrongCondition: lparams_8 >= 0" ; FAILWITH } } ;
+                             DROP ;
+                             PUSH bool True } } ;
+                       LAMBDA
+                         nat
+                         nat
+                         { { LAMBDA
+                               int
+                               bool
+                               { { DUP ;
+                                   PUSH int 0 ;
+                                   SWAP ;
+                                   COMPARE ;
+                                   GE ;
+                                   IF { {} }
+                                      { { PUSH string "WrongCondition: lparams_10 >= 0" ; FAILWITH } } ;
+                                   DROP ;
+                                   PUSH bool False } } ;
+                             PUSH nat 0 ;
+                             DIG 2 ;
+                             DUP ;
+                             DUG 3 ;
+                             COMPARE ;
+                             GE ;
+                             IF { {} }
+                                { { PUSH string "WrongCondition: lparams_9 >= 0" ; FAILWITH } } ;
+                             DROP ;
+                             PUSH nat 3 ;
+                             MUL } } ;
+                       SWAP ;
+                       DROP ;
+                       SWAP ;
+                       DROP ;
+                       SWAP ;
+                       DROP ;
+                       SWAP ;
+                       DROP ;
+                       SWAP ;
+                       DUP ;
+                       CAR ;
+                       SWAP ;
+                       CDR ;
+                       DUP ;
+                       CAR ;
+                       SWAP ;
+                       CDR ;
+                       CAR ;
+                       DIG 3 ;
+                       PUSH nat 12 ;
+                       EXEC ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       NIL operation } }
+                   { IF_LEFT
+                       { { DUP ;
+                           CONTRACT (lambda int int) ;
+                           NIL operation ;
+                           SWAP ;
+                           IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                           PUSH mutez 0 ;
+                           LAMBDA
+                             int
+                             int
+                             { { DUP ;
+                                 PUSH int 0 ;
+                                 SWAP ;
+                                 COMPARE ;
+                                 GE ;
+                                 IF { {} } { { PUSH string "x must be greater than 0" ; FAILWITH } } ;
+                                 PUSH int 334 ;
+                                 ADD } } ;
+                           DIG 4 ;
+                           DROP ;
+                           TRANSFER_TOKENS ;
+                           CONS } }
+                       { { SWAP ;
+                           DUP ;
+                           DUG 2 ;
+                           DUP ;
+                           CAR ;
+                           SWAP ;
+                           CDR ;
+                           DUP ;
+                           CAR ;
+                           SWAP ;
+                           CDR ;
+                           CDR ;
+                           LAMBDA
+                             nat
+                             nat
+                             { { DUP ;
+                                 PUSH nat 0 ;
+                                 SWAP ;
+                                 COMPARE ;
+                                 GE ;
+                                 IF { {} } { { PUSH string "x must be greater than 0" ; FAILWITH } } ;
+                                 PUSH nat 322 ;
+                                 MUL } } ;
+                           DIG 5 ;
+                           DROP ;
+                           DIG 4 ;
+                           DROP ;
+                           SOME ;
+                           PAIR ;
+                           SWAP ;
+                           PAIR ;
+                           SWAP ;
+                           PAIR ;
+                           NIL operation } } } } } ;
+         DIG 2 ;
+         DROP ;
+         DIG 2 ;
+         DROP ;
+         DIG 2 ;
+         DROP ;
+         PAIR } }

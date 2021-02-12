@@ -1,0 +1,19 @@
+{ storage int ;
+  parameter int ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         COMPARE ;
+         GT ;
+         IF { { PUSH int 42 ; DUG 2 ; SWAP ; DROP } }
+            { { PUSH int 43 ; DUG 2 ; SWAP ; DROP } } ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

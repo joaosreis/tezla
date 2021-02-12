@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (big_map (pair string string) string) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

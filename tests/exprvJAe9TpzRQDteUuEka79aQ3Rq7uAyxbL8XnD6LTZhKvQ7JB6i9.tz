@@ -1,0 +1,33 @@
+{ storage string ;
+  parameter
+    (or (string %replace) (pair %request_test (address %address) (string %text))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { DUP ;
+               PUSH string "test" ;
+               COMPARE ;
+               NEQ ;
+               IF { {} }
+                  { { PUSH string "WrongCondition: params.text != 'test'" ; FAILWITH } } ;
+               SWAP ;
+               DROP ;
+               NIL operation } }
+           { { DUP ;
+               CAR ;
+               NIL operation ;
+               SWAP ;
+               CONTRACT %replace string ;
+               IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+               PUSH mutez 0 ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               TRANSFER_TOKENS ;
+               CONS ;
+               SWAP ;
+               DROP } } ;
+         PAIR } }

@@ -1,0 +1,16 @@
+{ storage unit ;
+  parameter
+    (or (pair %approvalEvent (int %amount) (pair (address %owner) (address %spender)))
+        (or (pair %exchangeEvent
+               (pair (address %DVPaddress) (int %amount_A))
+               (pair (int %amount_B) (pair (address %party_A) (address %party_B))))
+            (pair %transferEvent
+               (int %amount)
+               (pair (option %fromAddress address) (option %toAddress address))))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT { { DROP } } { IF_LEFT { { DROP } } { { DROP } } } ;
+         NIL operation ;
+         PAIR } }

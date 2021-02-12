@@ -1,0 +1,15 @@
+{ parameter (or (unit %default) (or (int %setNumber) (bool %toggleStatus))) ;
+  storage (pair (int %number) (bool %status)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { DROP ; NIL operation ; PAIR }
+           { IF_LEFT
+               { SWAP ; { CDR @%% ; SWAP ; PAIR % %@ } ; NIL operation ; PAIR }
+               { DUP ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 CDR ;
+                 { COMPARE ;
+                   NEQ ;
+                   IF { SWAP ; { CAR @%% ; PAIR %@ % } ; NIL operation ; PAIR }
+                      { PUSH string "%toggleStatus parameter and %status storage must be different" ;
+                        FAILWITH } } } } } }

@@ -1,0 +1,8 @@
+{ storage (option string) ;
+  parameter unit ;
+  code { CDR ;
+         IF_NONE
+           { PUSH string "aaaaaaaaaaaaaaaaaaaaaaaa" ; SOME }
+           { DROP ; NONE string } ;
+         NIL operation ;
+         PAIR } }

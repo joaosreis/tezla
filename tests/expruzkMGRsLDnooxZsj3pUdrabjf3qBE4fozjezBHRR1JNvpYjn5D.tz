@@ -1,0 +1,15 @@
+{ parameter nat ;
+  storage nat ;
+  code { PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         NEQ ;
+         IF { PUSH string "This contract do not accept token" ; FAILWITH }
+            { PUSH unit Unit } ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 2 } } }

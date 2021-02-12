@@ -1,0 +1,66 @@
+{ parameter (pair (pair (string %ipfs) (string %name)) (string %version)) ;
+  storage
+    (map string
+         (pair (pair (string %appName) (address %appOwner))
+               (list %appVersions (pair (string %ipfs) (string %versionNumber))))) ;
+  code { DUP ;
+         CAR ;
+         DIP { DUP } ;
+         SWAP ;
+         CDR ;
+         DIP { DUP } ;
+         SWAP ;
+         DIP { DUP } ;
+         PAIR ;
+         PUSH mutez 5000000 ;
+         AMOUNT ;
+         COMPARE ;
+         LT ;
+         IF { PUSH unit Unit ; RIGHT (or unit unit) }
+            { DUP ;
+              CAR ;
+              CAR ;
+              CDR ;
+              DIP { DUP ; CDR } ;
+              MEM ;
+              IF { PUSH unit Unit ; RIGHT unit ; LEFT unit }
+                 { PUSH unit Unit ; LEFT unit ; LEFT unit } } ;
+         DIP { DROP } ;
+         DUP ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DIP 4 { DUP } ;
+                 DIG 4 ;
+                 DIP { DIP 3 { DUP } ; DIG 3 } ;
+                 PAIR ;
+                 DUP ;
+                 CAR ;
+                 DUP ;
+                 CAR ;
+                 CDR ;
+                 SENDER ;
+                 SWAP ;
+                 PAIR ;
+                 DIP { DUP ;
+                       CAR ;
+                       CAR ;
+                       DIP { DUP ; CDR } ;
+                       PAIR ;
+                       NIL (pair (string %ipfs) (string %versionNumber)) ;
+                       SWAP ;
+                       CONS } ;
+                 PAIR ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 CAR ;
+                 CDR ;
+                 DIP { DUP ; SOME ; DIP { DIP 2 { DUP } ; DIG 2 ; CDR } } ;
+                 UPDATE ;
+                 NIL operation ;
+                 PAIR ;
+                 DIP { DROP 4 } }
+               { PUSH string "App already exists" ; FAILWITH } ;
+             DIP { DROP } }
+           { PUSH string "Not enough money, at least 5tz to add" ; FAILWITH } ;
+         DIP { DROP 4 } } }

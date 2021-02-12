@@ -1,0 +1,77 @@
+{ parameter
+    (or (address %addDataContributor) (or (int %feedData) (nat %getDataFromOro))) ;
+  storage (pair (int %cycleNumber) (pair (set %keysset address) (address %owner))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             { CDR ; CDR } ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF { SWAP ;
+                  DUP ;
+                  CAR ;
+                  SWAP ;
+                  CDR ;
+                  DUP ;
+                  CDR ;
+                  SWAP ;
+                  CAR ;
+                  PUSH bool True ;
+                  DIG 4 ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR }
+                { DROP } ;
+             NIL operation }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 { CDR ; CAR } ;
+                 SENDER ;
+                 MEM ;
+                 IF { DUP ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CAR ;
+                      COMPARE ;
+                      NEQ ;
+                      IF { SWAP ; CDR ; SWAP ; PAIR } { DROP } }
+                    { DROP } ;
+                 NIL operation }
+               { PUSH mutez 5000 ;
+                 AMOUNT ;
+                 COMPARE ;
+                 EQ ;
+                 IF { NIL operation ;
+                      SENDER ;
+                      CONTRACT %placeBetFromOro (pair (int %cycleNumber) (nat %uuid)) ;
+                      { IF_NONE { UNIT ; FAILWITH } {} } ;
+                      PUSH mutez 0 ;
+                      DIG 3 ;
+                      DIG 4 ;
+                      DUP ;
+                      DUG 5 ;
+                      CAR ;
+                      PAIR %cycleNumber %uuid ;
+                      TRANSFER_TOKENS ;
+                      CONS }
+                    { NIL operation ;
+                      SENDER ;
+                      CONTRACT %placeBetFromOro (pair (int %cycleNumber) (nat %uuid)) ;
+                      { IF_NONE { UNIT ; FAILWITH } {} } ;
+                      AMOUNT ;
+                      DIG 3 ;
+                      PUSH int 0 ;
+                      PAIR %cycleNumber %uuid ;
+                      TRANSFER_TOKENS ;
+                      CONS } } } ;
+         PAIR } }

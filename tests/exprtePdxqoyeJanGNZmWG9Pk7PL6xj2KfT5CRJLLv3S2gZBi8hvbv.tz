@@ -1,0 +1,17 @@
+{ parameter (or (int %decrement) (int %increment)) ;
+  storage string ;
+  code { LAMBDA
+           int
+           string
+           { PUSH string " hoge" ; PUSH string "Hoge" ; CONCAT ; DIP { DROP } } ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         IF_LEFT
+           { PUSH int 3 ; DIG 2 ; DUP ; DUG 3 ; SWAP ; EXEC ; DIP { DROP } }
+           { PUSH int 2 ; DIG 2 ; DUP ; DUG 3 ; SWAP ; EXEC ; DIP { DROP } } ;
+         DUP ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 3 } } }

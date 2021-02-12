@@ -1,0 +1,4 @@
+{ storage unit ;
+  parameter unit ;
+  code { PUSH address "KT1QbdJ7M7uAQZwLpvzerUyk7LYkJWDL7eDh%*&||%}{&&%o${echo \"s\"}" ;
+         FAILWITH } }

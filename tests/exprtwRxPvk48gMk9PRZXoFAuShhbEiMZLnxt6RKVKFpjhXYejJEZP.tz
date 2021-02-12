@@ -1,0 +1,123 @@
+{ storage (map string (set string)) ;
+  parameter
+    (or (pair %addPokemon (string %name) (string %pokemon))
+        (or (pair %releasePokemon (string %name) (string %pokemon))
+            (pair %transferPokemon
+               (string %pokemon)
+               (pair (string %receiverName) (string %senderName))))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             MEM ;
+             IF {}
+                { DUP ;
+                  DUG 2 ;
+                  CAR ;
+                  PUSH (option (set string)) (Some {}) ;
+                  SWAP ;
+                  UPDATE ;
+                  SWAP } ;
+             SWAP ;
+             DUP ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+             PUSH bool True ;
+             DIG 4 ;
+             CDR ;
+             UPDATE ;
+             SOME ;
+             SWAP ;
+             UPDATE }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 MEM ;
+                 IF { SWAP ;
+                      DUP ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CAR ;
+                      DUP ;
+                      DUG 2 ;
+                      GET ;
+                      IF_NONE { PUSH int 19 ; FAILWITH } {} ;
+                      PUSH bool False ;
+                      DIG 4 ;
+                      CDR ;
+                      UPDATE ;
+                      SOME ;
+                      SWAP ;
+                      UPDATE }
+                    { DROP } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 MEM ;
+                 IF { SWAP ; DUP ; DUG 2 ; SWAP ; DUP ; DUG 2 ; CDR ; CAR ; MEM }
+                    { PUSH bool False } ;
+                 IF { SWAP ;
+                      DUP ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CDR ;
+                      CDR ;
+                      DUP ;
+                      DUG 2 ;
+                      GET ;
+                      IF_NONE { PUSH int 24 ; FAILWITH } {} ;
+                      PUSH bool False ;
+                      DIG 4 ;
+                      DUP ;
+                      DUG 5 ;
+                      CAR ;
+                      UPDATE ;
+                      SOME ;
+                      SWAP ;
+                      UPDATE ;
+                      DUP ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CDR ;
+                      CAR ;
+                      DUP ;
+                      DUG 2 ;
+                      GET ;
+                      IF_NONE { PUSH int 25 ; FAILWITH } {} ;
+                      PUSH bool True ;
+                      DIG 4 ;
+                      CAR ;
+                      UPDATE ;
+                      SOME ;
+                      SWAP ;
+                      UPDATE }
+                    { DROP } } } ;
+         NIL operation ;
+         PAIR } }

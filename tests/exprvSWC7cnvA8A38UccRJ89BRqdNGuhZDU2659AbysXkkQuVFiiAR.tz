@@ -1,0 +1,118 @@
+{ parameter (or (nat %buyTokens) (address %setTokenContract)) ;
+  storage
+    (pair (pair (address %admin) (address %daoMultiSig))
+          (pair (nat %price) (option %token address))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CDR ;
+             IF_NONE
+               { PUSH string "WrongCondition: self.data.token.is_some()" ; FAILWITH }
+               { DROP } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF {}
+                { PUSH string "WrongCondition: sp.sender != self.data.daoMultiSig" ;
+                  FAILWITH } ;
+             AMOUNT ;
+             PUSH mutez 1 ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             CDR ;
+             CAR ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             MUL ;
+             MUL ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: sp.mutez(params * self.data.price) == sp.amount" ;
+                  FAILWITH } ;
+             NIL operation ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             CDR ;
+             IF_NONE { PUSH int 371 ; FAILWITH } {} ;
+             CONTRACT %mint (pair (address %address) (nat %value)) ;
+             IF_NONE { PUSH int 370 ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             SENDER ;
+             PAIR %address %value ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             CDR ;
+             IF_NONE { PUSH int 371 ; FAILWITH } {} ;
+             CONTRACT %mint (pair (address %address) (nat %value)) ;
+             IF_NONE { PUSH int 370 ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             PUSH nat 10 ;
+             DIG 4 ;
+             EDIV ;
+             IF_NONE { PUSH int 380 ; FAILWITH } { CAR } ;
+             DIG 4 ;
+             DUP ;
+             DUG 5 ;
+             CAR ;
+             CDR ;
+             PAIR %address %value ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CDR ;
+             IF_NONE
+               {}
+               { PUSH string "WrongCondition: ~ self.data.token.is_some()" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             SWAP ;
+             CDR ;
+             CAR ;
+             DIG 2 ;
+             SOME ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             NIL operation } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

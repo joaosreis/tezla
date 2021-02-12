@@ -1,0 +1,25 @@
+{ parameter unit ;
+  storage unit ;
+  code { NIL string ;
+         PUSH string "3" ;
+         CONS ;
+         PUSH string "2" ;
+         CONS ;
+         PUSH string "1" ;
+         CONS ;
+         PUSH string "4" ;
+         SWAP ;
+         PAIR ;
+         DUP ;
+         CAR ;
+         PUSH bool False ;
+         SWAP ;
+         ITER { SWAP ;
+                PAIR ;
+                DUP ;
+                CAR ;
+                DIP { DUP ; CDR ; DIP { DIP { DUP } ; SWAP ; CDR } ; COMPARE ; EQ } ;
+                OR ;
+                DIP { DROP } } ;
+         DIP { DROP } ;
+         IF { PUSH string "TRUE" ; FAILWITH } { PUSH string "FALSE" ; FAILWITH } } }

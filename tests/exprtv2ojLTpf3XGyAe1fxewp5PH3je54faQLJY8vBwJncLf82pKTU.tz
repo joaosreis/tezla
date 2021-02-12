@@ -1,0 +1,11 @@
+{ parameter (or (pair %add (int %x) (int %y)) (pair %sub (int %x) (int %y))) ;
+  storage int ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DUP ; CDR ; SWAP ; DUP ; DUG 2 ; CAR ; ADD ; DUG 2 ; DROP 2 }
+           { DUP ; CDR ; SWAP ; DUP ; DUG 2 ; CAR ; SUB ; DUG 2 ; DROP 2 } ;
+         NIL operation ;
+         PAIR } }

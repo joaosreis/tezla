@@ -1,0 +1,7 @@
+{ parameter (or int string) ;
+  storage (pair int string) ;
+  code { { { DUP ; CAR ; DIP { CDR } } ;
+           DIP { { DUP ; CAR ; DIP { CDR } } } } ;
+         IF_LEFT { ADD } { DIP 2 { DROP } ; SWAP } ;
+         NIL operation ;
+         { DIP { PAIR } ; PAIR } } }

@@ -1,0 +1,14 @@
+{ parameter address ;
+  storage (list mutez) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         PUSH mutez 90 ;
+         BALANCE ;
+         { COMPARE ;
+           GT ;
+           IF { CONTRACT unit ;
+                IF_NONE
+                  { NIL operation }
+                  { DIP { NIL operation } ; PUSH mutez 30 ; UNIT ; TRANSFER_TOKENS ; CONS } }
+              { DROP ; NIL operation } } ;
+         DIP { BALANCE ; CONS } ;
+         PAIR } }

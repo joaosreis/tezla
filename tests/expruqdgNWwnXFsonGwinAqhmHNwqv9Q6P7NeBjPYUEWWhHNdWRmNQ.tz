@@ -1,0 +1,93 @@
+{ storage
+    (pair (map %horses int (pair (int %horseId) (pair (string %horseName) (int %titles))))
+          (pair (address %owner) (string %track))) ;
+  parameter
+    (or (or (pair %addHorse (int %horseId) (pair (string %horseName) (int %titles)))
+            (address %addOwner))
+        (or (string %changeTrack) (int %runrace))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { SENDER ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.owner == sp.sender" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 2 ;
+                 DUP ;
+                 SOME ;
+                 SWAP ;
+                 CAR ;
+                 UPDATE ;
+                 PAIR }
+               { SWAP ; DUP ; CAR ; SWAP ; CDR ; CDR ; DIG 2 ; PAIR ; SWAP ; PAIR } }
+           { IF_LEFT
+               { SWAP ; DUP ; CAR ; SWAP ; CDR ; CAR ; DIG 2 ; SWAP ; PAIR ; SWAP ; PAIR }
+               { DUP ;
+                 PUSH int 4 ;
+                 SWAP ;
+                 COMPARE ;
+                 LE ;
+                 IF {} { PUSH string "WrongCondition: params <= 4" ; FAILWITH } ;
+                 DUP ;
+                 PUSH int 1 ;
+                 SWAP ;
+                 COMPARE ;
+                 GE ;
+                 IF {} { PUSH string "WrongCondition: params >= 1" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 DUP ;
+                 PUSH int 1 ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 SUB ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 45 ; FAILWITH } {} ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 CAR ;
+                 PUSH int 1 ;
+                 DIG 7 ;
+                 CAR ;
+                 PUSH int 1 ;
+                 DIG 8 ;
+                 SUB ;
+                 GET ;
+                 IF_NONE { PUSH int 45 ; FAILWITH } {} ;
+                 CDR ;
+                 CDR ;
+                 ADD ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 PAIR } } ;
+         NIL operation ;
+         PAIR } }

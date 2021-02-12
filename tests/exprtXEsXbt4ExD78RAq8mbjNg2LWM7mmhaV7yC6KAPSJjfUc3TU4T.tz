@@ -1,0 +1,15 @@
+{ storage (pair (map %myMap string int) (int %storedValue)) ;
+  parameter
+    (or (unit %double)
+        (pair %mapsAndList
+           (pair (int %myInt) (list %myList int))
+           (pair (map %myMap string int) (pair (nat %myNat) (string %myString))))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DROP ; DUP ; CAR ; SWAP ; CDR ; PUSH int 2 ; MUL ; SWAP ; PAIR }
+           { DROP } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,3 @@
+{ parameter string ;
+  storage unit ;
+  code { DROP ; UNIT ; UNIT ; DROP ; DROP ; UNIT ; NIL operation ; PAIR } }

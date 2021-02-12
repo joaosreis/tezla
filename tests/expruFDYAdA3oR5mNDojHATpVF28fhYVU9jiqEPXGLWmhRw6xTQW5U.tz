@@ -1,0 +1,49 @@
+{ storage (pair (bool %rt) (bool %rf)) ;
+  parameter unit ;
+  code { LAMBDA
+           (pair (list string) string)
+           bool
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             PUSH bool False ;
+             SWAP ;
+             ITER { DIG 2 ; DUP ; DUG 3 ; COMPARE ; EQ ; OR } ;
+             DIP { DROP } } ;
+         DIG 1 ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         DIP { { { DUP ; CAR ; DIP { CDR } } } ; SWAP } ;
+         DROP ;
+         NIL string ;
+         PUSH string "3" ;
+         CONS ;
+         PUSH string "2" ;
+         CONS ;
+         PUSH string "1" ;
+         CONS ;
+         DIG 3 ;
+         DUP ;
+         DUG 4 ;
+         PUSH string "2" ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         PAIR ;
+         EXEC ;
+         DIP { DIG 2 ; DROP } ;
+         DUG 2 ;
+         DIG 3 ;
+         DUP ;
+         DUG 4 ;
+         PUSH string "0" ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         PAIR ;
+         EXEC ;
+         DIP { DIG 1 ; DROP } ;
+         DUG 1 ;
+         DROP ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP } } }

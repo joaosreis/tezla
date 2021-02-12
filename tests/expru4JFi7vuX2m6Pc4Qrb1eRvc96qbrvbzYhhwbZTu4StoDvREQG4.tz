@@ -1,0 +1,59 @@
+{ storage
+    (pair (pair (bytes %packedAddress) (bytes %packedBytes)) (bytes %packedString)) ;
+  parameter (or (or (address %packAddress) (bytes %packBytes)) (string %packString)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   DUP ;
+                   CDR ;
+                   SWAP ;
+                   CAR ;
+                   CDR ;
+                   DIG 2 ;
+                   DUP ;
+                   DUG 3 ;
+                   PACK ;
+                   PAIR ;
+                   PAIR ;
+                   DUG 2 ;
+                   DROP ;
+                   DROP } }
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   DUP ;
+                   CDR ;
+                   SWAP ;
+                   CAR ;
+                   CAR ;
+                   DIG 2 ;
+                   DUP ;
+                   DUG 3 ;
+                   PACK ;
+                   SWAP ;
+                   PAIR ;
+                   PAIR ;
+                   DUG 2 ;
+                   DROP ;
+                   DROP } } }
+           { { SWAP ;
+               DUP ;
+               DUG 2 ;
+               CAR ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               PACK ;
+               SWAP ;
+               PAIR ;
+               DUG 2 ;
+               DROP ;
+               DROP } } ;
+         NIL operation ;
+         PAIR } }

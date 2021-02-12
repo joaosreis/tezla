@@ -1,0 +1,34 @@
+{ parameter (pair address string) ;
+  storage unit ;
+  code { NIL operation ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         NIL operation ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         CONTRACT %appendLog string ;
+         IF_NONE
+           { PUSH string "bad address for get_entrypoint (%appendLog)" ; FAILWITH }
+           {} ;
+         DUP ;
+         PUSH mutez 0 ;
+         DIG 4 ;
+         DUP ;
+         DUG 5 ;
+         CDR ;
+         TRANSFER_TOKENS ;
+         NIL operation ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CONS ;
+         PUSH unit Unit ;
+         DIG 6 ;
+         DUP ;
+         DUG 7 ;
+         PAIR ;
+         DIP { DROP 7 } } }

@@ -1,0 +1,13 @@
+{ storage string ;
+  parameter string ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUP ;
+         PUSH string "Quote is" ;
+         CONCAT ;
+         DUG 2 ;
+         DROP 2 ;
+         NIL operation ;
+         PAIR } }

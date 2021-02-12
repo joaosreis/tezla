@@ -1,0 +1,40 @@
+{ storage
+    (pair (pair (int %myParameter1) (pair (int %myParameter2) (option %x address)))
+          (big_map
+             nat
+             (lambda
+                (pair (pair unit (pair (int %myParameter1) (pair (int %myParameter2) (option %x address))))
+                      address)
+                (pair (list operation)
+                      (pair (int %myParameter1) (pair (int %myParameter2) (option %x address))))))) ;
+  parameter unit ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DIG 2 ;
+         PAIR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         PUSH nat 0 ;
+         GET ;
+         IF_NONE { { PUSH string "missing entry point" ; FAILWITH } } {} ;
+         SWAP ;
+         SELF ;
+         ADDRESS ;
+         SWAP ;
+         PAIR ;
+         EXEC ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUG 2 ;
+         PAIR ;
+         SWAP ;
+         PAIR } }

@@ -1,0 +1,6 @@
+{ parameter int ;
+  storage unit ;
+  code { CAR ;
+         EQ ;
+         IF { PUSH string "oops" ; FAILWITH }
+            { PUSH nat 257 ; PUSH nat 1 ; LSL ; DROP ; UNIT ; NIL operation ; PAIR } } }

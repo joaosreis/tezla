@@ -1,0 +1,24 @@
+{ parameter unit ;
+  storage unit ;
+  code { PUSH unit Unit ;
+         DROP ;
+         SENDER ;
+         CONTRACT unit ;
+         DUP ;
+         IF_NONE { PUSH string "Option.get" ; FAILWITH } {} ;
+         DUP ;
+         PUSH mutez 1000 ;
+         PUSH unit Unit ;
+         TRANSFER_TOKENS ;
+         PUSH unit Unit ;
+         NIL operation ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CONS ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CONS ;
+         PAIR ;
+         DIP { DROP 4 } } }

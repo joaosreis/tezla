@@ -1,0 +1,8 @@
+{ parameter unit ;
+  storage timestamp ;
+  code { DROP ;
+         PUSH (int :a) 92233720368547758079223372036854775807 ;
+         PUSH (timestamp :a) 9223372036854775807 ;
+         ADD ;
+         NIL operation ;
+         PAIR } }

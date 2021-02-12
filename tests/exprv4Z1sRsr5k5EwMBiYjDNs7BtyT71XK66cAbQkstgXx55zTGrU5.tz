@@ -1,0 +1,182 @@
+{ parameter
+    (or (or (unit %getStorage) (pair %lookup (pair address address) (pair nat nat)))
+        (or (pair %requestTransfer (pair address nat) bool)
+            (pair %updateStorage
+               (pair (pair (pair (big_map %allowed address bool) (key_hash %delegated))
+                           (pair (address %factoryAddress) (nat %feeRate)))
+                     (pair (pair (nat %invariant) (key_hash %nextDelegated))
+                           (pair (big_map %shares address nat) (nat %tezPool))))
+               (pair (pair (pair (address %tokenAddress) (nat %tokenPool))
+                           (pair (nat %totalShares) (nat %veto)))
+                     (pair (pair (big_map %vetoVoters address nat) (big_map %vetos key_hash bool))
+                           (pair (big_map %voters
+                                    address
+                                    (pair (map %allowances address bool) (option %candidate key_hash)))
+                                 (big_map %votes key_hash nat))))))) ;
+  storage
+    (pair (pair (pair (pair (big_map %allowed address bool) (key_hash %delegated))
+                      (pair (address %factoryAddress) (nat %feeRate)))
+                (pair (pair (nat %invariant) (key_hash %nextDelegated))
+                      (pair (big_map %shares address nat) (nat %tezPool))))
+          (pair (pair (pair (address %tokenAddress) (nat %tokenPool))
+                      (pair (nat %totalShares) (nat %veto)))
+                (pair (pair (big_map %vetoVoters address nat) (big_map %vetos key_hash bool))
+                      (pair (big_map %voters
+                               address
+                               (pair (map %allowances address bool) (option %candidate key_hash)))
+                            (big_map %votes key_hash nat))))) ;
+  code { DUP ;
+         CDR ;
+         DUP ;
+         CAR ;
+         CAR ;
+         CAR ;
+         CAR ;
+         SENDER ;
+         GET ;
+         IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+         IF { PUSH unit Unit } { PUSH string "Not permitted" ; FAILWITH } ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 NIL operation ;
+                 SENDER ;
+                 CONTRACT %receiveDexStorage
+                   (pair (pair (pair (pair (big_map %allowed address bool) (key_hash %delegated))
+                                     (pair (address %factoryAddress) (nat %feeRate)))
+                               (pair (pair (nat %invariant) (key_hash %nextDelegated))
+                                     (pair (big_map %shares address nat) (nat %tezPool))))
+                         (pair (pair (pair (address %tokenAddress) (nat %tokenPool))
+                                     (pair (nat %totalShares) (nat %veto)))
+                               (pair (pair (big_map %vetoVoters address nat) (big_map %vetos key_hash bool))
+                                     (pair (big_map %voters
+                                              address
+                                              (pair (map %allowances address bool) (option %candidate key_hash)))
+                                           (big_map %votes key_hash nat))))) ;
+                 IF_NONE { PUSH string "01" ; FAILWITH } { DUP ; DIP { DROP } } ;
+                 AMOUNT ;
+                 DIG 7 ;
+                 DUP ;
+                 DUG 8 ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 PAIR ;
+                 DIP { DROP } }
+               { DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 NIL operation ;
+                 DIG 5 ;
+                 DUP ;
+                 DUG 6 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CONTRACT
+                   (or (pair %launchExchange address address)
+                       (pair %tokenToExchangeLookup (pair address address) nat)) ;
+                 IF_NONE { PUSH string "bad address for get_contract" ; FAILWITH } {} ;
+                 PUSH mutez 1 ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 CDR ;
+                 CDR ;
+                 MUL ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 CDR ;
+                 CAR ;
+                 DIG 5 ;
+                 DUP ;
+                 DUG 6 ;
+                 CAR ;
+                 CDR ;
+                 DIG 6 ;
+                 DUP ;
+                 DUG 7 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 RIGHT (pair address address) ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 PAIR ;
+                 DIP { DROP } } ;
+             DIP { DROP } }
+           { DUP ;
+             IF_LEFT
+               { DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 NIL operation ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 IF { DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CAR ;
+                      CAR ;
+                      CONTRACT unit ;
+                      IF_NONE { PUSH string "bad address for get_contract" ; FAILWITH } {} ;
+                      PUSH mutez 1 ;
+                      DIG 4 ;
+                      DUP ;
+                      DUG 5 ;
+                      CAR ;
+                      CDR ;
+                      MUL ;
+                      UNIT ;
+                      TRANSFER_TOKENS }
+                    { DIG 5 ;
+                      DUP ;
+                      DUG 6 ;
+                      CDR ;
+                      CAR ;
+                      CAR ;
+                      CAR ;
+                      CONTRACT
+                        (or (or (or (pair %approve address nat) (nat %burn))
+                                (or (pair %getAllowance (pair address address) (contract nat))
+                                    (pair %getBalance address (contract nat))))
+                            (or (or (pair %getTotalSupply unit (contract nat)) (nat %mint))
+                                (pair %transfer (pair address address) nat))) ;
+                      IF_NONE { PUSH string "bad address for get_contract" ; FAILWITH } {} ;
+                      PUSH mutez 0 ;
+                      DIG 4 ;
+                      DUP ;
+                      DUG 5 ;
+                      CAR ;
+                      CDR ;
+                      DIG 5 ;
+                      DUP ;
+                      DUG 6 ;
+                      CAR ;
+                      CAR ;
+                      SELF ;
+                      ADDRESS ;
+                      PAIR ;
+                      PAIR ;
+                      RIGHT (or (pair unit (contract nat)) nat) ;
+                      RIGHT
+                        (or (or (pair address nat) nat)
+                            (or (pair (pair address address) (contract nat)) (pair address (contract nat)))) ;
+                      TRANSFER_TOKENS } ;
+                 CONS ;
+                 PAIR ;
+                 DIP { DROP } }
+               { DUP ; NIL operation ; PAIR ; DIP { DROP } } ;
+             DIP { DROP } } ;
+         DIP { DROP 3 } } }

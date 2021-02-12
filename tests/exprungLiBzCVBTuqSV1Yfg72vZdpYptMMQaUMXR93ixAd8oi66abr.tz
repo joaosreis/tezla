@@ -1,0 +1,3 @@
+{ storage unit ;
+  parameter unit ;
+  code { DROP ; LAMBDA unit unit { DUP ; DROP } ; FAILWITH } }

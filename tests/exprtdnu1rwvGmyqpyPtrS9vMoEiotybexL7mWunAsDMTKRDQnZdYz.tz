@@ -1,0 +1,1466 @@
+{ parameter
+    (or (or (or (or (or (or (address %setRoleNone) (pair %getAdministrator unit (contract address)))
+                        (or (address %offerRoleAdmin) (unit %acceptRoleAdmin)))
+                    (or (or (address %setRoleBurn) (pair %getRoleBurn unit (contract (option address))))
+                        (or (address %setRoleMint) (pair %getRoleMint unit (contract (option address))))))
+                (or (or (or (address %setRoleAdjust) (pair %getRoleAdjust unit (contract (option address))))
+                        (or (address %setRoleRegister) (pair %getRoleRegister unit (contract (set address)))))
+                    (or (or (address %setRoleActivate)
+                            (pair %getRoleActivate unit (contract (option address))))
+                        (or (address %setRoleDeactivate)
+                            (pair %getRoleDeactivate unit (contract (option address)))))))
+            (or (or (or (pair %transfer (address :from) (pair (address :to) (nat :value)))
+                        (or (pair %approve (address :spender) (nat :value))
+                            (pair %getAllowance (pair (address :owner) (address :spender)) (contract nat))))
+                    (or (pair %getBalance (address :owner) (contract nat))
+                        (or (pair %getTotalMinted unit (contract nat))
+                            (pair %getCapReduction unit (lambda nat nat)))))
+                (or (or (pair %getHardCap unit (lambda nat nat))
+                        (or (pair %mint (address :to) (nat :value)) (pair %burn (address :from) (nat :value))))
+                    (or (option %halt timestamp)
+                        (or (unit %resume) (pair %getPaused unit (lambda bool bool)))))))
+        (or (or (or (address %register) (pair %getStatus address (lambda bool bool)))
+                (or (address %setStatusActivate) (address %setStatusDeactivate)))
+            (or (or (address %adjustCapTable) (address :source %setDistributionSource))
+                (or (pair %getDistributionList unit (lambda (option address) (option address)))
+                    (or (unit %nextBatchTransfer)
+                        (list %performBatchTransfer (pair (address :to) (nat :value)))))))) ;
+  storage
+    (pair (pair (big_map address (pair (pair nat (map address nat)) (pair bool nat)))
+                (pair (pair (pair address (option address)) (pair (option address) (option address)))
+                      (pair (pair (option address) (set address)) (pair (option address) (option address)))))
+          (pair (pair (pair nat nat) (pair nat (option timestamp)))
+                (pair (option address) (pair (option address) nat)))) ;
+  code { CAST (pair (or (or (or (or (or (or address (pair unit (contract address))) (or address unit))
+                                    (or (or address (pair unit (contract (option address))))
+                                        (or address (pair unit (contract (option address))))))
+                                (or (or (or address (pair unit (contract (option address))))
+                                        (or address (pair unit (contract (set address)))))
+                                    (or (or address (pair unit (contract (option address))))
+                                        (or address (pair unit (contract (option address)))))))
+                            (or (or (or (pair address (pair address nat))
+                                        (or (pair address nat) (pair (pair address address) (contract nat))))
+                                    (or (pair address (contract nat)) (or (pair unit (contract nat)) (pair unit (lambda nat nat)))))
+                                (or (or (pair unit (lambda nat nat)) (or (pair address nat) (pair address nat)))
+                                    (or (option timestamp) (or unit (pair unit (lambda bool bool)))))))
+                        (or (or (or address (pair address (lambda bool bool))) (or address address))
+                            (or (or address address)
+                                (or (pair unit (lambda (option address) (option address))) (or unit (list (pair address nat)))))))
+                    (pair (pair (big_map address (pair (pair nat (map address nat)) (pair bool nat)))
+                                (pair (pair (pair address (option address)) (pair (option address) (option address)))
+                                      (pair (pair (option address) (set address)) (pair (option address) (option address)))))
+                          (pair (pair (pair nat nat) (pair nat (option timestamp)))
+                                (pair (option address) (pair (option address) nat))))) ;
+         NIL operation ;
+         SWAP ;
+         DUP ;
+         CAR ;
+         DIP { CDR } ;
+         DUP ;
+         IF_LEFT
+           { IF_LEFT
+               { DUP ;
+                 IF_LEFT
+                   { IF_LEFT
+                       { IF_LEFT
+                           { IF_LEFT
+                               { DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF {} { UNIT ; PUSH string "SenderNotAdmin" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CAR ;
+                                 DUP ;
+                                 DIP 2 { DUP } ;
+                                 DIG 2 ;
+                                 GET ;
+                                 IF_NONE
+                                   { UNIT ; PUSH string "AddressNotOnCapTable" ; PAIR ; FAILWITH }
+                                   { DUP ;
+                                     CDR ;
+                                     CDR ;
+                                     PUSH nat 0 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF { UNIT ; PUSH string "ErrorAdminRemove" ; PAIR ; FAILWITH } {} ;
+                                     PUSH nat 1 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF { NONE address ;
+                                          DUG 6 ;
+                                          DIP 6
+                                              { DIP { DUP ; CAR ; CDR } ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR ;
+                                                PAIR ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR } }
+                                        {} ;
+                                     PUSH nat 2 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF { NONE address ;
+                                          DUG 6 ;
+                                          DIP 6
+                                              { DIP { DUP ; CAR ; CDR } ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DROP } ;
+                                                PAIR ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR } }
+                                        {} ;
+                                     PUSH nat 3 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF { NONE address ;
+                                          DUG 6 ;
+                                          DIP 6
+                                              { DIP { DUP ; CAR ; CDR } ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR } }
+                                        {} ;
+                                     PUSH nat 4 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF { NONE address ;
+                                          DUG 6 ;
+                                          DIP 6
+                                              { DIP { DUP ; CAR ; CDR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DROP } ;
+                                                PAIR ;
+                                                PAIR ;
+                                                SWAP ;
+                                                PAIR ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR } }
+                                        {} ;
+                                     PUSH nat 5 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF { DIP 6 { DUP } ;
+                                          DIG 6 ;
+                                          CAR ;
+                                          CDR ;
+                                          CDR ;
+                                          CAR ;
+                                          CDR ;
+                                          DUP ;
+                                          DIP 5 { DUP } ;
+                                          DIG 5 ;
+                                          DIP { PUSH bool False } ;
+                                          UPDATE ;
+                                          DUG 7 ;
+                                          DIP 7
+                                              { DIP { DUP ; CAR ; CDR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR ;
+                                                SWAP ;
+                                                PAIR ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR } ;
+                                          DROP }
+                                        {} ;
+                                     PUSH nat 6 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF { NONE address ;
+                                          DUG 6 ;
+                                          DIP 6
+                                              { DIP { DUP ; CAR ; CDR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DROP } ;
+                                                PAIR ;
+                                                SWAP ;
+                                                PAIR ;
+                                                SWAP ;
+                                                PAIR ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR } }
+                                        {} ;
+                                     PUSH nat 7 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF { NONE address ;
+                                          DUG 6 ;
+                                          DIP 6
+                                              { DIP { DUP ; CAR ; CDR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                SWAP ;
+                                                PAIR ;
+                                                SWAP ;
+                                                PAIR ;
+                                                DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                DIP { DROP } ;
+                                                SWAP ;
+                                                PAIR ;
+                                                PAIR } }
+                                        {} ;
+                                     PUSH nat 8 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF { UNIT ; PUSH string "RoleIsAlreadyNone" ; PAIR ; FAILWITH } {} ;
+                                     DIP 2 { DUP } ;
+                                     DIG 2 ;
+                                     DIP 2 { DUP } ;
+                                     DIG 2 ;
+                                     PUSH nat 8 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 5 { DUP } ;
+                                     DIG 5 ;
+                                     UPDATE ;
+                                     DIP { DROP } ;
+                                     DIP { DROP } } ;
+                                 DUP ;
+                                 DUG 5 ;
+                                 DIP 5
+                                     { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 DROP ;
+                                 DROP }
+                               { DUP ;
+                                 CDR ;
+                                 AMOUNT ;
+                                 DIP 5 { DUP } ;
+                                 DIG 5 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 TRANSFER_TOKENS ;
+                                 DUG 4 ;
+                                 DIP 4 { CONS } ;
+                                 DROP } }
+                           { IF_LEFT
+                               { DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF {} { UNIT ; PUSH string "SenderNotAdmin" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CDR ;
+                                 IF_NONE
+                                   {}
+                                   { DIP 4 { DUP } ;
+                                     DIG 4 ;
+                                     CAR ;
+                                     CAR ;
+                                     DUP ;
+                                     DIP 2 { DUP } ;
+                                     DIG 2 ;
+                                     GET ;
+                                     IF_NONE
+                                       { UNIT ; PUSH string "AddressNotOnCapTable" ; PAIR ; FAILWITH }
+                                       { DUP ;
+                                         CDR ;
+                                         CDR ;
+                                         PUSH nat 0 ;
+                                         DIP { DUP } ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         IF { UNIT ; PUSH string "ErrorAdminRemove" ; PAIR ; FAILWITH } {} ;
+                                         PUSH nat 1 ;
+                                         DIP { DUP } ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         IF { NONE address ;
+                                              DUG 7 ;
+                                              DIP 7
+                                                  { DIP { DUP ; CAR ; CDR } ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR } }
+                                            {} ;
+                                         PUSH nat 2 ;
+                                         DIP { DUP } ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         IF { NONE address ;
+                                              DUG 7 ;
+                                              DIP 7
+                                                  { DIP { DUP ; CAR ; CDR } ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DROP } ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR } }
+                                            {} ;
+                                         PUSH nat 3 ;
+                                         DIP { DUP } ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         IF { NONE address ;
+                                              DUG 7 ;
+                                              DIP 7
+                                                  { DIP { DUP ; CAR ; CDR } ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR } }
+                                            {} ;
+                                         PUSH nat 4 ;
+                                         DIP { DUP } ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         IF { NONE address ;
+                                              DUG 7 ;
+                                              DIP 7
+                                                  { DIP { DUP ; CAR ; CDR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DROP } ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR } }
+                                            {} ;
+                                         PUSH nat 5 ;
+                                         DIP { DUP } ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         IF { DIP 7 { DUP } ;
+                                              DIG 7 ;
+                                              CAR ;
+                                              CDR ;
+                                              CDR ;
+                                              CAR ;
+                                              CDR ;
+                                              DUP ;
+                                              DIP 5 { DUP } ;
+                                              DIG 5 ;
+                                              DIP { PUSH bool False } ;
+                                              UPDATE ;
+                                              DUG 8 ;
+                                              DIP 8
+                                                  { DIP { DUP ; CAR ; CDR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR } ;
+                                              DROP }
+                                            {} ;
+                                         PUSH nat 6 ;
+                                         DIP { DUP } ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         IF { NONE address ;
+                                              DUG 7 ;
+                                              DIP 7
+                                                  { DIP { DUP ; CAR ; CDR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DROP } ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR } }
+                                            {} ;
+                                         PUSH nat 7 ;
+                                         DIP { DUP } ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         IF { NONE address ;
+                                              DUG 7 ;
+                                              DIP 7
+                                                  { DIP { DUP ; CAR ; CDR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    DIP { DUP ; DIP { CDR } ; CAR } ;
+                                                    DIP { DUP ; DIP { CAR } ; CDR } ;
+                                                    DIP { DROP } ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR } }
+                                            {} ;
+                                         PUSH nat 8 ;
+                                         DIP { DUP } ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         IF { UNIT ; PUSH string "RoleIsAlreadyNone" ; PAIR ; FAILWITH } {} ;
+                                         DIP 2 { DUP } ;
+                                         DIG 2 ;
+                                         DIP 2 { DUP } ;
+                                         DIG 2 ;
+                                         PUSH nat 8 ;
+                                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                                         DIP { DUP ; DIP { CAR } ; CDR } ;
+                                         DIP { DROP } ;
+                                         SWAP ;
+                                         PAIR ;
+                                         SWAP ;
+                                         PAIR ;
+                                         SOME ;
+                                         DIP 5 { DUP } ;
+                                         DIG 5 ;
+                                         UPDATE ;
+                                         DIP { DROP } ;
+                                         DIP { DROP } } ;
+                                     DUP ;
+                                     DUG 6 ;
+                                     DIP 6
+                                         { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                           DIP { DUP ; DIP { CDR } ; CAR } ;
+                                           DIP { DROP } ;
+                                           PAIR ;
+                                           PAIR } ;
+                                     DROP ;
+                                     DROP ;
+                                     DROP } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CAR ;
+                                 DUP ;
+                                 DIP 2 { DUP } ;
+                                 DIG 2 ;
+                                 GET ;
+                                 IF_NONE
+                                   { DUP ;
+                                     PUSH nat 0 ;
+                                     DIP { PUSH (map address nat) {} } ;
+                                     PAIR ;
+                                     DIP { PUSH bool True ; DIP { PUSH nat 1 } ; PAIR } ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 3 { DUP } ;
+                                     DIG 3 ;
+                                     UPDATE ;
+                                     DIP {} }
+                                   { PUSH nat 8 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     CDR ;
+                                     CDR ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF {} { UNIT ; PUSH string "AlreadyHasNonNoneRole" ; PAIR ; FAILWITH } ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 1 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 4 { DUP } ;
+                                     DIG 4 ;
+                                     UPDATE ;
+                                     DIP {} ;
+                                     DIP { DROP } } ;
+                                 DUP ;
+                                 DUG 5 ;
+                                 DIP 5
+                                     { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 DROP ;
+                                 DUP ;
+                                 SOME ;
+                                 DUG 3 ;
+                                 DIP 3
+                                     { DIP { DUP ; CAR ; CDR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR ;
+                                       PAIR ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP }
+                               { DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CDR ;
+                                 IF_NONE
+                                   { UNIT ; PUSH string "SenderNotNewAdmin" ; PAIR ; FAILWITH }
+                                   { DUP ;
+                                     SENDER ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF {} { UNIT ; PUSH string "SenderNotNewAdmin" ; PAIR ; FAILWITH } ;
+                                     DROP } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CAR ;
+                                 DUP ;
+                                 DIP 5 { DUP } ;
+                                 DIG 5 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 GET ;
+                                 IF_NONE
+                                   { UNIT ; PUSH string "AddressNotOnCapTable" ; PAIR ; FAILWITH }
+                                   { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 8 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 7 { DUP } ;
+                                     DIG 7 ;
+                                     CAR ;
+                                     CDR ;
+                                     CAR ;
+                                     CAR ;
+                                     CAR ;
+                                     UPDATE ;
+                                     DIP 2 { DROP } ;
+                                     DUG 1 ;
+                                     DROP } ;
+                                 DUP ;
+                                 SENDER ;
+                                 GET ;
+                                 IF_NONE
+                                   { UNIT ; PUSH string "AddressNotOnCapTable" ; PAIR ; FAILWITH }
+                                   { DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 0 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     SENDER ;
+                                     UPDATE ;
+                                     DIP 2 { DROP } ;
+                                     DUG 1 ;
+                                     DROP } ;
+                                 DUP ;
+                                 DUG 4 ;
+                                 DIP 4
+                                     { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 SENDER ;
+                                 DUG 3 ;
+                                 DIP 3
+                                     { DIP { DUP ; CAR ; CDR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR ;
+                                       PAIR ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 NONE address ;
+                                 DUG 3 ;
+                                 DIP 3
+                                     { DIP { DUP ; CAR ; CDR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR ;
+                                       PAIR ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP } } }
+                       { IF_LEFT
+                           { IF_LEFT
+                               { DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF {} { UNIT ; PUSH string "SenderNotAdmin" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 IF_NONE {} { UNIT ; PUSH string "RoleAlreadyAssigned" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CAR ;
+                                 DUP ;
+                                 DIP 2 { DUP } ;
+                                 DIG 2 ;
+                                 GET ;
+                                 IF_NONE
+                                   { DUP ;
+                                     PUSH nat 0 ;
+                                     DIP { PUSH (map address nat) {} } ;
+                                     PAIR ;
+                                     DIP { PUSH bool True ; DIP { PUSH nat 2 } ; PAIR } ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 3 { DUP } ;
+                                     DIG 3 ;
+                                     UPDATE ;
+                                     DIP {} }
+                                   { PUSH nat 8 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     CDR ;
+                                     CDR ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF {} { UNIT ; PUSH string "AlreadyHasNonNoneRole" ; PAIR ; FAILWITH } ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 2 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 4 { DUP } ;
+                                     DIG 4 ;
+                                     UPDATE ;
+                                     DIP {} ;
+                                     DIP { DROP } } ;
+                                 DUP ;
+                                 DUG 5 ;
+                                 DIP 5
+                                     { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 DROP ;
+                                 DUP ;
+                                 SOME ;
+                                 DUG 3 ;
+                                 DIP 3
+                                     { DIP { DUP ; CAR ; CDR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP }
+                               { DUP ;
+                                 CDR ;
+                                 AMOUNT ;
+                                 DIP 5 { DUP } ;
+                                 DIG 5 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 TRANSFER_TOKENS ;
+                                 DUG 4 ;
+                                 DIP 4 { CONS } ;
+                                 DROP } }
+                           { IF_LEFT
+                               { DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF {} { UNIT ; PUSH string "SenderNotAdmin" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 IF_NONE {} { UNIT ; PUSH string "RoleAlreadyAssigned" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CAR ;
+                                 DUP ;
+                                 DIP 2 { DUP } ;
+                                 DIG 2 ;
+                                 GET ;
+                                 IF_NONE
+                                   { DUP ;
+                                     PUSH nat 0 ;
+                                     DIP { PUSH (map address nat) {} } ;
+                                     PAIR ;
+                                     DIP { PUSH bool True ; DIP { PUSH nat 3 } ; PAIR } ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 3 { DUP } ;
+                                     DIG 3 ;
+                                     UPDATE ;
+                                     DIP {} }
+                                   { PUSH nat 8 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     CDR ;
+                                     CDR ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF {} { UNIT ; PUSH string "AlreadyHasNonNoneRole" ; PAIR ; FAILWITH } ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 3 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 4 { DUP } ;
+                                     DIG 4 ;
+                                     UPDATE ;
+                                     DIP {} ;
+                                     DIP { DROP } } ;
+                                 DUP ;
+                                 DUG 5 ;
+                                 DIP 5
+                                     { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 DROP ;
+                                 DUP ;
+                                 SOME ;
+                                 DUG 3 ;
+                                 DIP 3
+                                     { DIP { DUP ; CAR ; CDR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP }
+                               { DUP ;
+                                 CDR ;
+                                 AMOUNT ;
+                                 DIP 5 { DUP } ;
+                                 DIG 5 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 TRANSFER_TOKENS ;
+                                 DUG 4 ;
+                                 DIP 4 { CONS } ;
+                                 DROP } } } }
+                   { IF_LEFT
+                       { IF_LEFT
+                           { IF_LEFT
+                               { DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF {} { UNIT ; PUSH string "SenderNotAdmin" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 IF_NONE {} { UNIT ; PUSH string "RoleAlreadyAssigned" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CAR ;
+                                 DUP ;
+                                 DIP 2 { DUP } ;
+                                 DIG 2 ;
+                                 GET ;
+                                 IF_NONE
+                                   { DUP ;
+                                     PUSH nat 0 ;
+                                     DIP { PUSH (map address nat) {} } ;
+                                     PAIR ;
+                                     DIP { PUSH bool True ; DIP { PUSH nat 4 } ; PAIR } ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 3 { DUP } ;
+                                     DIG 3 ;
+                                     UPDATE ;
+                                     DIP {} }
+                                   { PUSH nat 8 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     CDR ;
+                                     CDR ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF {} { UNIT ; PUSH string "AlreadyHasNonNoneRole" ; PAIR ; FAILWITH } ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 4 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 4 { DUP } ;
+                                     DIG 4 ;
+                                     UPDATE ;
+                                     DIP {} ;
+                                     DIP { DROP } } ;
+                                 DUP ;
+                                 DUG 5 ;
+                                 DIP 5
+                                     { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 DROP ;
+                                 DUP ;
+                                 SOME ;
+                                 DUG 3 ;
+                                 DIP 3
+                                     { DIP { DUP ; CAR ; CDR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP }
+                               { DUP ;
+                                 CDR ;
+                                 AMOUNT ;
+                                 DIP 5 { DUP } ;
+                                 DIG 5 ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 TRANSFER_TOKENS ;
+                                 DUG 4 ;
+                                 DIP 4 { CONS } ;
+                                 DROP } }
+                           { IF_LEFT
+                               { DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF {} { UNIT ; PUSH string "SenderNotAdmin" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CAR ;
+                                 DUP ;
+                                 DIP 2 { DUP } ;
+                                 DIG 2 ;
+                                 GET ;
+                                 IF_NONE
+                                   { DUP ;
+                                     PUSH nat 0 ;
+                                     DIP { PUSH (map address nat) {} } ;
+                                     PAIR ;
+                                     DIP { PUSH bool True ; DIP { PUSH nat 5 } ; PAIR } ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 3 { DUP } ;
+                                     DIG 3 ;
+                                     UPDATE ;
+                                     DIP {} }
+                                   { PUSH nat 8 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     CDR ;
+                                     CDR ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF {} { UNIT ; PUSH string "AlreadyHasNonNoneRole" ; PAIR ; FAILWITH } ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 5 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 4 { DUP } ;
+                                     DIG 4 ;
+                                     UPDATE ;
+                                     DIP {} ;
+                                     DIP { DROP } } ;
+                                 DUP ;
+                                 DUG 5 ;
+                                 DIP 5
+                                     { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 DROP ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 CAR ;
+                                 CDR ;
+                                 DUP ;
+                                 DIP 2 { DUP } ;
+                                 DIG 2 ;
+                                 DIP { PUSH bool True } ;
+                                 UPDATE ;
+                                 DUG 4 ;
+                                 DIP 4
+                                     { DIP { DUP ; CAR ; CDR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 DROP }
+                               { DUP ;
+                                 CDR ;
+                                 AMOUNT ;
+                                 DIP 5 { DUP } ;
+                                 DIG 5 ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 CAR ;
+                                 CDR ;
+                                 TRANSFER_TOKENS ;
+                                 DUG 4 ;
+                                 DIP 4 { CONS } ;
+                                 DROP } } }
+                       { IF_LEFT
+                           { IF_LEFT
+                               { DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF {} { UNIT ; PUSH string "SenderNotAdmin" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 CDR ;
+                                 CAR ;
+                                 IF_NONE {} { UNIT ; PUSH string "RoleAlreadyAssigned" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CAR ;
+                                 DUP ;
+                                 DIP 2 { DUP } ;
+                                 DIG 2 ;
+                                 GET ;
+                                 IF_NONE
+                                   { DUP ;
+                                     PUSH nat 0 ;
+                                     DIP { PUSH (map address nat) {} } ;
+                                     PAIR ;
+                                     DIP { PUSH bool True ; DIP { PUSH nat 6 } ; PAIR } ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 3 { DUP } ;
+                                     DIG 3 ;
+                                     UPDATE ;
+                                     DIP {} }
+                                   { PUSH nat 8 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     CDR ;
+                                     CDR ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF {} { UNIT ; PUSH string "AlreadyHasNonNoneRole" ; PAIR ; FAILWITH } ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 6 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 4 { DUP } ;
+                                     DIG 4 ;
+                                     UPDATE ;
+                                     DIP {} ;
+                                     DIP { DROP } } ;
+                                 DUP ;
+                                 DUG 5 ;
+                                 DIP 5
+                                     { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 DROP ;
+                                 DUP ;
+                                 SOME ;
+                                 DUG 3 ;
+                                 DIP 3
+                                     { DIP { DUP ; CAR ; CDR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP }
+                               { DUP ;
+                                 CDR ;
+                                 AMOUNT ;
+                                 DIP 5 { DUP } ;
+                                 DIG 5 ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 CDR ;
+                                 CAR ;
+                                 TRANSFER_TOKENS ;
+                                 DUG 4 ;
+                                 DIP 4 { CONS } ;
+                                 DROP } }
+                           { IF_LEFT
+                               { DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 CAR ;
+                                 CAR ;
+                                 SENDER ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF {} { UNIT ; PUSH string "SenderNotAdmin" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 CDR ;
+                                 CDR ;
+                                 IF_NONE {} { UNIT ; PUSH string "RoleAlreadyAssigned" ; PAIR ; FAILWITH } ;
+                                 DIP 3 { DUP } ;
+                                 DIG 3 ;
+                                 CAR ;
+                                 CAR ;
+                                 DUP ;
+                                 DIP 2 { DUP } ;
+                                 DIG 2 ;
+                                 GET ;
+                                 IF_NONE
+                                   { DUP ;
+                                     PUSH nat 0 ;
+                                     DIP { PUSH (map address nat) {} } ;
+                                     PAIR ;
+                                     DIP { PUSH bool True ; DIP { PUSH nat 7 } ; PAIR } ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 3 { DUP } ;
+                                     DIG 3 ;
+                                     UPDATE ;
+                                     DIP {} }
+                                   { PUSH nat 8 ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     CDR ;
+                                     CDR ;
+                                     COMPARE ;
+                                     EQ ;
+                                     IF {} { UNIT ; PUSH string "AlreadyHasNonNoneRole" ; PAIR ; FAILWITH } ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     DIP { DUP } ;
+                                     SWAP ;
+                                     PUSH nat 7 ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DUP ; DIP { CAR } ; CDR } ;
+                                     DIP { DROP } ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SOME ;
+                                     DIP 4 { DUP } ;
+                                     DIG 4 ;
+                                     UPDATE ;
+                                     DIP {} ;
+                                     DIP { DROP } } ;
+                                 DUP ;
+                                 DUG 5 ;
+                                 DIP 5
+                                     { DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DROP } ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP ;
+                                 DROP ;
+                                 DUP ;
+                                 SOME ;
+                                 DUG 3 ;
+                                 DIP 3
+                                     { DIP { DUP ; CAR ; CDR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       DIP { DUP ; DIP { CDR } ; CAR } ;
+                                       DIP { DUP ; DIP { CAR } ; CDR } ;
+                                       DIP { DROP } ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR } ;
+                                 DROP }
+                               { DUP ;
+                                 CDR ;
+                                 AMOUNT ;
+                                 DIP 5 { DUP } ;
+                                 DIG 5 ;
+                                 CAR ;
+                                 CDR ;
+                                 CDR ;
+                                 CDR ;
+                                 CDR ;
+                                 TRANSFER_TOKENS ;
+                                 DUG 4 ;
+                                 DIP 4 { CONS } ;
+                                 DROP } } } } ;
+                 DROP }
+               { DROP } }
+           { IF_LEFT { DROP } { DROP } } ;
+         DROP ;
+         SWAP ;
+         PAIR } }

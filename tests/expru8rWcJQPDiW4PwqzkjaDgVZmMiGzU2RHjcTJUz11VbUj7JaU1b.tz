@@ -1,0 +1,16 @@
+{ parameter (pair string address) ;
+  storage unit ;
+  code { CAR ;
+         DUP ;
+         CDR ;
+         CONTRACT string ;
+         IF_NONE
+           { DROP ; NIL operation }
+           { SWAP ;
+             CAR ;
+             DIP { PUSH mutez 0 } ;
+             TRANSFER_TOKENS ;
+             DIP { NIL operation } ;
+             CONS } ;
+         DIP { PUSH unit Unit } ;
+         PAIR } }

@@ -1,0 +1,26 @@
+{ storage (pair (bytes %aaa) (pair (bytes %bbb) (bytes %ccc))) ;
+  parameter address ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         CDR ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         PACK ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         DUG 2 ;
+         DROP ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

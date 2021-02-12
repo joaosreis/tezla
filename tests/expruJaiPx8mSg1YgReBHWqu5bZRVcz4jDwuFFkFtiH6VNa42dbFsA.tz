@@ -1,0 +1,79 @@
+{ parameter
+    (or (or (pair %register nat key)
+            (pair %setSettings
+               (pair (big_map nat (pair (nat %fee) (nat %price))) nat)
+               (pair string string)))
+        (pair %withdrawFee address nat)) ;
+  storage
+    (pair (pair (pair (pair (big_map %accounts
+                               address
+                               (pair (pair (pair (nat %balance) (nat %deals_count))
+                                           (pair (key %public_key) (nat %refunds_count)))
+                                     (pair (timestamp %subscribed_until) (nat %subscription))))
+                            (nat %cashback))
+                      (pair (nat %fee_pool) (big_map %items string (pair (nat %price) (address %seller_id)))))
+                (pair (pair (string %items_db)
+                            (big_map %orders
+                               string
+                               (pair (pair (pair (address %buyer_id) (nat %count)) (pair (string %item) (address %seller_id)))
+                                     (pair (pair (nat %status) (nat %total_price)) (timestamp %valid_until)))))
+                      (pair (string %orders_db) (address %owner))))
+          (pair (pair (big_map %refunds string string)
+                      (big_map %subscriptions nat (pair (nat %fee) (nat %price))))
+                (address %token))) ;
+  code { DUP ;
+         CDR ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 PAIR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SELF ;
+                 ADDRESS ;
+                 PAIR ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 CDR ;
+                 NIL operation ;
+                 PAIR ;
+                 DIP { DROP 2 } }
+               { DIG 2 ; DUP ; DUG 3 ; NIL operation ; PAIR ; DIP { DROP } } ;
+             DIP { DROP } }
+           { DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             PAIR ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SELF ;
+             ADDRESS ;
+             PAIR ;
+             PAIR ;
+             DUP ;
+             CDR ;
+             CDR ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP 2 } } ;
+         DIP { DROP 2 } } }
