@@ -1,0 +1,11 @@
+{ parameter unit ;
+  storage (option string) ;
+  code { DUP ;
+         CDR ;
+         PUSH bytes 0x050100000009617263686574797065 ;
+         UNPACK string ;
+         DIP { DROP } ;
+         DUP ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 2 } } }

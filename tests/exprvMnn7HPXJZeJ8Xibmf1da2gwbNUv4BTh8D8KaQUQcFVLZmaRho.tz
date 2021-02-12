@@ -1,0 +1,4 @@
+{ parameter unit ;
+  storage
+    (pair (map %theBigMap (pair nat address) int) (map %theMap (pair nat address) int)) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

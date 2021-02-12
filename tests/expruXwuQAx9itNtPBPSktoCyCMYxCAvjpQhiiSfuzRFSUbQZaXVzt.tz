@@ -1,0 +1,23 @@
+{ storage unit ;
+  parameter (pair (contract %k nat) (nat %x)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUP ;
+         CAR ;
+         NIL operation ;
+         SWAP ;
+         PUSH mutez 0 ;
+         PUSH nat 2 ;
+         DIG 4 ;
+         DUP ;
+         DUG 5 ;
+         CDR ;
+         EDIV ;
+         IF_NONE { { PUSH string "division by zero" ; FAILWITH } } { CAR } ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         SWAP ;
+         DROP ;
+         PAIR } }

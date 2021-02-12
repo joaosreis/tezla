@@ -1,0 +1,38 @@
+{ storage (pair (pair (string %text) (string %translated_text)) (bool %validity)) ;
+  parameter (or (string %setTranslation) (bool %setValidity)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               CDR ;
+               SWAP ;
+               CAR ;
+               CAR ;
+               DIG 2 ;
+               DUP ;
+               DUG 3 ;
+               SWAP ;
+               PAIR ;
+               PAIR ;
+               DUG 2 ;
+               DROP ;
+               DROP } }
+           { { SWAP ;
+               DUP ;
+               DUG 2 ;
+               CAR ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               SWAP ;
+               PAIR ;
+               DUG 2 ;
+               DROP ;
+               DROP } } ;
+         NIL operation ;
+         PAIR } }

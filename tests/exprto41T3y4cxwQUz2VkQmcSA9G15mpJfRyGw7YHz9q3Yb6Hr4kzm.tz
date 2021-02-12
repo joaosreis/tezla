@@ -1,0 +1,110 @@
+{ parameter
+    (or (int %closeOrder)
+        (pair %purchase
+           (pair (string %contactPerson) (string %deliveryAddress))
+           (pair (string %item) (int %units)))) ;
+  storage
+    (pair (address %admin)
+          (pair (int %counter)
+                (map %orders
+                   int
+                   (pair (pair (string %contactPerson) (string %deliveryAddress))
+                         (pair (bool %fulfilled) (pair (string %item) (int %units))))))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CAR ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             DIG 4 ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             { IF_NONE { PUSH int 20 ; FAILWITH } {} } ;
+             DUP ;
+             CAR ;
+             SWAP ;
+             { CDR ; CDR } ;
+             PUSH bool True ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR }
+           { SWAP ;
+             DUP ;
+             CAR ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             PUSH int 1 ;
+             ADD ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             DUP ;
+             DUG 2 ;
+             DUP ;
+             CAR ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CAR ;
+             SWAP ;
+             CDR ;
+             DIG 4 ;
+             { CDR ; CAR } ;
+             DIG 4 ;
+             DUP ;
+             DUG 5 ;
+             { CDR ; CDR } ;
+             DIG 5 ;
+             DUP ;
+             DUG 6 ;
+             { CDR ; CAR } ;
+             PAIR %item %units ;
+             PUSH bool False ;
+             PAIR %fulfilled ;
+             DIG 5 ;
+             DUP ;
+             DUG 6 ;
+             { CAR ; CDR } ;
+             DIG 6 ;
+             { CAR ; CAR } ;
+             PAIR %contactPerson %deliveryAddress ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR } ;
+         NIL operation ;
+         PAIR } }

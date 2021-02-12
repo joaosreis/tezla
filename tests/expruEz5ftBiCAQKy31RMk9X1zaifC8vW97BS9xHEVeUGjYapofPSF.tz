@@ -1,0 +1,8 @@
+{ parameter string ;
+  storage (big_map address string) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         SOME ;
+         SENDER ;
+         UPDATE ;
+         NIL operation ;
+         PAIR } }

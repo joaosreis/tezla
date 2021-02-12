@@ -1,0 +1,5 @@
+{ parameter
+    (or (pair %transfer (address :from) (pair (address :to) (nat :value)))
+        (pair %approve (address :spender) (nat :value))) ;
+  storage unit ;
+  code { FAILWITH } }

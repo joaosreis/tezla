@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (pair (pair (address %main) (address %sender)) (nat %tmp)) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

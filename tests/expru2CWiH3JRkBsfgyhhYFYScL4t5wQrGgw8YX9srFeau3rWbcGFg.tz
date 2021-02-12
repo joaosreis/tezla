@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage string ;
+  code { DROP ; PUSH string "Hello Tezos" ; NIL operation ; PAIR } }

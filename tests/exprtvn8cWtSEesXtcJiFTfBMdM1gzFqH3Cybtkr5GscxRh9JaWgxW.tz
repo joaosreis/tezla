@@ -1,0 +1,3 @@
+{ parameter nat ;
+  storage unit ;
+  code { DROP ; UNIT ; NIL operation ; PAIR } }

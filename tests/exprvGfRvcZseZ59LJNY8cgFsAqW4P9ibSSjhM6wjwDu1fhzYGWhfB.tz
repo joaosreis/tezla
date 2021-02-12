@@ -1,0 +1,94 @@
+{ parameter (pair (pair string string) address) ;
+  storage
+    (pair (big_map %tokens
+             string
+             (pair (pair (pair (address %address) (timestamp %createdOn))
+                         (pair (string %name) (address %owner)))
+                   (string %symbol)))
+          (set %tokensList string)) ;
+  code { DUP ;
+         CAR ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         GT ;
+         IF { PUSH string "NoTokenAccepted" ; FAILWITH }
+            { DUP ;
+              CDR ;
+              DIG 2 ;
+              DUP ;
+              DUG 3 ;
+              CAR ;
+              CDR ;
+              MEM ;
+              IF { PUSH string "TokenAlreadyExists" ; FAILWITH }
+                 { DIG 1 ;
+                   DUP ;
+                   DUG 2 ;
+                   CAR ;
+                   CDR ;
+                   SOURCE ;
+                   DIG 3 ;
+                   DUP ;
+                   DUG 4 ;
+                   CAR ;
+                   CAR ;
+                   PAIR ;
+                   NOW ;
+                   DIG 4 ;
+                   DUP ;
+                   DUG 5 ;
+                   CDR ;
+                   PAIR ;
+                   PAIR ;
+                   PAIR ;
+                   DIG 1 ;
+                   DUP ;
+                   DUG 2 ;
+                   CAR ;
+                   DIG 3 ;
+                   DUP ;
+                   DUG 4 ;
+                   CAR ;
+                   CDR ;
+                   GET ;
+                   IF_NONE
+                     { DIG 1 ;
+                       DUP ;
+                       DUG 2 ;
+                       CAR ;
+                       DIG 1 ;
+                       DUP ;
+                       DUG 2 ;
+                       SOME ;
+                       DIG 4 ;
+                       DUP ;
+                       DUG 5 ;
+                       CAR ;
+                       CDR ;
+                       UPDATE }
+                     { PUSH string "TokenAlreadyExists" ; FAILWITH } ;
+                   DIG 2 ;
+                   DUP ;
+                   DUG 3 ;
+                   CDR ;
+                   DIG 4 ;
+                   DUP ;
+                   DUG 5 ;
+                   CAR ;
+                   CDR ;
+                   PUSH bool True ;
+                   SWAP ;
+                   UPDATE ;
+                   DIG 1 ;
+                   DUP ;
+                   DUG 2 ;
+                   PAIR ;
+                   NIL operation ;
+                   PAIR ;
+                   DIP { DROP 2 } } } ;
+         DIP { DROP 3 } } }

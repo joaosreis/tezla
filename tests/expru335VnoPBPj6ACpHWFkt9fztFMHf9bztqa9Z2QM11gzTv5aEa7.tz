@@ -1,0 +1,15 @@
+{ storage (pair (string %CID) (address %owner)) ;
+  parameter string ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         SENDER ;
+         COMPARE ;
+         EQ ;
+         IF { SWAP ; CDR ; SWAP ; PAIR } { PUSH string "BadSender" ; FAILWITH } ;
+         NIL operation ;
+         PAIR } }

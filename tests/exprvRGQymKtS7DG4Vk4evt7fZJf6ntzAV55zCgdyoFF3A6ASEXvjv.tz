@@ -1,0 +1,67 @@
+{ storage
+    (pair (pair (bool %is_alive) (string %name))
+          (pair (int %plasma_bullet_count) (map %record_alien_kills string nat))) ;
+  parameter (or (unit %checkBullets) (string %shoot_alien)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DROP ;
+             DUP ;
+             CDR ;
+             CAR ;
+             PUSH int 0 ;
+             COMPARE ;
+             LT ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.plasma_bullet_count > 0" ; FAILWITH } }
+           { PUSH int 1 ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             CAR ;
+             COMPARE ;
+             GE ;
+             IF { SWAP ;
+                  DUP ;
+                  CAR ;
+                  SWAP ;
+                  CDR ;
+                  DUP ;
+                  CDR ;
+                  SWAP ;
+                  CAR ;
+                  PUSH int 1 ;
+                  SWAP ;
+                  SUB ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  DUP ;
+                  CAR ;
+                  SWAP ;
+                  CDR ;
+                  DUP ;
+                  CAR ;
+                  SWAP ;
+                  CDR ;
+                  DUP ;
+                  DIG 4 ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  IF_NONE { PUSH int 27 ; FAILWITH } {} ;
+                  PUSH nat 1 ;
+                  ADD ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR }
+                { PUSH string "Error: you ran out of bullets! Please buy more!" ; FAILWITH } } ;
+         NIL operation ;
+         PAIR } }

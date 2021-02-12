@@ -1,0 +1,126 @@
+{ parameter
+    (or (or (or (pair %balance_of
+                   (list %requests (pair (address %owner) (nat %token_id)))
+                   (contract %callback
+                      (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                (pair %mint
+                   (pair (address %address) (nat %amount))
+                   (pair (string %symbol) (nat %token_id))))
+            (or (address %set_administrator) (bool %set_pause)))
+        (or (or (pair %token_metadata
+                   (list %token_ids nat)
+                   (lambda %handler
+                      (list (pair (nat %token_id)
+                                  (pair (string %symbol)
+                                        (pair (string %name) (pair (nat %decimals) (map %extras string string))))))
+                      unit))
+                (contract %token_metadata_regitry address))
+            (or (list %transfer
+                   (pair (address %from_)
+                         (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+                (list %update_operators
+                   (or (pair %add_operator (address %owner) (address %operator))
+                       (pair %remove_operator (address %owner) (address %operator))))))) ;
+  storage
+    (pair (pair (pair (address %administrator)
+                      (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                (pair (pair (unit %version_202006XX_tzip_a57dfe86_lzep2_contract)
+                            (big_map %operators (pair (address %owner) (address %operator)) unit))
+                      (pair (bool %paused)
+                            (big_map %tokens
+                               nat
+                               (pair (pair %metadata
+                                        (nat %token_id)
+                                        (pair (string %symbol)
+                                              (pair (string %name) (pair (nat %decimals) (map %extras string string)))))
+                                     (nat %total_supply))))))
+          (big_map
+             nat
+             (lambda
+                (pair (pair (or (or (or (pair %balance_of
+                                           (list %requests (pair (address %owner) (nat %token_id)))
+                                           (contract %callback
+                                              (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                                        (pair %mint
+                                           (pair (address %address) (nat %amount))
+                                           (pair (string %symbol) (nat %token_id))))
+                                    (or (address %set_administrator) (bool %set_pause)))
+                                (or (or (pair %token_metadata
+                                           (list %token_ids nat)
+                                           (lambda %handler
+                                              (list (pair (nat %token_id)
+                                                          (pair (string %symbol)
+                                                                (pair (string %name) (pair (nat %decimals) (map %extras string string))))))
+                                              unit))
+                                        (contract %token_metadata_regitry address))
+                                    (or (list %transfer
+                                           (pair (address %from_)
+                                                 (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+                                        (list %update_operators
+                                           (or (pair %add_operator (address %owner) (address %operator))
+                                               (pair %remove_operator (address %owner) (address %operator)))))))
+                            (pair (pair (address %administrator)
+                                        (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                  (pair (pair (unit %version_202006XX_tzip_a57dfe86_lzep2_contract)
+                                              (big_map %operators (pair (address %owner) (address %operator)) unit))
+                                        (pair (bool %paused)
+                                              (big_map %tokens
+                                                 nat
+                                                 (pair (pair %metadata
+                                                          (nat %token_id)
+                                                          (pair (string %symbol)
+                                                                (pair (string %name) (pair (nat %decimals) (map %extras string string)))))
+                                                       (nat %total_supply)))))))
+                      address)
+                (pair (list operation)
+                      (pair (pair (address %administrator)
+                                  (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                            (pair (pair (unit %version_202006XX_tzip_a57dfe86_lzep2_contract)
+                                        (big_map %operators (pair (address %owner) (address %operator)) unit))
+                                  (pair (bool %paused)
+                                        (big_map %tokens
+                                           nat
+                                           (pair (pair %metadata
+                                                    (nat %token_id)
+                                                    (pair (string %symbol)
+                                                          (pair (string %name) (pair (nat %decimals) (map %extras string string)))))
+                                                 (nat %total_supply)))))))))) ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DIG 2 ;
+         DUP ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT { DROP ; PUSH nat 7 } { DROP ; PUSH nat 6 } }
+               { IF_LEFT { DROP ; PUSH nat 5 } { DROP ; PUSH nat 4 } } }
+           { IF_LEFT
+               { IF_LEFT { DROP ; PUSH nat 3 } { DROP ; PUSH nat 2 } }
+               { IF_LEFT { DROP ; PUSH nat 1 } { DROP ; PUSH nat 0 } } } ;
+         DIG 3 ;
+         DUP ;
+         DUG 4 ;
+         SWAP ;
+         GET ;
+         { IF_NONE { PUSH string "missing entry point" ; FAILWITH } {} } ;
+         DIG 2 ;
+         DIG 2 ;
+         PAIR ;
+         SELF ;
+         ADDRESS ;
+         SWAP ;
+         PAIR ;
+         EXEC ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUG 2 ;
+         PAIR ;
+         SWAP ;
+         PAIR } }

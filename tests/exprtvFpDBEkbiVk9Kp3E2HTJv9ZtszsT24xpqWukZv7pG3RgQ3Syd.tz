@@ -1,0 +1,11 @@
+{ storage (pair string nat) ;
+  parameter (or %root unit (or %default string nat)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { DROP ; NIL operation ; PAIR }
+           { IF_LEFT
+               { DIP { { { DUP ; CAR ; DIP { CDR } } } ; DROP } }
+               { DUG 1 ; { { DUP ; CAR ; DIP { CDR } } } ; DIP { DROP } } ;
+             PAIR ;
+             NIL operation ;
+             PAIR } } }

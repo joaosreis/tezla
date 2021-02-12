@@ -1,0 +1,9 @@
+{ parameter unit ;
+  storage (big_map string string) ;
+  code { CDR ;
+         PUSH string "Tema" ;
+         SOME ;
+         PUSH string "Hello" ;
+         UPDATE ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,77 @@
+{ parameter
+    (or (or (pair %createArtwork (string %0) (string %1))
+            (pair %transfer (string %0) (address %1)))
+        (string %updateArtist)) ;
+  storage
+    (pair (map %artists address string)
+          (map %artwork
+             string
+             (pair (pair (address %artist) (string %ipfsArtworkAddress)) (address %owner)))) ;
+  code { DUP ;
+         CDR ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         NEQ ;
+         IF { PUSH string "This is a tokenless contract" ; FAILWITH }
+            { PUSH unit Unit } ;
+         DIP 2 { DUP } ;
+         DIG 2 ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DUP ;
+                 DIP 4 { DUP } ;
+                 DIG 4 ;
+                 DIP { DUP ; CAR } ;
+                 PAIR ;
+                 DIP { DUP ; CDR } ;
+                 PAIR ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 DUP ;
+                 DIP 2 { DUP } ;
+                 DIG 2 ;
+                 CAR ;
+                 CDR ;
+                 DIP { DIP 2 { DUP } ;
+                       DIG 2 ;
+                       CDR ;
+                       SENDER ;
+                       PAIR ;
+                       SENDER ;
+                       SWAP ;
+                       PAIR ;
+                       SOME ;
+                       DIP { DIP { DUP } ; SWAP ; CDR } } ;
+                 UPDATE ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 DIP { DROP 4 } }
+               { DIP 3 { DUP } ; DIG 3 ; DIP { DROP } } ;
+             DIP { DROP } }
+           { DIP 2 { DUP } ;
+             DIG 2 ;
+             DIP { DUP } ;
+             PAIR ;
+             DUP ;
+             CAR ;
+             DUP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             CDR ;
+             SOME ;
+             DIP { DIP { DUP } ; SWAP ; CAR } ;
+             SENDER ;
+             UPDATE ;
+             SWAP ;
+             CDR ;
+             SWAP ;
+             PAIR ;
+             DIP { DROP 3 } } ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 3 } } }

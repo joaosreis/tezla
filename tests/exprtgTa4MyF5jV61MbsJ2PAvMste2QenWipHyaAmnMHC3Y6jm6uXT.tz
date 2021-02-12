@@ -1,0 +1,43 @@
+{ storage (pair (option %byt string) (nat %storedValue)) ;
+  parameter (or (nat %divide) (or (unit %double) (nat %replace))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { DUP ;
+               PUSH nat 5 ;
+               COMPARE ;
+               LT ;
+               IF { {} }
+                  { { PUSH string "WrongCondition: params.divisor > 5" ; FAILWITH } } ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               CAR ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               EDIV ;
+               IF_NONE { { PUSH string "division by zero" ; FAILWITH } } { CAR } ;
+               DIG 3 ;
+               DROP ;
+               DIG 2 ;
+               DROP ;
+               SWAP ;
+               PAIR } }
+           { IF_LEFT
+               { { DROP ; DUP ; CAR ; PUSH nat 2 ; DIG 2 ; CDR ; MUL ; SWAP ; PAIR } }
+               { { SWAP ;
+                   CAR ;
+                   PAIR ;
+                   CDR ;
+                   PUSH bytes 0x050100000006706175736564 ;
+                   UNPACK string ;
+                   PAIR } } } ;
+         NIL operation ;
+         PAIR } }

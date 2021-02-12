@@ -1,0 +1,27 @@
+{ parameter (or (unit %receiveDexStorage) (nat %use)) ;
+  storage (pair (address %main) (nat %tmp)) ;
+  code { DUP ;
+         CDR ;
+         DUP ;
+         CAR ;
+         CONTRACT
+           (or (or (unit %default) (unit %getStorage))
+               (pair %updateStorage
+                  (pair (pair (pair (big_map %allowed address bool) (key_hash %delegated))
+                              (pair (address %factoryAddress) (nat %feeRate)))
+                        (pair (pair (nat %invariant) (key_hash %nextDelegated))
+                              (pair (big_map %shares address nat) (nat %tezPool))))
+                  (pair (pair (pair (address %tokenAddress) (nat %tokenPool))
+                              (pair (nat %totalShares) (nat %veto)))
+                        (pair (pair (big_map %vetoVoters address nat) (big_map %vetos key_hash bool))
+                              (pair (big_map %voters
+                                       address
+                                       (pair (map %allowances address bool) (option %candidate key_hash)))
+                                    (big_map %votes key_hash nat)))))) ;
+         IF_NONE { PUSH string "Not found" ; FAILWITH } { DUP ; DIP { DROP } } ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 3 } } }

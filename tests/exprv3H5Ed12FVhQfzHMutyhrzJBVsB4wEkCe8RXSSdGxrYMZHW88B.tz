@@ -1,0 +1,3 @@
+{ parameter string ;
+  storage string ;
+  code { DUP ; DROP ; PUSH string "X" ; NIL operation ; PAIR ; DIP { DROP } } }

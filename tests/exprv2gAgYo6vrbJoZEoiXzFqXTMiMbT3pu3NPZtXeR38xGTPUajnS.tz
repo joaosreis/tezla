@@ -1,0 +1,17 @@
+{ storage (big_map int int) ;
+  parameter unit ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         NIL operation ;
+         PUSH address "tz1PirboZKFVqkfE45hVLpkpXaZtLk3mqC17" ;
+         CONTRACT unit ;
+         IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+         PUSH mutez 500000000 ;
+         PUSH unit Unit ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         SWAP ;
+         DROP ;
+         PAIR } }

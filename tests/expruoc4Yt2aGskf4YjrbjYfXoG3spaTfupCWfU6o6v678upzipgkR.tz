@@ -1,0 +1,3 @@
+{ storage (pair (map %metadata string string) (int %x)) ;
+  parameter unit ;
+  code { CDR ; NIL operation ; PAIR } }

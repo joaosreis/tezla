@@ -1,0 +1,3 @@
+{ storage nat ;
+  parameter nat ;
+  code { CAR ; PUSH nat 1 ; LSL ; NIL operation ; PAIR } }

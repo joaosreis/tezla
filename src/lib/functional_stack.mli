@@ -21,3 +21,5 @@ val map : ('a -> 'b) -> 'a t -> 'b t
 val map2 : ('a -> 'b -> 'c) -> 'a t -> 'b t -> 'c t
 
 val find : ('a -> bool) -> 'a t -> 'a
+
+exception Unsufficient_length

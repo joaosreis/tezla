@@ -1,0 +1,95 @@
+{ parameter (or (or (unit %payOff) (unit %refund)) (unit %sendFund)) ;
+  storage
+    (pair (pair (pair (timestamp %maxTime) (mutez %minAmount)) (address %owner))
+          (map %payments address mutez)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { PAIR ;
+                 DUP ;
+                 { CDR ; CAR ; CAR ; CAR } ;
+                 NOW ;
+                 COMPARE ;
+                 GE ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.now >= self.data.maxTime" ; FAILWITH } ;
+                 DUP ;
+                 { CDR ; CAR ; CAR ; CDR } ;
+                 BALANCE ;
+                 COMPARE ;
+                 GE ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.balance >= self.data.minAmount" ; FAILWITH } ;
+                 NIL operation ;
+                 { DIP { DUP } ; SWAP } ;
+                 { CDR ; CAR ; CDR } ;
+                 CONTRACT unit ;
+                 { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+                 BALANCE ;
+                 PUSH unit Unit ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIP { CDR } }
+               { PAIR ;
+                 DUP ;
+                 { CDR ; CAR ; CAR ; CAR } ;
+                 NOW ;
+                 COMPARE ;
+                 GE ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.now >= self.data.maxTime" ; FAILWITH } ;
+                 DUP ;
+                 { CDR ; CDR } ;
+                 SENDER ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.payments.contains(sp.sender)" ;
+                      FAILWITH } ;
+                 DUP ;
+                 { CDR ; CAR ; CAR ; CDR } ;
+                 BALANCE ;
+                 COMPARE ;
+                 LT ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.balance < self.data.minAmount" ; FAILWITH } ;
+                 NIL operation ;
+                 SENDER ;
+                 CONTRACT unit ;
+                 { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+                 { DIP { DIP { DUP } ; SWAP } ; SWAP } ;
+                 { CDR ; CDR } ;
+                 SENDER ;
+                 GET ;
+                 { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+                 PUSH unit Unit ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIP { CDR } } }
+           { PAIR ;
+             DUP ;
+             { CDR ; CDR } ;
+             SENDER ;
+             MEM ;
+             NOT ;
+             IF {}
+                { PUSH string "WrongCondition: ~ (self.data.payments.contains(sp.sender))" ;
+                  FAILWITH } ;
+             DUP ;
+             CDR ;
+             DUP ;
+             CDR ;
+             SENDER ;
+             AMOUNT ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             SWAP ;
+             CAR ;
+             PAIR ;
+             SWAP ;
+             DROP ;
+             NIL operation } ;
+         PAIR } }

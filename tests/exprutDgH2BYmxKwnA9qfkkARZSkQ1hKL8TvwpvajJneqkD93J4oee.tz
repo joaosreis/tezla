@@ -1,0 +1,10 @@
+{ storage (pair (address %leader) (timestamp %leadership_start_timestamp)) ;
+  parameter
+    (or (address %receive_leader) (timestamp %receive_leader_start_timestamp)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT { SWAP ; CDR ; SWAP ; PAIR } { SWAP ; CAR ; PAIR } ;
+         NIL operation ;
+         PAIR } }

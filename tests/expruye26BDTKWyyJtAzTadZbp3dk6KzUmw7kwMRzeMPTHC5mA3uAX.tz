@@ -1,0 +1,9 @@
+{ storage int ;
+  parameter (or (int %setValue) (int %setValueBis)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT { { SWAP ; DROP } } { { SWAP ; DROP } } ;
+         NIL operation ;
+         PAIR } }

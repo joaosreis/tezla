@@ -1,0 +1,5 @@
+{ parameter unit ;
+  storage
+    (pair (pair (address %main) (address %sender))
+          (pair %tmp (pair (nat %a) (nat %b)) (int %c))) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

@@ -1,0 +1,203 @@
+{ parameter
+    (or (pair %balance_of
+           (pair %balance_request (address %owner) (nat %token_id))
+           (contract %balance_view (list (pair (pair (address %owner) (nat %token_id)) nat))))
+        (pair %transfer
+           (pair (list %batch (pair (nat %amount) (nat %token_id))) (address %from_))
+           (address %to_))) ;
+  storage
+    (pair (map %assets nat (pair (big_map %balances address nat) (bool %fungible)))
+          (unit %u)) ;
+  code { DUP ;
+         CDR ;
+         DIP { DUP } ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DIP { DUP } ; SWAP ; NIL operation ; PAIR ; DIP { DROP } }
+           { DUP ;
+             DIP { DIP { DUP } ; SWAP } ;
+             PAIR ;
+             DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             NIL operation ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             CAR ;
+             CAR ;
+             ITER { DUP ;
+                    CDR ;
+                    DIP { DIP 3 { DUP } ; DIG 3 ; CAR ; CDR } ;
+                    PAIR ;
+                    DIP { DUP ; CAR ; DIP { DIP 2 { DUP } ; DIG 2 } ; PAIR } ;
+                    PAIR ;
+                    DUP ;
+                    CAR ;
+                    CAR ;
+                    DIP { DUP ; CAR ; CDR } ;
+                    PAIR ;
+                    DIP { DUP ; CDR ; CAR ; DIP { DUP ; CDR ; CDR } ; PAIR } ;
+                    PAIR ;
+                    DUP ;
+                    CAR ;
+                    CAR ;
+                    DIP { DUP ; CDR ; CDR } ;
+                    PAIR ;
+                    DUP ;
+                    CAR ;
+                    DIP { DUP ; CDR ; CAR } ;
+                    GET ;
+                    IF_NONE { PUSH string "1" ; FAILWITH } { DUP ; DIP { DROP } } ;
+                    DIP { DROP ; DUP } ;
+                    SWAP ;
+                    CAR ;
+                    CDR ;
+                    DIP { DUP ; CAR } ;
+                    GET ;
+                    IF_NONE
+                      { PUSH bool False }
+                      { DUP ;
+                        DIP { DIP 2 { DUP } ; DIG 2 ; CDR ; CAR } ;
+                        COMPARE ;
+                        GE ;
+                        DIP { DROP } } ;
+                    DIP { DROP 2 } ;
+                    IF { PUSH unit Unit } { PUSH string "2" ; FAILWITH } ;
+                    DROP 2 ;
+                    DIP 3 { DUP } ;
+                    DIG 3 ;
+                    CAR ;
+                    CDR ;
+                    SENDER ;
+                    SWAP ;
+                    COMPARE ;
+                    NEQ ;
+                    IF { PUSH string "3" ; FAILWITH } { PUSH unit Unit } ;
+                    DROP ;
+                    DUP ;
+                    CDR ;
+                    DIP { DIP 2 { DUP } ; DIG 2 ; CAR } ;
+                    GET ;
+                    IF_NONE { PUSH string "GET_FORCE" ; FAILWITH } {} ;
+                    DIP 4 { DUP } ;
+                    DIG 4 ;
+                    CAR ;
+                    CDR ;
+                    DIP { DUP ; CAR } ;
+                    GET ;
+                    IF_NONE { PUSH string "GET_FORCE" ; FAILWITH } {} ;
+                    DIP 5 { DUP } ;
+                    DIG 5 ;
+                    CAR ;
+                    CDR ;
+                    DIP { DUP ;
+                          DIP { DIP 2 { DUP } ; DIG 2 ; CAR } ;
+                          SUB ;
+                          ABS ;
+                          SOME ;
+                          DIP { DIP { DUP } ; SWAP ; CAR } } ;
+                    UPDATE ;
+                    DIP { DIP { DUP } ; SWAP ; CDR } ;
+                    PAIR ;
+                    SWAP ;
+                    DIP { DIP { DROP } } ;
+                    DIP 5 { DUP } ;
+                    DIG 5 ;
+                    CDR ;
+                    DIP { DIP { DUP } ; SWAP ; CAR } ;
+                    GET ;
+                    PUSH nat 0 ;
+                    SWAP ;
+                    PAIR ;
+                    DUP ;
+                    CAR ;
+                    IF_NONE { DUP ; CDR } { DUP ; DIP { DROP } } ;
+                    DIP { DROP } ;
+                    DIP 6 { DUP } ;
+                    DIG 6 ;
+                    CDR ;
+                    DIP { DUP ;
+                          DIP { DIP 3 { DUP } ; DIG 3 ; CAR } ;
+                          ADD ;
+                          SOME ;
+                          DIP { DIP 2 { DUP } ; DIG 2 ; CAR } } ;
+                    UPDATE ;
+                    DIP { DIP 2 { DUP } ; DIG 2 ; CDR } ;
+                    PAIR ;
+                    DIP 3 { DROP } ;
+                    DUG 2 ;
+                    DIP 3 { DUP } ;
+                    DIG 3 ;
+                    CDR ;
+                    DIP { DIP 2 { DUP } ;
+                          DIG 2 ;
+                          SOME ;
+                          DIP { DIP 5 { DUP } ; DIG 5 ; CAR } } ;
+                    UPDATE ;
+                    DIP { DIP 5 { DUP } ; DIG 5 ; CDR } ;
+                    PAIR ;
+                    DIP 6 { DROP } ;
+                    DUG 5 ;
+                    DROP 4 } ;
+             SENDER ;
+             DUP ;
+             PACK ;
+             PUSH nat 21 ;
+             PUSH nat 7 ;
+             SLICE ;
+             IF_NONE { PUSH string "SLICE" ; FAILWITH } {} ;
+             PUSH bytes 0x050a00000015 ;
+             CONCAT ;
+             UNPACK key_hash ;
+             DUP ;
+             IF_NONE
+               { PUSH bool False }
+               { DIP 2 { DUP } ;
+                 DIG 2 ;
+                 DIP { DUP ; IMPLICIT_ACCOUNT ; ADDRESS } ;
+                 COMPARE ;
+                 EQ ;
+                 DIP { DROP } } ;
+             DUP ;
+             NOT ;
+             DIP { DROP 3 } ;
+             IF { DIP 2 { DUP } ;
+                  DIG 2 ;
+                  CDR ;
+                  CONTRACT %on_multi_tokens_received_param
+                    (pair (pair (list %batch (pair (nat %amount) (nat %token_id))) (option %from_ address))
+                          (address %operator)) ;
+                  IF_NONE
+                    { PUSH string "bad address for get_entrypoint (%on_multi_tokens_received_param)" ;
+                      FAILWITH }
+                    {} ;
+                  DIP 3 { DUP } ;
+                  DIG 3 ;
+                  CAR ;
+                  CAR ;
+                  DIP { DIP 3 { DUP } ; DIG 3 ; CAR ; CDR ; SOME } ;
+                  PAIR ;
+                  SENDER ;
+                  SWAP ;
+                  PAIR ;
+                  DUP ;
+                  DIP { DIP { DUP } ; SWAP ; PUSH mutez 0 } ;
+                  TRANSFER_TOKENS ;
+                  DUP ;
+                  DIP { DIP 3 { DUP } ; DIG 3 } ;
+                  CONS ;
+                  DIP { DIP 3 { DUP } ; DIG 3 ; DROP } ;
+                  DIP 4 { DROP } ;
+                  DUG 3 ;
+                  DROP 3 ;
+                  PUSH unit Unit }
+                { PUSH unit Unit } ;
+             DROP ;
+             DUP ;
+             DIP { DIP { DUP } ; SWAP } ;
+             PAIR ;
+             DIP { DROP 5 } } ;
+         DIP { DROP 2 } } }

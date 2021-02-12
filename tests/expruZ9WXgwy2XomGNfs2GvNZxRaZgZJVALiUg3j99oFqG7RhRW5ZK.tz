@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (pair (pair (int %i) (nat %n)) (string %s)) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

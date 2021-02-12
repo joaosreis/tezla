@@ -1,4 +1,4 @@
-type elem = string * Adt.typ
+type elem = Adt.var
 
 type env = Failed | Stack of elem Functional_stack.t
 
@@ -25,3 +25,5 @@ val dug : env -> Z.t -> env
 val dip : env -> Z.t -> elem list * env
 
 val dup : env -> elem * env
+
+val length : env -> int

@@ -1,4 +1,4 @@
-(lang dune 2.03)
+(lang dune 2.8)
 
 (name tezla)
 
@@ -22,6 +22,9 @@
  (synopsis "An intermediate representation of the Michelson language")
  (depends
   (dune :build)
-  (zarith :build)
-  (batteries :build)
-  (michelson :build)))
+  (bisect_ppx :with-test)
+  (ppx_inline_test :with-test)
+  (alcotest :with-test)
+  zarith
+  batteries
+  michelson))

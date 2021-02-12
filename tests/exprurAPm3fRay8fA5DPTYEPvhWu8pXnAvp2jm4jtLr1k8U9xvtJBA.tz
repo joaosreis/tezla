@@ -1,0 +1,33 @@
+{ storage (map address string) ;
+  parameter string ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         EQ ;
+         IF { {} }
+            { { PUSH string "WrongCondition: sp.amount == sp.tez(0)" ; FAILWITH } } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         SENDER ;
+         MEM ;
+         IF { { SWAP ; DUP ; DUG 2 ; NONE string ; SENDER ; UPDATE ; DUG 2 ; SWAP ; DROP } }
+            { {} } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         SOME ;
+         SENDER ;
+         UPDATE ;
+         DUG 2 ;
+         DROP ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

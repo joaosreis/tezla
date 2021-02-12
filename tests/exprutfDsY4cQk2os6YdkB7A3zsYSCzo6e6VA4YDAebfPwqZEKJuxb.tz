@@ -1,0 +1,59 @@
+{ storage (pair (list %admins address) (bytes %hash)) ;
+  parameter
+    (pair (option %newadmins (list address)) (pair (bytes %oldhash) (bytes %newhash))) ;
+  code { LAMBDA
+           (pair (list address) address)
+           bool
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             PUSH bool False ;
+             SWAP ;
+             ITER { DIG 2 ; DUP ; DUG 3 ; COMPARE ; EQ ; OR } ;
+             DIP { DROP } } ;
+         DIG 1 ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         DIP { { { DUP ; CAR ; DIP { CDR } } } ; SWAP } ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         DIG 3 ;
+         DUP ;
+         DUG 4 ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         COMPARE ;
+         EQ ;
+         NOT ;
+         IF { PUSH string "InvalidCondition: r1" ; FAILWITH } {} ;
+         DIG 5 ;
+         DUP ;
+         DUG 6 ;
+         SENDER ;
+         DIG 6 ;
+         DUP ;
+         DUG 7 ;
+         PAIR ;
+         EXEC ;
+         NOT ;
+         IF { PUSH string "InvalidCondition: r2" ; FAILWITH } {} ;
+         DUP ;
+         DIP { DIG 3 ; DROP } ;
+         DUG 3 ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         IF_NONE { PUSH bool False } { PUSH bool True ; SWAP ; DROP } ;
+         IF { DIG 2 ;
+              DUP ;
+              DUG 3 ;
+              IF_NONE { PUSH string "NoneValue" ; FAILWITH } {} ;
+              DIP { DIG 4 ; DROP } ;
+              DUG 4 }
+            {} ;
+         DROP 3 ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP } } }

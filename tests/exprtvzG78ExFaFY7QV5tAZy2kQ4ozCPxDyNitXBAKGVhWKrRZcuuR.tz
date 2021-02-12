@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (set bool) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

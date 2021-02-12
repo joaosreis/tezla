@@ -1,0 +1,9 @@
+{ parameter nat ;
+  storage nat ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         DROP ;
+         PUSH nat 1 ;
+         LSL ;
+         NIL operation ;
+         PAIR } }

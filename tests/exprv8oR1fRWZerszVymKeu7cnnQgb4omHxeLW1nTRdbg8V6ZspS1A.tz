@@ -1,0 +1,23 @@
+{ storage unit ;
+  parameter
+    (or (or (pair %cashReceived (nat %status) (nat %subscriptionId))
+            (or (pair %cashSent (nat %status) (nat %subscriptionId))
+                (pair %confirmTokenLocked (nat %status) (nat %subscriptionId))))
+        (or (pair %forgeTokenCreated
+               (pair (address %owner) (address %registrar))
+               (pair (address %settler)
+                     (pair (address %tokenAddress)
+                           (pair %tokenMetadata
+                              (pair (nat %initialSupply) (nat %isinCode))
+                              (pair (string %name) (string %symbol))))))
+            (or (pair %newOperator (address %by) (pair (address %operator) (nat %operatorRole)))
+                (pair %revokeOperator (address %by) (pair (address %operator) (nat %operatorRole)))))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT { { DROP } } { IF_LEFT { { DROP } } { { DROP } } } }
+           { IF_LEFT { { DROP } } { IF_LEFT { { DROP } } { { DROP } } } } ;
+         NIL operation ;
+         PAIR } }

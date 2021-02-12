@@ -1,0 +1,10 @@
+{ storage int ;
+  parameter unit ;
+  code { CDR ;
+         DUP ;
+         PUSH int 5 ;
+         COMPARE ;
+         GT ;
+         IF { { DROP ; PUSH int 1 } } { {} } ;
+         NIL operation ;
+         PAIR } }

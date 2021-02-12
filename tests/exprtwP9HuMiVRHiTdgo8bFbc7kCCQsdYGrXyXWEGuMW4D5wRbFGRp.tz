@@ -1,0 +1,338 @@
+{ storage
+    (pair (pair (pair (int %r) (or %x (or (or (int %A) (int %B)) (int %C)) (int %Toto)))
+                (option %y int))
+          (or %z (int %Left) (int %Right))) ;
+  parameter
+    (or (or (or (or (or (or (unit %ep1) (unit %ep3)) (unit %ep4)) (unit %ep5)) (unit %ep6))
+            (or %ep7 (or (or (int %A) (int %B)) (int %C)) (int %Toto)))
+        (unit %options)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { IF_LEFT
+                       { IF_LEFT
+                           { IF_LEFT
+                               { { SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   IF_LEFT
+                                     { IF_LEFT
+                                         { IF_LEFT
+                                             { { DIG 2 ;
+                                                 DUP ;
+                                                 DUG 3 ;
+                                                 DUP ;
+                                                 CDR ;
+                                                 SWAP ;
+                                                 CAR ;
+                                                 DUP ;
+                                                 CDR ;
+                                                 SWAP ;
+                                                 CAR ;
+                                                 CAR ;
+                                                 PUSH (or (or (or (int %A) int) (int %C)) (int %Toto)) (Left (Left (Right -2))) ;
+                                                 SWAP ;
+                                                 PAIR ;
+                                                 PAIR ;
+                                                 PAIR ;
+                                                 DUG 3 ;
+                                                 DIG 2 ;
+                                                 DROP ;
+                                                 DIG 2 ;
+                                                 DUP ;
+                                                 DUG 3 ;
+                                                 DUP ;
+                                                 CDR ;
+                                                 SWAP ;
+                                                 CAR ;
+                                                 DUP ;
+                                                 CDR ;
+                                                 SWAP ;
+                                                 CAR ;
+                                                 CDR ;
+                                                 DIG 3 ;
+                                                 DUP ;
+                                                 DUG 4 ;
+                                                 PAIR ;
+                                                 PAIR ;
+                                                 PAIR ;
+                                                 DUG 3 ;
+                                                 DROP ;
+                                                 SWAP ;
+                                                 DROP } }
+                                             { DROP } }
+                                         { DROP } }
+                                     { DROP } ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   DUP ;
+                                   CDR ;
+                                   SWAP ;
+                                   CAR ;
+                                   DUP ;
+                                   CDR ;
+                                   SWAP ;
+                                   CAR ;
+                                   CAR ;
+                                   PUSH (or (or (or (int %A) (int %B)) int) (int %Toto)) (Left (Right 3)) ;
+                                   SWAP ;
+                                   PAIR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DUG 2 ;
+                                   DROP ;
+                                   DROP } }
+                               { { SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CDR ;
+                                   IF_LEFT
+                                     { { DIG 2 ;
+                                         DUP ;
+                                         DUG 3 ;
+                                         DUP ;
+                                         CDR ;
+                                         SWAP ;
+                                         CAR ;
+                                         DUP ;
+                                         CDR ;
+                                         SWAP ;
+                                         CAR ;
+                                         CDR ;
+                                         DIG 3 ;
+                                         DUP ;
+                                         DUG 4 ;
+                                         PAIR ;
+                                         PAIR ;
+                                         PAIR ;
+                                         DUG 3 ;
+                                         DROP ;
+                                         SWAP ;
+                                         DROP } }
+                                     { DROP } ;
+                                   DROP } } }
+                           { { SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CAR ;
+                               CAR ;
+                               CDR ;
+                               IF_LEFT
+                                 { IF_LEFT
+                                     { IF_LEFT
+                                         { { DIG 2 ;
+                                             DUP ;
+                                             DUG 3 ;
+                                             CDR ;
+                                             IF_LEFT
+                                               { DROP }
+                                               { { DIG 3 ;
+                                                   DUP ;
+                                                   DUG 4 ;
+                                                   DUP ;
+                                                   CDR ;
+                                                   SWAP ;
+                                                   CAR ;
+                                                   DUP ;
+                                                   CDR ;
+                                                   SWAP ;
+                                                   CAR ;
+                                                   CDR ;
+                                                   DIG 3 ;
+                                                   DUP ;
+                                                   DUG 4 ;
+                                                   DIG 5 ;
+                                                   DUP ;
+                                                   DUG 6 ;
+                                                   ADD ;
+                                                   PAIR ;
+                                                   PAIR ;
+                                                   PAIR ;
+                                                   DUG 4 ;
+                                                   DROP ;
+                                                   DIG 2 ;
+                                                   DROP } } ;
+                                             DROP } }
+                                         { DROP } }
+                                     { DROP } }
+                                 { DROP } ;
+                               DROP } } }
+                       { { SWAP ;
+                           DUP ;
+                           DUG 2 ;
+                           CAR ;
+                           CAR ;
+                           CDR ;
+                           IF_LEFT
+                             { IF_LEFT
+                                 { IF_LEFT
+                                     { { DROP ; PUSH bool False } }
+                                     { { DROP ; PUSH bool False } } }
+                                 { { DROP ; PUSH bool False } } }
+                             { { DROP ; PUSH bool True } } ;
+                           IF { { SWAP ;
+                                  DUP ;
+                                  DUG 2 ;
+                                  DUP ;
+                                  CDR ;
+                                  SWAP ;
+                                  CAR ;
+                                  DUP ;
+                                  CDR ;
+                                  SWAP ;
+                                  CAR ;
+                                  CDR ;
+                                  PUSH int 42 ;
+                                  PAIR ;
+                                  PAIR ;
+                                  PAIR ;
+                                  DUG 2 ;
+                                  SWAP ;
+                                  DROP } }
+                              { {} } ;
+                           DROP } } }
+                   { { SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       DUP ;
+                       CDR ;
+                       SWAP ;
+                       CAR ;
+                       DUP ;
+                       CDR ;
+                       SWAP ;
+                       CAR ;
+                       CDR ;
+                       DIG 4 ;
+                       DUP ;
+                       DUG 5 ;
+                       CAR ;
+                       CAR ;
+                       CDR ;
+                       IF_LEFT
+                         { IF_LEFT
+                             { IF_LEFT
+                                 { { DROP ; PUSH unit Unit ; FAILWITH } }
+                                 { { DROP ; PUSH unit Unit ; FAILWITH } } }
+                             { { DROP ; PUSH unit Unit ; FAILWITH } } }
+                         { {} } ;
+                       PAIR ;
+                       PAIR ;
+                       PAIR ;
+                       DUG 2 ;
+                       DROP ;
+                       DROP } } }
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   DUP ;
+                   CDR ;
+                   SWAP ;
+                   CAR ;
+                   DUP ;
+                   CDR ;
+                   SWAP ;
+                   CAR ;
+                   CAR ;
+                   DIG 3 ;
+                   DUP ;
+                   DUG 4 ;
+                   SWAP ;
+                   PAIR ;
+                   PAIR ;
+                   PAIR ;
+                   DUG 2 ;
+                   DROP ;
+                   DROP } } }
+           { { SWAP ;
+               DUP ;
+               DUG 2 ;
+               CAR ;
+               CDR ;
+               IF_NONE { PUSH bool False } { { DROP ; PUSH bool True } } ;
+               IF { { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      DUP ;
+                      CDR ;
+                      SWAP ;
+                      CAR ;
+                      DUP ;
+                      CDR ;
+                      SWAP ;
+                      CAR ;
+                      CDR ;
+                      DIG 4 ;
+                      DUP ;
+                      DUG 5 ;
+                      CAR ;
+                      CDR ;
+                      IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+                      PUSH int 44 ;
+                      ADD ;
+                      PAIR ;
+                      PAIR ;
+                      PAIR ;
+                      DUG 2 ;
+                      SWAP ;
+                      DROP ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      DUP ;
+                      CDR ;
+                      SWAP ;
+                      CAR ;
+                      CAR ;
+                      NONE int ;
+                      SWAP ;
+                      PAIR ;
+                      PAIR ;
+                      DUG 2 ;
+                      SWAP ;
+                      DROP } }
+                  { { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      DUP ;
+                      CDR ;
+                      SWAP ;
+                      CAR ;
+                      DUP ;
+                      CDR ;
+                      SWAP ;
+                      CAR ;
+                      CDR ;
+                      PUSH int 3 ;
+                      PAIR ;
+                      PAIR ;
+                      PAIR ;
+                      DUG 2 ;
+                      SWAP ;
+                      DROP ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      DUP ;
+                      CDR ;
+                      SWAP ;
+                      CAR ;
+                      CAR ;
+                      PUSH (option int) (Some 12) ;
+                      SWAP ;
+                      PAIR ;
+                      PAIR ;
+                      DUG 2 ;
+                      SWAP ;
+                      DROP } } ;
+               DROP } } ;
+         NIL operation ;
+         PAIR } }

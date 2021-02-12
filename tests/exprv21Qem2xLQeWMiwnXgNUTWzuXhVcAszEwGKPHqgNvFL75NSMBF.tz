@@ -1,0 +1,100 @@
+{ storage (pair (option %ggg int) (int %value)) ;
+  parameter (or (unit %f) (unit %i)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { LAMBDA int int { { PUSH int 123 ; ADD } } ; DROP ; DROP } }
+           { { LAMBDA
+                 int
+                 unit
+                 { { DUP ;
+                     PUSH int 0 ;
+                     SWAP ;
+                     COMPARE ;
+                     GE ;
+                     IF { {} }
+                        { { PUSH string "WrongCondition: lparams_1 >= 0" ; FAILWITH } } ;
+                     DROP ;
+                     PUSH unit Unit } } ;
+               LAMBDA
+                 int
+                 int
+                 { { DUP ;
+                     PUSH int 0 ;
+                     SWAP ;
+                     COMPARE ;
+                     GE ;
+                     IF { {} }
+                        { { PUSH string "WrongCondition: lparams_2 >= 0" ; FAILWITH } } ;
+                     DUP ;
+                     PUSH int 2 ;
+                     SWAP ;
+                     SUB ;
+                     SWAP ;
+                     DROP } } ;
+               LAMBDA
+                 int
+                 bool
+                 { { DUP ;
+                     PUSH int 0 ;
+                     SWAP ;
+                     COMPARE ;
+                     GE ;
+                     IF { {} }
+                        { { PUSH string "WrongCondition: lparams_3 >= 0" ; FAILWITH } } ;
+                     DROP ;
+                     PUSH bool True } } ;
+               LAMBDA
+                 int
+                 int
+                 { { LAMBDA
+                       int
+                       bool
+                       { { DUP ;
+                           PUSH int 0 ;
+                           SWAP ;
+                           COMPARE ;
+                           GE ;
+                           IF { {} }
+                              { { PUSH string "WrongCondition: lparams_5 >= 0" ; FAILWITH } } ;
+                           DROP ;
+                           PUSH bool False } } ;
+                     PUSH int 0 ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     COMPARE ;
+                     GE ;
+                     IF { {} }
+                        { { PUSH string "WrongCondition: lparams_4 >= 0" ; FAILWITH } } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     PUSH int 3 ;
+                     MUL ;
+                     SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DROP } } ;
+               DIG 5 ;
+               DUP ;
+               DUG 6 ;
+               CAR ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               PUSH int 12 ;
+               EXEC ;
+               SWAP ;
+               PAIR ;
+               DUG 6 ;
+               DROP ;
+               DROP ;
+               DROP ;
+               DROP ;
+               DROP ;
+               DROP } } ;
+         NIL operation ;
+         PAIR } }

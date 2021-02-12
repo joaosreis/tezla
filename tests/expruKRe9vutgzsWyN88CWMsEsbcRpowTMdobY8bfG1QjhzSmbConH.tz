@@ -1,0 +1,852 @@
+{ parameter
+    (or (or (or (string %allowDataPublication)
+                (pair %buyData (pair (string %data_id) (string %signature)) (string %transaction_id)))
+            (or (pair %createData (string %data_id) (string %keywords))
+                (pair %createMetadata
+                   (pair (string %data_id) (string %keywords))
+                   (string %metadata_id))))
+        (or (or (pair %requestDataPublication (string %data_id) (address %data_publisher))
+                (pair %setRole
+                   (pair (pair (address %address) (bool %customer))
+                         (pair (bool %data_creator) (bool %metadata_creator)))
+                   (bool %publisher)))
+            (pair %updateRole
+               (pair (pair (address %address) (bool %customer))
+                     (pair (bool %data_creator) (bool %metadata_creator)))
+               (bool %publisher)))) ;
+  storage
+    (pair (pair (big_map %catalog
+                   string
+                   (pair (pair (pair (address %data_creator) (string %data_id))
+                               (pair (option %data_publisher address) (string %is_data_public)))
+                         (pair (string %keywords) (option %meta_data_for_data_id string))))
+                (address %manager))
+          (pair (big_map %transactions
+                   string
+                   (pair (pair (address %customer) (string %data_id))
+                         (pair (string %signature) (string %transaction_id))))
+                (big_map %users
+                   address
+                   (pair (pair (pair (address %address) (bool %customer))
+                               (pair (bool %data_creator) (bool %metadata_creator)))
+                         (bool %publisher))))) ;
+  code { LAMBDA
+           (pair (pair (pair (pair address bool) (pair bool bool)) bool)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           (pair (list operation)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CAR ;
+             CDR ;
+             SOURCE ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "setRole - permission denied - Not contract manager" ;
+                  FAILWITH }
+                { PUSH unit Unit } ;
+             DROP ;
+             DIP { DUP } ;
+             SWAP ;
+             CAR ;
+             CAR ;
+             CAR ;
+             DIP { DUP ; CDR ; CDR } ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { DIP 2 { DUP } ;
+                 DIG 2 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 DIP { DIP 2 { DUP } ;
+                       DIG 2 ;
+                       SOME ;
+                       DIP { DIP { DUP } ; SWAP ; CDR ; CDR } } ;
+                 UPDATE ;
+                 DIP { DIP { DUP } ; SWAP ; DUP ; CAR ; SWAP ; CDR ; CAR } ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 DIP { SWAP ; DROP } ;
+                 PUSH unit Unit }
+               { PUSH string "setRole - User allready exists..." ; FAILWITH } ;
+             DROP ;
+             DIP { DUP } ;
+             SWAP ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP ; DROP ; DROP ; DROP } } ;
+         LAMBDA
+           (pair (pair (pair (pair address bool) (pair bool bool)) bool)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           (pair (list operation)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CAR ;
+             CDR ;
+             SOURCE ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "updateRole - permission denied - Not contract manager" ;
+                  FAILWITH }
+                { PUSH unit Unit } ;
+             DROP ;
+             DIP { DUP } ;
+             SWAP ;
+             CAR ;
+             CAR ;
+             CAR ;
+             DIP { DUP ; CDR ; CDR } ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string
+                      "updateRole - User not found - You need to call setRole before updating a user" ;
+                 FAILWITH }
+               { DIP 3 { DUP } ;
+                 DIG 3 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 DIP { DIP 3 { DUP } ;
+                       DIG 3 ;
+                       SOME ;
+                       DIP { DIP 2 { DUP } ; DIG 2 ; CDR ; CDR } } ;
+                 UPDATE ;
+                 DIP { DIP 2 { DUP } ; DIG 2 ; DUP ; CAR ; SWAP ; CDR ; CAR } ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 DIP 3 { DROP } ;
+                 DUG 2 ;
+                 DROP ;
+                 PUSH unit Unit } ;
+             DROP ;
+             DIP { DUP } ;
+             SWAP ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP ; DROP ; DROP ; DROP } } ;
+         LAMBDA
+           (pair (pair string string)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           (pair (list operation)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CDR ;
+             CDR ;
+             SOURCE ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string
+                      "createData - User not found - You are not permited to interact with this contract" ;
+                 FAILWITH }
+               { DUP ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 NOT ;
+                 IF { PUSH string
+                           "createData - permission denied - You do not have permission to create data" ;
+                      FAILWITH }
+                    { PUSH unit Unit } ;
+                 SWAP ;
+                 DROP } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             CAR ;
+             DIP { DIP { DUP } ; SWAP ; CAR ; CAR } ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { DIP 3 { DUP } ;
+                 DIG 3 ;
+                 CAR ;
+                 SOURCE ;
+                 PAIR ;
+                 DIP { PUSH string "no" ; NONE address ; PAIR } ;
+                 PAIR ;
+                 DIP { DIP 3 { DUP } ; DIG 3 ; CDR ; NONE string ; SWAP ; PAIR } ;
+                 PAIR ;
+                 DIP 4 { DUP } ;
+                 DIG 4 ;
+                 CAR ;
+                 DIP { DUP ; SOME ; DIP { DIP 3 { DUP } ; DIG 3 ; CAR ; CAR } } ;
+                 UPDATE ;
+                 DIP { DIP 3 { DUP } ; DIG 3 ; DUP ; CDR ; SWAP ; CAR ; CDR } ;
+                 PAIR ;
+                 PAIR ;
+                 DIP 4 { DROP } ;
+                 DUG 3 ;
+                 DROP ;
+                 PUSH unit Unit }
+               { PUSH string "createData - This ID is allready in storage" ; FAILWITH } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP ; DROP ; DROP ; DROP ; DROP } } ;
+         LAMBDA
+           (pair (pair string address)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           (pair (list operation)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CDR ;
+             CDR ;
+             SOURCE ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string
+                      "requestDataPublication - User not found - You are not permited to interact with this contract" ;
+                 FAILWITH }
+               { DUP ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 NOT ;
+                 IF { PUSH string
+                           "requestDataPublication - permission denied - You are not permitted to request publication for this data" ;
+                      FAILWITH }
+                    { PUSH unit Unit } ;
+                 SWAP ;
+                 DROP } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             CAR ;
+             DIP { DIP { DUP } ; SWAP ; CAR ; CAR } ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string
+                      "requestDataPublication - This ID is not in storage - can not request publication" ;
+                 FAILWITH }
+               { DUP ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SOURCE ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string
+                           "requestDataPublication - permission deniead - You are not the creator of this data" ;
+                      FAILWITH }
+                    { PUSH unit Unit } ;
+                 DROP ;
+                 DUP ;
+                 PUSH string "pending" ;
+                 SWAP ;
+                 COMPARE ;
+                 EQ ;
+                 IF { PUSH string "requestDataPublication - Data allready requested for publication" ;
+                      FAILWITH }
+                    { DUP ;
+                      PUSH string "yes" ;
+                      SWAP ;
+                      COMPARE ;
+                      EQ ;
+                      IF { PUSH string "requestDataPublication - Data allready published" ; FAILWITH }
+                         { DUP ;
+                           PUSH string "no" ;
+                           SWAP ;
+                           COMPARE ;
+                           EQ ;
+                           IF { DIP { DUP } ;
+                                SWAP ;
+                                DUP ;
+                                CDR ;
+                                SWAP ;
+                                CAR ;
+                                DUP ;
+                                CAR ;
+                                SWAP ;
+                                CDR ;
+                                CAR ;
+                                PUSH string "pending" ;
+                                SWAP ;
+                                PAIR ;
+                                SWAP ;
+                                PAIR ;
+                                PAIR ;
+                                SWAP ;
+                                DIP { SWAP ; DROP } ;
+                                DIP 5 { DUP } ;
+                                DIG 5 ;
+                                CDR ;
+                                SOME ;
+                                DIP { DIP { DUP } ;
+                                      SWAP ;
+                                      DUP ;
+                                      CDR ;
+                                      SWAP ;
+                                      CAR ;
+                                      DUP ;
+                                      CAR ;
+                                      SWAP ;
+                                      CDR ;
+                                      CDR } ;
+                                PAIR ;
+                                SWAP ;
+                                PAIR ;
+                                PAIR ;
+                                SWAP ;
+                                DIP { SWAP ; DROP } ;
+                                DIP 5 { DUP } ;
+                                DIG 5 ;
+                                CAR ;
+                                DIP { DIP { DUP } ;
+                                      SWAP ;
+                                      SOME ;
+                                      DIP { DIP 4 { DUP } ; DIG 4 ; CAR ; CAR } } ;
+                                UPDATE ;
+                                DIP { DIP 4 { DUP } ; DIG 4 ; DUP ; CDR ; SWAP ; CAR ; CDR } ;
+                                PAIR ;
+                                PAIR ;
+                                DIP 5 { DROP } ;
+                                DUG 4 ;
+                                PUSH unit Unit }
+                              { PUSH unit Unit } } } ;
+                 SWAP ;
+                 DROP ;
+                 SWAP ;
+                 DROP } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP ; DROP ; DROP ; DROP ; DROP } } ;
+         LAMBDA
+           (pair (pair (pair string string) string)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           (pair (list operation)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CDR ;
+             CDR ;
+             SOURCE ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string
+                      "createMetadata - User not found - You are not permited to interact with this contract" ;
+                 FAILWITH }
+               { DUP ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 NOT ;
+                 IF { PUSH string
+                           "createMetadata - permission denied - You are not permitted to create metadata for this data" ;
+                      FAILWITH }
+                    { PUSH unit Unit } ;
+                 SWAP ;
+                 DROP } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             CAR ;
+             CAR ;
+             DIP { DIP { DUP } ; SWAP ; CAR ; CAR } ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string
+                      "createMetadata - This ID is not in storage - can not create metadata for this data" ;
+                 FAILWITH }
+               { DIP 4 { DUP } ;
+                 DIG 4 ;
+                 CDR ;
+                 DIP { DIP 3 { DUP } ; DIG 3 ; CAR ; CAR } ;
+                 GET ;
+                 DUP ;
+                 IF_NONE
+                   { DIP 5 { DUP } ;
+                     DIG 5 ;
+                     CDR ;
+                     SOURCE ;
+                     PAIR ;
+                     DIP { PUSH string "no" ; NONE address ; PAIR } ;
+                     PAIR ;
+                     DIP { DIP 5 { DUP } ;
+                           DIG 5 ;
+                           CAR ;
+                           CDR ;
+                           DIP { DIP 5 { DUP } ; DIG 5 ; CAR ; CAR ; SOME } ;
+                           PAIR } ;
+                     PAIR ;
+                     DIP 6 { DUP } ;
+                     DIG 6 ;
+                     CDR ;
+                     DIP { DUP ; SOME ; DIP { DIP 5 { DUP } ; DIG 5 ; CAR ; CAR } } ;
+                     UPDATE ;
+                     DIP { DIP 5 { DUP } ; DIG 5 ; DUP ; CDR ; SWAP ; CAR ; CDR } ;
+                     PAIR ;
+                     PAIR ;
+                     DIP 6 { DROP } ;
+                     DUG 5 ;
+                     DROP ;
+                     PUSH unit Unit }
+                   { PUSH string "createMetadata - duplicit metadata - This ID is allready in storage" ;
+                     FAILWITH } ;
+                 SWAP ;
+                 DROP ;
+                 SWAP ;
+                 DROP } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP ; DROP ; DROP ; DROP ; DROP } } ;
+         LAMBDA
+           (pair string
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           (pair (list operation)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CDR ;
+             CDR ;
+             SOURCE ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string
+                      "allowDataPublication - User not found - You are not permited to interact with this contract" ;
+                 FAILWITH }
+               { DUP ;
+                 CDR ;
+                 NOT ;
+                 IF { PUSH string
+                           "allowDataPublication - permission denied - You are not permitted to publish data" ;
+                      FAILWITH }
+                    { PUSH unit Unit } ;
+                 SWAP ;
+                 DROP } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             DIP { DIP { DUP } ; SWAP ; CAR ; CAR } ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string "allowDataPublication - ID not found - This ID is not in storage" ;
+                 FAILWITH }
+               { DUP ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 DUP ;
+                 PUSH string "no" ;
+                 SWAP ;
+                 COMPARE ;
+                 EQ ;
+                 IF { PUSH string "allowDataPublication - Data not requested for publication yet" ;
+                      FAILWITH }
+                    { DUP ;
+                      PUSH string "yes" ;
+                      SWAP ;
+                      COMPARE ;
+                      EQ ;
+                      IF { PUSH string "allowDataPublication - Data allready published" ; FAILWITH }
+                         { DUP ;
+                           PUSH string "pending" ;
+                           SWAP ;
+                           COMPARE ;
+                           EQ ;
+                           IF { DIP { DUP } ;
+                                SWAP ;
+                                CAR ;
+                                CDR ;
+                                CAR ;
+                                DUP ;
+                                IF_NONE
+                                  { PUSH string
+                                         "allowDataPublication - Publisher not found - Nopublisher found for this data id" ;
+                                    FAILWITH }
+                                  { DUP ;
+                                    SOURCE ;
+                                    COMPARE ;
+                                    NEQ ;
+                                    IF { PUSH string
+                                              "allowDataPublication - Publisher address mismatch - You are not the selected publisher for this data" ;
+                                         FAILWITH }
+                                       { PUSH unit Unit } ;
+                                    SWAP ;
+                                    DROP } ;
+                                DROP ;
+                                DIP 2 { DUP } ;
+                                DIG 2 ;
+                                DUP ;
+                                CDR ;
+                                SWAP ;
+                                CAR ;
+                                DUP ;
+                                CAR ;
+                                SWAP ;
+                                CDR ;
+                                CAR ;
+                                PUSH string "yes" ;
+                                SWAP ;
+                                PAIR ;
+                                SWAP ;
+                                PAIR ;
+                                PAIR ;
+                                DIP 3 { DROP } ;
+                                DUG 2 ;
+                                DIP 6 { DUP } ;
+                                DIG 6 ;
+                                DIP { DIP 2 { DUP } ;
+                                      DIG 2 ;
+                                      SOME ;
+                                      DIP { DIP 5 { DUP } ; DIG 5 ; CAR ; CAR } } ;
+                                UPDATE ;
+                                DIP { DIP 5 { DUP } ; DIG 5 ; DUP ; CDR ; SWAP ; CAR ; CDR } ;
+                                PAIR ;
+                                PAIR ;
+                                DIP 6 { DROP } ;
+                                DUG 5 ;
+                                DROP ;
+                                PUSH unit Unit }
+                              { PUSH unit Unit } } } ;
+                 SWAP ;
+                 DROP ;
+                 SWAP ;
+                 DROP } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP ; DROP ; DROP ; DROP ; DROP } } ;
+         LAMBDA
+           (pair (pair (pair string string) string)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           (pair (list operation)
+                 (pair (pair (big_map
+                                string
+                                (pair (pair (pair address string) (pair (option address) string))
+                                      (pair string (option string))))
+                             address)
+                       (pair (big_map string (pair (pair address string) (pair string string)))
+                             (big_map address (pair (pair (pair address bool) (pair bool bool)) bool)))))
+           { DUP ;
+             CAR ;
+             DIP { DUP } ;
+             SWAP ;
+             CDR ;
+             DUP ;
+             CDR ;
+             CDR ;
+             SOURCE ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string
+                      "buyData - User not found - You are not permited to interact with this contract" ;
+                 FAILWITH }
+               { DUP ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 NOT ;
+                 IF { PUSH string
+                           "buyData - permission denied - You do not have permission to buy data" ;
+                      FAILWITH }
+                    { PUSH unit Unit } ;
+                 SWAP ;
+                 DROP } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             CAR ;
+             CAR ;
+             DIP { DIP { DUP } ; SWAP ; CAR ; CAR } ;
+             GET ;
+             DUP ;
+             IF_NONE
+               { PUSH string "buyData - Data with this ID does not exist" ; FAILWITH }
+               { DUP ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 DUP ;
+                 PUSH string "no" ;
+                 SWAP ;
+                 COMPARE ;
+                 EQ ;
+                 IF { PUSH string
+                           "buyData - not published - The data you trying to purchase is not published yet" ;
+                      FAILWITH }
+                    { DUP ;
+                      PUSH string "pending" ;
+                      SWAP ;
+                      COMPARE ;
+                      EQ ;
+                      IF { PUSH string
+                                "buyData - publication pending - Publication requested for the data, but not yet accepted" ;
+                           FAILWITH }
+                         { DUP ;
+                           PUSH string "yes" ;
+                           SWAP ;
+                           COMPARE ;
+                           EQ ;
+                           IF { DIP 5 { DUP } ;
+                                DIG 5 ;
+                                CAR ;
+                                CAR ;
+                                SOURCE ;
+                                PAIR ;
+                                DIP { DIP 5 { DUP } ;
+                                      DIG 5 ;
+                                      CAR ;
+                                      CDR ;
+                                      DIP { DIP 5 { DUP } ; DIG 5 ; CDR } ;
+                                      PAIR } ;
+                                PAIR ;
+                                DIP 6 { DUP } ;
+                                DIG 6 ;
+                                CDR ;
+                                DIP { DUP ; SOME ; DIP { DIP 5 { DUP } ; DIG 5 ; CDR ; CAR } } ;
+                                UPDATE ;
+                                DIP { DIP 5 { DUP } ; DIG 5 ; DUP ; CAR ; SWAP ; CDR ; CDR } ;
+                                PAIR ;
+                                SWAP ;
+                                PAIR ;
+                                DIP 6 { DROP } ;
+                                DUG 5 ;
+                                DROP ;
+                                PUSH unit Unit }
+                              { PUSH unit Unit } } } ;
+                 SWAP ;
+                 DROP ;
+                 SWAP ;
+                 DROP } ;
+             DROP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP ; DROP ; DROP ; DROP ; DROP } } ;
+         DIP 7 { DUP } ;
+         DIG 7 ;
+         CAR ;
+         DIP 8 { DUP } ;
+         DIG 8 ;
+         CDR ;
+         DIP { DUP } ;
+         SWAP ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DUP ;
+                 IF_LEFT
+                   { DUP ;
+                     DUP ;
+                     DIP { DIP 4 { DUP } ; DIG 4 } ;
+                     PAIR ;
+                     DIP { DIP 7 { DUP } ; DIG 7 } ;
+                     EXEC ;
+                     SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DROP }
+                   { DUP ;
+                     DUP ;
+                     DIP { DIP 4 { DUP } ; DIG 4 } ;
+                     PAIR ;
+                     DIP { DIP 6 { DUP } ; DIG 6 } ;
+                     EXEC ;
+                     SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DROP } ;
+                 SWAP ;
+                 DROP }
+               { DUP ;
+                 IF_LEFT
+                   { DUP ;
+                     DUP ;
+                     DIP { DIP 4 { DUP } ; DIG 4 } ;
+                     PAIR ;
+                     DIP { DIP 10 { DUP } ; DIG 10 } ;
+                     EXEC ;
+                     SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DROP }
+                   { DUP ;
+                     DUP ;
+                     DIP { DIP 4 { DUP } ; DIG 4 } ;
+                     PAIR ;
+                     DIP { DIP 8 { DUP } ; DIG 8 } ;
+                     EXEC ;
+                     SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DROP } ;
+                 SWAP ;
+                 DROP } ;
+             SWAP ;
+             DROP }
+           { DUP ;
+             IF_LEFT
+               { DUP ;
+                 IF_LEFT
+                   { DUP ;
+                     DUP ;
+                     DIP { DIP 4 { DUP } ; DIG 4 } ;
+                     PAIR ;
+                     DIP { DIP 9 { DUP } ; DIG 9 } ;
+                     EXEC ;
+                     SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DROP }
+                   { DUP ;
+                     DUP ;
+                     DIP { DIP 4 { DUP } ; DIG 4 } ;
+                     PAIR ;
+                     DIP { DIP 12 { DUP } ; DIG 12 } ;
+                     EXEC ;
+                     SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DROP } ;
+                 SWAP ;
+                 DROP }
+               { DUP ;
+                 DUP ;
+                 DIP { DIP 3 { DUP } ; DIG 3 } ;
+                 PAIR ;
+                 DIP { DIP 10 { DUP } ; DIG 10 } ;
+                 EXEC ;
+                 SWAP ;
+                 DROP ;
+                 SWAP ;
+                 DROP } ;
+             SWAP ;
+             DROP } ;
+         DIP { DROP ; DROP ; DROP ; DROP ; DROP ; DROP ; DROP ; DROP ; DROP ; DROP } } }

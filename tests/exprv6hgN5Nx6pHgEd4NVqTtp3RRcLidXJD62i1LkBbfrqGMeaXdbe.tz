@@ -1,0 +1,36 @@
+{ storage int ;
+  parameter (or (int %addThree) (int %addTwo)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { NIL operation ;
+               SENDER ;
+               CONTRACT %getit int ;
+               IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+               PUSH mutez 0 ;
+               PUSH int 3 ;
+               DIG 4 ;
+               DUP ;
+               DUG 5 ;
+               ADD ;
+               TRANSFER_TOKENS ;
+               CONS ;
+               SWAP ;
+               DROP } }
+           { { NIL operation ;
+               SENDER ;
+               CONTRACT %getit int ;
+               IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+               PUSH mutez 0 ;
+               PUSH int 2 ;
+               DIG 4 ;
+               DUP ;
+               DUG 5 ;
+               ADD ;
+               TRANSFER_TOKENS ;
+               CONS ;
+               SWAP ;
+               DROP } } ;
+         PAIR } }

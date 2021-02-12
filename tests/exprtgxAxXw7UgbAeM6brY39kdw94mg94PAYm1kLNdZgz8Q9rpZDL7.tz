@@ -1,0 +1,17 @@
+{ parameter
+    (or (or (nat %burn) (pair %mint (address %nftToMint) (nat %nftToMintId)))
+        (pair %transfer (address %destination) (nat %nftToTransfer))) ;
+  storage (map nat address) ;
+  code { DUP ;
+         CDR ;
+         DIP { DUP } ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DIP 2 { DUP } ; DIG 2 ; NIL operation ; PAIR ; DIP { DROP } }
+               { DIP 2 { DUP } ; DIG 2 ; NIL operation ; PAIR ; DIP { DROP } } ;
+             DIP { DROP } }
+           { DIP { DUP } ; SWAP ; NIL operation ; PAIR ; DIP { DROP } } ;
+         DIP { DROP 2 } } }

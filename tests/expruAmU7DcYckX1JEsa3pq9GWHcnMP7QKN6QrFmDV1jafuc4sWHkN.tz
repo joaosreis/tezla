@@ -1,0 +1,3 @@
+{ parameter string ;
+  storage (list string) ;
+  code { DUP ; CAR ; DIP { CDR } ; CONS ; NIL operation ; PAIR } }

@@ -1,0 +1,7 @@
+{ parameter string ;
+  storage (option string) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         DIP { IF_NONE {} { { UNIT ; FAILWITH } } } ;
+         SOME ;
+         NIL operation ;
+         PAIR } }

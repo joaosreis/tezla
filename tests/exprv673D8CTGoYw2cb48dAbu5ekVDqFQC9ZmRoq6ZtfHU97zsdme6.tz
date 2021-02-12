@@ -1,0 +1,73 @@
+{ parameter
+    (or (or (unit %default) (unit %getStorage))
+        (pair %updateStorage
+           (pair (pair (pair (big_map %allowed address bool) (key_hash %delegated))
+                       (pair (address %factoryAddress) (nat %feeRate)))
+                 (pair (pair (nat %invariant) (key_hash %nextDelegated))
+                       (pair (big_map %shares address nat) (nat %tezPool))))
+           (pair (pair (pair (address %tokenAddress) (nat %tokenPool))
+                       (pair (nat %totalShares) (nat %veto)))
+                 (pair (pair (big_map %vetoVoters address nat) (big_map %vetos key_hash bool))
+                       (pair (big_map %voters
+                                address
+                                (pair (map %allowances address bool) (option %candidate key_hash)))
+                             (big_map %votes key_hash nat)))))) ;
+  storage
+    (pair (pair (pair (pair (big_map %allowed address bool) (key_hash %delegated))
+                      (pair (address %factoryAddress) (nat %feeRate)))
+                (pair (pair (nat %invariant) (key_hash %nextDelegated))
+                      (pair (big_map %shares address nat) (nat %tezPool))))
+          (pair (pair (pair (address %tokenAddress) (nat %tokenPool))
+                      (pair (nat %totalShares) (nat %veto)))
+                (pair (pair (big_map %vetoVoters address nat) (big_map %vetos key_hash bool))
+                      (pair (big_map %voters
+                               address
+                               (pair (map %allowances address bool) (option %candidate key_hash)))
+                            (big_map %votes key_hash nat))))) ;
+  code { DUP ;
+         CDR ;
+         SENDER ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DIG 3 ; DUP ; DUG 4 ; NIL operation ; PAIR ; DIP { DROP } }
+               { DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 NIL operation ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 CONTRACT
+                   (or (or (pair %receiveDexStorage
+                              (pair (pair (pair (big_map %allowed address bool) (key_hash %delegated))
+                                          (pair (address %factoryAddress) (nat %feeRate)))
+                                    (pair (pair (nat %invariant) (key_hash %nextDelegated))
+                                          (pair (big_map %shares address nat) (nat %tezPool))))
+                              (pair (pair (pair (address %tokenAddress) (nat %tokenPool))
+                                          (pair (nat %totalShares) (nat %veto)))
+                                    (pair (pair (big_map %vetoVoters address nat) (big_map %vetos key_hash bool))
+                                          (pair (big_map %voters
+                                                   address
+                                                   (pair (map %allowances address bool) (option %candidate key_hash)))
+                                                (big_map %votes key_hash nat)))))
+                           (address %setMain))
+                       (pair %use (pair (pair nat nat) (pair nat address)) (pair (pair address bool) key_hash))) ;
+                 IF_NONE { PUSH string "bad address for get_contract" ; FAILWITH } {} ;
+                 AMOUNT ;
+                 DIG 7 ;
+                 DUP ;
+                 DUG 8 ;
+                 LEFT address ;
+                 LEFT (pair (pair (pair nat nat) (pair nat address)) (pair (pair address bool) key_hash)) ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 PAIR ;
+                 DIP { DROP } } ;
+             DIP { DROP } }
+           { DUP ; NIL operation ; PAIR ; DIP { DROP } } ;
+         DIP { DROP 3 } } }

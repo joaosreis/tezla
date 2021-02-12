@@ -1,0 +1,34 @@
+{ parameter string ;
+  storage
+    (pair (pair (pair (pair (pair (pair (string %string01) (string %string02))
+                                  (pair (string %string03) (string %string04)))
+                            (pair (pair (string %string05) (string %string06))
+                                  (pair (string %string07) (string %string08))))
+                      (pair (pair (pair (string %string09) (string %string10))
+                                  (pair (string %string11) (string %string12)))
+                            (pair (pair (string %string13) (string %string14))
+                                  (pair (string %string15) (string %string16)))))
+                (pair (pair (pair (pair (string %string17) (string %string18))
+                                  (pair (string %string19) (string %string20)))
+                            (pair (pair (string %string21) (string %string22))
+                                  (pair (string %string23) (string %string24))))
+                      (pair (pair (pair (string %string25) (string %string26))
+                                  (pair (string %string27) (string %string28)))
+                            (pair (pair (string %string29) (string %string30))
+                                  (pair (string %string31) (string %string32))))))
+          (pair (pair (pair (pair (string %string33) (string %string34))
+                            (pair (string %string35) (string %string36)))
+                      (pair (pair (string %string37) (string %string38))
+                            (pair (string %string39) (string %string40))))
+                (pair (pair (string %string41) (string %string42))
+                      (pair (string %string43) (string %string44))))) ;
+  code { NIL operation ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         PAIR ;
+         DIP { DROP 2 } } }

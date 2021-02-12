@@ -1,0 +1,19 @@
+{ storage (pair (address %admin) (map %registry address int)) ;
+  parameter int ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DIG 2 ;
+         SOME ;
+         SENDER ;
+         UPDATE ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

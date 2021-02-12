@@ -1,0 +1,96 @@
+{ storage
+    (pair (map %myMap string string)
+          (pair (option %myRecord
+                   (pair (pair (int %amount) (address %contractAddress))
+                         (pair (address %from_) (pair (int %nonce) (address %to_)))))
+                (int %storedValue))) ;
+  parameter (or (unit %double) (pair %replace (bytes %mapBytes) (bytes %recordBytes))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { DROP ;
+               DUP ;
+               DUP ;
+               CAR ;
+               SWAP ;
+               CDR ;
+               CAR ;
+               PUSH int 2 ;
+               DIG 3 ;
+               CDR ;
+               CDR ;
+               MUL ;
+               SWAP ;
+               PAIR ;
+               SWAP ;
+               PAIR } }
+           { { SWAP ;
+               CDR ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               CAR ;
+               UNPACK (map string string) ;
+               IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+               PAIR ;
+               SWAP ;
+               SWAP ;
+               DUP ;
+               CAR ;
+               SWAP ;
+               CDR ;
+               CDR ;
+               DIG 2 ;
+               DUP ;
+               DUG 3 ;
+               CDR ;
+               UNPACK (pair int (pair int (pair address (pair address address)))) ;
+               IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+               CDR ;
+               CDR ;
+               CDR ;
+               CAR ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               UNPACK (pair int (pair int (pair address (pair address address)))) ;
+               IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+               CDR ;
+               CAR ;
+               PAIR %nonce %to_ ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               UNPACK (pair int (pair int (pair address (pair address address)))) ;
+               IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+               CDR ;
+               CDR ;
+               CAR ;
+               PAIR %from_ ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               UNPACK (pair int (pair int (pair address (pair address address)))) ;
+               IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+               CDR ;
+               CDR ;
+               CDR ;
+               CDR ;
+               DIG 4 ;
+               CDR ;
+               UNPACK (pair int (pair int (pair address (pair address address)))) ;
+               IF_NONE { { PUSH unit Unit ; FAILWITH } } { {} } ;
+               CAR ;
+               PAIR %amount %contractAddress ;
+               PAIR ;
+               SOME ;
+               PAIR ;
+               SWAP ;
+               PAIR } } ;
+         NIL operation ;
+         PAIR } }

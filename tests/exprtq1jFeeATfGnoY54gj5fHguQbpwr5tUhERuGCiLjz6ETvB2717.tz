@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage unit ;
+  code { PUSH string "m1" ; PUSH string "m0" ; PAIR ; FAILWITH } }

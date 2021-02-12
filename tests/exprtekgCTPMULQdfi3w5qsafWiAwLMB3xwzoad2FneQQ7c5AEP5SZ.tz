@@ -1,0 +1,126 @@
+{ storage (map address (pair (set %allowed address) (string %qid))) ;
+  parameter
+    (or (or (string %addQid) (or (address %checkConsent) (unit %checkRegistration)))
+        (or (address %getQid) (or (address %giveConsent) (address %raiseConsent)))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   SENDER ;
+                   MEM ;
+                   IF { {} }
+                      { { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          PUSH (option (pair (set %allowed address) (string %qid))) (Some (Pair {} "")) ;
+                          SENDER ;
+                          UPDATE ;
+                          DUG 2 ;
+                          SWAP ;
+                          DROP } } ;
+                   SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   DUP ;
+                   SENDER ;
+                   DUP ;
+                   DUG 2 ;
+                   GET ;
+                   IF_NONE { { PUSH string "set_in_top-any" ; FAILWITH } } {} ;
+                   CAR ;
+                   DIG 3 ;
+                   DUP ;
+                   DUG 4 ;
+                   SWAP ;
+                   PAIR ;
+                   SOME ;
+                   SWAP ;
+                   UPDATE ;
+                   DUG 2 ;
+                   DROP 2 } }
+               { IF_LEFT
+                   { { SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       GET ;
+                       IF_NONE { { PUSH string "Get-item:36" ; FAILWITH } } {} ;
+                       CAR ;
+                       SENDER ;
+                       MEM ;
+                       DROP 2 } }
+                   { { SWAP ; DUP ; DUG 2 ; SENDER ; MEM ; DROP 2 } } } }
+           { IF_LEFT
+               { { DROP } }
+               { IF_LEFT
+                   { { SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       DUP ;
+                       SENDER ;
+                       DUP ;
+                       DUG 2 ;
+                       GET ;
+                       IF_NONE { { PUSH string "set_in_top-any" ; FAILWITH } } {} ;
+                       DUP ;
+                       CDR ;
+                       SWAP ;
+                       CAR ;
+                       PUSH bool True ;
+                       DIG 5 ;
+                       DUP ;
+                       DUG 6 ;
+                       UPDATE ;
+                       PAIR ;
+                       SOME ;
+                       SWAP ;
+                       UPDATE ;
+                       DUG 2 ;
+                       DROP 2 } }
+                   { { SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       SENDER ;
+                       GET ;
+                       IF_NONE { { PUSH string "Get-item:-1" ; FAILWITH } } {} ;
+                       CAR ;
+                       SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       MEM ;
+                       IF { { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              DUP ;
+                              SENDER ;
+                              DUP ;
+                              DUG 2 ;
+                              GET ;
+                              IF_NONE { { PUSH string "set_in_top-any" ; FAILWITH } } {} ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              CAR ;
+                              PUSH bool False ;
+                              DIG 5 ;
+                              DUP ;
+                              DUG 6 ;
+                              UPDATE ;
+                              PAIR ;
+                              SOME ;
+                              SWAP ;
+                              UPDATE ;
+                              DUG 2 ;
+                              SWAP ;
+                              DROP } }
+                          { {} } ;
+                       DROP } } } } ;
+         NIL operation ;
+         PAIR } }

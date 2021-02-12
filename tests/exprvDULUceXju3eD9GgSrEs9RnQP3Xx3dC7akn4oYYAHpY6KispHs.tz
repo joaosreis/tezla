@@ -1,0 +1,23 @@
+{ storage (pair (address %manager) (string %merkle_hash)) ;
+  parameter string ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         PACK ;
+         SENDER ;
+         PACK ;
+         COMPARE ;
+         EQ ;
+         IF {}
+            { PUSH string
+                   "WrongCondition: sp.pack(sp.set_type_expr(sp.sender, sp.TAddress)) == sp.pack(sp.set_type_expr(self.data.manager, sp.TAddress))" ;
+              FAILWITH } ;
+         SWAP ;
+         CAR ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

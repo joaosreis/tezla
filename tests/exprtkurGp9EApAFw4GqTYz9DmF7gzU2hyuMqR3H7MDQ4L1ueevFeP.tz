@@ -1,0 +1,131 @@
+{ parameter
+    (or (or (nat %burn) (nat %list))
+        (or (pair %mint (pair %nftToMint (bytes %data) (address %owner)) (nat %nftToMintId))
+            (pair %transfer (address %destination) (nat %nftToTransfer)))) ;
+  storage
+    (pair (address %contractOwner) (map %nfts nat (pair (bytes %data) (address %owner)))) ;
+  code { DUP ;
+         CDR ;
+         DIP { DUP } ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DUP ;
+                 DIP { DIP 2 { DUP } ; DIG 2 } ;
+                 PAIR ;
+                 DUP ;
+                 CAR ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 CDR ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 DIP { DUP ; CDR } ;
+                 GET ;
+                 IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                 DUP ;
+                 CDR ;
+                 SOURCE ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "You do not have permission to burn this asset" ; FAILWITH }
+                    { PUSH unit Unit } ;
+                 DIP 3 { DUP } ;
+                 DIG 3 ;
+                 DIP { DIP 2 { DUP } ; DIG 2 ; CDR ; NONE (pair (bytes %data) (address %owner)) } ;
+                 UPDATE ;
+                 DIP 3 { DUP } ;
+                 DIG 3 ;
+                 CAR ;
+                 DIP { DUP } ;
+                 PAIR ;
+                 NIL operation ;
+                 PAIR ;
+                 DIP { DROP 7 } }
+               { DIP 2 { DUP } ; DIG 2 ; NIL operation ; PAIR ; DIP { DROP } } ;
+             DIP { DROP } }
+           { DUP ;
+             IF_LEFT
+               { DUP ;
+                 DIP { DIP 2 { DUP } ; DIG 2 } ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 DUP ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "You do not have permission to mint assets" ; FAILWITH }
+                    { PUSH unit Unit } ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 CDR ;
+                 SIZE ;
+                 PUSH nat 1 ;
+                 ADD ;
+                 DIP 2 { DUP } ;
+                 DIG 2 ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 DIP { DIP 4 { DUP } ;
+                       DIG 4 ;
+                       CAR ;
+                       CAR ;
+                       SOME ;
+                       DIP { DIP 3 { DUP } ; DIG 3 ; CDR } } ;
+                 UPDATE ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 NIL operation ;
+                 PAIR ;
+                 DIP { DROP 5 } }
+               { DUP ;
+                 DIP { DIP 2 { DUP } ; DIG 2 } ;
+                 PAIR ;
+                 DUP ;
+                 CAR ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 CDR ;
+                 DIP { DUP } ;
+                 SWAP ;
+                 CDR ;
+                 DIP { DUP ; CDR } ;
+                 GET ;
+                 IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                 DUP ;
+                 CDR ;
+                 SOURCE ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "You do not have permission to transfer this asset." ;
+                      FAILWITH }
+                    { PUSH unit Unit } ;
+                 DIP 2 { DUP } ;
+                 DIG 2 ;
+                 DIP 4 { DUP } ;
+                 DIG 4 ;
+                 CDR ;
+                 DIP { DIP 2 { DUP } ;
+                       DIG 2 ;
+                       DIP 5 { DUP } ;
+                       DIG 5 ;
+                       CAR ;
+                       SWAP ;
+                       CAR ;
+                       PAIR ;
+                       SOME ;
+                       DIP { DIP 3 { DUP } ; DIG 3 ; CDR } } ;
+                 UPDATE ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 NIL operation ;
+                 PAIR ;
+                 DIP { DROP 6 } } ;
+             DIP { DROP } } ;
+         DIP { DROP 2 } } }

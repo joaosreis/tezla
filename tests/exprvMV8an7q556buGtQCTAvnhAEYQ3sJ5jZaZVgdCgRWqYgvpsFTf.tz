@@ -1,0 +1,1103 @@
+{ parameter
+    (or (or (or (or (unit %default) (pair %divestLiquidity (pair nat nat) nat))
+                (or (nat %initializeExchange) (nat %investLiquidity)))
+            (or (or (pair %setVotesDelegation address bool) (pair %tezToTokenPayment nat address))
+                (or (pair %tokenToTezPayment (pair nat nat) address)
+                    (pair %tokenToTokenPayment (pair nat nat) (pair address address)))))
+        (or (address %veto) (pair %vote address key_hash))) ;
+  storage
+    (pair (pair (pair (pair (big_map %divestLiquidity
+                               nat
+                               (lambda
+                                  (pair (pair (pair address nat) (pair nat nat))
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat)))))
+                                  (pair (list operation)
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat)))))))
+                            (big_map %initializeExchange
+                               nat
+                               (lambda
+                                  (pair (pair address nat)
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat)))))
+                                  (pair (list operation)
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat))))))))
+                      (pair (big_map %investLiquidity
+                               nat
+                               (lambda
+                                  (pair (pair address nat)
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat)))))
+                                  (pair (list operation)
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat)))))))
+                            (big_map %setVotesDelegation
+                               nat
+                               (lambda
+                                  (pair (pair address bool)
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat)))))
+                                  (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                    (pair (nat %feeRate) (nat %invariant)))
+                                              (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                    (pair (nat %tezPool) (address %tokenAddress))))
+                                        (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                    (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                              (pair (pair (big_map %vetos key_hash bool)
+                                                          (big_map %voters
+                                                             address
+                                                             (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                    (big_map %votes key_hash nat))))))))
+                (pair (pair (pair %storage
+                               (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                           (pair (nat %feeRate) (nat %invariant)))
+                                     (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                           (pair (nat %tezPool) (address %tokenAddress))))
+                               (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                           (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                     (pair (pair (big_map %vetos key_hash bool)
+                                                 (big_map %voters
+                                                    address
+                                                    (pair (map %allowances address bool) (option %candidate key_hash))))
+                                           (big_map %votes key_hash nat))))
+                            (big_map %tezToToken
+                               nat
+                               (lambda
+                                  (pair (pair (pair address address) (pair nat nat))
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat)))))
+                                  (pair (list operation)
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat))))))))
+                      (pair (big_map %tokenToTez
+                               nat
+                               (lambda
+                                  (pair (pair (pair address address) (pair address nat))
+                                        (pair nat
+                                              (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                                (pair (nat %feeRate) (nat %invariant)))
+                                                          (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                                (pair (nat %tezPool) (address %tokenAddress))))
+                                                    (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                                (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                          (pair (pair (big_map %vetos key_hash bool)
+                                                                      (big_map %voters
+                                                                         address
+                                                                         (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                                (big_map %votes key_hash nat))))))
+                                  (pair (list operation)
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat)))))))
+                            (big_map %tokenToTokenOut
+                               nat
+                               (lambda
+                                  (pair (pair (pair address address) (pair address nat))
+                                        (pair (pair nat address)
+                                              (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                                (pair (nat %feeRate) (nat %invariant)))
+                                                          (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                                (pair (nat %tezPool) (address %tokenAddress))))
+                                                    (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                                (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                          (pair (pair (big_map %vetos key_hash bool)
+                                                                      (big_map %voters
+                                                                         address
+                                                                         (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                                (big_map %votes key_hash nat))))))
+                                  (pair (list operation)
+                                        (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                                          (pair (nat %feeRate) (nat %invariant)))
+                                                    (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                                          (pair (nat %tezPool) (address %tokenAddress))))
+                                              (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                                          (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                                    (pair (pair (big_map %vetos key_hash bool)
+                                                                (big_map %voters
+                                                                   address
+                                                                   (pair (map %allowances address bool) (option %candidate key_hash))))
+                                                          (big_map %votes key_hash nat))))))))))
+          (pair (big_map %veto
+                   nat
+                   (lambda
+                      (pair address
+                            (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                              (pair (nat %feeRate) (nat %invariant)))
+                                        (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                              (pair (nat %tezPool) (address %tokenAddress))))
+                                  (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                              (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                        (pair (pair (big_map %vetos key_hash bool)
+                                                    (big_map %voters
+                                                       address
+                                                       (pair (map %allowances address bool) (option %candidate key_hash))))
+                                              (big_map %votes key_hash nat)))))
+                      (pair (list operation)
+                            (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                              (pair (nat %feeRate) (nat %invariant)))
+                                        (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                              (pair (nat %tezPool) (address %tokenAddress))))
+                                  (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                              (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                        (pair (pair (big_map %vetos key_hash bool)
+                                                    (big_map %voters
+                                                       address
+                                                       (pair (map %allowances address bool) (option %candidate key_hash))))
+                                              (big_map %votes key_hash nat)))))))
+                (big_map %vote
+                   nat
+                   (lambda
+                      (pair (pair address key_hash)
+                            (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                              (pair (nat %feeRate) (nat %invariant)))
+                                        (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                              (pair (nat %tezPool) (address %tokenAddress))))
+                                  (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                              (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                        (pair (pair (big_map %vetos key_hash bool)
+                                                    (big_map %voters
+                                                       address
+                                                       (pair (map %allowances address bool) (option %candidate key_hash))))
+                                              (big_map %votes key_hash nat)))))
+                      (pair (list operation)
+                            (pair (pair (pair (pair (key_hash %delegated) (address %factoryAddress))
+                                              (pair (nat %feeRate) (nat %invariant)))
+                                        (pair (pair (key_hash %nextDelegated) (big_map %shares address nat))
+                                              (pair (nat %tezPool) (address %tokenAddress))))
+                                  (pair (pair (pair (nat %tokenPool) (nat %totalShares))
+                                              (pair (nat %veto) (big_map %vetoVoters address nat)))
+                                        (pair (pair (big_map %vetos key_hash bool)
+                                                    (big_map %voters
+                                                       address
+                                                       (pair (map %allowances address bool) (option %candidate key_hash))))
+                                              (big_map %votes key_hash nat))))))))) ;
+  code { DUP ;
+         CDR ;
+         SELF ;
+         ADDRESS ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CAR ;
+         IF_LEFT
+           { DUP ;
+             IF_LEFT
+               { DUP ;
+                 IF_LEFT
+                   { DUP ;
+                     IF_LEFT
+                       { DIG 5 ; DUP ; DUG 6 ; NIL operation ; PAIR ; DIP { DROP } }
+                       { DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         CAR ;
+                         CDR ;
+                         PAIR ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         CAR ;
+                         CAR ;
+                         DIG 7 ;
+                         DUP ;
+                         DUG 8 ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PUSH nat 0 ;
+                         GET ;
+                         IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         EXEC ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DIP { DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               DUP ;
+                               CAR ;
+                               SWAP ;
+                               CDR ;
+                               DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               CDR } ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         PAIR ;
+                         DIP { DROP 5 } } ;
+                     DIP { DROP } }
+                   { DUP ;
+                     IF_LEFT
+                       { DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         DIG 6 ;
+                         DUP ;
+                         DUG 7 ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         PUSH nat 0 ;
+                         GET ;
+                         IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         CAR ;
+                         CDR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         EXEC ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DIP { DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               DUP ;
+                               CAR ;
+                               SWAP ;
+                               CDR ;
+                               DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               CDR } ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         PAIR ;
+                         DIP { DROP 5 } }
+                       { DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         DIG 6 ;
+                         DUP ;
+                         DUG 7 ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PUSH nat 0 ;
+                         GET ;
+                         IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         CAR ;
+                         CDR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         EXEC ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DIP { DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               DUP ;
+                               CAR ;
+                               SWAP ;
+                               CDR ;
+                               DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               CDR } ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         PAIR ;
+                         DIP { DROP 5 } } ;
+                     DIP { DROP } } ;
+                 DIP { DROP } }
+               { DUP ;
+                 IF_LEFT
+                   { DUP ;
+                     IF_LEFT
+                       { DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         PUSH nat 0 ;
+                         GET ;
+                         IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CDR ;
+                         DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         DIP { DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               DUP ;
+                               CAR ;
+                               SWAP ;
+                               CDR ;
+                               DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               CDR } ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         DIP { DROP 4 } ;
+                         NIL operation ;
+                         PAIR ;
+                         DIP { DROP } }
+                       { DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         PUSH mutez 1 ;
+                         AMOUNT ;
+                         EDIV ;
+                         IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                         CAR ;
+                         PAIR ;
+                         DIG 6 ;
+                         DUP ;
+                         DUG 7 ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         CDR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         PUSH nat 0 ;
+                         GET ;
+                         IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         EXEC ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DIP { DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               DUP ;
+                               CAR ;
+                               SWAP ;
+                               CDR ;
+                               DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               CDR } ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         PAIR ;
+                         DIP { DROP 5 } } ;
+                     DIP { DROP } }
+                   { DUP ;
+                     IF_LEFT
+                       { DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         DIG 6 ;
+                         DUP ;
+                         DUG 7 ;
+                         PAIR ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         CDR ;
+                         SENDER ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         PUSH nat 0 ;
+                         GET ;
+                         IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         EXEC ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DIP { DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               DUP ;
+                               CAR ;
+                               SWAP ;
+                               CDR ;
+                               DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               CDR } ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         PAIR ;
+                         DIP { DROP 5 } }
+                       { DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CDR ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         CAR ;
+                         CDR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         DIG 6 ;
+                         DUP ;
+                         DUG 7 ;
+                         PAIR ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         CDR ;
+                         CAR ;
+                         SENDER ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         CDR ;
+                         DUP ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CDR ;
+                         PUSH nat 0 ;
+                         GET ;
+                         IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 4 ;
+                         DUP ;
+                         DUG 5 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         DIG 5 ;
+                         DUP ;
+                         DUG 6 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         EXEC ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DIP { DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               DUP ;
+                               CAR ;
+                               SWAP ;
+                               CDR ;
+                               DUP ;
+                               CDR ;
+                               SWAP ;
+                               CAR ;
+                               CDR } ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 1 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         PAIR ;
+                         DIP { DROP 5 } } ;
+                     DIP { DROP } } ;
+                 DIP { DROP } } ;
+             DIP { DROP } }
+           { DUP ;
+             IF_LEFT
+               { DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 DUP ;
+                 CDR ;
+                 CAR ;
+                 PUSH nat 0 ;
+                 GET ;
+                 IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 CAR ;
+                 PAIR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 EXEC ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 DIP { DUP ;
+                       CDR ;
+                       SWAP ;
+                       CAR ;
+                       DUP ;
+                       CAR ;
+                       SWAP ;
+                       CDR ;
+                       DUP ;
+                       CDR ;
+                       SWAP ;
+                       CAR ;
+                       CDR } ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 PAIR ;
+                 DIP { DROP 5 } }
+               { DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 DUP ;
+                 CDR ;
+                 CDR ;
+                 PUSH nat 0 ;
+                 GET ;
+                 IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 CAR ;
+                 CDR ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 EXEC ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 DIP { DUP ;
+                       CDR ;
+                       SWAP ;
+                       CAR ;
+                       DUP ;
+                       CAR ;
+                       SWAP ;
+                       CDR ;
+                       DUP ;
+                       CDR ;
+                       SWAP ;
+                       CAR ;
+                       CDR } ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 PAIR ;
+                 DIP { DROP 5 } } ;
+             DIP { DROP } } ;
+         DIP { DROP 3 } } }

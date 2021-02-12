@@ -1,0 +1,11 @@
+{ parameter (pair key (pair signature bytes)) ;
+  storage unit ;
+  code { CAR ;
+         DUP ;
+         CAR ;
+         DIP { CDR ; DUP ; CAR ; DIP { CDR } } ;
+         CHECK_SIGNATURE ;
+         IF {} { PUSH string "Invalid signature" ; FAILWITH } ;
+         UNIT ;
+         NIL operation ;
+         PAIR } }

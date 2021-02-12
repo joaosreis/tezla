@@ -1,0 +1,53 @@
+{ storage
+    (pair (big_map %bMap nat (pair (int %cos) (nat %sin)))
+          (pair (nat %mamma) (nat %storedValue))) ;
+  parameter (or (nat %divide) (or (unit %double) (nat %replace))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { DUP ;
+               PUSH nat 5 ;
+               COMPARE ;
+               LT ;
+               IF { {} }
+                  { { PUSH string "WrongCondition: params.divisor > 5" ; FAILWITH } } ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               CAR ;
+               SWAP ;
+               CDR ;
+               CAR ;
+               DIG 2 ;
+               DIG 3 ;
+               CDR ;
+               CDR ;
+               EDIV ;
+               IF_NONE { { PUSH string "division by zero" ; FAILWITH } } { CAR } ;
+               SWAP ;
+               PAIR ;
+               SWAP ;
+               PAIR } }
+           { IF_LEFT
+               { { DROP ;
+                   DUP ;
+                   DUP ;
+                   CAR ;
+                   SWAP ;
+                   CDR ;
+                   CAR ;
+                   PUSH nat 2 ;
+                   DIG 3 ;
+                   CDR ;
+                   CDR ;
+                   MUL ;
+                   SWAP ;
+                   PAIR ;
+                   SWAP ;
+                   PAIR } }
+               { { SWAP ; DUP ; CAR ; SWAP ; CDR ; CAR ; DIG 2 ; SWAP ; PAIR ; SWAP ; PAIR } } } ;
+         NIL operation ;
+         PAIR } }

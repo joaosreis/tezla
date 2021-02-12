@@ -1,0 +1,44 @@
+{ storage
+    (pair (option %storedBytes (pair nat (pair (option nat) (pair nat (pair address address)))))
+          (nat %storedValue)) ;
+  parameter (or (nat %divide) (or (unit %double) (nat %replace))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { DUP ;
+               PUSH nat 5 ;
+               COMPARE ;
+               LT ;
+               IF { {} }
+                  { { PUSH string "WrongCondition: params.divisor > 5" ; FAILWITH } } ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               CAR ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               EDIV ;
+               IF_NONE { { PUSH string "division by zero" ; FAILWITH } } { CAR } ;
+               DIG 3 ;
+               DROP ;
+               DIG 2 ;
+               DROP ;
+               SWAP ;
+               PAIR } }
+           { IF_LEFT
+               { { DROP ; DUP ; CAR ; PUSH nat 2 ; DIG 2 ; CDR ; MUL ; SWAP ; PAIR } }
+               { { SWAP ;
+                   DROP ;
+                   PUSH bytes
+                        0x0507070006070703060707070700a0bb010a00000016000085ef0c18b31983603d978a152de4cd61803db8810a000000160107661cfdafc5b6f1c4abce957548e3fa91a76e4000 ;
+                   UNPACK (pair nat (pair (option nat) (pair nat (pair address address)))) ;
+                   PAIR } } } ;
+         NIL operation ;
+         PAIR } }

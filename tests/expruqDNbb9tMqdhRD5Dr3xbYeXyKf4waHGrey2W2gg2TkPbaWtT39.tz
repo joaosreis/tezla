@@ -1,0 +1,16 @@
+{ parameter unit ;
+  storage (map string int) ;
+  code { DUP ;
+         CDR ;
+         DUP ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         PUSH int 42 ;
+         SOME ;
+         PUSH string "key" ;
+         UPDATE ;
+         DIP { DROP } ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 2 } } }

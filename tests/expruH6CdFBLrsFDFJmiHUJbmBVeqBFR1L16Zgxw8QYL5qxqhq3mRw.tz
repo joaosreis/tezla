@@ -1,0 +1,15 @@
+{ storage int ;
+  parameter int ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUP ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         ADD ;
+         DUG 2 ;
+         DROP 2 ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,12 @@
+{ storage (pair mutez mutez) ;
+  parameter unit ;
+  code { CDR ;
+         DUP ;
+         CDR ;
+         AMOUNT ;
+         ADD ;
+         SWAP ;
+         CAR ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

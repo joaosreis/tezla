@@ -1,0 +1,88 @@
+{ parameter %
+    (or (unit %default)
+        (pair %main
+           (pair :payload nat (or :action (lambda unit (list operation)) (pair nat (list key))))
+           (list (option signature)))) ;
+  storage (pair nat (pair nat (list key))) ;
+  code { DUP ;
+         CAR ;
+         DIP { CDR } ;
+         IF_LEFT
+           { DROP ; NIL operation ; PAIR }
+           { PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             EQ ;
+             IF {} { UNIT ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DIP { SWAP } ;
+             DIP { DUP ;
+                   CAR ;
+                   DIP { CDR } ;
+                   DUP ;
+                   SELF ;
+                   ADDRESS ;
+                   CHAIN_ID ;
+                   PAIR ;
+                   PAIR ;
+                   PACK ;
+                   DIP { DUP ; CAR ; DIP { CDR } ; DIP { SWAP } } ;
+                   SWAP } ;
+             DUP ;
+             CAR ;
+             DIP { CDR } ;
+             DIP { SWAP } ;
+             COMPARE ;
+             EQ ;
+             IF {} { UNIT ; FAILWITH } ;
+             DIP { SWAP } ;
+             DUP ;
+             CAR ;
+             DIP { CDR } ;
+             DIP { PUSH nat 0 ;
+                   SWAP ;
+                   ITER { DIP { SWAP } ;
+                          SWAP ;
+                          IF_CONS
+                            { IF_NONE
+                                { SWAP ; DROP }
+                                { SWAP ;
+                                  DIP { SWAP ;
+                                        DIP 2 { DIP { DUP } ; SWAP } ;
+                                        DIP 2 { DUP } ;
+                                        DIG 2 ;
+                                        DIP { CHECK_SIGNATURE } ;
+                                        SWAP ;
+                                        IF { DROP } { DROP ; UNIT ; FAILWITH } ;
+                                        PUSH nat 1 ;
+                                        ADD } } }
+                            { UNIT ; FAILWITH } ;
+                          SWAP } } ;
+             COMPARE ;
+             LE ;
+             IF {} { UNIT ; FAILWITH } ;
+             IF_CONS { UNIT ; FAILWITH } {} ;
+             DROP ;
+             DIP { DUP ; CAR ; DIP { CDR } ; PUSH nat 1 ; ADD ; PAIR } ;
+             IF_LEFT
+               { UNIT ; EXEC }
+               { DUP ;
+                 DUP ;
+                 CAR ;
+                 PUSH nat 0 ;
+                 COMPARE ;
+                 EQ ;
+                 IF { UNIT ; FAILWITH } {} ;
+                 DUP ;
+                 CAR ;
+                 DIP { CDR } ;
+                 DIP { SIZE } ;
+                 COMPARE ;
+                 GT ;
+                 IF { UNIT ; FAILWITH } {} ;
+                 DIP { CAR } ;
+                 SWAP ;
+                 PAIR ;
+                 NIL operation } ;
+             PAIR } } }

@@ -1,0 +1,166 @@
+{ parameter
+    (or (lambda %admin_update
+           (pair (pair (big_map %actions
+                          string
+                          (lambda
+                             (pair (pair bytes address)
+                                   (pair (pair (pair (address %owner)
+                                                     (big_map %records
+                                                        bytes
+                                                        (pair (pair (pair (option %address address) (map %data string bytes))
+                                                                    (pair (nat %level) (address %owner)))
+                                                              (pair (option %validator nat) (option %validity_key bytes)))))
+                                               (pair (big_map %reverse_records address (pair (option %name bytes) (address %owner)))
+                                                     (map %validators nat address)))
+                                         (big_map %validity_map bytes timestamp)))
+                             (pair (list operation)
+                                   (pair (pair (pair (address %owner)
+                                                     (big_map %records
+                                                        bytes
+                                                        (pair (pair (pair (option %address address) (map %data string bytes))
+                                                                    (pair (nat %level) (address %owner)))
+                                                              (pair (option %validator nat) (option %validity_key bytes)))))
+                                               (pair (big_map %reverse_records address (pair (option %name bytes) (address %owner)))
+                                                     (map %validators nat address)))
+                                         (big_map %validity_map bytes timestamp)))))
+                       (pair %store
+                          (pair (pair (address %owner)
+                                      (big_map %records
+                                         bytes
+                                         (pair (pair (pair (option %address address) (map %data string bytes))
+                                                     (pair (nat %level) (address %owner)))
+                                               (pair (option %validator nat) (option %validity_key bytes)))))
+                                (pair (big_map %reverse_records address (pair (option %name bytes) (address %owner)))
+                                      (map %validators nat address)))
+                          (big_map %validity_map bytes timestamp)))
+                 (set %trusted_senders address))
+           (pair (list operation)
+                 (pair (pair (big_map %actions
+                                string
+                                (lambda
+                                   (pair (pair bytes address)
+                                         (pair (pair (pair (address %owner)
+                                                           (big_map %records
+                                                              bytes
+                                                              (pair (pair (pair (option %address address) (map %data string bytes))
+                                                                          (pair (nat %level) (address %owner)))
+                                                                    (pair (option %validator nat) (option %validity_key bytes)))))
+                                                     (pair (big_map %reverse_records address (pair (option %name bytes) (address %owner)))
+                                                           (map %validators nat address)))
+                                               (big_map %validity_map bytes timestamp)))
+                                   (pair (list operation)
+                                         (pair (pair (pair (address %owner)
+                                                           (big_map %records
+                                                              bytes
+                                                              (pair (pair (pair (option %address address) (map %data string bytes))
+                                                                          (pair (nat %level) (address %owner)))
+                                                                    (pair (option %validator nat) (option %validity_key bytes)))))
+                                                     (pair (big_map %reverse_records address (pair (option %name bytes) (address %owner)))
+                                                           (map %validators nat address)))
+                                               (big_map %validity_map bytes timestamp)))))
+                             (pair %store
+                                (pair (pair (address %owner)
+                                            (big_map %records
+                                               bytes
+                                               (pair (pair (pair (option %address address) (map %data string bytes))
+                                                           (pair (nat %level) (address %owner)))
+                                                     (pair (option %validator nat) (option %validity_key bytes)))))
+                                      (pair (big_map %reverse_records address (pair (option %name bytes) (address %owner)))
+                                            (map %validators nat address)))
+                                (big_map %validity_map bytes timestamp)))
+                       (set %trusted_senders address))))
+        (pair %execute
+           (pair (string %action_name) (address %original_sender))
+           (bytes %payload))) ;
+  storage
+    (pair (pair (big_map %actions
+                   string
+                   (lambda
+                      (pair (pair bytes address)
+                            (pair (pair (pair (address %owner)
+                                              (big_map %records
+                                                 bytes
+                                                 (pair (pair (pair (option %address address) (map %data string bytes))
+                                                             (pair (nat %level) (address %owner)))
+                                                       (pair (option %validator nat) (option %validity_key bytes)))))
+                                        (pair (big_map %reverse_records address (pair (option %name bytes) (address %owner)))
+                                              (map %validators nat address)))
+                                  (big_map %validity_map bytes timestamp)))
+                      (pair (list operation)
+                            (pair (pair (pair (address %owner)
+                                              (big_map %records
+                                                 bytes
+                                                 (pair (pair (pair (option %address address) (map %data string bytes))
+                                                             (pair (nat %level) (address %owner)))
+                                                       (pair (option %validator nat) (option %validity_key bytes)))))
+                                        (pair (big_map %reverse_records address (pair (option %name bytes) (address %owner)))
+                                              (map %validators nat address)))
+                                  (big_map %validity_map bytes timestamp)))))
+                (pair %store
+                   (pair (pair (address %owner)
+                               (big_map %records
+                                  bytes
+                                  (pair (pair (pair (option %address address) (map %data string bytes))
+                                              (pair (nat %level) (address %owner)))
+                                        (pair (option %validator nat) (option %validity_key bytes)))))
+                         (pair (big_map %reverse_records address (pair (option %name bytes) (address %owner)))
+                               (map %validators nat address)))
+                   (big_map %validity_map bytes timestamp)))
+          (set %trusted_senders address)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { PAIR ;
+             DUP ;
+             CDR ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             CAR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF { SWAP ; CAR ; SWAP ; EXEC }
+                { DROP 2 ; PUSH string "NOT_AUTHORIZED" ; FAILWITH } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             GET ;
+             IF_NONE
+               { DROP 2 ; PUSH string "UNKNOWN_ACTION" ; FAILWITH }
+               { DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CDR ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CDR ;
+                 DIG 3 ;
+                 CDR ;
+                 PAIR ;
+                 PAIR ;
+                 EXEC ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 DIP { DUP ; CDR ; SWAP ; CAR ; CAR } ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 CAR ;
+                 PAIR } } } }

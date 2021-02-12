@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (pair (pair (pair address bool) (pair (nat %theNat) (int %theNumber))) mutez) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

@@ -1,0 +1,32 @@
+{ parameter (or (unit %inc) (int %set_value)) ;
+  storage int ;
+  code { DUP ;
+         CDR ;
+         DIP { DUP } ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DIP { DUP } ;
+             SWAP ;
+             DIP 2 { DUP } ;
+             DIG 2 ;
+             PUSH int 1 ;
+             ADD ;
+             DIP { DROP } ;
+             DUP ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP 2 } }
+           { DUP ;
+             DIP { DIP { DUP } ; SWAP } ;
+             PAIR ;
+             DUP ;
+             CDR ;
+             DIP { DUP } ;
+             SWAP ;
+             CAR ;
+             DIP { DROP } ;
+             NIL operation ;
+             PAIR ;
+             DIP { DROP 2 } } ;
+         DIP { DROP 2 } } }

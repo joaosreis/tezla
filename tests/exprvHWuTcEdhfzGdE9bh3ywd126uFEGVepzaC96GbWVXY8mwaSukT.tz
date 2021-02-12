@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (big_map int nat) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

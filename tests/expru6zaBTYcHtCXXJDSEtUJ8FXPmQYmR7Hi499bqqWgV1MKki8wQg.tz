@@ -1,0 +1,89 @@
+{ storage
+    (pair (pair (big_map %credentials address string) (string %modulus))
+          (pair (big_map %vote_commitments_1 address string)
+                (big_map %vote_commitments_2 address string))) ;
+  parameter
+    (or (string %add_credential) (pair %vote (int %index) (string %vote_commitment))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               CDR ;
+               SWAP ;
+               CAR ;
+               DUP ;
+               CDR ;
+               SWAP ;
+               CAR ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               SOME ;
+               SENDER ;
+               UPDATE ;
+               PAIR ;
+               PAIR ;
+               DUG 2 ;
+               DROP 2 } }
+           { { DUP ;
+               CAR ;
+               PUSH int 1 ;
+               COMPARE ;
+               EQ ;
+               IF { { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      DUP ;
+                      CAR ;
+                      SWAP ;
+                      CDR ;
+                      DUP ;
+                      CDR ;
+                      SWAP ;
+                      CAR ;
+                      DIG 3 ;
+                      DUP ;
+                      DUG 4 ;
+                      CDR ;
+                      SOME ;
+                      SENDER ;
+                      UPDATE ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      DUG 2 ;
+                      SWAP ;
+                      DROP } }
+                  { { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      DUP ;
+                      CAR ;
+                      SWAP ;
+                      CDR ;
+                      DUP ;
+                      CAR ;
+                      SWAP ;
+                      CDR ;
+                      DIG 3 ;
+                      DUP ;
+                      DUG 4 ;
+                      CDR ;
+                      SOME ;
+                      SENDER ;
+                      UPDATE ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      DUG 2 ;
+                      SWAP ;
+                      DROP } } ;
+               DROP } } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,94 @@
+{ storage (pair (map %codeMap address string) (address %owner)) ;
+  parameter
+    (or (or (pair %changeOwner (address %confirmNewOwner) (address %newOwner))
+            (address %deleteCode))
+        (string %newCode)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   SENDER ;
+                   COMPARE ;
+                   EQ ;
+                   IF { {} }
+                      { { PUSH string "WrongCondition: sp.sender == self.data.owner" ; FAILWITH } } ;
+                   DUP ;
+                   CAR ;
+                   SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   COMPARE ;
+                   EQ ;
+                   IF { {} }
+                      { { PUSH string "WrongCondition: params.newOwner == params.confirmNewOwner" ;
+                          FAILWITH } } ;
+                   SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CAR ;
+                   SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   SWAP ;
+                   PAIR ;
+                   DUG 2 ;
+                   DROP ;
+                   DROP } }
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   SENDER ;
+                   COMPARE ;
+                   EQ ;
+                   IF { {} }
+                      { { PUSH string "WrongCondition: sp.sender == self.data.owner" ; FAILWITH } } ;
+                   SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   DUP ;
+                   CDR ;
+                   SWAP ;
+                   CAR ;
+                   NONE string ;
+                   DIG 3 ;
+                   DUP ;
+                   DUG 4 ;
+                   UPDATE ;
+                   PAIR ;
+                   DUG 2 ;
+                   DROP ;
+                   DROP } } }
+           { { PUSH mutez 0 ;
+               AMOUNT ;
+               COMPARE ;
+               EQ ;
+               IF { {} }
+                  { { PUSH string "WrongCondition: sp.amount == sp.tez(0)" ; FAILWITH } } ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               CDR ;
+               SWAP ;
+               CAR ;
+               DIG 2 ;
+               DUP ;
+               DUG 3 ;
+               SOME ;
+               SENDER ;
+               UPDATE ;
+               PAIR ;
+               DUG 2 ;
+               DROP ;
+               DROP } } ;
+         NIL operation ;
+         PAIR } }

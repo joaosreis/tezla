@@ -1,0 +1,3 @@
+{ parameter string ;
+  storage string ;
+  code { CAR ; PUSH string "Hello " ; CONCAT ; NIL operation ; PAIR } }

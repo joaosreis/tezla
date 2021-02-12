@@ -1,0 +1,9 @@
+{ parameter nat ;
+  storage (pair (pair nat bool) timestamp) ;
+  code { DUP ;
+         CAR ;
+         DIP { { CDR ; CDR } ; DUP ; NOW ; { COMPARE ; GT } } ;
+         PAIR ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,3 @@
+{ parameter (pair %account (map %settings string (or :value string int)) (nat %id)) ;
+  storage unit ;
+  code { FAILWITH } }

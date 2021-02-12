@@ -1,0 +1,6 @@
+{ parameter
+    (or %sender
+       (unit %owner_no_op)
+       (or (unit %optional_owner_hook) (unit %required_owner_hook))) ;
+  storage unit ;
+  code { DROP ; UNIT ; NIL operation ; PAIR } }

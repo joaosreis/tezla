@@ -1,0 +1,9 @@
+{ storage (pair (option %a address) (int %x)) ;
+  parameter (or (unit %entry_point_1) (unit %toto)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT { DROP ; CDR ; SELF %toto ; ADDRESS ; SOME ; PAIR } { DROP } ;
+         NIL operation ;
+         PAIR } }

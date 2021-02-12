@@ -1,0 +1,26 @@
+{ parameter (or (bool %setBool) (bool %setNotBool)) ;
+  storage bool ;
+  code { LAMBDA bool bool { DUP ; DIP { DROP } } ;
+         LAMBDA bool bool { DUP ; NOT ; DIP { DROP } } ;
+         DIP 2 { DUP } ;
+         DIG 2 ;
+         CAR ;
+         DIP 3 { DUP } ;
+         DIG 3 ;
+         CDR ;
+         DIP { DUP } ;
+         SWAP ;
+         IF_LEFT
+           { DUP ;
+             DUP ;
+             DIP { DIP 5 { DUP } ; DIG 5 } ;
+             EXEC ;
+             DIP { DROP 2 } }
+           { DUP ;
+             DUP ;
+             DIP { DIP 4 { DUP } ; DIG 4 } ;
+             EXEC ;
+             DIP { DROP 2 } } ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 5 } } }

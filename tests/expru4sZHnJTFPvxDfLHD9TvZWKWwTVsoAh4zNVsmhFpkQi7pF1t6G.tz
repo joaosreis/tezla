@@ -1,0 +1,16 @@
+{ parameter (pair (string %date) (pair (string %hash) (string %url))) ;
+  storage address ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         SENDER ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         COMPARE ;
+         NEQ ;
+         IF {} { PUSH string "SeeParams" ; FAILWITH } ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

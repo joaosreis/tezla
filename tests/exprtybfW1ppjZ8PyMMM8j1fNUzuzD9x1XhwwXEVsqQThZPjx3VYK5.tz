@@ -1,0 +1,111 @@
+{ parameter unit ;
+  storage
+    (pair (pair (map %my_asset_assets string (pair (list %col string) (int %value)))
+                (set %o_asset_assets string))
+          (int %res)) ;
+  code { DUP ;
+         LAMBDA
+           (pair (pair %0
+                    (pair (map %my_asset_assets string (pair (list %col string) (int %value)))
+                          (set %o_asset_assets string))
+                    (int %res))
+                 (string %1))
+           (pair (pair (list %col string) (string %id)) (int %value))
+           { DUP ;
+             CDR ;
+             DUP ;
+             DIP { DIP { DUP } ; SWAP ; CAR ; CAR ; CAR } ;
+             GET ;
+             IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+             DUP ;
+             CAR ;
+             DIP { DIP { DUP } ; SWAP } ;
+             PAIR ;
+             DIP { DUP ; CDR } ;
+             PAIR ;
+             DIP { DROP 3 } } ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         DIP { DUP ;
+               PUSH string "id0" ;
+               SWAP ;
+               PAIR ;
+               DIP { DIP { DUP } ; SWAP } ;
+               EXEC } ;
+         PAIR ;
+         DIP { DUP ;
+               PUSH string "oid" ;
+               SWAP ;
+               PAIR ;
+               DUP ;
+               CDR ;
+               DUP ;
+               DIP { DIP { DUP } ; SWAP ; CAR ; CAR ; CDR } ;
+               MEM ;
+               NOT ;
+               IF { PUSH string "key does not exists" ; FAILWITH } { PUSH unit Unit } ;
+               DIP { DUP } ;
+               SWAP ;
+               DIP { DROP 3 } } ;
+         PAIR ;
+         DUP ;
+         CAR ;
+         CAR ;
+         DIP { DUP } ;
+         SWAP ;
+         CAR ;
+         CDR ;
+         DUP ;
+         CAR ;
+         CDR ;
+         DIP 2 { DUP } ;
+         DIG 2 ;
+         DIP { DUP } ;
+         PAIR ;
+         DIP { DIP 5 { DUP } ; DIG 5 } ;
+         EXEC ;
+         DIP 3 { DUP } ;
+         DIG 3 ;
+         DIP 2 { DUP } ;
+         DIG 2 ;
+         DIP { DIP 3 { DUP } ;
+               DIG 3 ;
+               CAR ;
+               CAR ;
+               DIP { DIP 3 { DUP } ; DIG 3 ; CDR } ;
+               PAIR ;
+               SOME ;
+               DIP { DIP 4 { DUP } ; DIG 4 ; CAR ; CAR } } ;
+         UPDATE ;
+         DIP { DUP ; CDR ; SWAP ; CAR ; CDR } ;
+         PAIR ;
+         PAIR ;
+         DIP { DIP 4 { DUP } ; DIG 4 ; CDR } ;
+         PAIR ;
+         DUP ;
+         CAR ;
+         DIP { DUP } ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         DIP { DIP { DUP } ; SWAP ; CAR ; CDR } ;
+         MEM ;
+         IF { PUSH string "key already exists" ; FAILWITH } { PUSH unit Unit } ;
+         DIP 2 { DUP } ;
+         DIG 2 ;
+         DIP 2 { DUP } ;
+         DIG 2 ;
+         DIP { DIP 3 { DUP } ; DIG 3 ; CAR ; CDR ; PUSH bool True } ;
+         UPDATE ;
+         DIP { DUP ; CDR ; SWAP ; CAR ; CAR } ;
+         SWAP ;
+         PAIR ;
+         PAIR ;
+         DIP { DROP 4 } ;
+         DUP ;
+         DIP { DROP 6 } ;
+         DUP ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 4 } } }

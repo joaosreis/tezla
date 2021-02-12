@@ -1,0 +1,24 @@
+{ parameter (unit %) ;
+  storage (list address) ;
+  code { NIL operation ;
+         SWAP ;
+         DUP ;
+         CAR ;
+         DIP { CDR } ;
+         DIP { DUP } ;
+         SWAP ;
+         ITER { DUP ;
+                CONTRACT unit ;
+                IF_NONE
+                  {}
+                  { DUP ;
+                    PUSH mutez 1 ;
+                    UNIT ;
+                    TRANSFER_TOKENS ;
+                    DUG 4 ;
+                    DIP 4 { CONS } ;
+                    DROP } ;
+                DROP } ;
+         DROP ;
+         SWAP ;
+         PAIR } }

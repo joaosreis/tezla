@@ -1,0 +1,12 @@
+{ storage int ;
+  parameter int ;
+  code { CAR ;
+         DUP ;
+         DUP ;
+         PUSH int 12 ;
+         COMPARE ;
+         GT ;
+         IF { {} } { { UNIT ; FAILWITH } } ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

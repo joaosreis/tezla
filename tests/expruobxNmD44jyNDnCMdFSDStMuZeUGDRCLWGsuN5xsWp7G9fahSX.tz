@@ -1,0 +1,17 @@
+{ parameter string ;
+  storage (pair :storage (list %contents string) (list %dates timestamp)) ;
+  code { {} ;
+         { DUP ; CDR ; DIP { CAR } } ;
+         { { PUSH unit Unit ; DROP ; NOW } ;
+           { { { DIG 1 ; DUP ; DUG 2 } ; CDR } ;
+             { DIG 1 ; DUP ; DUG 2 } ;
+             CONS ;
+             { { DIG 2 ; DUP ; DUG 3 } ; CAR } ;
+             { DIG 4 ; DUP ; DUG 5 } ;
+             CONS ;
+             PAIR } ;
+           DUP ;
+           NIL operation ;
+           PAIR ;
+           DIP { DROP 2 } } ;
+         DIP { DROP 2 } } }

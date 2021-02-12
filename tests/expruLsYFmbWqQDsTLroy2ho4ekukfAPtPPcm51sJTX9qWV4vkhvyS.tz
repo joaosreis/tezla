@@ -1,0 +1,15 @@
+{ parameter unit ;
+  storage (pair (string %original) (string %value)) ;
+  code { DUP ;
+         CDR ;
+         DUP ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         SWAP ;
+         CAR ;
+         PAIR ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 2 } } }

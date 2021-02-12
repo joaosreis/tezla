@@ -1,0 +1,94 @@
+{ storage (pair (address %admin) (big_map %invoices string (list string))) ;
+  parameter
+    (or (pair %insertInvoice (string %invoiceHash) (string %invoiceID))
+        (pair %modifyInvoice (string %invoiceHash) (string %invoiceID))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { SENDER ;
+               DIG 2 ;
+               DUP ;
+               DUG 3 ;
+               CAR ;
+               COMPARE ;
+               EQ ;
+               IF { { SWAP ; DUP ; DUG 2 ; CDR ; SWAP ; DUP ; DUG 2 ; CDR ; MEM ; NOT } }
+                  { PUSH bool False } ;
+               IF { {} }
+                  { { PUSH string
+                           "WrongCondition: (self.data.admin == sp.sender) & (~ (self.data.invoices.contains(params.invoiceID)))" ;
+                      FAILWITH } } ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               CAR ;
+               SWAP ;
+               CDR ;
+               PUSH (list string) {} ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CAR ;
+               CONS ;
+               SOME ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               UPDATE ;
+               SWAP ;
+               PAIR ;
+               DUG 2 ;
+               DROP ;
+               DROP } }
+           { { SENDER ;
+               DIG 2 ;
+               DUP ;
+               DUG 3 ;
+               CAR ;
+               COMPARE ;
+               EQ ;
+               IF { { SWAP ; DUP ; DUG 2 ; CDR ; SWAP ; DUP ; DUG 2 ; CDR ; MEM } }
+                  { PUSH bool False } ;
+               IF { {} }
+                  { { PUSH string
+                           "WrongCondition: (self.data.admin == sp.sender) & (self.data.invoices.contains(params.invoiceID))" ;
+                      FAILWITH } } ;
+               SWAP ;
+               DUP ;
+               DUG 2 ;
+               DUP ;
+               CAR ;
+               SWAP ;
+               CDR ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               GET ;
+               IF_NONE { { PUSH string "Get-item:21" ; FAILWITH } } {} ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CAR ;
+               CONS ;
+               SOME ;
+               DIG 3 ;
+               DUP ;
+               DUG 4 ;
+               CDR ;
+               UPDATE ;
+               SWAP ;
+               PAIR ;
+               DUG 2 ;
+               DROP ;
+               DROP } } ;
+         NIL operation ;
+         PAIR } }

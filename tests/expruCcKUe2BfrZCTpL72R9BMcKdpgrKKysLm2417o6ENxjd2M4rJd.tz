@@ -1,0 +1,11 @@
+{ storage int ;
+  parameter (or (unit %doubleIt) (int %set)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { { PUSH int 2 ; DIG 2 ; DUP ; DUG 3 ; MUL ; DUG 2 ; DROP 2 } }
+           { { SWAP ; DROP } } ;
+         NIL operation ;
+         PAIR } }

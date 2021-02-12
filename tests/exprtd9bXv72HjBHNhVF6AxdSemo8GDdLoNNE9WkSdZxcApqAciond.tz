@@ -1,0 +1,13 @@
+{ parameter int ;
+  storage (pair int nat) ;
+  code { {} ;
+         { DUP ; CDR ; DIP { CAR } } ;
+         { { DUP ; CAR } ;
+           { { DIG 1 ; DUP ; DUG 2 } ; CDR } ;
+           { PUSH nat 1 ; { DIG 1 ; DUP ; DUG 2 } ; ADD } ;
+           { { DIG 2 ; DUP ; DUG 3 } ; { DIG 5 ; DUP ; DUG 6 } ; ADD } ;
+           PAIR ;
+           NIL operation ;
+           PAIR ;
+           DIP { DROP 2 } } ;
+         DIP { DROP 2 } } }

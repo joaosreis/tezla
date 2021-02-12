@@ -1,0 +1,23 @@
+{ parameter (contract int) ;
+  storage unit ;
+  code { NIL operation ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         PUSH mutez 0 ;
+         PUSH int 1000 ;
+         TRANSFER_TOKENS ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CDR ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CONS ;
+         PAIR ;
+         DIP { DROP 3 } } }

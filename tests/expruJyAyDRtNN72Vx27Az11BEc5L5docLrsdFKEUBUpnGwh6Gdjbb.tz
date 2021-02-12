@@ -1,0 +1,9 @@
+{ parameter unit ;
+  storage int ;
+  code { PUSH bytes 0x050016 ;
+         UNPACK int ;
+         DUP ;
+         IF_NONE { PUSH int 0 } { DUP ; DIP { DROP } } ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP 2 } } }

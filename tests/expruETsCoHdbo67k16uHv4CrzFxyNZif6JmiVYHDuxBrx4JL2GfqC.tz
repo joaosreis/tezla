@@ -1,0 +1,44 @@
+{ storage
+    (pair unit
+          (big_map
+             nat
+             (lambda
+                (pair (pair (or (unit %bounce) (unit %bounce2)) unit) address)
+                (pair (list operation) unit)))) ;
+  parameter (or (unit %bounce) (unit %bounce2)) ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DIG 2 ;
+         DUP ;
+         IF_LEFT { { DROP ; PUSH nat 1 } } { { DROP ; PUSH nat 0 } } ;
+         DIG 3 ;
+         DUP ;
+         DUG 4 ;
+         SWAP ;
+         GET ;
+         IF_NONE { { PUSH string "missing entry point" ; FAILWITH } } {} ;
+         DIG 2 ;
+         DIG 2 ;
+         PAIR ;
+         SELF ;
+         ADDRESS ;
+         SWAP ;
+         PAIR ;
+         EXEC ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUG 2 ;
+         PAIR ;
+         SWAP ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

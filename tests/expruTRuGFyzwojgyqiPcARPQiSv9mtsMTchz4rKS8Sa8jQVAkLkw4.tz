@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (or (string %bar) (nat %foo)) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

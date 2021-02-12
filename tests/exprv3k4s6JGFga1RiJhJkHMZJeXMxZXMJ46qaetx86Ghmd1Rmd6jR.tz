@@ -1,0 +1,12 @@
+{ parameter (or (int %first) (or (int %second) (int %default))) ;
+  storage unit ;
+  code { DUP ;
+         DIP { CDR } ;
+         CAR ;
+         DUP ;
+         IF_LEFT
+           { DROP ; { DIP { DUP } ; SWAP } ; NIL operation ; PAIR }
+           { IF_LEFT
+               { DROP ; { DIP { DUP } ; SWAP } ; NIL operation ; PAIR }
+               { DROP ; { DIP { DUP } ; SWAP } ; NIL operation ; PAIR } } ;
+         DIP { DROP ; DROP } } }

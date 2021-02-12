@@ -1,0 +1,11 @@
+{ parameter unit ;
+  storage (option address) ;
+  code { DROP ;
+         UNIT ;
+         AMOUNT ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter unit ; storage unit ; code { CDR ; NIL operation ; PAIR } } ;
+         DIP { SOME ; NIL operation } ;
+         CONS ;
+         PAIR } }

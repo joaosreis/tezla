@@ -1,0 +1,176 @@
+{ storage
+    (pair (pair (option %admin address) (pair (option %issuer address) (address %owner)))
+          (pair (option %whiteListID nat)
+                (pair (option %whitelistDetails (pair (set %allowed_whitelists nat) (bool %unrestricted)))
+                      (address %whitelistingContract)))) ;
+  parameter
+    (or (or (address %setAdmin) (address %setIssuer))
+        (or (nat %setUser)
+            (or (address %setWhiteListingContract)
+                (pair %setWhitelist (set %allowed_whitelists nat) (bool %unrestricted))))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   CDR ;
+                   CDR ;
+                   SENDER ;
+                   COMPARE ;
+                   EQ ;
+                   IF { {} }
+                      { { PUSH string "only whitelisting contract can set values." ; FAILWITH } } ;
+                   SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   DUP ;
+                   CDR ;
+                   SWAP ;
+                   CAR ;
+                   CDR ;
+                   DIG 2 ;
+                   DUP ;
+                   DUG 3 ;
+                   SOME ;
+                   PAIR ;
+                   PAIR ;
+                   DUG 2 ;
+                   DROP 2 } }
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   CDR ;
+                   CDR ;
+                   SENDER ;
+                   COMPARE ;
+                   EQ ;
+                   IF { {} }
+                      { { PUSH string "only whitelisting contract can set values." ; FAILWITH } } ;
+                   SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   DUP ;
+                   CDR ;
+                   SWAP ;
+                   CAR ;
+                   DUP ;
+                   CAR ;
+                   SWAP ;
+                   CDR ;
+                   CDR ;
+                   DIG 3 ;
+                   DUP ;
+                   DUG 4 ;
+                   SOME ;
+                   PAIR ;
+                   SWAP ;
+                   PAIR ;
+                   PAIR ;
+                   DUG 2 ;
+                   DROP 2 } } }
+           { IF_LEFT
+               { { SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   CDR ;
+                   CDR ;
+                   CDR ;
+                   SENDER ;
+                   COMPARE ;
+                   EQ ;
+                   IF { {} }
+                      { { PUSH string "only whitelisting contract can set values." ; FAILWITH } } ;
+                   SWAP ;
+                   DUP ;
+                   DUG 2 ;
+                   DUP ;
+                   CAR ;
+                   SWAP ;
+                   CDR ;
+                   CDR ;
+                   DIG 2 ;
+                   DUP ;
+                   DUG 3 ;
+                   SOME ;
+                   PAIR ;
+                   SWAP ;
+                   PAIR ;
+                   DUG 2 ;
+                   DROP 2 } }
+               { IF_LEFT
+                   { { SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       SENDER ;
+                       COMPARE ;
+                       EQ ;
+                       IF { {} }
+                          { { PUSH string "only owner can change the address." ; FAILWITH } } ;
+                       SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       DUP ;
+                       CAR ;
+                       SWAP ;
+                       CDR ;
+                       DUP ;
+                       CAR ;
+                       SWAP ;
+                       CDR ;
+                       CAR ;
+                       DIG 3 ;
+                       DUP ;
+                       DUG 4 ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       DUG 2 ;
+                       DROP 2 } }
+                   { { SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       CDR ;
+                       CDR ;
+                       CDR ;
+                       SENDER ;
+                       COMPARE ;
+                       EQ ;
+                       IF { {} }
+                          { { PUSH string "only whitelisting contract can set values." ; FAILWITH } } ;
+                       SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       DUP ;
+                       CAR ;
+                       SWAP ;
+                       CDR ;
+                       DUP ;
+                       CAR ;
+                       SWAP ;
+                       CDR ;
+                       CDR ;
+                       DIG 3 ;
+                       DUP ;
+                       DUG 4 ;
+                       SOME ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       DUG 2 ;
+                       DROP 2 } } } } ;
+         NIL operation ;
+         PAIR } }

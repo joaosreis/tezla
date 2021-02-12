@@ -1,0 +1,15 @@
+{ parameter (pair (int %first) (nat %second)) ;
+  storage int ;
+  code { DUP ;
+         CAR ;
+         DUP ;
+         CDR ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         ADD ;
+         DIP { DROP } ;
+         NIL operation ;
+         PAIR ;
+         DIP { DROP } } }
