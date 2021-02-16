@@ -208,7 +208,7 @@ let type_expr e =
   | E_size _ -> T_nat
   | E_isnat _ -> T_option T_nat
   | E_int_of_nat _ -> T_int
-  | E_lambda (t_1, t_2, _) -> T_lambda (t_1, t_2)
+  | E_lambda (t_1, t_2, _, _) -> T_lambda (t_1, t_2)
   | E_exec (_, v) -> (
       match v.var_type with
       | T_lambda (_, t) -> t

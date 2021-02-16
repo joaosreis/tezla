@@ -117,7 +117,7 @@ and expr =
   | E_isnat of var
   | E_int_of_nat of var
   | E_chain_id
-  | E_lambda of typ * typ * stmt
+  | E_lambda of typ * typ * var * stmt
   | E_exec of var * var
   | E_dup of var
   | E_nil of typ

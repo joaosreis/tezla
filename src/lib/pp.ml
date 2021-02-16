@@ -121,8 +121,9 @@ and pp_expr ppf = function
   | E_isnat e -> fprintf ppf "ISNAT %a" pp_var e
   | E_int_of_nat e -> fprintf ppf "INT %a" pp_var e
   | E_chain_id -> fprintf ppf "CHAIN_ID"
-  | E_lambda (t_1, t_2, i) ->
-      fprintf ppf "LAMBDA %a %a %a" pp_typ t_1 pp_typ t_2 pp_stmt i
+  | E_lambda (t_1, t_2, v, i) ->
+      fprintf ppf "LAMBDA %a %a (%a => %a)" pp_typ t_1 pp_typ t_2 pp_var v
+        pp_stmt i
   | E_exec (v_1, v_2) -> fprintf ppf "EXEC %a %a" pp_var v_1 pp_var v_2
   | E_contract_of_address (t, v) ->
       fprintf ppf "CONTRACT %a %a" pp_typ t pp_var v

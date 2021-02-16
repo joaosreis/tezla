@@ -652,10 +652,8 @@ and inst_to_stmt counter env
     | I_lambda (t_1, t_2, i) ->
         let t_1 = convert_typ t_1 in
         let t_2 = convert_typ t_2 in
-        let b, lambda_env =
-          let v = { var_name = "param"; var_type = t_1 } in
-          inst_to_stmt counter (push v empty_env) i
-        in
+        let param = { var_name = next_var (); var_type = t_1 } in
+        let b, lambda_env = inst_to_stmt counter (push param empty_env) i in
         let b =
           match lambda_env with
           | Failed -> b
@@ -663,7 +661,7 @@ and inst_to_stmt counter env
               let r = peek lambda_env in
               create_stmt (S_seq (b, create_stmt (S_return r)))
         in
-        let v, assign = create_assign (E_lambda (t_1, t_2, b)) in
+        let v, assign = create_assign (E_lambda (t_1, t_2, param, b)) in
         (assign, push v env)
     | I_exec ->
         let param, env' = pop env in
