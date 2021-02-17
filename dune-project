@@ -23,7 +23,7 @@
  (depends
   (dune :build)
   (bisect_ppx :with-test)
-  (ppx_inline_test :with-test)
+  (ppx_inline_test :dev)
   (alcotest :with-test)
   zarith
   batteries
