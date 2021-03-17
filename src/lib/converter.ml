@@ -367,7 +367,7 @@ and convert_data_elt t_1 t_2 (_, d) =
   | _ -> assert false
 
 and inst_to_stmt counter env
-    ((l, i, _) :
+    ((l, i, annots) :
       (Michelson.Location.t, Michelson.Adt.annot list) Michelson.Adt.inst) =
   let open Michelson.Adt in
   let open Adt in
@@ -378,11 +378,23 @@ and inst_to_stmt counter env
     loop
   in
   let next_var () = next_var counter in
-  let create_assign e =
-    let var_name = next_var () in
+  let create_assign ?var_name e =
+    let var_name = match var_name with None -> next_var () | Some v -> v in
     let var_type = Typer.type_expr e in
     let v = { var_name; var_type } in
     (v, create_stmt (S_assign (v, e)))
+  in
+  let create_assign_annot_1 e =
+    let annots = List.filter (function A_var _ -> true | _ -> false) annots in
+    match annots with
+    | A_var var_name :: _ -> create_assign ~var_name e
+    | _ -> create_assign e
+  in
+  let create_assign_annot_2 e =
+    let annots = List.filter (function A_var _ -> true | _ -> false) annots in
+    match annots with
+    | _ :: A_var var_name :: _ -> create_assign ~var_name e
+    | _ -> create_assign e
   in
   try
     match i with
@@ -441,7 +453,7 @@ and inst_to_stmt counter env
         let t = convert_typ t in
         let d = convert_data t x in
         let e = E_push (d, t) in
-        let v, assign = create_assign e in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_drop ->
         let v, env' = pop env in
@@ -457,7 +469,8 @@ and inst_to_stmt counter env
         (create_stmt (S_drop l), env')
     | I_dup ->
         let v = peek env in
-        let v', assign = create_assign (E_dup v) in
+        let e = E_dup v in
+        let v', assign = create_assign_annot_1 e in
         let env' = push v' env in
         (assign, env')
     | I_dig n -> (create_stmt S_dig, dig env n)
@@ -467,14 +480,17 @@ and inst_to_stmt counter env
         (create_stmt S_swap, env')
     | I_some ->
         let v, env' = pop env in
-        let v', assign = create_assign (E_some v) in
+        let e = E_some v in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_none t ->
         let t = convert_typ t in
-        let v, assign = create_assign (E_none t) in
+        let e = E_none t in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_unit ->
-        let v, assign = create_assign E_unit in
+        let e = E_unit in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_if_none (i_t, i_f) ->
         let v, env' = pop env in
@@ -490,25 +506,30 @@ and inst_to_stmt counter env
     | I_pair ->
         let v_1, env' = pop env in
         let t_2, env' = pop env' in
-        let v, assign = create_assign (E_pair (v_1, t_2)) in
+        let e = E_pair (v_1, t_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_car ->
         let v, env' = pop env in
-        let v', assign = create_assign (E_car v) in
+        let e = E_car v in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_cdr ->
         let v, env' = pop env in
-        let v', assign = create_assign (E_cdr v) in
+        let e = E_cdr v in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_left t ->
         let t = convert_typ t in
         let v, env' = pop env in
-        let v', assign = create_assign (E_left (v, t)) in
+        let e = E_left (v, t) in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_right t ->
         let t = convert_typ t in
         let v, env' = pop env in
-        let v', assign = create_assign (E_right (v, t)) in
+        let e = E_right (v, t) in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_if_left (i_t, i_f) ->
         let v, env' = pop env in
@@ -529,12 +550,14 @@ and inst_to_stmt counter env
         (s, env')
     | I_nil t ->
         let t = convert_typ t in
-        let v, assign = create_assign (E_nil t) in
+        let e = E_nil t in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_cons ->
         let v_1, env' = pop env in
         let v_2, env' = pop env' in
-        let v, assign = create_assign (E_cons (v_1, v_2)) in
+        let e = E_cons (v_1, v_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_if_cons (i_t, i_f) ->
         let c, env' = pop env in
@@ -560,21 +583,25 @@ and inst_to_stmt counter env
         (s, env')
     | I_size ->
         let v, env' = pop env in
-        let v', assign = create_assign (E_size v) in
+        let e = E_size v in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_empty_set t ->
         let t = convert_typ t in
-        let v, assign = create_assign (E_empty_set t) in
+        let e = E_empty_set t in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_empty_map (t_k, t_v) ->
         let t_k = convert_typ t_k in
         let t_v = convert_typ t_v in
-        let v, assign = create_assign (E_empty_map (t_k, t_v)) in
+        let e = E_empty_map (t_k, t_v) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_empty_big_map (t_k, t_v) ->
         let t_k = convert_typ t_k in
         let t_v = convert_typ t_v in
-        let v, assign = create_assign (E_empty_big_map (t_k, t_v)) in
+        let e = E_empty_big_map (t_k, t_v) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_map b ->
         let c, env' = pop env in
@@ -636,18 +663,21 @@ and inst_to_stmt counter env
     | I_mem ->
         let elt, env' = pop env in
         let set, env' = pop env' in
-        let v, assign = create_assign (E_mem (elt, set)) in
+        let e = E_mem (elt, set) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_get ->
         let key, env' = pop env in
         let map, env' = pop env' in
-        let v, assign = create_assign (E_get (key, map)) in
+        let e = E_get (key, map) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_update ->
         let key, env' = pop env in
         let value, env' = pop env' in
         let map, env' = pop env' in
-        let v, assign = create_assign (E_update (key, value, map)) in
+        let e = E_update (key, value, map) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_lambda (t_1, t_2, i) ->
         let t_1 = convert_typ t_1 in
@@ -661,12 +691,14 @@ and inst_to_stmt counter env
               let r = peek lambda_env in
               create_stmt (S_seq (b, create_stmt (S_return r)))
         in
-        let v, assign = create_assign (E_lambda (t_1, t_2, param, b)) in
+        let e = E_lambda (t_1, t_2, param, b) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_exec ->
         let param, env' = pop env in
         let lambda, env' = pop env' in
-        let v, assign = create_assign (E_exec (param, lambda)) in
+        let e = E_exec (param, lambda) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_dip i ->
         let x, env' = pop env in
@@ -681,217 +713,259 @@ and inst_to_stmt counter env
     | I_rename -> (create_stmt S_skip, env)
     | I_concat ->
         let v, env' = pop env in
-        let (v', assign), env' =
+        let e, env' =
           match v.var_type with
-          | T_list T_string | T_list T_bytes ->
-              (create_assign (E_concat_list v), env')
+          | T_list T_string | T_list T_bytes -> (E_concat_list v, env')
           | T_string | T_bytes ->
               let s_2, env' = pop env' in
-              (create_assign (E_concat (v, s_2)), env')
+              (E_concat (v, s_2), env')
           | _ -> assert false
         in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_slice ->
         let offset, env' = pop env in
         let length, env' = pop env' in
         let x, env' = pop env' in
-        let v, assign = create_assign (E_slice (offset, length, x)) in
+        let e = E_slice (offset, length, x) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_pack ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_pack x) in
+        let e = E_pack x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_unpack t ->
         let t = convert_typ t in
         let v, env' = pop env in
-        let v', assign = create_assign (E_unpack (t, v)) in
+        let e = E_unpack (t, v) in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_add ->
         let v_1, env' = pop env in
         let v_2, env' = pop env' in
-        let v, assign = create_assign (E_add (v_1, v_2)) in
+        let e = E_add (v_1, v_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_sub ->
         let v_1, env' = pop env in
         let v_2, env' = pop env' in
-        let v, assign = create_assign (E_sub (v_1, v_2)) in
+        let e = E_sub (v_1, v_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_mul ->
         let t_1, env' = pop env in
         let t_2, env' = pop env' in
-        let v, assign = create_assign (E_mul (t_1, t_2)) in
+        let e = E_mul (t_1, t_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_ediv ->
         let v_1, env' = pop env in
         let v_2, env' = pop env' in
-        let v, assign = create_assign (E_div (v_1, v_2)) in
+        let e = E_div (v_1, v_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_abs ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_abs x) in
+        let e = E_abs x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_neg ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_neg x) in
+        let e = E_neg x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_lsl ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let v, assign = create_assign (E_shiftL (x_1, x_2)) in
+        let e = E_shiftL (x_1, x_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_lsr ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let v, assign = create_assign (E_shiftR (x_1, x_2)) in
+        let e = E_shiftR (x_1, x_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_or ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let v, assign = create_assign (E_or (x_1, x_2)) in
+        let e = E_or (x_1, x_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_and ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let v, assign = create_assign (E_and (x_1, x_2)) in
+        let e = E_and (x_1, x_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_xor ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let v, assign = create_assign (E_xor (x_1, x_2)) in
+        let e = E_xor (x_1, x_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_not ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_not x) in
+        let e = E_not x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_compare ->
         let x_1, env' = pop env in
         let x_2, env'' = pop env' in
-        let v, assign = create_assign (E_compare (x_1, x_2)) in
+        let e = E_compare (x_1, x_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env'')
     | I_eq ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_eq x) in
+        let e = E_eq x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_neq ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_neq x) in
+        let e = E_neq x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_lt ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_lt x) in
+        let e = E_lt x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_gt ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_gt x) in
+        let e = E_gt x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_le ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_leq x) in
+        let e = E_leq x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_ge ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_geq x) in
+        let e = E_geq x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_self ->
-        let v, assign = create_assign E_self in
+        let e = E_self in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_contract t ->
         let t = convert_typ t in
         let x, env' = pop env in
-        let v, assign = create_assign (E_contract_of_address (t, x)) in
+        let e = E_contract_of_address (t, x) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_transfer_tokens ->
         let x, env' = pop env in
         let amount, env' = pop env' in
         let contract, env' = pop env' in
         let operation = O_transfer_tokens (x, amount, contract) in
-        let v, assign = create_assign (E_operation operation) in
+        let e = E_operation operation in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_set_delegate ->
         let x, env' = pop env in
         let o = O_set_delegate x in
-        let v, assign = create_assign (E_operation o) in
+        let e = E_operation o in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_create_contract c ->
         let delegate, env' = pop env in
         let amount, env' = pop env' in
         let storage, env' = pop env' in
         let o = O_create_contract (c, delegate, amount, storage) in
-        let v_o, assign_o = create_assign (E_operation o) in
+        let v_o, assign_o = create_assign_annot_1 (E_operation o) in
         let v_a, assign_a =
-          create_assign
+          create_assign_annot_2
             (E_create_contract_address (c, delegate, amount, storage))
         in
         let env' = push v_o (push v_a env') in
         (create_stmt (S_seq (assign_o, assign_a)), env')
     | I_implicit_account ->
         let v, env' = pop env in
-        let v', assign = create_assign (E_implicit_account v) in
+        let e = E_implicit_account v in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_now ->
-        let v, assign = create_assign E_now in
+        let e = E_now in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_amount ->
-        let v, assign = create_assign E_amount in
+        let e = E_amount in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_balance ->
-        let v, assign = create_assign E_balance in
+        let e = E_balance in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_check_signature ->
         let key, env' = pop env in
         let signature, env' = pop env' in
         let bytes, env' = pop env' in
-        let v, assign =
-          create_assign (E_check_signature (key, signature, bytes))
-        in
+        let e = E_check_signature (key, signature, bytes) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_blake2b ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_blake2b x) in
+        let e = E_blake2b x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_sha256 ->
         let v, env' = pop env in
-        let v', assign = create_assign (E_sha256 v) in
+        let e = E_sha256 v in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_sha512 ->
         let v, env' = pop env in
-        let v', assign = create_assign (E_sha512 v) in
+        let e = E_sha512 v in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_hash_key ->
         let v, env' = pop env in
-        let v', assign = create_assign (E_hash_key v) in
+        let e = E_hash_key v in
+        let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_source ->
-        let v, assign = create_assign E_source in
+        let e = E_source in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_sender ->
-        let v, assign = create_assign E_sender in
+        let e = E_sender in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_address ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_address_of_contract x) in
+        let e = E_address_of_contract x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_isnat ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_isnat x) in
+        let e = E_isnat x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_int ->
         let x, env' = pop env in
-        let v, assign = create_assign (E_int_of_nat x) in
+        let e = E_int_of_nat x in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_chain_id ->
-        let v, assign = create_assign E_chain_id in
+        let e = E_chain_id in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_noop -> (create_stmt S_skip, env)
     | I_unpair ->
         let x, env' = pop env in
-        let v_1, assign_1 = create_assign (E_car x) in
-        let v_2, assign_2 = create_assign (E_cdr x) in
+        let e = E_car x in
+        let v_1, assign_1 = create_assign_annot_1 e in
+        let e = E_cdr x in
+        let v_2, assign_2 = create_assign_annot_2 e in
         (create_stmt (S_seq (assign_1, assign_2)), push v_1 (push v_2 env'))
     | I_apply ->
         let x_1, env = pop env in
         let x_2, env = pop env in
-        let v, assign = create_assign (E_apply (x_1, x_2)) in
+        let e = E_apply (x_1, x_2) in
+        let v, assign = create_assign_annot_1 e in
         (assign, push v env)
   with
   | Functional_stack.Unsufficient_length ->
