@@ -60,51 +60,52 @@ let%test "swap size 1" =
 let%test "swap" = swap [ 1; 2 ] = [ 2; 1 ]
 
 let dig s n =
-  if Z.(n = ~$0) then s
-  else if Z.(n = ~$1) then swap s
-  else if Z.(~$(List.length s)) <= n then raise Unsufficient_length
+  if Bignum.(n = zero) then s
+  else if Bignum.(n = one) then swap s
+  else if Bignum.(of_int (List.length s)) <= n then raise Unsufficient_length
   else
     let rec aux (l_h, l_t) =
-      if Z.(~$(List.length l_h) = n) then (List.hd l_t :: l_h) @ List.tl l_t
+      if Bignum.(of_int (List.length l_h) = n) then
+        (List.hd l_t :: l_h) @ List.tl l_t
       else aux (l_h @ [ List.hd l_t ], List.tl l_t)
     in
     aux ([], s)
 
 let%test "dig invalid length" =
   try
-    let _ = dig [ 1; 2 ] Z.(~$2) in
+    let _ = dig [ 1; 2 ] Bignum.(of_int 2) in
     false
   with Unsufficient_length -> true
 
-let%test "dig 0" = dig [ 1; 2; 3 ] Z.zero = [ 1; 2; 3 ]
+let%test "dig 0" = dig [ 1; 2; 3 ] Bignum.zero = [ 1; 2; 3 ]
 
-let%test "dig 1" = dig [ 1; 2; 3 ] Z.one = [ 2; 1; 3 ]
+let%test "dig 1" = dig [ 1; 2; 3 ] Bignum.one = [ 2; 1; 3 ]
 
-let%test "dig 2" = dig [ 1; 2; 3 ] Z.(~$2) = [ 3; 1; 2 ]
+let%test "dig 2" = dig [ 1; 2; 3 ] Bignum.(of_int 2) = [ 3; 1; 2 ]
 
 let dug s n =
-  if Z.(n = ~$0) then s
-  else if Z.(n = ~$1) then swap s
-  else if Z.(~$(List.length s)) <= n then raise Unsufficient_length
+  if Bignum.(n = of_int 0) then s
+  else if Bignum.(n = of_int 1) then swap s
+  else if Bignum.(of_int (List.length s)) <= n then raise Unsufficient_length
   else
     let h = List.hd s in
     let rec aux (l_h, l_t) =
-      if Z.(~$(List.length l_h) = n) then l_h @ (h :: l_t)
+      if Bignum.(of_int (List.length l_h) = n) then l_h @ (h :: l_t)
       else aux (l_h @ [ List.hd l_t ], List.tl l_t)
     in
     aux ([], List.tl s)
 
 let%test "dug invalid length" =
   try
-    let _ = dug [ 1; 2 ] Z.(~$2) in
+    let _ = dug [ 1; 2 ] Bignum.(of_int 2) in
     false
   with Unsufficient_length -> true
 
-let%test "dug 0" = dug [ 1 ] Z.zero = [ 1 ]
+let%test "dug 0" = dug [ 1 ] Bignum.zero = [ 1 ]
 
-let%test "dug 1" = dug [ 1; 2; 3 ] Z.one = [ 2; 1; 3 ]
+let%test "dug 1" = dug [ 1; 2; 3 ] Bignum.one = [ 2; 1; 3 ]
 
-let%test "dug 2" = dug [ 1; 2; 3 ] Z.(~$2) = [ 2; 3; 1 ]
+let%test "dug 2" = dug [ 1; 2; 3 ] Bignum.(of_int 2) = [ 2; 3; 1 ]
 
 let map = List.map
 

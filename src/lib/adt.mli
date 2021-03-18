@@ -1,3 +1,5 @@
+open Core_kernel
+
 type typ =
   | T_key
   | T_unit
@@ -22,21 +24,39 @@ type typ =
   | T_key_hash
   | T_timestamp
   | T_address
+[@@deriving ord, sexp]
 
-type var = { var_name : string; var_type : typ }
+module Typ : sig
+  include Comparable.S with type t = typ
+
+  val to_string : t -> string
+end
+
+type var = { var_name : string; var_type : typ } [@@deriving ord, sexp]
+
+module Var : sig
+  include Comparable.S with type t = var
+
+  val to_string : t -> string
+end
 
 type operation =
   | O_create_contract of
-      (Michelson.Location.t, Michelson.Adt.annot list) Michelson.Adt.program
+      ( Michelson.Loc.t,
+        Michelson.Carthage.Adt.annot list )
+      Michelson.Carthage.Adt.program
       * var
       * var
       * var
   | O_transfer_tokens of var * var * var
   | O_set_delegate of var
   | O_create_account of var * var * var * var
+[@@deriving ord, sexp]
+
+module Operation : Comparable.S with type t = operation
 
 type data =
-  | D_int of Z.t
+  | D_int of Bignum.t
   | D_string of string
   | D_bytes of Bytes.t
   | D_unit
@@ -104,7 +124,9 @@ and expr =
   | E_sender
   | E_address_of_contract of var
   | E_create_contract_address of
-      (Michelson.Location.t, Michelson.Adt.annot list) Michelson.Adt.program
+      ( Michelson.Loc.t,
+        Michelson.Carthage.Adt.annot list )
+      Michelson.Carthage.Adt.program
       * var
       * var
       * var
@@ -129,6 +151,7 @@ and expr =
   | E_special_empty_list of typ
   | E_special_empty_map of typ * typ
   | E_phi of var * var
+[@@deriving ord, sexp]
 
 and stmt_t =
   | S_seq of stmt * stmt
@@ -152,6 +175,20 @@ and stmt_t =
 and stmt = { id : int; stm : stmt_t }
 
 and program = typ * typ * stmt
+
+module Data : sig
+  include Comparable.S with type t = data
+
+  val to_string : t -> string
+end
+
+module Expr : sig
+  include Comparable.S with type t = expr
+
+  val to_string : t -> string
+end
+
+module Stmt : Comparable.S with type t = stmt
 
 val create_stmt : stmt_t -> stmt
 

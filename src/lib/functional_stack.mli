@@ -12,9 +12,9 @@ val peek : 'a t -> 'a
 
 val swap : 'a t -> 'a t
 
-val dig : 'a t -> Z.t -> 'a t
+val dig : 'a t -> Bignum.t -> 'a t
 
-val dug : 'a t -> Z.t -> 'a t
+val dug : 'a t -> Bignum.t -> 'a t
 
 val map : ('a -> 'b) -> 'a t -> 'b t
 

@@ -1,3 +1,5 @@
+open Core_kernel
+
 type typ =
   | T_key
   | T_unit
@@ -22,21 +24,93 @@ type typ =
   | T_key_hash
   | T_timestamp
   | T_address
+[@@deriving ord, sexp]
 
-type var = { var_name : string; var_type : typ }
+module Typ = struct
+  module T = struct
+    type t = typ [@@deriving ord, sexp]
+  end
+
+  let rec to_string = function
+    | T_int -> "int"
+    | T_nat -> "nat"
+    | T_string -> "string"
+    | T_bytes -> "bytes"
+    | T_mutez -> "mutez"
+    | T_bool -> "bool"
+    | T_key_hash -> "key_hash"
+    | T_timestamp -> "timestamp"
+    | T_address -> "address"
+    | T_key -> "key"
+    | T_unit -> "unit"
+    | T_signature -> "signature"
+    | T_option t -> [%string "(option %{to_string t})"]
+    | T_list t -> [%string "(list %{to_string t})"]
+    | T_set t -> [%string "(set %{to_string t})"]
+    | T_operation -> "operation"
+    | T_contract t -> [%string "(contract %{to_string t})"]
+    | T_pair (t_1, t_2) -> [%string "(pair %{to_string t_1} %{to_string t_2})"]
+    | T_or (t_1, t_2) -> [%string "(or %{to_string t_1} %{to_string t_2})"]
+    | T_lambda (t_1, t_2) ->
+        [%string "(lambda %{to_string t_1} %{to_string t_2})"]
+    | T_map (t_1, t_2) -> [%string "(map %{to_string t_1} %{to_string t_2})"]
+    | T_big_map (t_1, t_2) ->
+        [%string "(big_map %{to_string t_1} %{to_string t_2})"]
+    | T_chain_id -> "chain_id"
+
+  include T
+  include Comparable.Make (T)
+end
+
+type var = { var_name : string; var_type : typ } [@@deriving sexp]
+
+let compare_var { var_name = v_1; _ } { var_name = v_2; _ } =
+  String.compare v_1 v_2
+
+module Var = struct
+  module T = struct
+    type t = var [@@deriving ord, sexp]
+  end
+
+  let to_string { var_name; _ } = var_name
+
+  include T
+  include Comparable.Make (T)
+end
 
 type operation =
   | O_create_contract of
-      (Michelson.Location.t, Michelson.Adt.annot list) Michelson.Adt.program
+      ( Michelson.Loc.t,
+        Michelson.Carthage.Adt.annot list )
+      Michelson.Carthage.Adt.program
       * var
       * var
       * var
   | O_transfer_tokens of var * var * var
   | O_set_delegate of var
   | O_create_account of var * var * var * var
+[@@deriving ord, sexp]
+
+module Operation = struct
+  module T = struct
+    type t = operation [@@deriving ord, sexp]
+  end
+
+  let to_string = function
+    | O_create_account (v_1, v_2, v_3, v_4) ->
+        [%string "CREATE_ACCOUNT %{v_1#Var} %{v_2#Var} %{v_3#Var} %{v_4#Var}"]
+    | O_create_contract (_, v_1, v_2, v_3) ->
+        [%string "CREATE_CONTRACT {...} %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
+    | O_set_delegate v -> [%string "SET_DELEGATE %{v#Var}"]
+    | O_transfer_tokens (v_1, v_2, v_3) ->
+        [%string "TRANSFER_TOKENS %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
+
+  include T
+  include Comparable.Make (T)
+end
 
 type data =
-  | D_int of Z.t
+  | D_int of Bignum.t
   | D_string of string
   | D_bytes of Bytes.t
   | D_unit
@@ -49,6 +123,7 @@ type data =
   | D_elt of data * data
   | D_list of data list
   | D_instruction of stmt
+[@@deriving ord, sexp]
 
 and expr =
   | E_push of data * typ
@@ -104,7 +179,9 @@ and expr =
   | E_sender
   | E_address_of_contract of var
   | E_create_contract_address of
-      (Michelson.Location.t, Michelson.Adt.annot list) Michelson.Adt.program
+      ( Michelson.Loc.t,
+        Michelson.Carthage.Adt.annot list )
+      Michelson.Carthage.Adt.program
       * var
       * var
       * var
@@ -129,6 +206,7 @@ and expr =
   | E_special_empty_list of typ
   | E_special_empty_map of typ * typ
   | E_phi of var * var
+[@@deriving ord, sexp]
 
 and stmt_t =
   | S_seq of stmt * stmt
@@ -152,6 +230,132 @@ and stmt_t =
 and stmt = { id : int; stm : stmt_t }
 
 and program = typ * typ * stmt
+
+let compare_stmt s_1 s_2 = Int.compare s_1.id s_2.id
+
+module Data = struct
+  module T = struct
+    type t = data [@@deriving ord, sexp]
+  end
+
+  include T
+  include Comparable.Make (T)
+
+  let rec to_string = function
+    | D_int d -> Bignum.to_string_accurate d
+    | D_string s -> s
+    | D_bytes b -> [%string "%{b#Bytes}"]
+    | D_elt (d_1, d_2) -> [%string "Elt %{to_string d_1} %{to_string d_2}"]
+    | D_left d -> [%string "Left %{to_string d}"]
+    | D_right d -> [%string "Right %{to_string d}"]
+    | D_some d -> [%string "Some %{to_string d}"]
+    | D_none -> "None"
+    | D_unit -> "Unit"
+    | D_bool b -> ( match b with true -> "True" | false -> "False" )
+    | D_pair (d_1, d_2) -> [%string "(Pair %{to_string d_1} %{to_string d_2})"]
+    | D_list d -> List.to_string ~f:to_string d
+    | D_instruction _ -> "{ ... }"
+end
+
+module Expr = struct
+  module T = struct
+    type t = expr [@@deriving ord, sexp]
+  end
+
+  let to_string = function
+    | E_push (d, t) -> [%string "PUSH %{t#Typ} %{d#Data}"]
+    | E_car e -> [%string "CAR %{e#Var}"]
+    | E_cdr e -> [%string "CDR %{e#Var}"]
+    | E_abs e -> [%string "ABS %{e#Var}"]
+    | E_neg e -> [%string "NEG %{e#Var}"]
+    | E_not e -> [%string "NOT %{e#Var}"]
+    | E_eq e -> [%string "EQ %{e#Var}"]
+    | E_neq e -> [%string "NEQ %{e#Var}"]
+    | E_lt e -> [%string "LT %{e#Var}"]
+    | E_gt e -> [%string "GT %{e#Var}"]
+    | E_leq e -> [%string "LEQ %{e#Var}"]
+    | E_geq e -> [%string "GEQ %{e#Var}"]
+    | E_left (e, t) -> [%string "LEFT %{t#Typ} %{e#Var}"]
+    | E_right (e, t) -> [%string "RIGHT %{t#Typ} %{e#Var}"]
+    | E_some e -> [%string "SOME %{e#Var}"]
+    | E_pack e -> [%string "PACK %{e#Var}"]
+    | E_implicit_account e -> [%string "IMPLICIT_ACCOUNT %{e#Var}"]
+    | E_blake2b e -> [%string "BLAKE2B %{e#Var}"]
+    | E_sha256 e -> [%string "SHA256 %{e#Var}"]
+    | E_sha512 e -> [%string "SHA512 %{e#Var}"]
+    | E_hash_key e -> [%string "HASH_KEY %{e#Var}"]
+    | E_unit -> "UNIT"
+    | E_none t -> [%string "NONE %{t#Typ}"]
+    | E_add (v_1, v_2) -> [%string "ADD %{v_1#Var} %{v_2#Var}"]
+    | E_sub (v_1, v_2) -> [%string "SUB %{v_1#Var} %{v_2#Var}"]
+    | E_mul (v_1, v_2) -> [%string "MUL %{v_1#Var} %{v_2#Var}"]
+    | E_div (v_1, v_2) -> [%string "EDIV %{v_1#Var} %{v_2#Var}"]
+    | E_shiftL (v_1, v_2) -> [%string "LSL %{v_1#Var} %{v_2#Var}"]
+    | E_shiftR (v_1, v_2) -> [%string "LSR %{v_1#Var} %{v_2#Var}"]
+    | E_and (v_1, v_2) -> [%string "AND %{v_1#Var} %{v_2#Var}"]
+    | E_or (v_1, v_2) -> [%string "OR %{v_1#Var} %{v_2#Var}"]
+    | E_xor (v_1, v_2) -> [%string "XOR %{v_1#Var} %{v_2#Var}"]
+    | E_compare (v_1, v_2) -> [%string "COMPARE %{v_1#Var} %{v_2#Var}"]
+    | E_cons (v_1, v_2) -> [%string "CONS %{v_1#Var} %{v_2#Var}"]
+    | E_pair (v_1, v_2) -> [%string "PAIR %{v_1#Var} %{v_2#Var}"]
+    | E_mem (v_1, v_2) -> [%string "MEM %{v_1#Var} %{v_2#Var}"]
+    | E_get (v_1, v_2) -> [%string "GET %{v_1#Var} %{v_2#Var}"]
+    | E_concat (v_1, v_2) -> [%string "CONCAT %{v_1#Var} %{v_2#Var}"]
+    | E_concat_list e -> [%string "CONCAT %{e#Var}"]
+    | E_update (v_1, v_2, v_3) ->
+        [%string "UPDATE %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
+    | E_slice (v_1, v_2, v_3) ->
+        [%string "SLICE %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
+    | E_check_signature (v_1, v_2, v_3) ->
+        [%string "CHECK_SIGNATURE %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
+    | E_unpack (t, v) -> [%string "UNPACK %{t#Typ} %{v#Var}"]
+    | E_self -> [%string "SELF"]
+    | E_now -> [%string "NOW"]
+    | E_amount -> [%string "AMOUNT"]
+    | E_balance -> [%string "BALANCE"]
+    | E_source -> [%string "SOURCE"]
+    | E_sender -> [%string "SENDER"]
+    | E_address_of_contract e -> [%string "ADDRESS %{e#Var}"]
+    | E_size e -> [%string "SIZE %{e#Var}"]
+    | E_unlift_option e -> [%string "unlift_option %{e#Var}"]
+    | E_unlift_or_left e -> [%string "unlift_or_left %{e#Var}"]
+    | E_unlift_or_right e -> [%string "unlift_or_right %{e#Var}"]
+    | E_hd e -> [%string "hd %{e#Var}"]
+    | E_tl e -> [%string "tl %{e#Var}"]
+    | E_isnat e -> [%string "ISNAT %{e#Var}"]
+    | E_int_of_nat e -> [%string "INT %{e#Var}"]
+    | E_chain_id -> "CHAIN_ID"
+    | E_lambda (t_1, t_2, v, _) ->
+        [%string "LAMBDA %{t_1#Typ} %{t_2#Typ} (%{v#Var} => { ... })"]
+    | E_exec (v_1, v_2) -> [%string "EXEC %{v_1#Var} %{v_2#Var}"]
+    | E_contract_of_address (t, v) -> [%string "CONTRACT %{t#Typ} %{v#Var}"]
+    | E_create_contract_address (_, v_1, v_2, v_3) ->
+        [%string "CREATE_CONTRACT {...} %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
+    | E_operation o -> Operation.to_string o
+    | E_dup v -> [%string "DUP %{v#Var}"]
+    | E_nil t -> [%string "NIL %{t#Typ}"]
+    | E_empty_set t -> [%string "EMPTY_SET %{t#Typ}"]
+    | E_empty_map (t_k, t_v) -> [%string "EMPTY_MAP %{t_k#Typ} %{t_v#Typ}"]
+    | E_empty_big_map (t_k, t_v) ->
+        [%string "EMPTY_BIG_MAP %{t_k#Typ} %{t_v#Typ}"]
+    | E_apply (v_1, v_2) -> [%string "APPLY %{v_1#Var} %{v_2#Var}"]
+    | E_append (v_1, v_2) -> [%string "append(%{v_1#Var}, %{v_2#Var})"]
+    | E_phi (v_1, v_2) -> [%string "phi(%{v_1#Var}, %{v_2#Var})"]
+    | E_special_empty_list _ -> "{  }"
+    | E_special_empty_map _ -> "{  }"
+
+  include T
+  include Comparable.Make (T)
+end
+
+module Stmt = struct
+  module T = struct
+    type t = stmt [@@deriving ord, sexp]
+  end
+
+  include T
+  include Comparable.Make (T)
+end
 
 let id_counter = ref (-1)
 

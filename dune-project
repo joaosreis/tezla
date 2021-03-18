@@ -26,5 +26,5 @@
   (ppx_inline_test :dev)
   (alcotest :with-test)
   zarith
-  batteries
+  core_kernel
   michelson))

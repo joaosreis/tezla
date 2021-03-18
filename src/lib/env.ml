@@ -47,14 +47,14 @@ let dug env n =
   Stack (S.dug s n)
 
 let dip env n =
-  if Z.(n = ~$0) then ([], env)
+  if Bignum.(n = zero) then ([], env)
   else
     let rec aux (acc, env') n' =
-      if Z.(n' = ~$0) then (acc, env')
+      if Bignum.(n' = zero) then (acc, env')
       else
         let x, env'' = pop env' in
         let acc' = x :: acc in
-        aux (acc', env'') Z.(n' - ~$1)
+        aux (acc', env'') Bignum.(n' - one)
     in
     aux ([], env) n
 

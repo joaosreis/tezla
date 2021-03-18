@@ -265,7 +265,7 @@ let%test "E_compare" =
 
 let%test "E_eq" = type_expr (E_eq { var_name = ""; var_type = T_int }) = T_bool
 
-let%test "E_push" = type_expr (E_push (D_int Z.zero, T_int)) = T_int
+let%test "E_push" = type_expr (E_push (D_int Bignum.zero, T_int)) = T_int
 
 let%test "E_pair" =
   type_expr

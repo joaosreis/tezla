@@ -44,7 +44,7 @@ let pp_operation ppf = function
         v_3.var_name
 
 let rec pp_data ppf = function
-  | D_int d -> Z.pp_print ppf d
+  | D_int d -> Bignum.pp_accurate ppf d
   | D_string s -> fprintf ppf "\"%s\"" s
   | D_bytes b -> fprintf ppf "%s" (Bytes.to_string b)
   | D_elt (d_1, d_2) -> fprintf ppf "Elt %a %a" pp_data d_1 pp_data d_2
@@ -128,8 +128,8 @@ and pp_expr ppf = function
   | E_contract_of_address (t, v) ->
       fprintf ppf "CONTRACT %a %a" pp_typ t pp_var v
   | E_create_contract_address (p, v_1, v_2, v_3) ->
-      fprintf ppf "CREATE_CONTRACT %a %a %a %a" Michelson.Pp.pp_program p pp_var
-        v_1 pp_var v_2 pp_var v_3
+      fprintf ppf "CREATE_CONTRACT %a %a %a %a" Michelson.Carthage.Pp.pp_program
+        p pp_var v_1 pp_var v_2 pp_var v_3
   | E_operation o -> pp_operation ppf o
   | E_dup v -> fprintf ppf "DUP %a" pp_var v
   | E_nil t -> fprintf ppf "NIL %a" pp_typ t
