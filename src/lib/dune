@@ -1,10 +1,5 @@
 (library
  (name tezla)
  (public_name tezla)
- (libraries michelson zarith core_kernel)
- (instrumentation
-  (backend bisect_ppx))
- (inline_tests)
- (preprocess
-  (pps ppx_deriving.ord ppx_string ppx_sexp_conv ppx_inline_test))
+ (libraries adt converter functional_stack interpreter)
  (synopsis "Michelson front end for Softcheck."))

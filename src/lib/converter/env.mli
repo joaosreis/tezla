@@ -18,11 +18,11 @@ val peek : env -> elem
 
 val swap : env -> env
 
-val dig : env -> Bignum.t -> env
+val dig : env -> Bigint.t -> env
 
-val dug : env -> Bignum.t -> env
+val dug : env -> Bigint.t -> env
 
-val dip : env -> Bignum.t -> elem list * env
+val dip : env -> Bigint.t -> elem list * env
 
 val dup : env -> elem * env
 

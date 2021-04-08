@@ -1,0 +1,6 @@
+(library
+ (name functional_stack)
+ (public_name tezla.functional_stack)
+ (libraries core_kernel bignum)
+ (preprocess
+  (pps ppx_inline_test)))

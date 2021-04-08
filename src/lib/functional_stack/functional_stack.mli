@@ -12,14 +12,14 @@ val peek : 'a t -> 'a
 
 val swap : 'a t -> 'a t
 
-val dig : 'a t -> Bignum.t -> 'a t
+val dig : 'a t -> Bigint.t -> 'a t
 
-val dug : 'a t -> Bignum.t -> 'a t
+val dug : 'a t -> Bigint.t -> 'a t
 
 val map : ('a -> 'b) -> 'a t -> 'b t
 
 val map2 : ('a -> 'b -> 'c) -> 'a t -> 'b t -> 'c t
 
-val find : ('a -> bool) -> 'a t -> 'a
+val find : ('a -> bool) -> 'a t -> 'a option
 
 exception Unsufficient_length

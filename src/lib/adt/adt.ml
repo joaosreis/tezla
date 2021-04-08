@@ -1,116 +1,16 @@
 open Core_kernel
+module Var = Var
+module Typ = Typ
+module Operation = Operation
 
-type typ =
-  | T_key
-  | T_unit
-  | T_signature
-  | T_option of typ
-  | T_list of typ
-  | T_set of typ
-  | T_operation
-  | T_contract of typ
-  | T_pair of typ * typ
-  | T_or of typ * typ
-  | T_lambda of typ * typ
-  | T_map of typ * typ
-  | T_big_map of typ * typ
-  | T_chain_id
-  | T_int
-  | T_nat
-  | T_string
-  | T_bytes
-  | T_mutez
-  | T_bool
-  | T_key_hash
-  | T_timestamp
-  | T_address
-[@@deriving ord, sexp]
+type var = Var.t [@@deriving ord, sexp]
 
-module Typ = struct
-  module T = struct
-    type t = typ [@@deriving ord, sexp]
-  end
+type typ = Typ.t [@@deriving ord, sexp]
 
-  let rec to_string = function
-    | T_int -> "int"
-    | T_nat -> "nat"
-    | T_string -> "string"
-    | T_bytes -> "bytes"
-    | T_mutez -> "mutez"
-    | T_bool -> "bool"
-    | T_key_hash -> "key_hash"
-    | T_timestamp -> "timestamp"
-    | T_address -> "address"
-    | T_key -> "key"
-    | T_unit -> "unit"
-    | T_signature -> "signature"
-    | T_option t -> [%string "(option %{to_string t})"]
-    | T_list t -> [%string "(list %{to_string t})"]
-    | T_set t -> [%string "(set %{to_string t})"]
-    | T_operation -> "operation"
-    | T_contract t -> [%string "(contract %{to_string t})"]
-    | T_pair (t_1, t_2) -> [%string "(pair %{to_string t_1} %{to_string t_2})"]
-    | T_or (t_1, t_2) -> [%string "(or %{to_string t_1} %{to_string t_2})"]
-    | T_lambda (t_1, t_2) ->
-        [%string "(lambda %{to_string t_1} %{to_string t_2})"]
-    | T_map (t_1, t_2) -> [%string "(map %{to_string t_1} %{to_string t_2})"]
-    | T_big_map (t_1, t_2) ->
-        [%string "(big_map %{to_string t_1} %{to_string t_2})"]
-    | T_chain_id -> "chain_id"
-
-  include T
-  include Comparable.Make (T)
-end
-
-type var = { var_name : string; var_type : typ } [@@deriving sexp]
-
-let compare_var { var_name = v_1; _ } { var_name = v_2; _ } =
-  String.compare v_1 v_2
-
-module Var = struct
-  module T = struct
-    type t = var [@@deriving ord, sexp]
-  end
-
-  let to_string { var_name; _ } = var_name
-
-  include T
-  include Comparable.Make (T)
-end
-
-type operation =
-  | O_create_contract of
-      ( Michelson.Loc.t,
-        Michelson.Carthage.Adt.annot list )
-      Michelson.Carthage.Adt.program
-      * var
-      * var
-      * var
-  | O_transfer_tokens of var * var * var
-  | O_set_delegate of var
-  | O_create_account of var * var * var * var
-[@@deriving ord, sexp]
-
-module Operation = struct
-  module T = struct
-    type t = operation [@@deriving ord, sexp]
-  end
-
-  let to_string = function
-    | O_create_account (v_1, v_2, v_3, v_4) ->
-        [%string "CREATE_ACCOUNT %{v_1#Var} %{v_2#Var} %{v_3#Var} %{v_4#Var}"]
-    | O_create_contract (_, v_1, v_2, v_3) ->
-        [%string "CREATE_CONTRACT {...} %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
-    | O_set_delegate v -> [%string "SET_DELEGATE %{v#Var}"]
-    | O_transfer_tokens (v_1, v_2, v_3) ->
-        [%string "TRANSFER_TOKENS %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
-
-  include T
-  include Comparable.Make (T)
-end
+type operation = Operation.t [@@deriving ord, sexp]
 
 type data =
-  | D_int of Bignum.t
+  | D_int of Bigint.t
   | D_string of string
   | D_bytes of Bytes.t
   | D_unit
@@ -126,6 +26,7 @@ type data =
 [@@deriving ord, sexp]
 
 and expr =
+  | E_var of var
   | E_push of data * typ
   | E_car of var
   | E_cdr of var
@@ -205,7 +106,6 @@ and expr =
   | E_append of var * var
   | E_special_empty_list of typ
   | E_special_empty_map of typ * typ
-  | E_phi of var * var
 [@@deriving ord, sexp]
 
 and stmt_t =
@@ -220,10 +120,10 @@ and stmt_t =
   | S_if_none of var * stmt * stmt
   | S_if_left of var * stmt * stmt
   | S_if_cons of var * stmt * stmt
-  | S_loop of var * (var * var) * stmt
-  | S_loop_left of var * (var * var) * stmt
-  | S_map of (var * (var * var)) * (var * (var * var)) * stmt
-  | S_iter of var * (var * var) * stmt
+  | S_loop of var * stmt
+  | S_loop_left of var * stmt
+  | S_map of var * stmt
+  | S_iter of var * stmt
   | S_failwith of var
   | S_return of var
 
@@ -242,7 +142,7 @@ module Data = struct
   include Comparable.Make (T)
 
   let rec to_string = function
-    | D_int d -> Bignum.to_string_accurate d
+    | D_int d -> Bigint.to_string d
     | D_string s -> s
     | D_bytes b -> [%string "%{b#Bytes}"]
     | D_elt (d_1, d_2) -> [%string "Elt %{to_string d_1} %{to_string d_2}"]
@@ -251,7 +151,7 @@ module Data = struct
     | D_some d -> [%string "Some %{to_string d}"]
     | D_none -> "None"
     | D_unit -> "Unit"
-    | D_bool b -> ( match b with true -> "True" | false -> "False" )
+    | D_bool b -> ( match b with true -> "True" | false -> "False")
     | D_pair (d_1, d_2) -> [%string "(Pair %{to_string d_1} %{to_string d_2})"]
     | D_list d -> List.to_string ~f:to_string d
     | D_instruction _ -> "{ ... }"
@@ -263,6 +163,7 @@ module Expr = struct
   end
 
   let to_string = function
+    | E_var v -> v.var_name
     | E_push (d, t) -> [%string "PUSH %{t#Typ} %{d#Data}"]
     | E_car e -> [%string "CAR %{e#Var}"]
     | E_cdr e -> [%string "CDR %{e#Var}"]
@@ -340,7 +241,6 @@ module Expr = struct
         [%string "EMPTY_BIG_MAP %{t_k#Typ} %{t_v#Typ}"]
     | E_apply (v_1, v_2) -> [%string "APPLY %{v_1#Var} %{v_2#Var}"]
     | E_append (v_1, v_2) -> [%string "append(%{v_1#Var}, %{v_2#Var})"]
-    | E_phi (v_1, v_2) -> [%string "phi(%{v_1#Var}, %{v_2#Var})"]
     | E_special_empty_list _ -> "{  }"
     | E_special_empty_map _ -> "{  }"
 
@@ -378,14 +278,10 @@ let rec simpl s =
       { s with stm = S_if_left (c, simpl s_1, simpl s_2) }
   | S_if_none (c, s_1, s_2) ->
       { s with stm = S_if_none (c, simpl s_1, simpl s_2) }
-  | S_loop (c, (c_1, c_2), s) ->
-      { s with stm = S_loop (c, (c_1, c_2), simpl s) }
-  | S_loop_left (c, (c_1, c_2), s) ->
-      { s with stm = S_loop_left (c, (c_1, c_2), simpl s) }
-  | S_iter (c, (c_1, c_2), s) ->
-      { s with stm = S_iter (c, (c_1, c_2), simpl s) }
-  | S_map ((x, (x_1, x_2)), (y, (y_1, y_2)), s) ->
-      { s with stm = S_map ((x, (x_1, x_2)), (y, (y_1, y_2)), simpl s) }
+  | S_loop (c, s) -> { s with stm = S_loop (c, simpl s) }
+  | S_loop_left (c, s) -> { s with stm = S_loop_left (c, simpl s) }
+  | S_iter (c, s) -> { s with stm = S_iter (c, simpl s) }
+  | S_map (x, s) -> { s with stm = S_map (x, simpl s) }
   | S_skip | S_swap | S_dig | S_dug | S_assign _ | S_drop _ | S_failwith _
   | S_return _ ->
       s

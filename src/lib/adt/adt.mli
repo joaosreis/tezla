@@ -1,62 +1,16 @@
 open Core_kernel
+module Var = Var
+module Typ = Typ
+module Operation = Operation
 
-type typ =
-  | T_key
-  | T_unit
-  | T_signature
-  | T_option of typ
-  | T_list of typ
-  | T_set of typ
-  | T_operation
-  | T_contract of typ
-  | T_pair of typ * typ
-  | T_or of typ * typ
-  | T_lambda of typ * typ
-  | T_map of typ * typ
-  | T_big_map of typ * typ
-  | T_chain_id
-  | T_int
-  | T_nat
-  | T_string
-  | T_bytes
-  | T_mutez
-  | T_bool
-  | T_key_hash
-  | T_timestamp
-  | T_address
-[@@deriving ord, sexp]
+type var = Var.t
 
-module Typ : sig
-  include Comparable.S with type t = typ
+type typ = Typ.t
 
-  val to_string : t -> string
-end
-
-type var = { var_name : string; var_type : typ } [@@deriving ord, sexp]
-
-module Var : sig
-  include Comparable.S with type t = var
-
-  val to_string : t -> string
-end
-
-type operation =
-  | O_create_contract of
-      ( Michelson.Loc.t,
-        Michelson.Carthage.Adt.annot list )
-      Michelson.Carthage.Adt.program
-      * var
-      * var
-      * var
-  | O_transfer_tokens of var * var * var
-  | O_set_delegate of var
-  | O_create_account of var * var * var * var
-[@@deriving ord, sexp]
-
-module Operation : Comparable.S with type t = operation
+type operation = Operation.t
 
 type data =
-  | D_int of Bignum.t
+  | D_int of Bigint.t
   | D_string of string
   | D_bytes of Bytes.t
   | D_unit
@@ -71,6 +25,7 @@ type data =
   | D_instruction of stmt
 
 and expr =
+  | E_var of var
   | E_push of data * typ
   | E_car of var
   | E_cdr of var
@@ -150,7 +105,6 @@ and expr =
   | E_append of var * var
   | E_special_empty_list of typ
   | E_special_empty_map of typ * typ
-  | E_phi of var * var
 [@@deriving ord, sexp]
 
 and stmt_t =
@@ -165,10 +119,10 @@ and stmt_t =
   | S_if_none of var * stmt * stmt
   | S_if_left of var * stmt * stmt
   | S_if_cons of var * stmt * stmt
-  | S_loop of var * (var * var) * stmt
-  | S_loop_left of var * (var * var) * stmt
-  | S_map of (var * (var * var)) * (var * (var * var)) * stmt
-  | S_iter of var * (var * var) * stmt
+  | S_loop of var * stmt
+  | S_loop_left of var * stmt
+  | S_map of var * stmt
+  | S_iter of var * stmt
   | S_failwith of var
   | S_return of var
 
