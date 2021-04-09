@@ -80,9 +80,7 @@ and expr =
   | E_sender
   | E_address_of_contract of var
   | E_create_contract_address of
-      ( Michelson.Loc.t,
-        Michelson.Carthage.Adt.annot list )
-      Michelson.Carthage.Adt.program
+      (Loc.t, Michelson.Carthage.Adt.annot list) Michelson.Carthage.Adt.program
       * var
       * var
       * var

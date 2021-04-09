@@ -2,11 +2,11 @@ let () =
   let dir = "../../../../tests/" in
   let files = Sys.readdir dir in
   let open Alcotest in
-  let create_test file =
+  let create_test filename =
     let open Michelson.Carthage.Parser in
     let convert_f () =
-      let adt = parse_file (dir ^ file) in
-      let adt = convert adt in
+      let adt = parse_file (dir ^ filename) in
+      let adt = convert filename adt in
       let _ = Tezla.Converter.convert_program (ref (-1)) adt in
       ()
     in
@@ -16,7 +16,7 @@ let () =
         check pass "Ok" () ()
       with Failure s -> fail ("Convert error: " ^ s)
     in
-    test_case file `Quick test_f
+    test_case filename `Quick test_f
   in
   let tests = Array.map create_test files in
   let tests = Array.to_list tests in

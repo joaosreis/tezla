@@ -359,9 +359,7 @@ and convert_data_elt t_1 t_2 (_, d) =
 
 and inst_to_stmt counter env
     ((l, i, annots) :
-      ( Michelson.Loc.t,
-        Michelson.Carthage.Adt.annot list )
-      Michelson.Carthage.Adt.inst) =
+      (Loc.t, Michelson.Carthage.Adt.annot list) Michelson.Carthage.Adt.inst) =
   let open Michelson.Carthage.Adt in
   let open Adt in
   let loop_n f =
@@ -983,30 +981,26 @@ and inst_to_stmt counter env
         (assign, push v env)
   with
   | Functional_stack.Unsufficient_length ->
-      let open Michelson.Loc in
       failwith
-        (Printf.sprintf "Unsufficent_length: Line %d, columns %d-%d\n" l.s.lin
-           l.s.col l.e.col)
+        (Printf.sprintf "Unsufficent_length: Line %d, columns %d-%d\n"
+           l.start_pos.lin l.start_pos.col l.end_pos.col)
   | Typer.Type_error e ->
-      let open Michelson.Loc in
       failwith
-        (Printf.sprintf "Type error: %s, Line %d, columns %d-%d\n" e l.s.lin
-           l.s.col l.e.col)
+        (Printf.sprintf "Type error: %s, Line %d, columns %d-%d\n" e
+           l.start_pos.lin l.start_pos.col l.end_pos.col)
   | Assert_failure (f, lin, col) ->
-      let open Michelson.Loc in
       failwith
         (Printf.sprintf
            "Assert failure on %s:%d:%d\n\
             Michelson file, Line %d, columns %d-%d\n"
-           f lin col l.s.lin l.s.col l.e.col)
+           f lin col l.start_pos.lin l.start_pos.col l.end_pos.col)
   | Invalid_argument s ->
-      let open Michelson.Loc in
       failwith
         (Printf.sprintf
            "Invalid arguement: %s\nMichelson file, Line %d, columns %d-%d\n" s
-           l.s.lin l.s.col l.e.col)
+           l.start_pos.lin l.start_pos.col l.end_pos.col)
 
-and convert_program counter { Michelson.Carthage.Adt.param; code; storage } =
+and convert_program counter Michelson.Carthage.Adt.{ param; code; storage } =
   let param = convert_typ param in
   let storage = convert_typ storage in
   (* let code = inst_strip_location code in *)
