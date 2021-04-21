@@ -131,16 +131,24 @@ and program = typ * typ * stmt
 module Data : sig
   include Comparable.S with type t = data
 
+  include Sexpable.S with type t = data
+
   val to_string : t -> string
 end
 
 module Expr : sig
   include Comparable.S with type t = expr
 
+  include Sexpable.S with type t = expr
+
   val to_string : t -> string
 end
 
-module Stmt : Comparable.S with type t = stmt
+module Stmt : sig
+  include Comparable.S with type t = stmt
+
+  include Sexpable.S with type t = stmt
+end
 
 val create_stmt : stmt_t -> stmt
 
