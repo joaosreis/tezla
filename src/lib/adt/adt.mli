@@ -22,7 +22,7 @@ type data =
   | D_none
   | D_elt of data * data
   | D_list of data list
-  | D_instruction of stmt
+  | D_instruction of var * stmt
 
 and expr =
   | E_var of var

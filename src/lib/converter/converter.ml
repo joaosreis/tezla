@@ -322,40 +322,42 @@ let rec convert_typ (_, t, _) =
   | Michelson.Carthage.Adt.T_big_map (t_1, t_2) ->
       T_big_map (convert_typ t_1, convert_typ t_2)
 
-let rec convert_data t (_, d) =
+let rec convert_data counter =
   let open Adt in
   let open Adt.Typ in
-  match (t, d) with
-  | _, Michelson.Carthage.Adt.D_int n -> D_int n
-  | _, Michelson.Carthage.Adt.D_unit -> D_unit
-  | _, Michelson.Carthage.Adt.D_none -> D_none
-  | _, Michelson.Carthage.Adt.D_string s -> D_string s
-  | _, Michelson.Carthage.Adt.D_bytes b -> D_bytes b
-  | _, Michelson.Carthage.Adt.D_bool b -> D_bool b
-  | T_pair (t_1, t_2), Michelson.Carthage.Adt.D_pair (d_1, d_2) ->
-      D_pair (convert_data t_1 d_1, convert_data t_2 d_2)
-  | T_or (t, _), Michelson.Carthage.Adt.D_left d -> D_left (convert_data t d)
-  | T_or (_, t), Michelson.Carthage.Adt.D_right d -> D_right (convert_data t d)
-  | T_option t, Michelson.Carthage.Adt.D_some d -> D_some (convert_data t d)
-  | (T_list t | T_set t), Michelson.Carthage.Adt.D_list d_l ->
-      D_list (List.map ~f:(convert_data t) d_l)
-  | (T_map (t_1, t_2) | T_big_map (t_1, t_2)), Michelson.Carthage.Adt.D_list d_l
-    ->
-      D_list (List.map ~f:(convert_data_elt t_1 t_2) d_l)
-  | T_lambda (t, _), Michelson.Carthage.Adt.D_instruction i ->
-      let env =
-        Env.push { var_name = "parameter"; var_type = t } Env.empty_env
-      in
-      let i, _ = inst_to_stmt (ref (-1)) env i in
-      D_instruction i
-  | _ -> assert false
-
-and convert_data_elt t_1 t_2 (_, d) =
-  let open Adt in
-  match d with
-  | Michelson.Carthage.Adt.D_elt (d_1, d_2) ->
-      D_elt (convert_data t_1 d_1, convert_data t_2 d_2)
-  | _ -> assert false
+  let rec convert_data t (_, d) =
+    match (t, d) with
+    | _, Michelson.Carthage.Adt.D_int n -> D_int n
+    | _, Michelson.Carthage.Adt.D_unit -> D_unit
+    | _, Michelson.Carthage.Adt.D_none -> D_none
+    | _, Michelson.Carthage.Adt.D_string s -> D_string s
+    | _, Michelson.Carthage.Adt.D_bytes b -> D_bytes b
+    | _, Michelson.Carthage.Adt.D_bool b -> D_bool b
+    | T_pair (t_1, t_2), Michelson.Carthage.Adt.D_pair (d_1, d_2) ->
+        D_pair (convert_data t_1 d_1, convert_data t_2 d_2)
+    | T_or (t, _), Michelson.Carthage.Adt.D_left d -> D_left (convert_data t d)
+    | T_or (_, t), Michelson.Carthage.Adt.D_right d ->
+        D_right (convert_data t d)
+    | T_option t, Michelson.Carthage.Adt.D_some d -> D_some (convert_data t d)
+    | (T_list t | T_set t), Michelson.Carthage.Adt.D_list d_l ->
+        D_list (List.map ~f:(convert_data t) d_l)
+    | ( (T_map (t_1, t_2) | T_big_map (t_1, t_2)),
+        Michelson.Carthage.Adt.D_list d_l ) ->
+        D_list (List.map ~f:(convert_data_elt t_1 t_2) d_l)
+    | T_lambda (t, _), Michelson.Carthage.Adt.D_instruction i ->
+        let param = Var.{ var_name = next_var counter; var_type = t } in
+        let env = Env.push param Env.empty_env in
+        let i, _ = inst_to_stmt (ref (-1)) env i in
+        D_instruction (param, i)
+    | _ -> assert false
+  and convert_data_elt t_1 t_2 (_, d) =
+    let open Adt in
+    match d with
+    | Michelson.Carthage.Adt.D_elt (d_1, d_2) ->
+        D_elt (convert_data t_1 d_1, convert_data t_2 d_2)
+    | _ -> assert false
+  in
+  convert_data
 
 and inst_to_stmt counter env
     ((l, i, annots) :
@@ -458,7 +460,7 @@ and inst_to_stmt counter env
     | I_push (t, x) ->
         assert (assert_type x t);
         let t = convert_typ t in
-        let d = convert_data t x in
+        let d = convert_data counter t x in
         let e = E_push (d, t) in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env)

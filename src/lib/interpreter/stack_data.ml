@@ -174,7 +174,7 @@ let rec from_adt_data : type a. a typ -> Adt.data -> a t =
   | Int_t, D_int n -> SD_int (Int n)
   | Key_t, D_string s -> SD_key (Key s)
   | Key_hash_t, D_string s -> SD_key_hash (Key_hash s)
-  | Lambda_t (_, _), D_instruction i -> SD_lambda (Lambda i)
+  | Lambda_t (_, _), D_instruction (_, i) -> SD_lambda (Lambda i)
   | List_t t, D_list l ->
       let l = list_from_adt_data t l in
       SD_list l
