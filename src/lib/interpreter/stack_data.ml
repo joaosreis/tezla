@@ -165,7 +165,7 @@ let rec typ_from_adt_typ =
 
 let rec from_adt_data : type a. a typ -> Adt.data -> a t =
  fun t d ->
-  match (t, d) with
+  match (t, d.value) with
   | Address_t, D_string s -> SD_address (Address s)
   | Bool_t, D_bool b -> SD_bool (Bool b)
   | Bytes_t, D_bytes b -> SD_bytes (Bytes b)
@@ -349,7 +349,7 @@ and map_from_adt_data : type k v. k typ -> v typ -> data list -> (k, v) t_map =
  fun t_k t_v d_l ->
   match d_l with
   | [] -> Map_nil
-  | D_elt (d_k, d_v) :: tl ->
+  | { value = D_elt (d_k, d_v); _ } :: tl ->
       let d_k' = from_adt_data t_k d_k in
       let d_v' = from_adt_data t_v d_v in
       let tl' = map_from_adt_data t_k t_v tl in

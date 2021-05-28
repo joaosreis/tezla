@@ -74,11 +74,11 @@ let find_t : type a. e_t Var.Map.t -> a typ -> var -> a t =
 
 let find_e_t : e_t Var.Map.t -> var -> e_t = Var.Map.find_exn
 
-let rec expr ctx env =
+let rec expr ctx env e =
   let module Map = Var.Map in
   let open Stack_data in
   let find = Var.Map.find_exn env in
-  function
+  match e.Node.value with
   | E_var v | E_dup v -> Ok (find v)
   | E_push (d, t) ->
       let (E_T t) = typ_from_adt_typ t in
@@ -636,7 +636,7 @@ and stmt ctx env s =
     | Failed -> Failed
     | Ok env' -> (
         let find = Map.find_exn env' in
-        match s.stm with
+        match s.Node.value with
         | S_assign (v, e) -> (
             match expr ctx env' e with
             | Ok d ->

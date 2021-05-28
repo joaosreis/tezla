@@ -9,7 +9,56 @@ type typ = Typ.t [@@deriving ord, sexp]
 
 type operation = Operation.t [@@deriving ord, sexp]
 
-type data =
+module Node = struct
+  type 'a t = {
+    id : int; [@compare fun a b -> Int.compare a b]
+    value : 'a; [@main]
+  }
+  [@@deriving ord, sexp, make]
+end
+
+module Id () = struct
+  let create_id_counter () = ref (-1)
+
+  let id_counter = create_id_counter ()
+
+  let next_id () =
+    let () = id_counter := !id_counter + 1 in
+    !id_counter
+end
+
+module type Common = sig
+  type t'
+
+  type t = t' Node.t
+
+  val create : t' -> t
+
+  val to_string : t -> string
+
+  include Sexpable.S with type t := t
+
+  include Comparable.S with type t := t
+end
+
+module Make_common (T : sig
+  type t'
+
+  type t = t' Node.t [@@deriving ord, sexp]
+
+  val to_string : t -> string
+end) : Common with type t' = T.t' and type t = T.t = struct
+  include T
+  include Comparable.Make (T)
+
+  include Id ()
+
+  let create = Node.make ~id:(next_id ())
+
+  let to_string = T.to_string
+end
+
+type data_t =
   | D_int of Bigint.t
   | D_string of string
   | D_bytes of Bytes.t
@@ -25,7 +74,9 @@ type data =
   | D_instruction of var * stmt
 [@@deriving ord, sexp]
 
-and expr =
+and data = data_t Node.t [@@deriving ord, sexp]
+
+and expr_t =
   | E_var of var
   | E_push of data * typ
   | E_car of var
@@ -106,6 +157,8 @@ and expr =
   | E_special_empty_map of typ * typ
 [@@deriving ord, sexp]
 
+and expr = expr_t Node.t [@@deriving ord, sexp]
+
 and stmt_t =
   | S_seq of stmt * stmt
   | S_assign of var * expr
@@ -124,22 +177,19 @@ and stmt_t =
   | S_iter of var * stmt
   | S_failwith of var
   | S_return of var
+[@@deriving ord, sexp]
 
-and stmt = { id : int; stm : stmt_t }
+and stmt = stmt_t Node.t [@@deriving ord, sexp]
 
-and program = typ * typ * stmt
+and program = typ * typ * stmt [@@deriving ord, sexp]
 
-let compare_stmt s_1 s_2 = Int.compare s_1.id s_2.id
+module Data = Make_common (struct
+  type t' = data_t
 
-module Data = struct
-  module T = struct
-    type t = data [@@deriving ord, sexp]
-  end
+  type t = data [@@deriving ord, sexp]
 
-  include T
-  include Comparable.Make (T)
-
-  let rec to_string = function
+  let rec to_string d =
+    match d.Node.value with
     | D_int d -> Bigint.to_string d
     | D_string s -> s
     | D_bytes b -> [%string "%{b#Bytes}"]
@@ -153,14 +203,15 @@ module Data = struct
     | D_pair (d_1, d_2) -> [%string "(Pair %{to_string d_1} %{to_string d_2})"]
     | D_list d -> List.to_string ~f:to_string d
     | D_instruction _ -> "{ ... }"
-end
+end)
 
-module Expr = struct
-  module T = struct
-    type t = expr [@@deriving ord, sexp]
-  end
+module Expr = Make_common (struct
+  type t' = expr_t
 
-  let to_string = function
+  type t = expr [@@deriving ord, sexp]
+
+  let to_string e =
+    match e.Node.value with
     | E_var v -> v.var_name
     | E_push (d, t) -> [%string "PUSH %{t#Typ} %{d#Data}"]
     | E_car e -> [%string "CAR %{e#Var}"]
@@ -241,45 +292,36 @@ module Expr = struct
     | E_append (v_1, v_2) -> [%string "append(%{v_1#Var}, %{v_2#Var})"]
     | E_special_empty_list _ -> "{  }"
     | E_special_empty_map _ -> "{  }"
-
-  include T
-  include Comparable.Make (T)
-end
+end)
 
 module Stmt = struct
   module T = struct
+    type t' = stmt_t
+
     type t = stmt [@@deriving ord, sexp]
+
+    let to_string s = Int.to_string s.Node.id
   end
 
-  include T
-  include Comparable.Make (T)
+  include Make_common (T)
+
+  let rec simpl s =
+    match s.Node.value with
+    | S_seq ({ value = S_skip; _ }, s) | S_seq (s, { value = S_skip; _ }) ->
+        simpl s
+    | S_seq (s_1, s_2) -> { s with value = S_seq (simpl s_1, simpl s_2) }
+    | S_if (c, s_1, s_2) -> { s with value = S_if (c, simpl s_1, simpl s_2) }
+    | S_if_cons (c, s_1, s_2) ->
+        { s with value = S_if_cons (c, simpl s_1, simpl s_2) }
+    | S_if_left (c, s_1, s_2) ->
+        { s with value = S_if_left (c, simpl s_1, simpl s_2) }
+    | S_if_none (c, s_1, s_2) ->
+        { s with value = S_if_none (c, simpl s_1, simpl s_2) }
+    | S_loop (c, s) -> { s with value = S_loop (c, simpl s) }
+    | S_loop_left (c, s) -> { s with value = S_loop_left (c, simpl s) }
+    | S_iter (c, s) -> { s with value = S_iter (c, simpl s) }
+    | S_map (x, s) -> { s with value = S_map (x, simpl s) }
+    | S_skip | S_swap | S_dig | S_dug | S_assign _ | S_drop _ | S_failwith _
+    | S_return _ ->
+        s
 end
-
-let id_counter = ref (-1)
-
-let next_id () =
-  let () = id_counter := !id_counter + 1 in
-  !id_counter
-
-let create_stmt stm =
-  let id = next_id () in
-  { id; stm }
-
-let rec simpl s =
-  match s.stm with
-  | S_seq ({ stm = S_skip; _ }, s) | S_seq (s, { stm = S_skip; _ }) -> simpl s
-  | S_seq (s_1, s_2) -> { s with stm = S_seq (simpl s_1, simpl s_2) }
-  | S_if (c, s_1, s_2) -> { s with stm = S_if (c, simpl s_1, simpl s_2) }
-  | S_if_cons (c, s_1, s_2) ->
-      { s with stm = S_if_cons (c, simpl s_1, simpl s_2) }
-  | S_if_left (c, s_1, s_2) ->
-      { s with stm = S_if_left (c, simpl s_1, simpl s_2) }
-  | S_if_none (c, s_1, s_2) ->
-      { s with stm = S_if_none (c, simpl s_1, simpl s_2) }
-  | S_loop (c, s) -> { s with stm = S_loop (c, simpl s) }
-  | S_loop_left (c, s) -> { s with stm = S_loop_left (c, simpl s) }
-  | S_iter (c, s) -> { s with stm = S_iter (c, simpl s) }
-  | S_map (x, s) -> { s with stm = S_map (x, simpl s) }
-  | S_skip | S_swap | S_dig | S_dug | S_assign _ | S_drop _ | S_failwith _
-  | S_return _ ->
-      s

@@ -7,8 +7,9 @@ let join_loop env_before env_after body =
       List.fold2_exn ~init:body
         ~f:(fun acc before after ->
           if not (Adt.Var.equal before after) then
-            let assign = Adt.create_stmt (S_assign (before, E_var after)) in
-            Adt.create_stmt (S_seq (acc, assign))
+            let e_after = Adt.Expr.create (E_var after) in
+            let assign = Adt.Stmt.create (S_assign (before, e_after)) in
+            Adt.Stmt.create (S_seq (acc, assign))
           else acc)
         env_before env_after
   | _ ->
@@ -27,8 +28,9 @@ let join env_t env_f s_f =
 
       let s =
         List.fold2_exn env_t env_f ~init:s_f ~f:(fun acc v_t v_f ->
-            let assign = create_stmt (S_assign (v_f, E_var v_t)) in
-            create_stmt (S_seq (acc, assign)))
+            let e_var = Adt.Expr.create (E_var v_t) in
+            let assign = Adt.Stmt.create (S_assign (v_f, e_var)) in
+            Adt.Stmt.create (S_seq (acc, assign)))
       in
       (Stack env_t, s)
 
@@ -326,35 +328,39 @@ let rec convert_data counter =
   let open Adt in
   let open Adt.Typ in
   let rec convert_data t (_, d) =
-    match (t, d) with
-    | _, Michelson.Carthage.Adt.D_int n -> D_int n
-    | _, Michelson.Carthage.Adt.D_unit -> D_unit
-    | _, Michelson.Carthage.Adt.D_none -> D_none
-    | _, Michelson.Carthage.Adt.D_string s -> D_string s
-    | _, Michelson.Carthage.Adt.D_bytes b -> D_bytes b
-    | _, Michelson.Carthage.Adt.D_bool b -> D_bool b
-    | T_pair (t_1, t_2), Michelson.Carthage.Adt.D_pair (d_1, d_2) ->
-        D_pair (convert_data t_1 d_1, convert_data t_2 d_2)
-    | T_or (t, _), Michelson.Carthage.Adt.D_left d -> D_left (convert_data t d)
-    | T_or (_, t), Michelson.Carthage.Adt.D_right d ->
-        D_right (convert_data t d)
-    | T_option t, Michelson.Carthage.Adt.D_some d -> D_some (convert_data t d)
-    | (T_list t | T_set t), Michelson.Carthage.Adt.D_list d_l ->
-        D_list (List.map ~f:(convert_data t) d_l)
-    | ( (T_map (t_1, t_2) | T_big_map (t_1, t_2)),
-        Michelson.Carthage.Adt.D_list d_l ) ->
-        D_list (List.map ~f:(convert_data_elt t_1 t_2) d_l)
-    | T_lambda (t, _), Michelson.Carthage.Adt.D_instruction i ->
-        let param = Var.{ var_name = next_var counter; var_type = t } in
-        let env = Env.push param Env.empty_env in
-        let i, _ = inst_to_stmt (ref (-1)) env i in
-        D_instruction (param, i)
-    | _ -> assert false
+    let d =
+      match (t, d) with
+      | _, Michelson.Carthage.Adt.D_int n -> D_int n
+      | _, Michelson.Carthage.Adt.D_unit -> D_unit
+      | _, Michelson.Carthage.Adt.D_none -> D_none
+      | _, Michelson.Carthage.Adt.D_string s -> D_string s
+      | _, Michelson.Carthage.Adt.D_bytes b -> D_bytes b
+      | _, Michelson.Carthage.Adt.D_bool b -> D_bool b
+      | T_pair (t_1, t_2), Michelson.Carthage.Adt.D_pair (d_1, d_2) ->
+          D_pair (convert_data t_1 d_1, convert_data t_2 d_2)
+      | T_or (t, _), Michelson.Carthage.Adt.D_left d ->
+          D_left (convert_data t d)
+      | T_or (_, t), Michelson.Carthage.Adt.D_right d ->
+          D_right (convert_data t d)
+      | T_option t, Michelson.Carthage.Adt.D_some d -> D_some (convert_data t d)
+      | (T_list t | T_set t), Michelson.Carthage.Adt.D_list d_l ->
+          D_list (List.map ~f:(convert_data t) d_l)
+      | ( (T_map (t_1, t_2) | T_big_map (t_1, t_2)),
+          Michelson.Carthage.Adt.D_list d_l ) ->
+          D_list (List.map ~f:(convert_data_elt t_1 t_2) d_l)
+      | T_lambda (t, _), Michelson.Carthage.Adt.D_instruction i ->
+          let param = Var.{ var_name = next_var counter; var_type = t } in
+          let env = Env.push param Env.empty_env in
+          let i, _ = inst_to_stmt (ref (-1)) env i in
+          D_instruction (param, i)
+      | _ -> assert false
+    in
+    Data.create d
   and convert_data_elt t_1 t_2 (_, d) =
     let open Adt in
     match d with
     | Michelson.Carthage.Adt.D_elt (d_1, d_2) ->
-        D_elt (convert_data t_1 d_1, convert_data t_2 d_2)
+        Data.create (D_elt (convert_data t_1 d_1, convert_data t_2 d_2))
     | _ -> assert false
   in
   convert_data
@@ -373,9 +379,10 @@ and inst_to_stmt counter env
   let next_var () = next_var counter in
   let create_assign ?var_name e =
     let var_name = match var_name with None -> next_var () | Some v -> v in
+    let e = Expr.create e in
     let var_type = Typer.type_expr e in
     let v = Var.{ var_name; var_type } in
-    (v, create_stmt (S_assign (v, e)))
+    (v, Stmt.create (S_assign (v, e)))
   in
   let create_assign_annot_1 e =
     let annots =
@@ -397,23 +404,23 @@ and inst_to_stmt counter env
     match i with
     | I_failwith ->
         let x, _ = pop env in
-        (create_stmt (S_failwith x), Failed)
+        (Stmt.create (S_failwith x), Failed)
     | I_seq i_l -> (
         match i_l with
-        | [] -> (create_stmt S_skip, env)
+        | [] -> (Stmt.create S_skip, env)
         | h :: tl ->
             let s_h, env_h = inst_to_stmt counter env h in
             List.fold_left
               ~f:(fun (s, env) i ->
                 let s', env' = inst_to_stmt counter env i in
-                (create_stmt (S_seq (s, s')), env'))
+                (Stmt.create (S_seq (s, s')), env'))
               ~init:(s_h, env_h) tl)
     | I_if (i_t, i_f) ->
         let c, env' = pop env in
         let s_t, env_t = inst_to_stmt counter env' i_t in
         let s_f, env_f = inst_to_stmt counter env' i_f in
         let env', s_f' = join env_t env_f s_f in
-        let s = create_stmt (S_if (c, s_t, s_f')) in
+        let s = Stmt.create (S_if (c, s_t, s_f')) in
         (s, env')
     | I_loop i ->
         (*
@@ -427,24 +434,25 @@ and inst_to_stmt counter env
         let c, env_before = pop env in
         let body, env' = inst_to_stmt counter env_before i in
         let top, env_after = pop env' in
-        let assign_c = create_stmt (S_assign (c, E_var top)) in
-        let body = create_stmt (S_seq (body, assign_c)) in
+        let e_top = Expr.create (E_var top) in
+        let assign_c = Stmt.create (S_assign (c, e_top)) in
+        let body = Stmt.create (S_seq (body, assign_c)) in
         let body = join_loop env_before env_after body in
-        let s = create_stmt (S_loop (c, body)) in
+        let s = Stmt.create (S_loop (c, body)) in
         (s, env_after)
     | I_loop_left i ->
         let c, env_before = pop env in
-        let e = E_unlift_or_left c in
-        let v, assign_unlift = create_assign e in
+        let v, assign_unlift = create_assign (E_unlift_or_left c) in
         let body, env' =
           let body_env = push v env_before in
           inst_to_stmt counter body_env i
         in
         let top, env_after = pop env' in
-        let assign_c = create_stmt (S_assign (c, E_var top)) in
+        let e_top = Expr.create (E_var top) in
+        let assign_c = Stmt.create (S_assign (c, e_top)) in
         let body =
-          create_stmt
-            (S_seq (create_stmt (S_seq (assign_unlift, body)), assign_c))
+          Stmt.create
+            (S_seq (Stmt.create (S_seq (assign_unlift, body)), assign_c))
         in
         let body = join_loop env_before env_after body in
         let post_loop_unlift = E_unlift_or_right c in
@@ -452,8 +460,8 @@ and inst_to_stmt counter env
           create_assign post_loop_unlift
         in
         let s =
-          create_stmt
-            (S_seq (create_stmt (S_loop_left (c, body)), post_loop_assign_unlift))
+          Stmt.create
+            (S_seq (Stmt.create (S_loop_left (c, body)), post_loop_assign_unlift))
         in
         let env' = push v_post_loop env_after in
         (s, env')
@@ -461,12 +469,11 @@ and inst_to_stmt counter env
         assert (assert_type x t);
         let t = convert_typ t in
         let d = convert_data counter t x in
-        let e = E_push (d, t) in
-        let v, assign = create_assign_annot_1 e in
+        let v, assign = create_assign_annot_1 (E_push (d, t)) in
         (assign, push v env)
     | I_drop ->
         let v, env' = pop env in
-        (create_stmt (S_drop [ v ]), env')
+        (Stmt.create (S_drop [ v ]), env')
     | I_drop_n n ->
         let env', l =
           loop_n
@@ -475,18 +482,17 @@ and inst_to_stmt counter env
               (env, v :: l))
             (env, []) n
         in
-        (create_stmt (S_drop l), env')
+        (Stmt.create (S_drop l), env')
     | I_dup ->
         let v = peek env in
-        let e = E_dup v in
-        let v', assign = create_assign_annot_1 e in
+        let v', assign = create_assign_annot_1 (E_dup v) in
         let env' = push v' env in
         (assign, env')
-    | I_dig n -> (create_stmt S_dig, dig env n)
-    | I_dug n -> (create_stmt S_dug, dug env n)
+    | I_dig n -> (Stmt.create S_dig, dig env n)
+    | I_dug n -> (Stmt.create S_dug, dug env n)
     | I_swap ->
         let env' = swap env in
-        (create_stmt S_swap, env')
+        (Stmt.create S_swap, env')
     | I_some ->
         let v, env' = pop env in
         let e = E_some v in
@@ -506,9 +512,9 @@ and inst_to_stmt counter env
         let s_t, env_t = inst_to_stmt counter env' i_t in
         let v', assign = create_assign (E_unlift_option v) in
         let s_f, env_f = inst_to_stmt counter (push v' env') i_f in
-        let s_f = create_stmt (S_seq (assign, s_f)) in
+        let s_f = Stmt.create (S_seq (assign, s_f)) in
         let env', s_f' = join env_t env_f s_f in
-        let s = create_stmt (S_if_none (v, s_t, s_f')) in
+        let s = Stmt.create (S_if_none (v, s_t, s_f')) in
         (s, env')
     | I_pair ->
         let v_1, env' = pop env in
@@ -548,10 +554,10 @@ and inst_to_stmt counter env
         let env_f = push v_f env' in
         let s_t, env_t = inst_to_stmt counter env_t i_t in
         let s_f, env_f = inst_to_stmt counter env_f i_f in
-        let s_t = create_stmt (S_seq (assign_t, s_t)) in
-        let s_f = create_stmt (S_seq (assign_f, s_f)) in
+        let s_t = Stmt.create (S_seq (assign_t, s_t)) in
+        let s_f = Stmt.create (S_seq (assign_f, s_f)) in
         let env', s_f' = join env_t env_f s_f in
-        let s = create_stmt (S_if_left (v, s_t, s_f')) in
+        let s = Stmt.create (S_if_left (v, s_t, s_f')) in
         (s, env')
     | I_nil t ->
         let t = convert_typ t in
@@ -578,11 +584,11 @@ and inst_to_stmt counter env
         let env_f = env' in
         let s_t, env_t = inst_to_stmt counter env_t i_t in
         let s_t =
-          create_stmt (S_seq (assign_hd, create_stmt (S_seq (assign_tl, s_t))))
+          Stmt.create (S_seq (assign_hd, Stmt.create (S_seq (assign_tl, s_t))))
         in
         let s_f, env_f = inst_to_stmt counter env_f i_f in
         let env', s_f' = join env_t env_f s_f in
-        let s = create_stmt (S_if_cons (c, s_t, s_f')) in
+        let s = Stmt.create (S_if_cons (c, s_t, s_f')) in
         (s, env')
     | I_size ->
         let v, env' = pop env in
@@ -626,7 +632,8 @@ and inst_to_stmt counter env
           let body_env = push hd env' in
           inst_to_stmt counter body_env b
         in
-        let assign_tl = create_stmt (S_assign (c, E_tl c)) in
+        let e_tl = Expr.create (E_tl c) in
+        let assign_tl = Stmt.create (S_assign (c, e_tl)) in
         let body_result, env_after_loop = pop env_after_body in
         let acc, initial_acc_assign =
           match c.var_type with
@@ -636,20 +643,19 @@ and inst_to_stmt counter env
               create_assign (E_special_empty_map (t, body_result.var_type))
           | _ -> assert false
         in
-        let assign_append =
-          create_stmt (S_assign (acc, E_append (acc, body_result)))
-        in
+        let e_append = Expr.create (E_append (acc, body_result)) in
+        let assign_append = Stmt.create (S_assign (acc, e_append)) in
         let body =
-          create_stmt
+          Stmt.create
             (S_seq
                ( assign_hd,
-                 create_stmt
-                   (S_seq (body, create_stmt (S_seq (assign_append, assign_tl))))
+                 Stmt.create
+                   (S_seq (body, Stmt.create (S_seq (assign_append, assign_tl))))
                ))
         in
         let s =
-          create_stmt
-            (S_seq (initial_acc_assign, create_stmt (S_map (c, body))))
+          Stmt.create
+            (S_seq (initial_acc_assign, Stmt.create (S_map (c, body))))
         in
         (s, push acc env_after_loop)
     | I_iter b ->
@@ -668,11 +674,12 @@ and inst_to_stmt counter env
           let body_env = push hd env' in
           inst_to_stmt counter body_env b
         in
-        let assign_tl = create_stmt (S_assign (c, E_tl c)) in
+        let e_tl = Expr.create (E_tl c) in
+        let assign_tl = Stmt.create (S_assign (c, e_tl)) in
         let body =
-          create_stmt (S_seq (assign_hd, create_stmt (S_seq (body, assign_tl))))
+          Stmt.create (S_seq (assign_hd, Stmt.create (S_seq (body, assign_tl))))
         in
-        let s = create_stmt (S_iter (c, body)) in
+        let s = Stmt.create (S_iter (c, body)) in
         (s, env')
     | I_mem ->
         let elt, env' = pop env in
@@ -703,7 +710,7 @@ and inst_to_stmt counter env
           | Failed -> b
           | Stack _ ->
               let r = peek lambda_env in
-              create_stmt (S_seq (b, create_stmt (S_return r)))
+              Stmt.create (S_seq (b, Stmt.create (S_return r)))
         in
         let e = E_lambda (t_1, t_2, param, b) in
         let v, assign = create_assign_annot_1 e in
@@ -723,8 +730,8 @@ and inst_to_stmt counter env
         let s, env' = inst_to_stmt counter env' i in
         let env' = List.fold_left ~f:(fun acc x -> push x acc) ~init:env' xl in
         (s, env')
-    | I_cast _ -> (create_stmt S_skip, env)
-    | I_rename -> (create_stmt S_skip, env)
+    | I_cast _ -> (Stmt.create S_skip, env)
+    | I_rename -> (Stmt.create S_skip, env)
     | I_concat ->
         let v, env' = pop env in
         let e, env' =
@@ -895,7 +902,7 @@ and inst_to_stmt counter env
             (E_create_contract_address (c, delegate, amount, storage))
         in
         let env' = push v_o (push v_a env') in
-        (create_stmt (S_seq (assign_o, assign_a)), env')
+        (Stmt.create (S_seq (assign_o, assign_a)), env')
     | I_implicit_account ->
         let v, env' = pop env in
         let e = E_implicit_account v in
@@ -967,14 +974,14 @@ and inst_to_stmt counter env
         let e = E_chain_id in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env)
-    | I_noop -> (create_stmt S_skip, env)
+    | I_noop -> (Stmt.create S_skip, env)
     | I_unpair ->
         let x, env' = pop env in
         let e = E_car x in
         let v_1, assign_1 = create_assign_annot_1 e in
         let e = E_cdr x in
         let v_2, assign_2 = create_assign_annot_2 e in
-        (create_stmt (S_seq (assign_1, assign_2)), push v_1 (push v_2 env'))
+        (Stmt.create (S_seq (assign_1, assign_2)), push v_1 (push v_2 env'))
     | I_apply ->
         let x_1, env = pop env in
         let x_2, env = pop env in
@@ -1012,10 +1019,10 @@ and convert_program counter Michelson.Carthage.Adt.{ param; code; storage } =
       Env.empty_env
   in
   let code, env = inst_to_stmt counter env code in
-  let code = Adt.simpl code in
+  let code = Adt.Stmt.simpl code in
   match env with
   | Failed -> (param, storage, code)
   | Stack _ ->
       let v = Env.peek env in
-      let i = Adt.create_stmt (S_return v) in
-      (param, storage, Adt.create_stmt (S_seq (code, i)))
+      let i = Adt.Stmt.create (S_return v) in
+      (param, storage, Adt.Stmt.create (S_seq (code, i)))

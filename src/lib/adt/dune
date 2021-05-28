@@ -3,4 +3,4 @@
  (public_name tezla.adt)
  (libraries core_kernel michelson)
  (preprocess
-  (pps ppx_deriving.ord ppx_jane ppx_string)))
+  (pps ppx_deriving.ord ppx_deriving.make ppx_jane ppx_string)))

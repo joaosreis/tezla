@@ -4,7 +4,7 @@ open Adt.Typ
 exception Type_error of string
 
 let type_expr e =
-  match e with
+  match e.Node.value with
   | E_abs _ | E_shiftL (_, _) | E_shiftR (_, _) -> T_nat
   | E_unit -> T_unit
   | E_now -> T_timestamp
@@ -245,41 +245,3 @@ let type_expr e =
           in
           raise (Type_error (flush_str_formatter ())))
   | E_append (v, _) -> v.var_type
-
-let%test "E_dup" = type_expr (E_dup { var_name = ""; var_type = T_int }) = T_int
-
-let%test "E_cdr" =
-  type_expr (E_cdr { var_name = ""; var_type = T_pair (T_int, T_nat) }) = T_nat
-
-let%test "E_cdr" =
-  type_expr (E_car { var_name = ""; var_type = T_pair (T_int, T_nat) }) = T_int
-
-let%test "E_unlift_or_left" =
-  type_expr (E_unlift_or_left { var_name = ""; var_type = T_or (T_int, T_nat) })
-  = T_int
-
-let%test "E_unlift_or_right" =
-  type_expr
-    (E_unlift_or_right { var_name = ""; var_type = T_or (T_int, T_nat) })
-  = T_nat
-
-let%test "E_sender" = type_expr E_sender = T_address
-
-let%test "E_compare" =
-  type_expr
-    (E_compare
-       ( { var_name = ""; var_type = T_address },
-         { var_name = ""; var_type = T_address } ))
-  = T_int
-
-let%test "E_eq" = type_expr (E_eq { var_name = ""; var_type = T_int }) = T_bool
-
-let%test "E_push" = type_expr (E_push (D_int Bigint.zero, T_int)) = T_int
-
-let%test "E_pair" =
-  type_expr
-    (E_pair
-       ({ var_name = ""; var_type = T_int }, { var_name = ""; var_type = T_nat }))
-  = T_pair (T_int, T_nat)
-
-let%test "abs" = type_expr (E_abs { var_name = ""; var_type = T_int }) = T_nat

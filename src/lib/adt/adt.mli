@@ -9,7 +9,15 @@ type typ = Typ.t
 
 type operation = Operation.t
 
-type data =
+module Node : sig
+  type 'a t = {
+    id : int; [@compare fun a b -> Int.compare a b]
+    value : 'a; [@main]
+  }
+  [@@deriving ord, sexp, make]
+end
+
+type data_t =
   | D_int of Bigint.t
   | D_string of string
   | D_bytes of Bytes.t
@@ -23,8 +31,11 @@ type data =
   | D_elt of data * data
   | D_list of data list
   | D_instruction of var * stmt
+[@@deriving ord, sexp]
 
-and expr =
+and data = data_t Node.t [@@deriving ord, sexp]
+
+and expr_t =
   | E_var of var
   | E_push of data * typ
   | E_car of var
@@ -79,7 +90,7 @@ and expr =
   | E_sender
   | E_address_of_contract of var
   | E_create_contract_address of
-      (Loc.t, Carthage.Adt.annot list) Michelson.Carthage.Adt.program
+      (Loc.t, Michelson.Carthage.Adt.annot list) Michelson.Carthage.Adt.program
       * var
       * var
       * var
@@ -105,6 +116,8 @@ and expr =
   | E_special_empty_map of typ * typ
 [@@deriving ord, sexp]
 
+and expr = expr_t Node.t [@@deriving ord, sexp]
+
 and stmt_t =
   | S_seq of stmt * stmt
   | S_assign of var * expr
@@ -123,33 +136,32 @@ and stmt_t =
   | S_iter of var * stmt
   | S_failwith of var
   | S_return of var
+[@@deriving ord, sexp]
 
-and stmt = { id : int; stm : stmt_t }
+and stmt = stmt_t Node.t [@@deriving ord, sexp]
 
-and program = typ * typ * stmt
+and program = typ * typ * stmt [@@deriving ord, sexp]
 
-module Data : sig
-  include Comparable.S with type t = data
+module type Common = sig
+  type t'
 
-  include Sexpable.S with type t = data
+  type t = t' Node.t
 
-  val to_string : t -> string
-end
-
-module Expr : sig
-  include Comparable.S with type t = expr
-
-  include Sexpable.S with type t = expr
+  val create : t' -> t
 
   val to_string : t -> string
+
+  include Sexpable.S with type t := t
+
+  include Comparable.S with type t := t
 end
+
+module Data : Common with type t' = data_t and type t = data
+
+module Expr : Common with type t' = expr_t and type t = expr
 
 module Stmt : sig
-  include Comparable.S with type t = stmt
+  include Common with type t' = stmt_t and type t = stmt
 
-  include Sexpable.S with type t = stmt
+  val simpl : t -> t
 end
-
-val create_stmt : stmt_t -> stmt
-
-val simpl : stmt -> stmt
