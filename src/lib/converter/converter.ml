@@ -109,9 +109,9 @@ let lambda_t t =
       in
       assert false
 
-let rec assert_type (_, d) (_, t, _) =
+let rec assert_type d t =
   let open Michelson.Carthage.Adt in
-  match (d, t) with
+  match (d.value, t.value) with
   | D_int _, (T_int | T_nat | T_mutez | T_timestamp)
   | D_unit, T_unit
   | D_none, T_option _
@@ -134,167 +134,13 @@ let rec assert_type (_, d) (_, t, _) =
         | D_elt (d_k, d_v) -> assert_type d_k k && assert_type d_v v
         | _ -> false
       in
-      List.for_all ~f:(fun (_, d') -> assert_type_map d' k v) l
+      List.for_all ~f:(fun d' -> assert_type_map d'.value k v) l
   | D_instruction _, T_lambda _ -> true
   | _ -> false
 
-let rec typ_strip_location (_, t, a) =
-  let open Michelson.Carthage.Adt in
-  let t =
-    match t with
-    | T_option t -> T_option (typ_strip_location t)
-    | T_or (t_1, t_2) -> T_or (typ_strip_location t_1, typ_strip_location t_2)
-    | T_pair (t_1, t_2) ->
-        T_pair (typ_strip_location t_1, typ_strip_location t_2)
-    | T_set t -> T_set (typ_strip_location t)
-    | T_big_map (t_1, t_2) ->
-        T_big_map (typ_strip_location t_1, typ_strip_location t_2)
-    | T_map (t_1, t_2) -> T_map (typ_strip_location t_1, typ_strip_location t_2)
-    | T_contract t -> T_contract (typ_strip_location t)
-    | T_lambda (t_1, t_2) ->
-        T_lambda (typ_strip_location t_1, typ_strip_location t_2)
-    | T_list t -> T_list (typ_strip_location t)
-    | T_nat -> T_nat
-    | T_key -> T_key
-    | T_unit -> T_unit
-    | T_signature -> T_signature
-    | T_operation -> T_operation
-    | T_chain_id -> T_chain_id
-    | T_int -> T_int
-    | T_string -> T_string
-    | T_bytes -> T_bytes
-    | T_mutez -> T_mutez
-    | T_bool -> T_bool
-    | T_key_hash -> T_key_hash
-    | T_timestamp -> T_timestamp
-    | T_address -> T_address
-  in
-  ((), t, a)
-
-and data_strip_location (_, d) =
-  let open Michelson.Carthage.Adt in
-  let d =
-    match d with
-    | D_bool b -> D_bool b
-    | D_unit -> D_unit
-    | D_none -> D_none
-    | D_int n -> D_int n
-    | D_string s -> D_string s
-    | D_bytes b -> D_bytes b
-    | D_pair (d_1, d_2) ->
-        D_pair (data_strip_location d_1, data_strip_location d_2)
-    | D_left d -> D_left (data_strip_location d)
-    | D_right d -> D_right (data_strip_location d)
-    | D_some d -> D_some (data_strip_location d)
-    | D_elt (d_1, d_2) ->
-        D_elt (data_strip_location d_1, data_strip_location d_2)
-    | D_list l -> D_list (List.map ~f:data_strip_location l)
-    | D_instruction i -> D_instruction (inst_strip_location i)
-  in
-  ((), d)
-
-and inst_strip_location (_, i, a) =
-  let open Michelson.Carthage.Adt in
-  let i =
-    match i with
-    | I_cast t -> I_cast (typ_strip_location t)
-    | I_noop -> I_noop
-    | I_failwith -> I_failwith
-    | I_exec -> I_exec
-    | I_apply -> I_apply
-    | I_drop -> I_drop
-    | I_dup -> I_dup
-    | I_swap -> I_swap
-    | I_unit -> I_unit
-    | I_eq -> I_eq
-    | I_neq -> I_neq
-    | I_lt -> I_lt
-    | I_gt -> I_gt
-    | I_le -> I_le
-    | I_ge -> I_ge
-    | I_or -> I_or
-    | I_and -> I_and
-    | I_xor -> I_xor
-    | I_not -> I_not
-    | I_neg -> I_neg
-    | I_abs -> I_abs
-    | I_isnat -> I_isnat
-    | I_int -> I_int
-    | I_add -> I_add
-    | I_sub -> I_sub
-    | I_mul -> I_mul
-    | I_ediv -> I_ediv
-    | I_lsl -> I_lsl
-    | I_lsr | I_compare -> I_compare
-    | I_concat -> I_concat
-    | I_size -> I_size
-    | I_slice -> I_slice
-    | I_pair -> I_pair
-    | I_car -> I_car
-    | I_cdr -> I_cdr
-    | I_mem | I_update -> I_update
-    | I_get -> I_get
-    | I_some -> I_some
-    | I_cons -> I_cons
-    | I_transfer_tokens -> I_transfer_tokens
-    | I_set_delegate | I_balance -> I_balance
-    | I_address -> I_address
-    | I_source -> I_source
-    | I_sender -> I_sender
-    | I_self -> I_self
-    | I_amount | I_implicit_account -> I_implicit_account
-    | I_now -> I_now
-    | I_chain_id -> I_chain_id
-    | I_pack -> I_pack
-    | I_hash_key -> I_hash_key
-    | I_blake2b | I_sha256 -> I_sha256
-    | I_sha512 -> I_sha512
-    | I_check_signature -> I_check_signature
-    | I_unpair -> I_unpair
-    | I_rename -> I_rename
-    | I_seq l -> I_seq (List.map ~f:inst_strip_location l)
-    | I_if (i_1, i_2) -> I_if (inst_strip_location i_1, inst_strip_location i_2)
-    | I_loop i -> I_loop (inst_strip_location i)
-    | I_loop_left i -> I_loop_left (inst_strip_location i)
-    | I_dip i -> I_dip (inst_strip_location i)
-    | I_dip_n (n, i) -> I_dip_n (n, inst_strip_location i)
-    | I_drop_n n -> I_drop_n n
-    | I_dig n -> I_dig n
-    | I_dug n -> I_dug n
-    | I_push (t, d) -> I_push (typ_strip_location t, data_strip_location d)
-    | I_lambda (t_1, t_2, i) ->
-        I_lambda
-          (typ_strip_location t_1, typ_strip_location t_2, inst_strip_location i)
-    | I_empty_set t -> I_empty_set (typ_strip_location t)
-    | I_iter i -> I_iter (inst_strip_location i)
-    | I_empty_map (t_1, t_2) ->
-        I_empty_map (typ_strip_location t_1, typ_strip_location t_2)
-    | I_map i -> I_map (inst_strip_location i)
-    | I_empty_big_map (t_1, t_2) ->
-        I_empty_big_map (typ_strip_location t_1, typ_strip_location t_2)
-    | I_none t -> I_none (typ_strip_location t)
-    | I_if_none (i_1, i_2) ->
-        I_if_none (inst_strip_location i_1, inst_strip_location i_2)
-    | I_left t -> I_left (typ_strip_location t)
-    | I_right t -> I_right (typ_strip_location t)
-    | I_if_left (i_1, i_2) ->
-        I_if_left (inst_strip_location i_1, inst_strip_location i_2)
-    | I_nil t -> I_nil (typ_strip_location t)
-    | I_if_cons (i_1, i_2) ->
-        I_if_cons (inst_strip_location i_1, inst_strip_location i_2)
-    | I_contract t -> I_contract (typ_strip_location t)
-    | I_unpack t -> I_unpack (typ_strip_location t)
-    | I_create_contract { code; param; storage } ->
-        let code = inst_strip_location code in
-        let param = typ_strip_location param in
-        let storage = typ_strip_location storage in
-        I_create_contract { code; param; storage }
-  in
-  ((), i, a)
-
-let rec convert_typ (_, t, _) =
+let rec convert_typ t =
   let open Adt.Typ in
-  match t with
+  match t.Michelson.Carthage.Adt.value with
   | Michelson.Carthage.Adt.T_address -> T_address
   | Michelson.Carthage.Adt.T_key -> T_key
   | Michelson.Carthage.Adt.T_unit -> T_unit
@@ -327,9 +173,9 @@ let rec convert_typ (_, t, _) =
 let rec convert_data counter =
   let open Adt in
   let open Adt.Typ in
-  let rec convert_data t (_, d) =
+  let rec convert_data t d =
     let d =
-      match (t, d) with
+      match (t, d.Michelson.Carthage.Adt.value) with
       | _, Michelson.Carthage.Adt.D_int n -> D_int n
       | _, Michelson.Carthage.Adt.D_unit -> D_unit
       | _, Michelson.Carthage.Adt.D_none -> D_none
@@ -356,18 +202,16 @@ let rec convert_data counter =
       | _ -> assert false
     in
     Data.create d
-  and convert_data_elt t_1 t_2 (_, d) =
+  and convert_data_elt t_1 t_2 d =
     let open Adt in
-    match d with
+    match d.value with
     | Michelson.Carthage.Adt.D_elt (d_1, d_2) ->
         Data.create (D_elt (convert_data t_1 d_1, convert_data t_2 d_2))
     | _ -> assert false
   in
   convert_data
 
-and inst_to_stmt counter env
-    ((l, i, annots) :
-      (Loc.t, Michelson.Carthage.Adt.annot list) Michelson.Carthage.Adt.inst) =
+and inst_to_stmt counter env (i : Michelson.Carthage.Adt.inst) =
   let open Michelson.Carthage.Adt in
   let open Adt in
   let loop_n f =
@@ -386,7 +230,7 @@ and inst_to_stmt counter env
   in
   let create_assign_annot_1 e =
     let annots =
-      List.filter ~f:(function A_var _ -> true | _ -> false) annots
+      List.filter ~f:(function A_var _ -> true | _ -> false) i.annots
     in
     match annots with
     | A_var var_name :: _ -> create_assign ~var_name e
@@ -394,14 +238,14 @@ and inst_to_stmt counter env
   in
   let create_assign_annot_2 e =
     let annots =
-      List.filter ~f:(function A_var _ -> true | _ -> false) annots
+      List.filter ~f:(function A_var _ -> true | _ -> false) i.annots
     in
     match annots with
     | _ :: A_var var_name :: _ -> create_assign ~var_name e
     | _ -> create_assign e
   in
   try
-    match i with
+    match i.value with
     | I_failwith ->
         let x, _ = pop env in
         (Stmt.create (S_failwith x), Failed)
@@ -992,22 +836,22 @@ and inst_to_stmt counter env
   | Functional_stack.Unsufficient_length ->
       failwith
         (Printf.sprintf "Unsufficent_length: Line %d, columns %d-%d\n"
-           l.start_pos.lin l.start_pos.col l.end_pos.col)
+           i.loc.start_pos.lin i.loc.start_pos.col i.loc.end_pos.col)
   | Typer.Type_error e ->
       failwith
         (Printf.sprintf "Type error: %s, Line %d, columns %d-%d\n" e
-           l.start_pos.lin l.start_pos.col l.end_pos.col)
+           i.loc.start_pos.lin i.loc.start_pos.col i.loc.end_pos.col)
   | Assert_failure (f, lin, col) ->
       failwith
         (Printf.sprintf
            "Assert failure on %s:%d:%d\n\
             Michelson file, Line %d, columns %d-%d\n"
-           f lin col l.start_pos.lin l.start_pos.col l.end_pos.col)
+           f lin col i.loc.start_pos.lin i.loc.start_pos.col i.loc.end_pos.col)
   | Invalid_argument s ->
       failwith
         (Printf.sprintf
            "Invalid arguement: %s\nMichelson file, Line %d, columns %d-%d\n" s
-           l.start_pos.lin l.start_pos.col l.end_pos.col)
+           i.loc.start_pos.lin i.loc.start_pos.col i.loc.end_pos.col)
 
 and convert_program counter Michelson.Carthage.Adt.{ param; code; storage } =
   let param = convert_typ param in

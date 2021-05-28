@@ -1,23 +1,21 @@
+open Core_kernel
+
 let () =
   let dir = "../../../../tests/" in
   let files = Sys.readdir dir in
   let open Alcotest in
   let create_test filename =
-    let open Michelson.Carthage.Parser in
+    let open Michelson.Carthage.Parse in
     let convert_f () =
-      let adt = parse_file (dir ^ filename) in
-      let adt = convert filename adt in
-      let _ = Tezla.Converter.convert_program (ref (-1)) adt in
-      ()
+      match parse_program (dir ^ filename) with
+      | Ok adt ->
+          let adt, _ = program_parse adt in
+          let _ = Tezla.Converter.convert_program (ref (-1)) adt in
+          check pass "Ok" () ()
+      | Error e -> fail ("Convert error: " ^ Error.to_string_hum e)
     in
-    let test_f () =
-      try
-        convert_f ();
-        check pass "Ok" () ()
-      with Failure s -> fail ("Convert error: " ^ s)
-    in
-    test_case filename `Quick test_f
+    test_case filename `Quick convert_f
   in
-  let tests = Array.map create_test files in
+  let tests = Array.map files ~f:create_test in
   let tests = Array.to_list tests in
   run "Tezla converter" [ ("convert", tests) ]

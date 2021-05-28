@@ -131,10 +131,7 @@ and expr_t =
   | E_sender
   | E_address_of_contract of var
   | E_create_contract_address of
-      (Loc.t, Michelson.Carthage.Adt.annot list) Michelson.Carthage.Adt.program
-      * var
-      * var
-      * var
+      Michelson.Carthage.Adt.program * var * var * var
   | E_unlift_option of var
   | E_unlift_or_left of var
   | E_unlift_or_right of var

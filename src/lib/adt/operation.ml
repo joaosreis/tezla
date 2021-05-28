@@ -4,13 +4,7 @@ type var = Var.t [@@deriving ord, sexp]
 
 module T = struct
   type t =
-    | O_create_contract of
-        ( Loc.t,
-          Michelson.Carthage.Adt.annot list )
-        Michelson.Carthage.Adt.program
-        * var
-        * var
-        * var
+    | O_create_contract of Michelson.Carthage.Adt.program * var * var * var
     | O_transfer_tokens of var * var * var
     | O_set_delegate of var
     | O_create_account of var * var * var * var
