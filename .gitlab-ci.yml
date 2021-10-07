@@ -159,16 +159,9 @@ build:
     - echo -e "section_end:`date +%s`:setup_switch\r\e[0K"
 
     - echo -e "section_start:`date +%s`:setup_deps\r\e[0K setup the package dependencies"
-    # (Note: when opam 2.1 will be available with native depext integration,
-    # the complex dance below will be replaceable by just
-    #   opam install . --deps-only --locked --with-test --with-doc --yes
-    # which should start by installing depexts
-    # (possibly we will need to set some explicit environment variable first).
-    - opam pin add . -n --yes
-    - opam install depext --yes
-    - opam install . --dry-run --deps-only --locked --with-test --with-doc --yes | awk '/-> installed/{print $3}' | xargs opam depext -iyu
-    # the magical command above comes from https://github.com/ocaml/opam/issues/3790
-    # it installs both external dependencies and opam dependencies
+    
+    - opam install . --deps-only --locked --with-test --with-doc --yes
+    
     - echo "(we used --locked to honor any lockfiles if present)"
     - echo -e "section_end:`date +%s`:setup_deps\r\e[0K"
 
