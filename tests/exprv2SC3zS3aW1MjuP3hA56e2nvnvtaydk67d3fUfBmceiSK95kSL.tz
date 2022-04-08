@@ -1,0 +1,14 @@
+{ storage
+    (pair (map %bets address (pair (mutez %amount) (string %entry)))
+          (pair (list %entries string) (string %name))) ;
+  parameter (pair (mutez %amount) (string %entry)) ;
+  code { UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         DIG 2 ;
+         SOME ;
+         SENDER ;
+         UPDATE ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

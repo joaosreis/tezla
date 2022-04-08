@@ -1,0 +1,117 @@
+{ parameter
+    (or (unit %default)
+        (pair %mainParameter
+           (pair nat
+                 (or (pair %operation string address)
+                     (or (pair %transferTokens address mutez) (pair %changeKeys nat (list key)))))
+           (list (option signature)))) ;
+  storage (pair nat (pair nat (list key))) ;
+  code { CAST (pair (or unit
+                        (pair (pair nat (or (pair string address) (or (pair address mutez) (pair nat (list key)))))
+                              (list (option signature))))
+                    (pair nat (pair nat (list key)))) ;
+         DUP ;
+         CAR ;
+         DIP { CDR } ;
+         IF_LEFT
+           { DROP ; NIL operation ; PAIR }
+           { SWAP ;
+             DUP ;
+             DIP { SWAP ;
+                   DUP ;
+                   CAR ;
+                   DIP { CDR } ;
+                   DUP ;
+                   SELF ;
+                   ADDRESS ;
+                   CHAIN_ID ;
+                   PAIR ;
+                   PAIR ;
+                   PACK ;
+                   DIP { DUP ; CAR ; DIP { CDR ; SWAP } } ;
+                   SWAP } ;
+             DUP ;
+             CAR ;
+             DIP { CDR ; SWAP } ;
+             COMPARE ;
+             EQ ;
+             IF {} { UNIT ; PUSH string "CounterDoesntMatch" ; PAIR ; FAILWITH } ;
+             DIP { SWAP } ;
+             DUP ;
+             CAR ;
+             DIP { CDR ;
+                   PUSH nat 0 ;
+                   SWAP ;
+                   ITER { DIP { SWAP } ;
+                          SWAP ;
+                          IF_CONS
+                            { IF_NONE
+                                { SWAP ; DROP }
+                                { SWAP ;
+                                  DIP { SWAP ;
+                                        DIP { DIP { DUP 2 } } ;
+                                        DUP 3 ;
+                                        DIP { CHECK_SIGNATURE } ;
+                                        SWAP ;
+                                        IF { DROP } { UNIT ; PUSH string "InvalidSignature" ; PAIR ; FAILWITH } ;
+                                        PUSH nat 1 ;
+                                        ADD } } }
+                            { UNIT ; PUSH string "FewerSignaturesThanKeys" ; PAIR ; FAILWITH } ;
+                          SWAP } } ;
+             COMPARE ;
+             LE ;
+             IF {} { UNIT ; PUSH string "InsufficientSignatures" ; PAIR ; FAILWITH } ;
+             IF_CONS
+               { UNIT ; PUSH string "UncheckedSignaturesLeft" ; PAIR ; FAILWITH }
+               {} ;
+             DROP ;
+             DIP { DUP ; CAR ; DIP { CDR } ; PUSH nat 1 ; ADD ; PAIR } ;
+             IF_LEFT
+               { SWAP ;
+                 DIP { DUP ;
+                       CAR ;
+                       DIP { CDR ;
+                             DIP { NIL operation } ;
+                             AMOUNT ;
+                             DIP { CONTRACT string ;
+                                   IF_NONE
+                                     { UNIT ; PUSH string "ContractConversionError" ; PAIR ; FAILWITH }
+                                     {} } } ;
+                       TRANSFER_TOKENS ;
+                       CONS } ;
+                 SWAP }
+               { IF_LEFT
+                   { DUP ;
+                     CAR ;
+                     DIP { CDR } ;
+                     CONTRACT unit ;
+                     IF_NONE
+                       { UNIT ; PUSH string "NonUnitReceiverEntrypoint" ; PAIR ; FAILWITH }
+                       {} ;
+                     SWAP ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     DIP { NIL operation } ;
+                     CONS }
+                   { PUSH mutez 0 ;
+                     AMOUNT ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { UNIT ; PUSH string "NonZeroTransfer" ; PAIR ; FAILWITH } ;
+                     DUP ;
+                     DUP ;
+                     CAR ;
+                     INT ;
+                     EQ ;
+                     IF { UNIT ; PUSH string "ZeroThresholdUpdate" ; PAIR ; FAILWITH } {} ;
+                     DUP ;
+                     CAR ;
+                     DIP { CDR ; SIZE } ;
+                     COMPARE ;
+                     GT ;
+                     IF { UNIT ; PUSH string "ThresholdLargerThanKeysSize" ; PAIR ; FAILWITH } {} ;
+                     DIP { CAR } ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation } } ;
+             PAIR } } }

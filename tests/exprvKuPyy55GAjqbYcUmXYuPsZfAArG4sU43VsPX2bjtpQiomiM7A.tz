@@ -1,0 +1,3 @@
+{ parameter address ;
+  storage (pair bool (set address)) ;
+  code { UNPAIR ; DIP { CDR ; DUP } ; MEM ; PAIR ; NIL operation ; PAIR } }

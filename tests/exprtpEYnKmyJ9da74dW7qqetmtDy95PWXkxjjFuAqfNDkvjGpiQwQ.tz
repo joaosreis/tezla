@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (pair (address %admin) (map %extra string bytes)) ;
+  code { PUSH string "ERROR_TEST" ; FAILWITH } }

@@ -1,0 +1,8 @@
+{ storage
+    (pair (big_map %ledger
+             nat
+             (pair (pair (map %approvals address nat) (pair (nat %balance) (nat %frozenBalance)))
+                   (pair (mutez %reward) (pair (mutez %rewardDebt) (nat %usedVotes)))))
+          (big_map %metadata string bytes)) ;
+  parameter unit ;
+  code { CDR ; NIL operation ; PAIR } }

@@ -1,3 +1,0 @@
-{ parameter unit ;
-  storage (pair nat (big_map %metadata string bytes)) ;
-  code { FAILWITH } }

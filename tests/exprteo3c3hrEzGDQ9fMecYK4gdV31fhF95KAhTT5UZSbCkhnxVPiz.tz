@@ -1,0 +1,11 @@
+{ storage
+    (pair (big_map %accessRequests
+             (pair (string %scopeId) (string %status))
+             (pair (pair %address (address %providerAddress) (address %requesterAddress))
+                   (pair (timestamp %createdAt) (option %jwtToken string))))
+          (map %organizations
+             (pair (string %address) (string %jwtToken))
+             (pair (pair (map %datasources string string) (string %name))
+                   (pair (string %publicKey) (address %publicKeyHash))))) ;
+  parameter unit ;
+  code { CDR ; NIL operation ; PAIR } }

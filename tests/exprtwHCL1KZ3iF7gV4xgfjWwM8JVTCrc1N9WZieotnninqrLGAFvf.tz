@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (pair bool (big_map address unit)) ;
+  code { CDR ; NIL operation ; PAIR } }

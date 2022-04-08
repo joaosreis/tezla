@@ -1,3 +1,0 @@
-{ parameter chain_id ;
-  storage chain_id ;
-  code { CAR ; NIL operation ; PAIR } }

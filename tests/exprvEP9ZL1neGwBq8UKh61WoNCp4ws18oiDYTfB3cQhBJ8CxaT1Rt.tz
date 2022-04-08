@@ -1,0 +1,50 @@
+{ parameter
+    (or (or (or (pair %complex_optional_param
+                   (or %param1 (int %int) (string %string))
+                   (or %param2 (int %int) (string %string)))
+                (pair %complex_param (nat %param1) (string %param2)))
+            (or (unit %fail) (unit %fail_with_int)))
+        (or (unit %fail_with_pair) (int %simple_param))) ;
+  storage
+    (pair (int %simple)
+          (pair (pair %complex (nat %param1) (string %param2))
+                (pair %optional
+                   (or %param1 (int %int) (string %string))
+                   (or %param2 (int %int) (string %string))))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ; DUP ; DUG 2 ; CDR ; CAR ; PAIR ; SWAP ; CAR ; PAIR }
+                   { DUP ;
+                     CAR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     ADD ;
+                     ABS ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CDR ;
+                     CDR ;
+                     DIG 2 ;
+                     CDR ;
+                     DIG 2 ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     CAR ;
+                     PAIR } }
+               { IF_LEFT
+                   { DROP 2 ; PUSH string "Fail entrypoint" ; FAILWITH }
+                   { DROP ; PUSH int 5 ; FAILWITH } } }
+           { IF_LEFT
+               { DROP ; PUSH (pair int string) (Pair 6 "taquito") ; FAILWITH }
+               { PAIR ; DUP ; CDR ; DUP ; CDR ; SWAP ; CAR ; DIG 2 ; CAR ; ADD ; PAIR } } ;
+         NIL operation ;
+         PAIR } }

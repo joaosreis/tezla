@@ -1,0 +1,24 @@
+{ storage (big_map int int) ;
+  parameter
+    (or (pair %a (int %k) (pair (int %q) (int %v)))
+        (or (pair %add (int %k) (int %v)) (int %remove))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             NONE int ;
+             DUP 3 ;
+             GET 3 ;
+             UPDATE ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             SOME ;
+             DIG 2 ;
+             CAR ;
+             UPDATE }
+           { IF_LEFT
+               { DUP ; DUG 2 ; CDR ; SOME ; DIG 2 ; CAR ; UPDATE }
+               { SWAP ; NONE int ; DIG 2 ; UPDATE } } ;
+         NIL operation ;
+         PAIR } }

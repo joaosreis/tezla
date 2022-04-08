@@ -1,0 +1,131 @@
+{ storage
+    (pair (pair (bool %active) (address %admin))
+          (pair (option %aggregator address) (option %callback address))) ;
+  parameter
+    (or (or (list %administrate
+               (or (bool %changeActive)
+                   (or (address %changeAdmin) (option %changeAggregator address))))
+            (address %decimals))
+        (or (address %latestRoundData)
+            (or (nat %setDecimals)
+                (pair %setLatestRoundData
+                   (pair (nat %answer) (nat %answeredInRound))
+                   (pair (nat %roundId) (pair (timestamp %startedAt) (timestamp %updatedAt))))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DUP ;
+                 ITER { IF_LEFT
+                          { DIG 2 ; UNPAIR ; CDR ; DIG 2 ; PAIR ; PAIR ; SWAP }
+                          { IF_LEFT
+                              { DIG 2 ; UNPAIR ; CAR ; DIG 2 ; SWAP ; PAIR ; PAIR ; SWAP }
+                              { DIG 2 ; UNPAIR ; SWAP ; CDR ; DIG 2 ; PAIR ; SWAP ; PAIR ; SWAP } } } ;
+                 DROP ;
+                 NIL operation }
+               { NIL operation ;
+                 DUP 3 ;
+                 GET 3 ;
+                 IF_NONE { PUSH string "Proxy_AggregatorNotConfigured" ; FAILWITH } {} ;
+                 CONTRACT %decimals address ;
+                 IF_NONE { PUSH string "Proxy_InvalidProxyConfig" ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 SELF %setDecimals ;
+                 ADDRESS ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 3 ;
+                 SOME ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP } }
+           { IF_LEFT
+               { NIL operation ;
+                 DUP 3 ;
+                 GET 3 ;
+                 IF_NONE { PUSH string "Proxy_AggregatorNotConfigured" ; FAILWITH } {} ;
+                 CONTRACT %latestRoundData address ;
+                 IF_NONE { PUSH string "Proxy_InvalidProxyConfig" ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 SELF %setLatestRoundData ;
+                 ADDRESS ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 3 ;
+                 SOME ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     IF_NONE { PUSH string "Proxy_AggregatorNotConfigured" ; FAILWITH } {} ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Proxy_NotAggregator" ; FAILWITH } ;
+                     NIL operation ;
+                     DUP 3 ;
+                     GET 4 ;
+                     IF_NONE { PUSH string "Proxy_CallbackNotConfigured" ; FAILWITH } {} ;
+                     CONTRACT nat ;
+                     IF_NONE { PUSH string "Proxy_InvalidCallback" ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     NONE address ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     IF_NONE { PUSH string "Proxy_AggregatorNotConfigured" ; FAILWITH } {} ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Proxy_NotAggregator" ; FAILWITH } ;
+                     NIL operation ;
+                     DUP 3 ;
+                     GET 4 ;
+                     IF_NONE { PUSH string "Proxy_CallbackNotConfigured" ; FAILWITH } {} ;
+                     CONTRACT
+                       (pair (pair (nat %answer) (nat %answeredInRound))
+                             (pair (nat %roundId) (pair (timestamp %startedAt) (timestamp %updatedAt)))) ;
+                     IF_NONE { PUSH string "Proxy_InvalidCallback" ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     NONE address ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP } } } ;
+         PAIR } }

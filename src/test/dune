@@ -1,4 +1,4 @@
 (tests
- (names test)
- (libraries michelson tezla alcotest)
+ (names test converter)
+ (libraries michelson-parser.edo tezla alcotest core core_unix.sys_unix)
  (modes byte))

@@ -1,0 +1,71 @@
+{ parameter
+    (pair (pair (string %action) (pair (string %extension) (string %file_size)))
+          (pair (string %name) (pair (string %sharing) (string %upload_date)))) ;
+  storage
+    (pair (pair (option %action string)
+                (pair (option %extension string) (option %file_size string)))
+          (pair (option %name string)
+                (pair (option %sharing string) (option %upload_date string)))) ;
+  code { UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         CDR ;
+         DUP 3 ;
+         GET 3 ;
+         SOME ;
+         PAIR ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         CDR ;
+         DUP 4 ;
+         CAR ;
+         GET 3 ;
+         SOME ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         CAR ;
+         DUP 4 ;
+         GET 6 ;
+         SOME ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         CAR ;
+         DUP 4 ;
+         CAR ;
+         GET 4 ;
+         SOME ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         CDR ;
+         DUP 4 ;
+         GET 5 ;
+         SOME ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         CDR ;
+         DIG 2 ;
+         CAR ;
+         CAR ;
+         SOME ;
+         PAIR ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,13 @@
+{ storage unit ;
+  parameter (or (unit %ep) (unit %run)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ; NIL operation }
+           { DROP ;
+             NIL operation ;
+             SELF %ep ;
+             PUSH mutez 0 ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

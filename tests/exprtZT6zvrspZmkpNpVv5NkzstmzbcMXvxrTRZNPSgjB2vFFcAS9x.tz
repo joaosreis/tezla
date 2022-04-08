@@ -1,0 +1,18 @@
+{ storage (pair (string %audio) (string %image)) ;
+  parameter (or (string %storeaudio) (string %storeimg)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { PUSH string "null" ;
+             DUP 3 ;
+             CAR ;
+             COMPARE ;
+             EQ ;
+             IF { SWAP ; CDR ; SWAP ; PAIR } { DROP } }
+           { PUSH string "null" ;
+             DUP 3 ;
+             CDR ;
+             COMPARE ;
+             EQ ;
+             IF { SWAP ; CAR ; PAIR } { DROP } } ;
+         NIL operation ;
+         PAIR } }

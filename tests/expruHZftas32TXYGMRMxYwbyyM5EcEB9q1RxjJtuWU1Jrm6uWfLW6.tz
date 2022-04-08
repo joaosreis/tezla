@@ -1,0 +1,26 @@
+{ parameter timestamp ;
+  storage
+    (pair (pair (pair (string %certifier_address)
+                      (pair (string %certifier_name) (timestamp %date_issued)))
+                (pair (timestamp %date_last_update)
+                      (pair (timestamp %date_valid_from) (timestamp %date_valid_to))))
+          (pair (pair (string %doc_characteristics)
+                      (pair (string %doc_description_level1) (string %doc_description_level2)))
+                (pair (pair (string %doc_status) (string %doc_type))
+                      (pair (string %owner_address) (string %owner_name))))) ;
+  code { UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         UNPAIR ;
+         UNPAIR ;
+         SWAP ;
+         CAR ;
+         DIG 4 ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         PAIR ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

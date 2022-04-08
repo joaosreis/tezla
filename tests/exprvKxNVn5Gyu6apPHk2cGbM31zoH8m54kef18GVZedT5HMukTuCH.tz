@@ -1,0 +1,72 @@
+{ parameter (or (bytes %load_lambda) (unit %run_lambda)) ;
+  storage
+    (pair (address %owner)
+          (or (address %originated)
+              (pair %loading
+                 bytes
+                 (pair (pair (big_map (pair address nat) nat) (big_map (pair address address) unit))
+                       (pair (pair (big_map bytes (pair (option bytes) (pair bytes timestamp)))
+                                   (big_map
+                                      bytes
+                                      (pair (pair nat (pair nat timestamp))
+                                            (pair (pair (or (pair nat (list (pair bytes (option bytes))))
+                                                            (or (pair (pair (option nat) (option nat)) (pair (option nat) (pair (option nat) (option nat))))
+                                                                (or (list address) (list address))))
+                                                        address)
+                                                  (pair nat (list (pair address nat)))))))
+                             (big_map string bytes)))))) ;
+  code { DUP ;
+         CAR ;
+         DIP { CDR } ;
+         DIP { DUP ;
+               CAR ;
+               DIP { CDR } ;
+               SWAP ;
+               IF_LEFT
+                 { FAILWITH }
+                 { SWAP ;
+                   DUP ;
+                   SENDER ;
+                   COMPARE ;
+                   EQ ;
+                   IF { SWAP ; DUP ; CAR ; DIP { CDR } }
+                      { PUSH string "sender is not originator owner" ; FAILWITH } } } ;
+         IF_LEFT
+           { CONCAT ; PAIR ; RIGHT address ; NIL operation }
+           { DROP ;
+             UNPACK
+               (lambda
+                  (pair (pair (big_map (pair address nat) nat) (big_map (pair address address) unit))
+                        (pair (pair (big_map bytes (pair (option bytes) (pair bytes timestamp)))
+                                    (big_map
+                                       bytes
+                                       (pair (pair nat (pair nat timestamp))
+                                             (pair (pair (or (pair nat (list (pair bytes (option bytes))))
+                                                             (or (pair (pair (option nat) (option nat)) (pair (option nat) (pair (option nat) (option nat))))
+                                                                 (or (list address) (list address))))
+                                                         address)
+                                                   (pair nat (list (pair address nat)))))))
+                              (big_map string bytes)))
+                  (pair address (list operation))) ;
+             IF_NONE
+               { PUSH string "failed to unpack lambda" ; FAILWITH }
+               { SWAP ;
+                 EXEC ;
+                 DUP ;
+                 CAR ;
+                 DIP { CDR } ;
+                 LEFT (pair bytes
+                            (pair (pair (big_map (pair address nat) nat) (big_map (pair address address) unit))
+                                  (pair (pair (big_map bytes (pair (option bytes) (pair bytes timestamp)))
+                                              (big_map
+                                                 bytes
+                                                 (pair (pair nat (pair nat timestamp))
+                                                       (pair (pair (or (pair nat (list (pair bytes (option bytes))))
+                                                                       (or (pair (pair (option nat) (option nat)) (pair (option nat) (pair (option nat) (option nat))))
+                                                                           (or (list address) (list address))))
+                                                                   address)
+                                                             (pair nat (list (pair address nat)))))))
+                                        (big_map string bytes)))) ;
+                 SWAP } } ;
+         DIP { SWAP ; PAIR } ;
+         PAIR } }

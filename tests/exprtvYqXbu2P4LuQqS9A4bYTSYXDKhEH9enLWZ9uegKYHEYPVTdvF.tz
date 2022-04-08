@@ -1,0 +1,18 @@
+{ storage (pair (int %myParameter1) (int %myParameter2)) ;
+  parameter int ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         DUP ;
+         DUG 3 ;
+         CAR ;
+         COMPARE ;
+         LE ;
+         IF { SWAP ; DUP ; CDR ; SWAP ; CAR ; DIG 2 ; ADD ; PAIR }
+            { DROP ; CAR ; PUSH int 100 ; SWAP ; PAIR } ;
+         NIL operation ;
+         PAIR } }

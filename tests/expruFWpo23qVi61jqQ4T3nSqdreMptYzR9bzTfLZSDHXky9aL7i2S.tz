@@ -1,0 +1,98 @@
+{ storage
+    (pair (pair (address %admin) (address %land_nft_address))
+          (pair (nat %lands) (int %pixels_sold))) ;
+  parameter (pair (pair (nat %height) (nat %width)) (pair (nat %x) (nat %y))) ;
+  code { UNPAIR ;
+         PUSH mutez 0 ;
+         PUSH mutez 1 ;
+         PUSH nat 100 ;
+         DIG 3 ;
+         DUP ;
+         CAR ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         DUG 5 ;
+         CAR ;
+         CDR ;
+         MUL ;
+         MUL ;
+         MUL ;
+         COMPARE ;
+         GT ;
+         IF {}
+            { PUSH string
+                   "WrongCondition: sp.mutez((params.width * params.height) * 100) > sp.tez(0)" ;
+              FAILWITH } ;
+         PUSH mutez 1 ;
+         PUSH nat 100 ;
+         DIG 2 ;
+         DUP ;
+         CAR ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         DUG 4 ;
+         CAR ;
+         CDR ;
+         MUL ;
+         MUL ;
+         MUL ;
+         AMOUNT ;
+         COMPARE ;
+         GE ;
+         IF {}
+            { PUSH string
+                   "WrongCondition: sp.amount >= sp.mutez((params.width * params.height) * 100)" ;
+              FAILWITH } ;
+         NIL operation ;
+         DUP 3 ;
+         CAR ;
+         CDR ;
+         CONTRACT %mint
+           (pair (pair (pair (bool %force_nsfw) (nat %height))
+                       (pair (string %image) (pair (string %link) (bool %nsfw))))
+                 (pair (pair (address %owner) (pair (string %title) (nat %token_id)))
+                       (pair (nat %width) (pair (nat %x) (nat %y))))) ;
+         IF_NONE { PUSH string "Invalid Interface" ; FAILWITH } {} ;
+         PUSH mutez 0 ;
+         DIG 3 ;
+         DUP ;
+         GET 4 ;
+         SWAP ;
+         DUP ;
+         DUG 5 ;
+         GET 3 ;
+         PAIR %x %y ;
+         DUP 5 ;
+         CAR ;
+         CDR ;
+         PAIR %width ;
+         DUP 6 ;
+         GET 3 ;
+         PUSH string "" ;
+         PAIR %title %token_id ;
+         SENDER ;
+         PAIR %owner ;
+         PAIR ;
+         PUSH (pair (string %image) (pair (string %link) (bool %nsfw))) (Pair "" (Pair "" False)) ;
+         DIG 5 ;
+         CAR ;
+         CAR ;
+         PUSH bool False ;
+         PAIR %force_nsfw %height ;
+         PAIR ;
+         PAIR ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         PUSH nat 1 ;
+         ADD ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         PAIR } }

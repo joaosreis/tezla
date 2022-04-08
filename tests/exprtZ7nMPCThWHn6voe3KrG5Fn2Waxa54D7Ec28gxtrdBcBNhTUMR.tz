@@ -1,0 +1,16 @@
+{ parameter unit ;
+  storage address ;
+  code { DROP ;
+         NIL operation ;
+         PUSH (pair address (map string bytes))
+              (Pair "tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" {}) ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter unit ;
+             storage (pair (address %admin) (map %extra string bytes)) ;
+             code { PUSH string "ERROR_TEST" ; FAILWITH } } ;
+         SWAP ;
+         DIP { CONS } ;
+         SWAP ;
+         PAIR } }

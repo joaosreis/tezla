@@ -1,0 +1,43 @@
+{ storage
+    (pair (pair (option %x int) (string %y))
+          (pair (big_map
+                   nat
+                   (lambda
+                      (pair string (pair (option int) string))
+                      (pair (list operation) (pair (option int) string))))
+                (big_map
+                   nat
+                   (lambda
+                      (pair int (pair (option int) string))
+                      (pair (list operation) (pair (option int) string)))))) ;
+  parameter (or (string %bar) (int %fpp)) ;
+  code { UNPAIR 3 ;
+         IF_LEFT
+           { PAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             PUSH nat 0 ;
+             GET ;
+             IF_NONE { PUSH int -1 ; FAILWITH } {} ;
+             SWAP ;
+             EXEC }
+           { PAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             PUSH nat 0 ;
+             GET ;
+             IF_NONE { PUSH int -1 ; FAILWITH } {} ;
+             SWAP ;
+             EXEC } ;
+         UNPAIR ;
+         DUG 2 ;
+         PAIR ;
+         SWAP ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

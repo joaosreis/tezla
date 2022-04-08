@@ -1,0 +1,93 @@
+{ parameter
+    (or (list %transfer
+           (pair (pair (nat %amount) (address %from_)) (pair (address %to_) (nat %token_id))))
+        (unit %u)) ;
+  storage (big_map address nat) ;
+  code { LAMBDA
+           (pair (option nat) nat)
+           nat
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             IF_NONE {} { SWAP ; DROP } } ;
+         PUSH nat 0 ;
+         DIG 2 ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { ITER { DUP ;
+                    DUG 2 ;
+                    CAR ;
+                    CDR ;
+                    SENDER ;
+                    COMPARE ;
+                    NEQ ;
+                    IF { PUSH string "Address from_ needs to be equal to the sender" ; FAILWITH }
+                       {} ;
+                    SWAP ;
+                    DUP ;
+                    DUG 2 ;
+                    CAR ;
+                    CAR ;
+                    { DIP 3 { DUP } ; DIG 4 } ;
+                    { DIP 2 { DUP } ; DIG 3 } ;
+                    { DIP 4 { DUP } ; DIG 5 } ;
+                    CAR ;
+                    CDR ;
+                    GET ;
+                    PAIR ;
+                    { DIP 5 { DUP } ; DIG 6 } ;
+                    SWAP ;
+                    EXEC ;
+                    COMPARE ;
+                    LT ;
+                    IF { PUSH string "Insufficient balance" ; FAILWITH } {} ;
+                    DUP ;
+                    { DIP 2 { DUP } ; DIG 3 } ;
+                    CAR ;
+                    CAR ;
+                    { DIP 4 { DUP } ; DIG 5 } ;
+                    DIG 3 ;
+                    { DIP 4 { DUP } ; DIG 5 } ;
+                    CAR ;
+                    CDR ;
+                    GET ;
+                    PAIR ;
+                    { DIP 5 { DUP } ; DIG 6 } ;
+                    SWAP ;
+                    EXEC ;
+                    SUB ;
+                    ABS ;
+                    { DIP 2 { DUP } ; DIG 3 } ;
+                    CAR ;
+                    CDR ;
+                    SWAP ;
+                    SOME ;
+                    SWAP ;
+                    UPDATE ;
+                    DUP ;
+                    { DIP 2 { DUP } ; DIG 3 } ;
+                    CAR ;
+                    CAR ;
+                    { DIP 4 { DUP } ; DIG 5 } ;
+                    DIG 3 ;
+                    { DIP 4 { DUP } ; DIG 5 } ;
+                    CDR ;
+                    CAR ;
+                    GET ;
+                    PAIR ;
+                    { DIP 5 { DUP } ; DIG 6 } ;
+                    SWAP ;
+                    EXEC ;
+                    ADD ;
+                    DIG 2 ;
+                    CDR ;
+                    CAR ;
+                    SWAP ;
+                    SOME ;
+                    SWAP ;
+                    UPDATE } ;
+             SWAP ;
+             DROP ;
+             SWAP ;
+             DROP ;
+             NIL operation ;
+             PAIR }
+           { DROP ; SWAP ; DROP ; SWAP ; DROP ; NIL operation ; PAIR } } }

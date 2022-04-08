@@ -1,0 +1,9 @@
+{ storage string ;
+  parameter (string %str) ;
+  code { UNPAIR ;
+         DUP ;
+         DIP { DIG 1 ; DROP } ;
+         DUG 1 ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

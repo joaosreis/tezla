@@ -1,0 +1,77 @@
+{ parameter
+    (pair (pair (pair (bytes %chanID) (pair (mutez %custBal) (bytes %custBalB)))
+                (pair (pair (bytes %g2) (mutez %merchBal)) (pair (bytes %merchBalB) (bytes %merchPk0))))
+          (pair (pair (pair (bytes %merchPk1) (bytes %merchPk2))
+                      (pair (bytes %merchPk3) (bytes %merchPk4)))
+                (pair (pair (bytes %revLock) (bytes %revLockB)) (pair (bytes %s1) (bytes %s2))))) ;
+  storage unit ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUP ;
+         { CAR ; CAR ; CAR } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         { CAR ; CDR ; CDR ; CDR } ;
+         CONCAT ;
+         SWAP ;
+         DUP ;
+         { CDR ; CDR ; CAR ; CDR } ;
+         SWAP ;
+         DUP ;
+         DUG 3 ;
+         { CDR ; CAR ; CAR ; CAR } ;
+         CONCAT ;
+         DIG 2 ;
+         DUP ;
+         { CAR ; CAR ; CDR ; CDR } ;
+         SWAP ;
+         DUP ;
+         DUG 4 ;
+         { CDR ; CAR ; CAR ; CDR } ;
+         CONCAT ;
+         DIG 3 ;
+         DUP ;
+         { CAR ; CDR ; CDR ; CAR } ;
+         SWAP ;
+         DUP ;
+         DUG 5 ;
+         { CDR ; CAR ; CDR ; CAR } ;
+         CONCAT ;
+         DIG 4 ;
+         DUP ;
+         DUG 5 ;
+         { CDR ; CAR ; CDR ; CDR } ;
+         SWAP ;
+         DIG 2 ;
+         DIG 3 ;
+         DIG 4 ;
+         CONCAT ;
+         CONCAT ;
+         CONCAT ;
+         CONCAT ;
+         NIL (pair bytes bytes) ;
+         DIG 2 ;
+         DUP ;
+         { CAR ; CDR ; CAR ; CAR } ;
+         SWAP ;
+         DUP ;
+         DUG 4 ;
+         { CDR ; CDR ; CDR ; CDR } ;
+         PAIR ;
+         CONS ;
+         SWAP ;
+         DIG 2 ;
+         { CDR ; CDR ; CDR ; CAR } ;
+         PAIR ;
+         CONS ;
+         SIZE ;
+         PUSH nat 1 ;
+         COMPARE ;
+         LT ;
+         IF { PUSH bool True } { PUSH bool False } ;
+         IF {} { PUSH string "WrongCondition: out.value" ; FAILWITH } ;
+         NIL operation ;
+         PAIR } }

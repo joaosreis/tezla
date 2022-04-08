@@ -1,0 +1,53 @@
+{ parameter (or (unit %deposit) (mutez %withdraw)) ;
+  storage (big_map address mutez) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { DROP ;
+             PUSH mutez 1 ;
+             AMOUNT ;
+             COMPARE ;
+             LT ;
+             IF { PUSH string "AvocadoExchange | Tezos amount should be greater than 0" ;
+                  FAILWITH }
+                {} ;
+             DUP ;
+             SENDER ;
+             GET ;
+             IF_NONE { PUSH mutez 0 } {} ;
+             SWAP ;
+             AMOUNT ;
+             DIG 2 ;
+             ADD ;
+             SOME ;
+             SENDER ;
+             UPDATE ;
+             NIL operation ;
+             PAIR }
+           { PUSH mutez 1 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             COMPARE ;
+             LT ;
+             IF { PUSH string "AvocadoExchange | Tezos amount should be greater than 0" ;
+                  FAILWITH }
+                {} ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             SENDER ;
+             GET ;
+             IF_NONE { PUSH mutez 0 } {} ;
+             DUP ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             COMPARE ;
+             GT ;
+             IF { PUSH string "AvocadoExchange | A try to withdraw" ; FAILWITH } {} ;
+             SUB ;
+             SOME ;
+             SENDER ;
+             UPDATE ;
+             NIL operation ;
+             PAIR } } }

@@ -1,0 +1,1025 @@
+{ parameter
+    (or (or (or %checkerEntrypoint
+               (or (or (or (or (pair %activateBurrow
+                                  (ticket
+                                     (pair (pair nat
+                                                 (or (unit %admin)
+                                                     (pair %user
+                                                        (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                              (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                        (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                           (pair address nat)))
+                                  address)
+                               (pair %addLiquidity (pair (ticket (pair nat unit)) nat) timestamp))
+                           (or (pair %burnKit
+                                  (pair (option
+                                           (ticket
+                                              (pair (pair nat
+                                                          (or (unit %admin)
+                                                              (pair %user
+                                                                 (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                                       (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                                 (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                                    (pair address nat))))
+                                        address)
+                                  (ticket (pair nat unit)))
+                               (pair %buyKit nat timestamp)))
+                       (or (or (pair %cancelLiquidationSlice
+                                  (ticket
+                                     (pair (pair nat
+                                                 (or (unit %admin)
+                                                     (pair %user
+                                                        (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                              (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                        (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                           (pair address nat)))
+                                  int)
+                               (option %createBurrow key_hash))
+                           (or (pair %deactivateBurrow
+                                  (ticket
+                                     (pair (pair nat
+                                                 (or (unit %admin)
+                                                     (pair %user
+                                                        (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                              (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                        (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                           (pair address nat)))
+                                  address)
+                               (pair %delegationAuctionClaimWin
+                                  (ticket (pair nat (pair (pair (mutez %amount) (address %bidder)) (nat %cycle))))
+                                  key_hash))))
+                   (or (or (or (unit %delegationAuctionPlaceBid)
+                               (ticket %delegationAuctionReclaimBid
+                                  (pair nat (pair (pair (mutez %amount) (address %bidder)) (nat %cycle)))))
+                           (or (pair %depositTez
+                                  (option
+                                     (ticket
+                                        (pair (pair nat
+                                                    (or (unit %admin)
+                                                        (pair %user
+                                                           (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                                 (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                           (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                              (pair address nat))))
+                                  address)
+                               (pair %invalidateAllPermissions
+                                  (ticket
+                                     (pair (pair nat
+                                                 (or (unit %admin)
+                                                     (pair %user
+                                                        (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                              (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                        (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                           (pair address nat)))
+                                  address)))
+                       (or (or (ticket %liquidationAuctionClaimWin
+                                  (pair nat (pair (int %auction_id) (pair %bid (address %address) (nat %kit)))))
+                               (ticket %liquidationAuctionPlaceBid (pair nat unit)))
+                           (or (ticket %liquidationAuctionReclaimBid
+                                  (pair nat (pair (int %auction_id) (pair %bid (address %address) (nat %kit)))))
+                               (pair %makePermission
+                                  (pair (ticket
+                                           (pair (pair nat
+                                                       (or (unit %admin)
+                                                           (pair %user
+                                                              (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                                    (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                              (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                                 (pair address nat)))
+                                        address)
+                                  (or (unit %admin)
+                                      (pair %user
+                                         (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                               (pair (bool %deposit_tez) (bool %mint_kit)))
+                                         (pair (bool %set_delegate) (bool %withdraw_tez)))))))))
+               (or (or (or (or (address %markForLiquidation)
+                               (pair %mintKit
+                                  (pair (ticket
+                                           (pair (pair nat
+                                                       (or (unit %admin)
+                                                           (pair %user
+                                                              (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                                    (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                              (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                                 (pair address nat)))
+                                        address)
+                                  nat))
+                           (or (unit %receiveSliceFromBurrow)
+                               (pair %removeLiquidity (pair (ticket (pair nat unit)) mutez) (pair nat timestamp))))
+                       (or (or (pair %sellKit (pair (ticket (pair nat unit)) mutez) timestamp)
+                               (pair %setBurrowDelegate
+                                  (pair (ticket
+                                           (pair (pair nat
+                                                       (or (unit %admin)
+                                                           (pair %user
+                                                              (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                                    (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                              (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                                 (pair address nat)))
+                                        address)
+                                  (option key_hash)))
+                           (or (unit %touch) (address %touchBurrow))))
+                   (or (list %touchLiquidationSlices int)
+                       (pair %withdrawTez
+                          (pair (ticket
+                                   (pair (pair nat
+                                               (or (unit %admin)
+                                                   (pair %user
+                                                      (pair (pair (bool %burn_kit) (bool %cancel_liquidation))
+                                                            (pair (bool %deposit_tez) (bool %mint_kit)))
+                                                      (pair (bool %set_delegate) (bool %withdraw_tez)))))
+                                         (pair address nat)))
+                                mutez)
+                          address))))
+            (pair %deployFunction int bytes))
+        (unit %sealContract)) ;
+  storage
+    (pair (pair (pair (pair (pair (big_map %burrows
+                                     address
+                                     (pair (pair (pair (pair (bool %active) (int %adjustment_index))
+                                                       (pair (bool %allow_all_kit_burnings) (bool %allow_all_tez_deposits)))
+                                                 (pair (pair (mutez %collateral) (mutez %collateral_at_auction))
+                                                       (pair (option %delegate key_hash) (nat %excess_kit))))
+                                           (pair (pair (timestamp %last_touched) (nat %outstanding_kit))
+                                                 (nat %permission_version))))
+                                  (option %delegate key_hash))
+                            (pair (pair %delegation_auction
+                                     (pair (nat %cycle) (option %delegate key_hash))
+                                     (pair (option %leading_bid (pair (pair (mutez %amount) (address %bidder)) (nat %cycle)))
+                                           (option %winner (pair (pair (mutez %amount) (address %bidder)) (nat %cycle)))))
+                                  (option %last_price nat)))
+                      (pair (pair (pair %liquidation_auctions
+                                     (pair (pair (pair %avl_storage
+                                                    (int %last_ptr)
+                                                    (big_map %mem
+                                                       int
+                                                       (or (or (pair %branch
+                                                                  (pair (pair (int %left) (int %left_height)) (pair (mutez %left_tez) (int %parent)))
+                                                                  (pair (pair (int %right) (int %right_height)) (mutez %right_tez)))
+                                                               (pair %leaf
+                                                                  (int %parent)
+                                                                  (pair %value
+                                                                     (pair (pair %contents (pair (address %burrow) (nat %min_kit_for_unwarranted)) (mutez %tez))
+                                                                           (option %older int))
+                                                                     (option %younger int))))
+                                                           (pair %root
+                                                              (option int)
+                                                              (option
+                                                                 (pair (pair (option %older_auction int) (mutez %sold_tez))
+                                                                       (pair (pair %winning_bid (address %address) (nat %kit))
+                                                                             (option %younger_auction int))))))))
+                                                 (big_map %burrow_slices address (pair (int %oldest_slice) (int %youngest_slice))))
+                                           (pair (option %completed_auctions (pair (int %oldest) (int %youngest)))
+                                                 (option %current_auction
+                                                    (pair (int %contents)
+                                                          (or %state
+                                                             (pair %ascending (pair (pair (address %address) (nat %kit)) timestamp) nat)
+                                                             (pair %descending nat timestamp))))))
+                                     (int %queued_slices))
+                                  (pair %parameters
+                                     (pair (pair (pair (int %burrow_fee_index) (nat %circulating_kit))
+                                                 (pair (int %drift) (int %drift_derivative)))
+                                           (pair (pair (int %imbalance_index) (mutez %index))
+                                                 (pair (timestamp %last_touched) (nat %outstanding_kit))))
+                                     (pair (pair (mutez %protected_index) (int %q)) (int %target))))
+                            (pair %uniswap
+                               (pair (pair (nat %kit) (pair %kit_in_tez_in_prev_block (int %den) (int %num)))
+                                     (pair (nat %last_level) (nat %lqt)))
+                               (mutez %tez))))
+                (big_map int bytes))
+          (option address)) ;
+  code { SELF_ADDRESS ;
+         PUSH int 18446744073709551616 ;
+         PUSH mutez 1 ;
+         PUSH nat 1 ;
+         LEVEL ;
+         PAIR ;
+         PUSH int 1 ;
+         PUSH int 1 ;
+         PAIR ;
+         PUSH nat 1 ;
+         PAIR ;
+         PAIR ;
+         PAIR ;
+         EMPTY_BIG_MAP
+           int
+           (or (or (pair (pair (pair int int) (pair mutez int)) (pair (pair int int) mutez))
+                   (pair int (pair (pair (pair (pair address nat) mutez) (option int)) (option int))))
+               (pair (option int)
+                     (option (pair (pair (option int) mutez) (pair (pair address nat) (option int)))))) ;
+         PUSH int 0 ;
+         PAIR ;
+         NONE (pair (pair (option int) mutez) (pair (pair address nat) (option int))) ;
+         NONE int ;
+         PAIR ;
+         RIGHT
+           (or (pair (pair (pair int int) (pair mutez int)) (pair (pair int int) mutez))
+               (pair int (pair (pair (pair (pair address nat) mutez) (option int)) (option int)))) ;
+         SWAP ;
+         UNPAIR ;
+         PUSH int 1 ;
+         ADD ;
+         DUP ;
+         DIG 2 ;
+         DIG 3 ;
+         SOME ;
+         DUP 4 ;
+         UPDATE ;
+         DIG 2 ;
+         PAIR ;
+         SWAP ;
+         NONE (pair int (or (pair (pair (pair address nat) timestamp) nat) (pair nat timestamp))) ;
+         NONE (pair int int) ;
+         PAIR ;
+         EMPTY_BIG_MAP address (pair int int) ;
+         DIG 3 ;
+         PAIR ;
+         PAIR ;
+         PAIR ;
+         NONE (pair (pair mutez address) nat) ;
+         NONE (pair (pair mutez address) nat) ;
+         PAIR ;
+         NONE key_hash ;
+         LEVEL ;
+         PUSH nat 4096 ;
+         SWAP ;
+         EDIV ;
+         IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+         CAR ;
+         PAIR ;
+         PAIR ;
+         DIG 3 ;
+         DUP ;
+         DUP ;
+         DUG 5 ;
+         PUSH mutez 1000000 ;
+         PAIR ;
+         PAIR ;
+         PUSH nat 1 ;
+         NOW ;
+         PAIR ;
+         PUSH mutez 1000000 ;
+         DUP 7 ;
+         PAIR ;
+         PAIR ;
+         PUSH int 0 ;
+         PUSH int 0 ;
+         PAIR ;
+         PUSH nat 1 ;
+         DIG 7 ;
+         PAIR ;
+         PAIR ;
+         PAIR ;
+         PAIR ;
+         DIG 3 ;
+         SWAP ;
+         DIG 3 ;
+         PAIR ;
+         PAIR ;
+         NONE nat ;
+         DIG 2 ;
+         DROP 3 ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         UNPAIR ;
+         DUP 3 ;
+         IF_NONE
+           { DIG 3 ;
+             IF_LEFT
+               { IF_LEFT
+                   { IF_LEFT
+                       { IF_LEFT
+                           { IF_LEFT
+                               { IF_LEFT
+                                   { IF_LEFT
+                                       { UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         DIG 2 ;
+                                         UNPAIR ;
+                                         PUSH nat 0 ;
+                                         DIG 5 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 5 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 10 ;
+                                         DIG 6 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 6 ;
+                                         PAIR }
+                                       { UNPAIR ;
+                                         UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         CAR ;
+                                         PUSH nat 1 ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 8 ;
+                                         DIG 3 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         IF {} { DROP ; PUSH int 70 ; FAILWITH } ;
+                                         PAIR ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 17 ;
+                                         PAIR } }
+                                   { IF_LEFT
+                                       { UNPAIR ;
+                                         UNPAIR ;
+                                         DIG 2 ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         CAR ;
+                                         PUSH nat 1 ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DUP 9 ;
+                                         DIG 3 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         IF {} { DROP ; PUSH int 70 ; FAILWITH } ;
+                                         DUG 2 ;
+                                         IF_NONE
+                                           { DIG 5 ;
+                                             DROP ;
+                                             NONE (pair (pair (or unit (pair (pair (pair bool bool) (pair bool bool)) (pair bool bool))) address)
+                                                        nat) }
+                                           { READ_TICKET ;
+                                             SWAP ;
+                                             DROP ;
+                                             UNPAIR ;
+                                             SWAP ;
+                                             UNPAIR ;
+                                             UNPAIR ;
+                                             UNPAIR ;
+                                             DIG 2 ;
+                                             UNPAIR ;
+                                             PUSH nat 0 ;
+                                             DIG 5 ;
+                                             COMPARE ;
+                                             EQ ;
+                                             PUSH nat 5 ;
+                                             DIG 4 ;
+                                             COMPARE ;
+                                             EQ ;
+                                             DIG 11 ;
+                                             DIG 6 ;
+                                             COMPARE ;
+                                             EQ ;
+                                             AND ;
+                                             AND ;
+                                             IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                             SOME } ;
+                                         PAIR ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 5 ;
+                                         PAIR }
+                                       { DIG 4 ; DROP ; PACK ; PUSH int 15 ; PAIR } } }
+                               { IF_LEFT
+                                   { IF_LEFT
+                                       { UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         DIG 2 ;
+                                         UNPAIR ;
+                                         PUSH nat 0 ;
+                                         DIG 5 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 5 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 10 ;
+                                         DIG 6 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 10 ;
+                                         PAIR }
+                                       { DIG 4 ; DROP ; PACK ; PUSH int 1 ; PAIR } }
+                                   { IF_LEFT
+                                       { UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         DIG 2 ;
+                                         UNPAIR ;
+                                         PUSH nat 0 ;
+                                         DIG 5 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 5 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 10 ;
+                                         DIG 6 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 7 ;
+                                         PAIR }
+                                       { UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         PUSH nat 1 ;
+                                         DIG 3 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 3 ;
+                                         DIG 2 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 8 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF {} { DROP ; PUSH int 72 ; FAILWITH } ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 24 ;
+                                         PAIR } } } }
+                           { IF_LEFT
+                               { IF_LEFT
+                                   { IF_LEFT
+                                       { DIG 4 ; DROP ; PACK ; PUSH int 23 ; PAIR }
+                                       { READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         PUSH nat 1 ;
+                                         DIG 3 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 3 ;
+                                         DIG 2 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 7 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF {} { DROP ; PUSH int 72 ; FAILWITH } ;
+                                         PACK ;
+                                         PUSH int 25 ;
+                                         PAIR } }
+                                   { IF_LEFT
+                                       { UNPAIR ;
+                                         IF_NONE
+                                           { DIG 4 ;
+                                             DROP ;
+                                             NONE (pair (pair (or unit (pair (pair (pair bool bool) (pair bool bool)) (pair bool bool))) address)
+                                                        nat) }
+                                           { READ_TICKET ;
+                                             SWAP ;
+                                             DROP ;
+                                             UNPAIR ;
+                                             SWAP ;
+                                             UNPAIR ;
+                                             UNPAIR ;
+                                             UNPAIR ;
+                                             DIG 2 ;
+                                             UNPAIR ;
+                                             PUSH nat 0 ;
+                                             DIG 5 ;
+                                             COMPARE ;
+                                             EQ ;
+                                             PUSH nat 5 ;
+                                             DIG 4 ;
+                                             COMPARE ;
+                                             EQ ;
+                                             DIG 10 ;
+                                             DIG 6 ;
+                                             COMPARE ;
+                                             EQ ;
+                                             AND ;
+                                             AND ;
+                                             IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                             SOME } ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 2 ;
+                                         PAIR }
+                                       { UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         DIG 2 ;
+                                         UNPAIR ;
+                                         PUSH nat 0 ;
+                                         DIG 5 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 5 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 10 ;
+                                         DIG 6 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 14 ;
+                                         PAIR } } }
+                               { IF_LEFT
+                                   { IF_LEFT
+                                       { READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         PUSH nat 1 ;
+                                         DIG 3 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 4 ;
+                                         DIG 2 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 7 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF {} { DROP ; PUSH int 73 ; FAILWITH } ;
+                                         PACK ;
+                                         PUSH int 21 ;
+                                         PAIR }
+                                       { READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         CAR ;
+                                         PUSH nat 1 ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 6 ;
+                                         DIG 3 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         IF {} { DROP ; PUSH int 70 ; FAILWITH } ;
+                                         PACK ;
+                                         PUSH int 19 ;
+                                         PAIR } }
+                                   { IF_LEFT
+                                       { READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         PUSH nat 1 ;
+                                         DIG 3 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 4 ;
+                                         DIG 2 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 7 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF {} { DROP ; PUSH int 73 ; FAILWITH } ;
+                                         PACK ;
+                                         PUSH int 20 ;
+                                         PAIR }
+                                       { UNPAIR ;
+                                         UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         DIG 2 ;
+                                         UNPAIR ;
+                                         PUSH nat 0 ;
+                                         DIG 5 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 5 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 11 ;
+                                         DIG 6 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                         PAIR ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 13 ;
+                                         PAIR } } } } }
+                       { IF_LEFT
+                           { IF_LEFT
+                               { IF_LEFT
+                                   { IF_LEFT
+                                       { DIG 4 ; DROP ; PACK ; PUSH int 8 ; PAIR }
+                                       { UNPAIR ;
+                                         UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         DIG 2 ;
+                                         UNPAIR ;
+                                         PUSH nat 0 ;
+                                         DIG 5 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 5 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 11 ;
+                                         DIG 6 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                         PAIR ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 4 ;
+                                         PAIR } }
+                                   { IF_LEFT
+                                       { DIG 4 ; DROP ; PACK ; PUSH int 22 ; PAIR }
+                                       { UNPAIR ;
+                                         UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         CAR ;
+                                         PUSH nat 2 ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 8 ;
+                                         DIG 3 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         IF {} { DROP ; PUSH int 71 ; FAILWITH } ;
+                                         PAIR ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 18 ;
+                                         PAIR } } }
+                               { IF_LEFT
+                                   { IF_LEFT
+                                       { UNPAIR ;
+                                         UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         CAR ;
+                                         PUSH nat 1 ;
+                                         SWAP ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 8 ;
+                                         DIG 3 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         IF {} { DROP ; PUSH int 70 ; FAILWITH } ;
+                                         PAIR ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 16 ;
+                                         PAIR }
+                                       { UNPAIR ;
+                                         UNPAIR ;
+                                         READ_TICKET ;
+                                         SWAP ;
+                                         DROP ;
+                                         UNPAIR ;
+                                         SWAP ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         UNPAIR ;
+                                         DIG 2 ;
+                                         UNPAIR ;
+                                         PUSH nat 0 ;
+                                         DIG 5 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         PUSH nat 5 ;
+                                         DIG 4 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         DIG 11 ;
+                                         DIG 6 ;
+                                         COMPARE ;
+                                         EQ ;
+                                         AND ;
+                                         AND ;
+                                         IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                         PAIR ;
+                                         PAIR ;
+                                         PACK ;
+                                         PUSH int 12 ;
+                                         PAIR } }
+                                   { DIG 4 ;
+                                     DROP ;
+                                     IF_LEFT { PACK ; PUSH int 0 ; PAIR } { PACK ; PUSH int 11 ; PAIR } } } }
+                           { IF_LEFT
+                               { DIG 4 ; DROP ; PACK ; PUSH int 9 ; PAIR }
+                               { UNPAIR ;
+                                 UNPAIR ;
+                                 READ_TICKET ;
+                                 SWAP ;
+                                 DROP ;
+                                 UNPAIR ;
+                                 SWAP ;
+                                 UNPAIR ;
+                                 UNPAIR ;
+                                 UNPAIR ;
+                                 DIG 2 ;
+                                 UNPAIR ;
+                                 PUSH nat 0 ;
+                                 DIG 5 ;
+                                 COMPARE ;
+                                 EQ ;
+                                 PUSH nat 5 ;
+                                 DIG 4 ;
+                                 COMPARE ;
+                                 EQ ;
+                                 DIG 11 ;
+                                 DIG 6 ;
+                                 COMPARE ;
+                                 EQ ;
+                                 AND ;
+                                 AND ;
+                                 IF { DIG 2 ; PAIR ; PAIR } { DROP 3 ; PUSH int 74 ; FAILWITH } ;
+                                 PAIR ;
+                                 PAIR ;
+                                 PACK ;
+                                 PUSH int 3 ;
+                                 PAIR } } } ;
+                     UNPAIR ;
+                     SWAP ;
+                     DIG 2 ;
+                     PAIR ;
+                     DUP 3 ;
+                     DIG 2 ;
+                     GET ;
+                     IF_NONE
+                       { PUSH int 42 ; FAILWITH }
+                       { UNPACK
+                           (lambda
+                              (pair (pair (pair (pair (big_map %burrows
+                                                         address
+                                                         (pair (pair (pair (pair (bool %active) (int %adjustment_index))
+                                                                           (pair (bool %allow_all_kit_burnings) (bool %allow_all_tez_deposits)))
+                                                                     (pair (pair (mutez %collateral) (mutez %collateral_at_auction))
+                                                                           (pair (option %delegate key_hash) (nat %excess_kit))))
+                                                               (pair (pair (timestamp %last_touched) (nat %outstanding_kit))
+                                                                     (nat %permission_version))))
+                                                      (option %delegate key_hash))
+                                                (pair (pair %delegation_auction
+                                                         (pair (nat %cycle) (option %delegate key_hash))
+                                                         (pair (option %leading_bid (pair (pair (mutez %amount) (address %bidder)) (nat %cycle)))
+                                                               (option %winner (pair (pair (mutez %amount) (address %bidder)) (nat %cycle)))))
+                                                      (option %last_price nat)))
+                                          (pair (pair (pair %liquidation_auctions
+                                                         (pair (pair (pair %avl_storage
+                                                                        (int %last_ptr)
+                                                                        (big_map %mem
+                                                                           int
+                                                                           (or (or (pair %branch
+                                                                                      (pair (pair (int %left) (int %left_height)) (pair (mutez %left_tez) (int %parent)))
+                                                                                      (pair (pair (int %right) (int %right_height)) (mutez %right_tez)))
+                                                                                   (pair %leaf
+                                                                                      (int %parent)
+                                                                                      (pair %value
+                                                                                         (pair (pair %contents (pair (address %burrow) (nat %min_kit_for_unwarranted)) (mutez %tez))
+                                                                                               (option %older int))
+                                                                                         (option %younger int))))
+                                                                               (pair %root
+                                                                                  (option int)
+                                                                                  (option
+                                                                                     (pair (pair (option %older_auction int) (mutez %sold_tez))
+                                                                                           (pair (pair %winning_bid (address %address) (nat %kit))
+                                                                                                 (option %younger_auction int))))))))
+                                                                     (big_map %burrow_slices address (pair (int %oldest_slice) (int %youngest_slice))))
+                                                               (pair (option %completed_auctions (pair (int %oldest) (int %youngest)))
+                                                                     (option %current_auction
+                                                                        (pair (int %contents)
+                                                                              (or %state
+                                                                                 (pair %ascending (pair (pair (address %address) (nat %kit)) timestamp) nat)
+                                                                                 (pair %descending nat timestamp))))))
+                                                         (int %queued_slices))
+                                                      (pair %parameters
+                                                         (pair (pair (pair (int %burrow_fee_index) (nat %circulating_kit))
+                                                                     (pair (int %drift) (int %drift_derivative)))
+                                                               (pair (pair (int %imbalance_index) (mutez %index))
+                                                                     (pair (timestamp %last_touched) (nat %outstanding_kit))))
+                                                         (pair (pair (mutez %protected_index) (int %q)) (int %target))))
+                                                (pair %uniswap
+                                                   (pair (pair (nat %kit) (pair %kit_in_tez_in_prev_block (int %den) (int %num)))
+                                                         (pair (nat %last_level) (nat %lqt)))
+                                                   (mutez %tez))))
+                                    bytes)
+                              (pair (list operation)
+                                    (pair (pair (pair (big_map %burrows
+                                                         address
+                                                         (pair (pair (pair (pair (bool %active) (int %adjustment_index))
+                                                                           (pair (bool %allow_all_kit_burnings) (bool %allow_all_tez_deposits)))
+                                                                     (pair (pair (mutez %collateral) (mutez %collateral_at_auction))
+                                                                           (pair (option %delegate key_hash) (nat %excess_kit))))
+                                                               (pair (pair (timestamp %last_touched) (nat %outstanding_kit))
+                                                                     (nat %permission_version))))
+                                                      (option %delegate key_hash))
+                                                (pair (pair %delegation_auction
+                                                         (pair (nat %cycle) (option %delegate key_hash))
+                                                         (pair (option %leading_bid (pair (pair (mutez %amount) (address %bidder)) (nat %cycle)))
+                                                               (option %winner (pair (pair (mutez %amount) (address %bidder)) (nat %cycle)))))
+                                                      (option %last_price nat)))
+                                          (pair (pair (pair %liquidation_auctions
+                                                         (pair (pair (pair %avl_storage
+                                                                        (int %last_ptr)
+                                                                        (big_map %mem
+                                                                           int
+                                                                           (or (or (pair %branch
+                                                                                      (pair (pair (int %left) (int %left_height)) (pair (mutez %left_tez) (int %parent)))
+                                                                                      (pair (pair (int %right) (int %right_height)) (mutez %right_tez)))
+                                                                                   (pair %leaf
+                                                                                      (int %parent)
+                                                                                      (pair %value
+                                                                                         (pair (pair %contents (pair (address %burrow) (nat %min_kit_for_unwarranted)) (mutez %tez))
+                                                                                               (option %older int))
+                                                                                         (option %younger int))))
+                                                                               (pair %root
+                                                                                  (option int)
+                                                                                  (option
+                                                                                     (pair (pair (option %older_auction int) (mutez %sold_tez))
+                                                                                           (pair (pair %winning_bid (address %address) (nat %kit))
+                                                                                                 (option %younger_auction int))))))))
+                                                                     (big_map %burrow_slices address (pair (int %oldest_slice) (int %youngest_slice))))
+                                                               (pair (option %completed_auctions (pair (int %oldest) (int %youngest)))
+                                                                     (option %current_auction
+                                                                        (pair (int %contents)
+                                                                              (or %state
+                                                                                 (pair %ascending (pair (pair (address %address) (nat %kit)) timestamp) nat)
+                                                                                 (pair %descending nat timestamp))))))
+                                                         (int %queued_slices))
+                                                      (pair %parameters
+                                                         (pair (pair (pair (int %burrow_fee_index) (nat %circulating_kit))
+                                                                     (pair (int %drift) (int %drift_derivative)))
+                                                               (pair (pair (int %imbalance_index) (mutez %index))
+                                                                     (pair (timestamp %last_touched) (nat %outstanding_kit))))
+                                                         (pair (pair (mutez %protected_index) (int %q)) (int %target))))
+                                                (pair %uniswap
+                                                   (pair (pair (nat %kit) (pair %kit_in_tez_in_prev_block (int %den) (int %num)))
+                                                         (pair (nat %last_level) (nat %lqt)))
+                                                   (mutez %tez)))))) ;
+                         IF_NONE { PUSH int 42 ; FAILWITH } {} } ;
+                     SWAP ;
+                     EXEC }
+                   { DROP 2 ; DIG 2 ; DROP ; PUSH int 135 ; FAILWITH } }
+               { DROP 2 ; DIG 2 ; DROP ; PUSH int 135 ; FAILWITH } ;
+             UNPAIR ;
+             DIG 3 ;
+             DIG 3 ;
+             PAIR ;
+             DUG 2 ;
+             PAIR ;
+             PAIR }
+           { DIG 3 ;
+             DROP ;
+             DIG 4 ;
+             DROP ;
+             DUP ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF { DIG 3 ;
+                  IF_LEFT
+                    { IF_LEFT
+                        { DROP 2 ; SWAP ; DROP ; PUSH int 134 ; FAILWITH }
+                        { UNPAIR ;
+                          DIG 2 ;
+                          SOME ;
+                          DUP 5 ;
+                          DUP 3 ;
+                          GET ;
+                          IF_NONE
+                            { DIG 4 ; DIG 3 ; DIG 3 ; SWAP ; SOME ; SWAP ; UPDATE }
+                            { DIG 5 ; DIG 4 ; DIG 2 ; CONCAT ; DIG 3 ; SWAP ; SOME ; SWAP ; UPDATE } ;
+                          PAIR } }
+                    { DROP 2 ; NONE address ; DIG 2 ; PAIR } }
+                { DROP ; SWAP ; DROP ; SWAP ; DROP ; PUSH int 131 ; FAILWITH } ;
+             SWAP ;
+             NIL operation ;
+             PAIR ;
+             PAIR } ;
+         UNPAIR ;
+         UNPAIR ;
+         DIG 2 ;
+         UNPAIR ;
+         DIG 3 ;
+         PAIR ;
+         PAIR ;
+         SWAP ;
+         PAIR } }

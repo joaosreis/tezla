@@ -1,0 +1,15 @@
+{ parameter address ;
+  storage unit ;
+  code { PUSH mutez 0 ;
+         UNIT ;
+         DIP 2
+             { CAR ;
+               CONTRACT unit ;
+               IF_NONE { PUSH string "Invalid contract address" ; FAILWITH } {} } ;
+         TRANSFER_TOKENS ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         UNIT ;
+         SWAP ;
+         PAIR } }

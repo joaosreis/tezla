@@ -1,0 +1,3 @@
+{ storage int ;
+  parameter (pair %multiply (int %x) (int %y)) ;
+  code { CAR ; UNPAIR ; MUL ; NIL operation ; PAIR } }

@@ -1,0 +1,116 @@
+{ storage
+    (pair (pair (address %address) (pair (int %crops_available) (int %farmer_rate)))
+          (pair (int %income) (pair (int %request_from_supplier) (int %supplier_rate)))) ;
+  parameter
+    (or (pair %supplier_request (int %_supplier_rate) (int %quantity))
+        (or (pair %transfer_crops_to_supplier (address %address) (int %crops_quantity))
+            (pair %update_crops_available
+               (int %_crops_available)
+               (pair (int %_rate) (address %address))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DUP ;
+             DUG 2 ;
+             CAR ;
+             UPDATE 6 ;
+             UNPAIR ;
+             CDR ;
+             SENDER ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             CDR ;
+             UPDATE 5 ;
+             NIL operation }
+           { IF_LEFT
+               { SWAP ;
+                 UNPAIR ;
+                 CDR ;
+                 DUP 3 ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 NIL operation ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 CONTRACT %increment_crops_quantity int ;
+                 IF_NONE { PUSH int 25 ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 DUP 4 ;
+                 CDR ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 DUP 6 ;
+                 CDR ;
+                 SWAP ;
+                 SUB ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 DUP ;
+                 DUG 3 ;
+                 DUP ;
+                 GET 3 ;
+                 DUP 4 ;
+                 CDR ;
+                 DIG 5 ;
+                 GET 6 ;
+                 MUL ;
+                 ADD ;
+                 UPDATE 3 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CAR ;
+                 DIG 2 ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF { SWAP ;
+                      UNPAIR ;
+                      CDR ;
+                      PUSH address "KT1TeE29vBJaJeWc6WEaCm8KZkn46FxtgmBN" ;
+                      PAIR ;
+                      PAIR ;
+                      PUSH int 0 ;
+                      UPDATE 5 ;
+                      PUSH int 0 ;
+                      UPDATE 6 ;
+                      SWAP }
+                    {} }
+               { SWAP ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 4 ;
+                 DUP 3 ;
+                 CAR ;
+                 DUP 4 ;
+                 GET 3 ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 DUP ;
+                 GET 4 ;
+                 CONTRACT %get_rate_of_farmers int ;
+                 IF_NONE { PUSH int 12 ; FAILWITH } {} ;
+                 NIL operation ;
+                 SWAP ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 GET 3 ;
+                 TRANSFER_TOKENS ;
+                 CONS } } ;
+         PAIR } }

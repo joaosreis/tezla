@@ -1,0 +1,19 @@
+{ parameter unit ;
+  storage unit ;
+  code { DROP ;
+         PUSH nat 0 ;
+         PUSH string "hello" ;
+         TICKET ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter unit ;
+             storage (ticket string) ;
+             code { CDR ; NIL operation ; PAIR } } ;
+         SWAP ;
+         DROP ;
+         PUSH unit Unit ;
+         NIL operation ;
+         DIG 2 ;
+         CONS ;
+         PAIR } }

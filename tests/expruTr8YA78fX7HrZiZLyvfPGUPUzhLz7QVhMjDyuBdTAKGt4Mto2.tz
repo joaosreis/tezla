@@ -1,0 +1,143 @@
+{ storage (pair (address %sen) (nat %value)) ;
+  parameter
+    (or (or (or (pair %add (nat %x) (nat %y)) (nat %factorial))
+            (or (nat %log2) (pair %multiply (nat %x) (nat %y))))
+        (or (or (unit %op) (nat %square))
+            (or (nat %squareRoot) (pair %vi address (contract address))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { UNPAIR ; ADD ; UPDATE 2 }
+                   { SWAP ;
+                     PUSH nat 1 ;
+                     UPDATE 2 ;
+                     SWAP ;
+                     DUP ;
+                     PUSH nat 1 ;
+                     ADD ;
+                     PUSH nat 1 ;
+                     DUP ;
+                     DUP 3 ;
+                     COMPARE ;
+                     GT ;
+                     LOOP { DIG 3 ;
+                            DUP ;
+                            CDR ;
+                            DUP 3 ;
+                            MUL ;
+                            UPDATE 2 ;
+                            DUG 3 ;
+                            PUSH nat 1 ;
+                            ADD ;
+                            DUP ;
+                            DUP 3 ;
+                            COMPARE ;
+                            GT } ;
+                     DROP 3 } }
+               { IF_LEFT
+                   { SWAP ;
+                     PUSH nat 0 ;
+                     UPDATE 2 ;
+                     SWAP ;
+                     DUP ;
+                     DUP ;
+                     PUSH nat 1 ;
+                     COMPARE ;
+                     LT ;
+                     LOOP { DIG 2 ;
+                            DUP ;
+                            CDR ;
+                            PUSH nat 1 ;
+                            ADD ;
+                            UPDATE 2 ;
+                            DUG 2 ;
+                            PUSH nat 2 ;
+                            SWAP ;
+                            EDIV ;
+                            IF_NONE { PUSH int 42 ; FAILWITH } { CAR } ;
+                            DUP ;
+                            PUSH nat 1 ;
+                            COMPARE ;
+                            LT } ;
+                     DROP 2 }
+                   { UNPAIR ; MUL ; UPDATE 2 } } ;
+             NIL operation }
+           { IF_LEFT
+               { IF_LEFT { DROP ; SENDER ; UPDATE 1 } { DUP ; MUL ; UPDATE 2 } ;
+                 NIL operation }
+               { IF_LEFT
+                   { DUP ;
+                     PUSH nat 0 ;
+                     SWAP ;
+                     COMPARE ;
+                     GE ;
+                     IF {} { PUSH string "WrongCondition: params >= 0" ; FAILWITH } ;
+                     DUP ;
+                     DUP ;
+                     DUG 2 ;
+                     SWAP ;
+                     DUP ;
+                     DUP ;
+                     DUG 3 ;
+                     MUL ;
+                     COMPARE ;
+                     GT ;
+                     LOOP { PUSH nat 2 ;
+                            SWAP ;
+                            DUP ;
+                            DUP 4 ;
+                            EDIV ;
+                            IF_NONE { PUSH int 26 ; FAILWITH } { CAR } ;
+                            ADD ;
+                            EDIV ;
+                            IF_NONE { PUSH int 26 ; FAILWITH } { CAR } ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            SWAP ;
+                            DUP ;
+                            DUP ;
+                            DUG 3 ;
+                            MUL ;
+                            COMPARE ;
+                            GT } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     SWAP ;
+                     DUP ;
+                     DUP ;
+                     DUG 3 ;
+                     MUL ;
+                     COMPARE ;
+                     LE ;
+                     IF { DUP ;
+                          PUSH nat 1 ;
+                          ADD ;
+                          PUSH nat 1 ;
+                          DUP 3 ;
+                          ADD ;
+                          MUL ;
+                          DIG 2 ;
+                          COMPARE ;
+                          LT }
+                        { SWAP ; DROP ; PUSH bool False } ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: ((y.value * y.value) <= params) & (params < ((y.value + 1) * (y.value + 1)))" ;
+                          FAILWITH } ;
+                     UPDATE 2 ;
+                     NIL operation }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     NIL operation ;
+                     DIG 2 ;
+                     CDR ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS } } } ;
+         PAIR } }

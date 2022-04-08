@@ -1,0 +1,56 @@
+{ parameter (or (unit %payout) (pair %set (pair int int) (list int))) ;
+  storage (big_map (pair int int) (pair (list int) mutez)) ;
+  code { PUSH address "tz1RC2HCRUcXHM2gm8bxaxaXJybQdMqnhxXw" ;
+         SWAP ;
+         UNPAIR ;
+         IF_LEFT
+           { DROP ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CONTRACT unit ;
+             IF_NONE
+               { DROP 2 ; PUSH string "Owner not found" ; FAILWITH }
+               { BALANCE ;
+                 UNIT ;
+                 TRANSFER_TOKENS ;
+                 DIG 2 ;
+                 SOURCE ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP 2 ; PUSH string "Not owner" ; FAILWITH }
+                    { SWAP ; NIL operation ; DIG 2 ; CONS ; PAIR } } }
+           { DIG 2 ;
+             DROP ;
+             UNPAIR ;
+             DIG 2 ;
+             PUSH nat 256 ;
+             DUP 4 ;
+             SIZE ;
+             COMPARE ;
+             EQ ;
+             IF { DUP ;
+                  DUP 3 ;
+                  GET ;
+                  IF_NONE { PUSH mutez 1000 } { CDR } ;
+                  AMOUNT ;
+                  COMPARE ;
+                  GE ;
+                  IF { PUSH nat 10 ;
+                       PUSH nat 15 ;
+                       PUSH mutez 1 ;
+                       AMOUNT ;
+                       ADD ;
+                       MUL ;
+                       EDIV ;
+                       IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                       CAR ;
+                       DIG 3 ;
+                       PAIR ;
+                       SOME ;
+                       DIG 2 ;
+                       UPDATE }
+                     { DROP 3 ; PUSH string "Failed to provide enough tezos." ; FAILWITH } }
+                { DROP 3 ; PUSH string "Chunks are exactly 256 elements long." ; FAILWITH } ;
+             NIL operation ;
+             PAIR } } }

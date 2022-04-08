@@ -5,17 +5,17 @@
 (generate_opam_files true)
 
 (source
- (uri "git+https://gitlab.com/releaselab/fresco/tezla.git"))
+ (uri "git+https://github.com/joaosreis/tezla.git"))
 
-(bug_reports "https://gitlab.com/releaselab/fresco/tezla/issues")
+(bug_reports "https://github.com/joaosreis/tezla/issues")
 
-(homepage "https://gitlab.com/releaselab/fresco/tezla")
+(homepage "https://github.com/joaosreis/tezla")
 
 (license MIT)
 
-(authors "Jo\195\163o Santos Reis <joao.reis@ubi.pt>")
+(authors "Jo\195\163o Santos Reis <joaosreis@outlook.pt>")
 
-(maintainers "Jo\195\163o Santos Reis <joao.reis@ubi.pt>")
+(maintainers "Jo\195\163o Santos Reis <joaosreis@outlook.pt>")
 
 (package
  (name tezla)
@@ -23,8 +23,16 @@
  (depends
   (dune :build)
   (bisect_ppx :with-test)
-  (ppx_inline_test :dev)
+  ppx_inline_test
   (alcotest :with-test)
-  zarith
-  core_kernel
-  michelson))
+  (qcheck :with-test)
+  (qcheck-alcotest :with-test)
+  (core_unix
+   (and
+    :with-test
+    (>= v0.15)))
+  (core
+   (>= v0.15))
+  bignum
+  michelson-adt
+  michelson-parser))

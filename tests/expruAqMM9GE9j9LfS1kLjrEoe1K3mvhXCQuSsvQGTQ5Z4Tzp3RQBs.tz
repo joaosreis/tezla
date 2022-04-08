@@ -1,0 +1,189 @@
+{ parameter
+    (or (or (address %changeOwner) (int %closeGame))
+        (or (int %participate) (int %setUpGame))) ;
+  storage
+    (pair (pair (mutez %bet) (int %count))
+          (pair (address %owner) (map %players address int))) ;
+  code { NIL operation ;
+         LAMBDA
+           (pair (pair mutez int) (pair address (map address int)))
+           unit
+           { CDR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "You are not the Owner" ; FAILWITH } { UNIT } } ;
+         DIG 2 ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DIG 2 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP ; PUSH string "You are not Owner" ; FAILWITH }
+                    { SWAP ; DUP ; DUG 2 ; CDR ; CDR ; SWAP ; PAIR ; SWAP ; CAR ; PAIR } ;
+                 SWAP ;
+                 PAIR }
+               { DIG 3 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH nat 10 ;
+                 DUP 3 ;
+                 CDR ;
+                 CDR ;
+                 SIZE ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "No enougth players in game" ; FAILWITH } {} ;
+                 NIL address ;
+                 DUP 3 ;
+                 CDR ;
+                 CDR ;
+                 ITER { SWAP ;
+                        PAIR ;
+                        DUP ;
+                        CAR ;
+                        SWAP ;
+                        DUP ;
+                        DUG 2 ;
+                        CDR ;
+                        CDR ;
+                        DUP 4 ;
+                        COMPARE ;
+                        EQ ;
+                        IF { SWAP ; CDR ; CAR ; CONS } { SWAP ; DROP } } ;
+                 SWAP ;
+                 DROP ;
+                 NIL operation ;
+                 PUSH nat 0 ;
+                 DUP 3 ;
+                 SIZE ;
+                 COMPARE ;
+                 EQ ;
+                 IF { SWAP ;
+                      DROP ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CDR ;
+                      CAR ;
+                      CONTRACT unit ;
+                      IF_NONE { PUSH string "Contract not found." ; FAILWITH } {} ;
+                      BALANCE ;
+                      UNIT ;
+                      TRANSFER_TOKENS ;
+                      CONS }
+                    { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      SIZE ;
+                      BALANCE ;
+                      EDIV ;
+                      IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                      CAR ;
+                      SWAP ;
+                      DIG 2 ;
+                      ITER { SWAP ;
+                             PAIR ;
+                             DUP ;
+                             CDR ;
+                             CONTRACT unit ;
+                             IF_NONE { PUSH string "Contract not found." ; FAILWITH } {} ;
+                             DUP 3 ;
+                             UNIT ;
+                             TRANSFER_TOKENS ;
+                             SWAP ;
+                             CAR ;
+                             SWAP ;
+                             CONS } ;
+                      SWAP ;
+                      DROP } ;
+                 PAIR } }
+           { IF_LEFT
+               { DIG 2 ;
+                 DROP ;
+                 DIG 2 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 AMOUNT ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP ; PUSH string "Amount send not equal as bet price" ; FAILWITH }
+                    { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CDR ;
+                      CDR ;
+                      DUP ;
+                      SENDER ;
+                      GET ;
+                      IF_NONE
+                        { SWAP ; SOME ; SENDER ; UPDATE }
+                        { DROP ; SWAP ; DROP ; PUSH string "You are already registered" ; FAILWITH } ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CDR ;
+                      CAR ;
+                      PAIR ;
+                      SWAP ;
+                      CAR ;
+                      PAIR ;
+                      DUP ;
+                      CDR ;
+                      PUSH int 1 ;
+                      DUP 3 ;
+                      CAR ;
+                      CDR ;
+                      ADD ;
+                      DIG 2 ;
+                      CAR ;
+                      CAR ;
+                      PAIR ;
+                      PAIR } ;
+                 NIL operation ;
+                 PAIR }
+               { DROP ;
+                 DUP ;
+                 DIG 2 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 EMPTY_MAP address int ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CAR ;
+                 PAIR ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 PUSH int 0 ;
+                 DIG 2 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } } } }

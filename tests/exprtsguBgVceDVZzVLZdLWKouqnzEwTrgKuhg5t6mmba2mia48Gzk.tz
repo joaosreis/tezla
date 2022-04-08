@@ -1,0 +1,392 @@
+{ parameter
+    (or (or (or (pair %buy_tickets address (pair nat string))
+                (pair %create_ticket address string))
+            (or (pair %redeem_ticket address string) (address %update_admin)))
+        (or (or (pair %update_pool_addresses address string) (mutez %update_ticket_price))
+            (or (string %update_ticket_types) (unit %withdraw_balance)))) ;
+  storage
+    (pair (big_map %tickets (pair (address %owner) (string %ticket_type)) (ticket timestamp))
+          (pair %data
+             (address %admin)
+             (pair (big_map %pool_addresses address string)
+                   (pair (set %ticket_types string) (pair (mutez %ticket_price) (int %ticket_validity)))))) ;
+  code { UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         DIG 2 ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     PUSH nat 0 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { DROP 5 ; PUSH string "ZERO_TICKET_AMOUNT" ; FAILWITH }
+                        { DIG 3 ;
+                          DUP ;
+                          DUG 4 ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          CAR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          MUL ;
+                          AMOUNT ;
+                          COMPARE ;
+                          NEQ ;
+                          IF { DROP 5 ; PUSH string "INCORRECT_AMOUNT" ; FAILWITH }
+                             { DIG 3 ;
+                               DUP ;
+                               DUG 4 ;
+                               CDR ;
+                               CDR ;
+                               CAR ;
+                               DIG 2 ;
+                               DUP ;
+                               DUG 3 ;
+                               MEM ;
+                               NOT ;
+                               IF { DROP 5 ; PUSH string "INVALID_TICKET_TYPE" ; FAILWITH }
+                                  { SWAP ;
+                                    DIG 2 ;
+                                    PAIR ;
+                                    DIG 3 ;
+                                    NONE (ticket timestamp) ;
+                                    DIG 2 ;
+                                    DUP ;
+                                    DUG 3 ;
+                                    GET_AND_UPDATE ;
+                                    IF_NONE
+                                      { DIG 2 ; NOW ; TICKET }
+                                      { READ_TICKET ;
+                                        SWAP ;
+                                        DROP ;
+                                        UNPAIR ;
+                                        DROP ;
+                                        UNPAIR ;
+                                        DROP ;
+                                        DIG 3 ;
+                                        ADD ;
+                                        NOW ;
+                                        TICKET } ;
+                                    SOME ;
+                                    DIG 2 ;
+                                    GET_AND_UPDATE ;
+                                    DROP ;
+                                    PAIR } } } ;
+                     NIL operation ;
+                     PAIR }
+                   { SWAP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CDR ;
+                     CAR ;
+                     SENDER ;
+                     MEM ;
+                     DIG 3 ;
+                     DUP ;
+                     DUG 4 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     OR ;
+                     IF { PAIR ;
+                          DIG 2 ;
+                          NONE (ticket timestamp) ;
+                          DIG 2 ;
+                          DUP ;
+                          DUG 3 ;
+                          GET_AND_UPDATE ;
+                          IF_NONE
+                            { PUSH nat 1 ; NOW ; TICKET }
+                            { READ_TICKET ;
+                              SWAP ;
+                              DROP ;
+                              UNPAIR ;
+                              DROP ;
+                              UNPAIR ;
+                              DROP ;
+                              PUSH nat 1 ;
+                              ADD ;
+                              NOW ;
+                              TICKET } ;
+                          SOME ;
+                          DIG 2 ;
+                          GET_AND_UPDATE ;
+                          DROP ;
+                          PAIR }
+                        { DROP 4 ; PUSH string "FORBIDDEN_OP" ; FAILWITH } ;
+                     NIL operation ;
+                     PAIR } }
+               { IF_LEFT
+                   { SWAP ;
+                     DIG 2 ;
+                     DUP ;
+                     CDR ;
+                     CAR ;
+                     SENDER ;
+                     MEM ;
+                     NOT ;
+                     IF { DROP 3 ; PUSH string "FORBIDDEN_OP" ; FAILWITH }
+                        { DUG 2 ;
+                          NONE (ticket timestamp) ;
+                          DIG 2 ;
+                          DUP ;
+                          DUG 3 ;
+                          GET_AND_UPDATE ;
+                          IF_NONE
+                            { DROP 2 ; PUSH string "NO_TICKET_TO_REDEEM" ; FAILWITH }
+                            { READ_TICKET ;
+                              SWAP ;
+                              DROP ;
+                              UNPAIR ;
+                              DROP ;
+                              UNPAIR ;
+                              PUSH nat 0 ;
+                              DIG 2 ;
+                              DUP ;
+                              DUG 3 ;
+                              COMPARE ;
+                              EQ ;
+                              IF { DROP 4 ; PUSH string "ZERO_TICKET_AMOUNT" ; FAILWITH }
+                                 { NOW ;
+                                   DIG 5 ;
+                                   DUP ;
+                                   DUG 6 ;
+                                   CDR ;
+                                   CDR ;
+                                   CDR ;
+                                   CDR ;
+                                   DIG 2 ;
+                                   ADD ;
+                                   COMPARE ;
+                                   LT ;
+                                   IF { DROP 3 ; PUSH string "EXPIRED_TICKETS" ; FAILWITH }
+                                      { PUSH nat 1 ;
+                                        SWAP ;
+                                        DUP ;
+                                        DUG 2 ;
+                                        COMPARE ;
+                                        EQ ;
+                                        IF { DROP ; NONE (ticket timestamp) ; DIG 2 ; GET_AND_UPDATE ; PAIR }
+                                           { PUSH nat 1 ;
+                                             SWAP ;
+                                             SUB ;
+                                             ABS ;
+                                             NOW ;
+                                             TICKET ;
+                                             SOME ;
+                                             DIG 2 ;
+                                             GET_AND_UPDATE ;
+                                             PAIR } } } } ;
+                          UNPAIR ;
+                          DROP ;
+                          PAIR } ;
+                     NIL operation ;
+                     PAIR }
+                   { DIG 2 ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "NOT_AND_ADMIN" ; FAILWITH }
+                        { SWAP ; CDR ; SWAP ; PAIR } ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { DIG 2 ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "NOT_AND_ADMIN" ; FAILWITH }
+                        { UNPAIR ;
+                          DIG 2 ;
+                          DUP ;
+                          DUG 3 ;
+                          CDR ;
+                          CDR ;
+                          DIG 3 ;
+                          DUP ;
+                          DUG 4 ;
+                          CDR ;
+                          CAR ;
+                          DIG 2 ;
+                          DUP ;
+                          DUG 3 ;
+                          GET ;
+                          IF_NONE
+                            { DIG 3 ;
+                              DUP ;
+                              DUG 4 ;
+                              CDR ;
+                              CAR ;
+                              DIG 3 ;
+                              DIG 3 ;
+                              SWAP ;
+                              SOME ;
+                              SWAP ;
+                              UPDATE }
+                            { DROP ; DIG 3 ; DUP ; DUG 4 ; CDR ; CAR ; DIG 3 ; SOME ; DIG 3 ; UPDATE } ;
+                          PAIR ;
+                          SWAP ;
+                          CAR ;
+                          PAIR } ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR }
+                   { DIG 2 ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "NOT_AND_ADMIN" ; FAILWITH }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          CDR ;
+                          CAR ;
+                          PAIR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          CAR ;
+                          PAIR ;
+                          SWAP ;
+                          CAR ;
+                          PAIR } ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR } }
+               { IF_LEFT
+                   { DIG 2 ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "NOT_AND_ADMIN" ; FAILWITH }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          CDR ;
+                          CAR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          MEM ;
+                          IF { SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CDR ;
+                               CDR ;
+                               CDR ;
+                               DIG 2 ;
+                               DUP ;
+                               DUG 3 ;
+                               CDR ;
+                               CDR ;
+                               CAR ;
+                               DIG 2 ;
+                               PUSH bool False ;
+                               SWAP ;
+                               UPDATE ;
+                               PAIR ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CDR ;
+                               CAR ;
+                               PAIR ;
+                               SWAP ;
+                               CAR ;
+                               PAIR }
+                             { SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CDR ;
+                               CDR ;
+                               CDR ;
+                               DIG 2 ;
+                               DUP ;
+                               DUG 3 ;
+                               CDR ;
+                               CDR ;
+                               CAR ;
+                               DIG 2 ;
+                               PUSH bool True ;
+                               SWAP ;
+                               UPDATE ;
+                               PAIR ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CDR ;
+                               CAR ;
+                               PAIR ;
+                               SWAP ;
+                               CAR ;
+                               PAIR } } ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR }
+                   { DROP ;
+                     SWAP ;
+                     DUP ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "NOT_AND_ADMIN" ; FAILWITH }
+                        { DUP ;
+                          CAR ;
+                          CONTRACT unit ;
+                          IF_NONE { PUSH string "UNKNOWN_ADDRESS" ; FAILWITH } {} ;
+                          SWAP ;
+                          DIG 2 ;
+                          PAIR ;
+                          NIL operation ;
+                          DIG 2 ;
+                          BALANCE ;
+                          UNIT ;
+                          TRANSFER_TOKENS ;
+                          CONS ;
+                          PAIR } } } } } }

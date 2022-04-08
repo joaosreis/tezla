@@ -1,0 +1,15 @@
+{ parameter (or (int %decrement) (int %increment)) ;
+  storage int ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; SUB }
+           { SWAP ;
+             PUSH int 10 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             COMPARE ;
+             LT ;
+             IF { DROP 2 ; PUSH string "<10 fails" ; FAILWITH } { ADD } } ;
+         NIL operation ;
+         PAIR } }

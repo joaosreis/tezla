@@ -1,0 +1,3 @@
+{ parameter int ;
+  storage (pair int mutez) ;
+  code { CAR ; AMOUNT ; SWAP ; PAIR ; NIL operation ; PAIR } }

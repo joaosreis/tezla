@@ -1,0 +1,327 @@
+{ parameter
+    (or (or (pair %create_new_order
+               (or %order_type (unit %buy) (unit %sell))
+               (pair (nat %token_id_to_sell)
+                     (pair (nat %token_amount_to_sell)
+                           (pair (nat %token_id_to_buy)
+                                 (pair (nat %token_amount_to_buy) (pair (nat %total_token_amount) (address %seller)))))))
+            (nat %delete_order))
+        (or (pair %fulfill_order
+               (nat %order_id)
+               (pair (nat %amount_to_buy) (pair (address %buyer) (nat %buyer_balance))))
+            (address %update_ledger_address))) ;
+  storage
+    (pair (nat %last_order_id)
+          (pair (big_map %order_book
+                   nat
+                   (pair (or %order_type (unit %buy) (unit %sell))
+                         (pair (nat %token_id_to_sell)
+                               (pair (nat %token_amount_to_sell)
+                                     (pair (nat %token_id_to_buy)
+                                           (pair (nat %token_amount_to_buy)
+                                                 (pair (nat %total_token_amount) (pair (address %seller) (timestamp %created_on)))))))))
+                (pair (address %ledger_address) (address %admin)))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 AND ;
+                 IF { DROP 2 ; PUSH string "UNAUTHORIZED_SENDER" ; FAILWITH }
+                    { PUSH nat 1 ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CAR ;
+                      ADD ;
+                      NOW ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      PAIR ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CAR ;
+                      PAIR ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CAR ;
+                      PAIR ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CAR ;
+                      PAIR ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CDR ;
+                      CDR ;
+                      CAR ;
+                      PAIR ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CDR ;
+                      CAR ;
+                      PAIR ;
+                      DIG 2 ;
+                      CAR ;
+                      PAIR ;
+                      DIG 2 ;
+                      DUP ;
+                      CDR ;
+                      CAR ;
+                      DIG 2 ;
+                      DIG 3 ;
+                      DUP ;
+                      DUG 4 ;
+                      SWAP ;
+                      SOME ;
+                      SWAP ;
+                      UPDATE ;
+                      DIP { DUP ; CAR ; SWAP ; CDR ; CDR } ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      CDR ;
+                      SWAP ;
+                      PAIR ;
+                      NIL operation ;
+                      PAIR } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH string "UNKNOWN_ORDER_ID" ; FAILWITH } {} ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 SWAP ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 AND ;
+                 IF { DROP 2 ; PUSH string "UNAUTHORIZED_DELETE_ACTION" ; FAILWITH }
+                    { SWAP ;
+                      DUP ;
+                      CDR ;
+                      CAR ;
+                      DIG 2 ;
+                      NONE (pair (or unit unit)
+                                 (pair nat (pair nat (pair nat (pair nat (pair nat (pair address timestamp))))))) ;
+                      SWAP ;
+                      UPDATE ;
+                      DIP { DUP ; CAR ; SWAP ; CDR ; CDR } ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      NIL operation ;
+                      PAIR } } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 AND ;
+                 IF { DROP 2 ; PUSH string "UNAUTHORIZED_SENDER" ; FAILWITH }
+                    { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CDR ;
+                      CAR ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CAR ;
+                      GET ;
+                      IF_NONE { PUSH string "UNKNOWN_ORDER_ID" ; FAILWITH } {} ;
+                      DUP ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CDR ;
+                      CAR ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      CDR ;
+                      CAR ;
+                      COMPARE ;
+                      NEQ ;
+                      IF { DROP 3 ; PUSH string "WRONG_AMOUNT" ; FAILWITH }
+                         { DIG 2 ;
+                           DUP ;
+                           DUG 3 ;
+                           CDR ;
+                           CDR ;
+                           CAR ;
+                           CONTRACT %confirm_buy_from_exchange
+                             (pair (nat %order_id)
+                                   (pair (pair %token_ids nat nat)
+                                         (pair (bool %status) (pair (pair %from_ address nat) (pair %to_ address nat))))) ;
+                           IF_NONE { PUSH string "UNKNOWN_CONTRACT" ; FAILWITH } {} ;
+                           PUSH mutez 0 ;
+                           DIG 2 ;
+                           DUP ;
+                           DUG 3 ;
+                           CDR ;
+                           CDR ;
+                           CDR ;
+                           CDR ;
+                           CAR ;
+                           DIG 4 ;
+                           DUP ;
+                           DUG 5 ;
+                           CDR ;
+                           CDR ;
+                           CAR ;
+                           PAIR ;
+                           DIG 3 ;
+                           DUP ;
+                           DUG 4 ;
+                           CDR ;
+                           CDR ;
+                           CAR ;
+                           DIG 4 ;
+                           DUP ;
+                           DUG 5 ;
+                           CDR ;
+                           CDR ;
+                           CDR ;
+                           CDR ;
+                           CDR ;
+                           CDR ;
+                           CAR ;
+                           PAIR ;
+                           PAIR ;
+                           PUSH bool True ;
+                           PAIR ;
+                           DIG 3 ;
+                           DUP ;
+                           DUG 4 ;
+                           CDR ;
+                           CDR ;
+                           CDR ;
+                           CAR ;
+                           DIG 4 ;
+                           CDR ;
+                           CAR ;
+                           PAIR ;
+                           PAIR ;
+                           DIG 3 ;
+                           DUP ;
+                           DUG 4 ;
+                           CAR ;
+                           PAIR ;
+                           TRANSFER_TOKENS ;
+                           DIG 2 ;
+                           DUP ;
+                           CDR ;
+                           CAR ;
+                           DIG 3 ;
+                           CAR ;
+                           NONE (pair (or unit unit)
+                                      (pair nat (pair nat (pair nat (pair nat (pair nat (pair address timestamp))))))) ;
+                           SWAP ;
+                           UPDATE ;
+                           DIP { DUP ; CAR ; SWAP ; CDR ; CDR } ;
+                           PAIR ;
+                           SWAP ;
+                           PAIR ;
+                           NIL operation ;
+                           DIG 2 ;
+                           CONS ;
+                           PAIR } } }
+               { PAIR ;
+                 DUP ;
+                 CDR ;
+                 DUP ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP 2 ; PUSH string "NOT_AN_ADMIN" ; FAILWITH }
+                    { SWAP ;
+                      CAR ;
+                      DIP { DUP ; CAR ; SWAP ; CDR ; DUP ; CAR ; SWAP ; CDR ; CDR } ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      NIL operation ;
+                      PAIR } } } } }

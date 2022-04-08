@@ -1,0 +1,12 @@
+{ storage int ;
+  parameter unit ;
+  code { CDR ;
+         DUP ;
+         PUSH int 1 ;
+         COMPARE ;
+         GT ;
+         IF {} { PUSH string "Can inc anymore" ; FAILWITH } ;
+         PUSH int 1 ;
+         ADD ;
+         NIL operation ;
+         PAIR } }

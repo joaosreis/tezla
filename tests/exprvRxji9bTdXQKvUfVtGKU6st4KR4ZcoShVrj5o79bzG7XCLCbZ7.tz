@@ -1,0 +1,116 @@
+{ storage
+    (pair (map %hashToDoc
+             string
+             (pair (string %createdBy) (pair (string %name) (timestamp %timestamp))))
+          (pair (pair %lastDoc (string %createdBy) (pair (string %name) (timestamp %timestamp)))
+                (address %owner))) ;
+  parameter
+    (or (pair %register_doc (string %createdBy) (pair (string %hash) (string %name)))
+        (string %validate_doc)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             MEM ;
+             IF {}
+                { SWAP ;
+                  UNPAIR ;
+                  PUSH (option (pair (string %createdBy) (pair (string %name) (timestamp %timestamp))))
+                       (Some (Pair "" (Pair "" "1970-01-01T00:00:00Z"))) ;
+                  DUP 4 ;
+                  GET 3 ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP } ;
+             SWAP ;
+             UNPAIR ;
+             DUP ;
+             DUP 4 ;
+             GET 3 ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 17 ; FAILWITH } {} ;
+             UNPAIR ;
+             SWAP ;
+             CAR ;
+             NOW ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             DUP ;
+             DUP 4 ;
+             GET 3 ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 18 ; FAILWITH } {} ;
+             UNPAIR ;
+             SWAP ;
+             CDR ;
+             DUP 6 ;
+             GET 4 ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             DUP ;
+             DUP 4 ;
+             GET 3 ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 19 ; FAILWITH } {} ;
+             CDR ;
+             DIG 4 ;
+             CAR ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             PAIR }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             MEM ;
+             IF { SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  UNPAIR ;
+                  SWAP ;
+                  CDR ;
+                  DIG 3 ;
+                  CAR ;
+                  DIG 3 ;
+                  GET ;
+                  IF_NONE { PUSH int 28 ; FAILWITH } {} ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR }
+                { DROP ;
+                  UNPAIR ;
+                  SWAP ;
+                  CDR ;
+                  PUSH (pair (string %createdBy) (pair (string %name) (timestamp %timestamp)))
+                       (Pair "" (Pair "" "1970-01-01T00:00:00Z")) ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR } } ;
+         NIL operation ;
+         PAIR } }

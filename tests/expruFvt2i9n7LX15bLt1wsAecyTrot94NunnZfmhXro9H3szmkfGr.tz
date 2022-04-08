@@ -1,0 +1,16 @@
+{ parameter nat ;
+  storage unit ;
+  code { CAR ;
+         PUSH address "tz3MK7dMNgrXPPA3yYY9qAa879ZxFus7GHQh" ;
+         PAIR ;
+         SELF ;
+         ADDRESS ;
+         PAIR ;
+         DIP { PUSH address "KT1ERyzB85JJvKtyBfuuKsAURtkjFcZGN2At" ;
+               CONTRACT %transfer (pair address (pair address nat)) ;
+               IF_NONE { PUSH string "Internal: not FA1.2" ; FAILWITH } { PUSH mutez 0 } } ;
+         TRANSFER_TOKENS ;
+         DIP { NIL operation } ;
+         CONS ;
+         DIP { UNIT } ;
+         PAIR } }

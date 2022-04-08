@@ -1,0 +1,571 @@
+{ storage
+    (pair (pair (address %administrator)
+                (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+          (pair (pair (big_map %metadata string bytes)
+                      (big_map %operators
+                         (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                         unit))
+                (pair (bool %paused)
+                      (big_map %token_metadata nat (pair (nat %token_id) (map %token_info string string)))))) ;
+  parameter
+    (or (or (or (pair %balance_of
+                   (list %requests (pair (address %owner) (nat %token_id)))
+                   (contract %callback
+                      (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                (pair %mint
+                   (pair (address %address) (string %name))
+                   (pair (string %symbol) (string %uri))))
+            (or (address %set_administrator) (bool %set_pause)))
+        (or (or (pair %token_metadata
+                   (list %token_ids nat)
+                   (lambda %handler (list (pair (nat %token_id) (map %token_info string string))) unit))
+                (contract %token_metadata_registry address))
+            (or (list %transfer
+                   (pair (address %from_)
+                         (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+                (or (list %update_operators
+                       (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                           (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))))
+                    (pair %update_token_metadata
+                       (pair (string %name) (string %symbol))
+                       (pair (nat %token_id) (string %uri))))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     IF { PUSH string "WrongCondition: ~ self.data.paused" ; FAILWITH } {} ;
+                     DUP ;
+                     CAR ;
+                     MAP { DUP 3 ;
+                           GET 6 ;
+                           SWAP ;
+                           DUP ;
+                           DUG 2 ;
+                           CDR ;
+                           MEM ;
+                           IF {} { PUSH string "FA2_TOKEN_UNDEFINED" ; FAILWITH } ;
+                           DUP 3 ;
+                           CAR ;
+                           CDR ;
+                           CDR ;
+                           SWAP ;
+                           DUP ;
+                           CDR ;
+                           SWAP ;
+                           DUP ;
+                           DUG 3 ;
+                           CAR ;
+                           PAIR ;
+                           MEM ;
+                           IF { DUP 3 ;
+                                CAR ;
+                                CDR ;
+                                CDR ;
+                                SWAP ;
+                                DUP ;
+                                CDR ;
+                                SWAP ;
+                                DUP ;
+                                DUG 3 ;
+                                CAR ;
+                                PAIR ;
+                                GET ;
+                                IF_NONE { PUSH int 559 ; FAILWITH } {} ;
+                                SWAP ;
+                                PAIR %request %balance }
+                              { PUSH nat 0 ; SWAP ; PAIR %request %balance } } ;
+                     NIL operation ;
+                     DIG 2 ;
+                     CDR ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     IF { PUSH string "WrongCondition: ~ self.data.paused" ; FAILWITH } {} ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     PUSH (option nat) (Some 1) ;
+                     DIG 6 ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     DUP 7 ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     DUP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     EMPTY_MAP string string ;
+                     DUP 6 ;
+                     GET 4 ;
+                     SOME ;
+                     PUSH string "" ;
+                     UPDATE ;
+                     DUP 6 ;
+                     GET 3 ;
+                     SOME ;
+                     PUSH string "symbol" ;
+                     UPDATE ;
+                     DIG 5 ;
+                     CAR ;
+                     CDR ;
+                     SOME ;
+                     PUSH string "name" ;
+                     UPDATE ;
+                     PUSH (option string) (Some "0") ;
+                     PUSH string "decimals" ;
+                     UPDATE ;
+                     DUP 6 ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     PAIR %token_id %token_info ;
+                     SOME ;
+                     DIG 5 ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     PUSH nat 1 ;
+                     ADD ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     NIL operation } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     CDR ;
+                     DIG 2 ;
+                     PAIR ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DIG 3 ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } ;
+                 NIL operation } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     IF { PUSH string "WrongCondition: ~ self.data.paused" ; FAILWITH } {} ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     MAP { DUP 4 ; GET 6 ; SWAP ; GET ; IF_NONE { PUSH int 597 ; FAILWITH } {} } ;
+                     DIG 2 ;
+                     DROP ;
+                     EXEC ;
+                     DROP ;
+                     NIL operation }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     IF { PUSH string "WrongCondition: ~ self.data.paused" ; FAILWITH } {} ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     SELF_ADDRESS ;
+                     TRANSFER_TOKENS ;
+                     CONS } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     IF { PUSH string "WrongCondition: ~ self.data.paused" ; FAILWITH } {} ;
+                     DUP ;
+                     ITER { DUP ;
+                            CDR ;
+                            ITER { DUP 4 ;
+                                   CAR ;
+                                   CAR ;
+                                   SENDER ;
+                                   COMPARE ;
+                                   EQ ;
+                                   IF { PUSH bool True } { SENDER ; DUP 3 ; CAR ; COMPARE ; EQ } ;
+                                   IF { PUSH bool True }
+                                      { DUP 4 ;
+                                        CDR ;
+                                        CAR ;
+                                        CDR ;
+                                        SWAP ;
+                                        DUP ;
+                                        DUG 2 ;
+                                        GET 3 ;
+                                        SENDER ;
+                                        PAIR %operator %token_id ;
+                                        DUP 4 ;
+                                        CAR ;
+                                        PAIR %owner ;
+                                        MEM } ;
+                                   IF {} { PUSH string "FA2_NOT_OPERATOR" ; FAILWITH } ;
+                                   DUP 4 ;
+                                   GET 6 ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   GET 3 ;
+                                   MEM ;
+                                   IF {} { PUSH string "FA2_TOKEN_UNDEFINED" ; FAILWITH } ;
+                                   DUP ;
+                                   GET 4 ;
+                                   PUSH nat 0 ;
+                                   COMPARE ;
+                                   LT ;
+                                   IF { DUP ;
+                                        GET 4 ;
+                                        DUP 5 ;
+                                        CAR ;
+                                        CDR ;
+                                        CDR ;
+                                        DUP 3 ;
+                                        GET 3 ;
+                                        DUP 5 ;
+                                        CAR ;
+                                        PAIR ;
+                                        GET ;
+                                        IF_NONE { PUSH int 534 ; FAILWITH } {} ;
+                                        COMPARE ;
+                                        GE ;
+                                        IF {} { PUSH string "FA2_INSUFFICIENT_BALANCE" ; FAILWITH } ;
+                                        DUP 4 ;
+                                        UNPAIR ;
+                                        UNPAIR ;
+                                        SWAP ;
+                                        UNPAIR ;
+                                        SWAP ;
+                                        DUP ;
+                                        DUP 6 ;
+                                        GET 3 ;
+                                        DUP 8 ;
+                                        CAR ;
+                                        PAIR ;
+                                        DUP ;
+                                        DUG 2 ;
+                                        GET ;
+                                        IF_NONE { PUSH int 538 ; FAILWITH } { DROP } ;
+                                        DUP 6 ;
+                                        GET 4 ;
+                                        DIG 9 ;
+                                        CAR ;
+                                        CDR ;
+                                        CDR ;
+                                        DUP 8 ;
+                                        GET 3 ;
+                                        DUP 10 ;
+                                        CAR ;
+                                        PAIR ;
+                                        GET ;
+                                        IF_NONE { PUSH int 538 ; FAILWITH } {} ;
+                                        SUB ;
+                                        ISNAT ;
+                                        IF_NONE { PUSH int 538 ; FAILWITH } {} ;
+                                        SOME ;
+                                        SWAP ;
+                                        UPDATE ;
+                                        SWAP ;
+                                        PAIR ;
+                                        SWAP ;
+                                        PAIR ;
+                                        PAIR ;
+                                        DUP ;
+                                        DUG 4 ;
+                                        CAR ;
+                                        CDR ;
+                                        CDR ;
+                                        SWAP ;
+                                        DUP ;
+                                        GET 3 ;
+                                        SWAP ;
+                                        DUP ;
+                                        DUG 3 ;
+                                        CAR ;
+                                        PAIR ;
+                                        MEM ;
+                                        IF { DUP 4 ;
+                                             UNPAIR ;
+                                             UNPAIR ;
+                                             SWAP ;
+                                             UNPAIR ;
+                                             SWAP ;
+                                             DUP ;
+                                             DIG 5 ;
+                                             DUP ;
+                                             GET 3 ;
+                                             SWAP ;
+                                             DUP ;
+                                             DUG 7 ;
+                                             CAR ;
+                                             PAIR ;
+                                             DUP ;
+                                             DUG 2 ;
+                                             GET ;
+                                             IF_NONE { PUSH int 541 ; FAILWITH } { DROP } ;
+                                             DUP 6 ;
+                                             GET 4 ;
+                                             DIG 9 ;
+                                             CAR ;
+                                             CDR ;
+                                             CDR ;
+                                             DIG 7 ;
+                                             DUP ;
+                                             GET 3 ;
+                                             SWAP ;
+                                             CAR ;
+                                             PAIR ;
+                                             GET ;
+                                             IF_NONE { PUSH int 541 ; FAILWITH } {} ;
+                                             ADD ;
+                                             SOME ;
+                                             SWAP ;
+                                             UPDATE ;
+                                             SWAP ;
+                                             PAIR ;
+                                             SWAP ;
+                                             PAIR ;
+                                             PAIR ;
+                                             DUG 2 }
+                                           { DIG 3 ;
+                                             UNPAIR ;
+                                             UNPAIR ;
+                                             SWAP ;
+                                             UNPAIR ;
+                                             SWAP ;
+                                             DUP 5 ;
+                                             GET 4 ;
+                                             SOME ;
+                                             DIG 5 ;
+                                             DUP ;
+                                             GET 3 ;
+                                             SWAP ;
+                                             CAR ;
+                                             PAIR ;
+                                             UPDATE ;
+                                             SWAP ;
+                                             PAIR ;
+                                             SWAP ;
+                                             PAIR ;
+                                             PAIR ;
+                                             DUG 2 } }
+                                      { DROP } } ;
+                            DROP } ;
+                     DROP }
+                   { IF_LEFT
+                       { DUP ;
+                         ITER { IF_LEFT
+                                  { DUP ;
+                                    CAR ;
+                                    SENDER ;
+                                    COMPARE ;
+                                    EQ ;
+                                    IF { PUSH bool True } { DUP 3 ; CAR ; CAR ; SENDER ; COMPARE ; EQ } ;
+                                    IF {}
+                                       { PUSH string
+                                              "WrongCondition: (arg.owner == sp.sender) | (sp.sender == self.data.administrator)" ;
+                                         FAILWITH } ;
+                                    DIG 2 ;
+                                    UNPAIR ;
+                                    SWAP ;
+                                    UNPAIR ;
+                                    UNPAIR ;
+                                    SWAP ;
+                                    PUSH (option unit) (Some Unit) ;
+                                    DIG 5 ;
+                                    DUP ;
+                                    GET 4 ;
+                                    SWAP ;
+                                    DUP ;
+                                    DUG 7 ;
+                                    GET 3 ;
+                                    PAIR %operator %token_id ;
+                                    DIG 6 ;
+                                    CAR ;
+                                    PAIR %owner ;
+                                    UPDATE ;
+                                    SWAP ;
+                                    PAIR ;
+                                    PAIR ;
+                                    SWAP ;
+                                    PAIR ;
+                                    SWAP }
+                                  { DUP ;
+                                    CAR ;
+                                    SENDER ;
+                                    COMPARE ;
+                                    EQ ;
+                                    IF { PUSH bool True } { DUP 3 ; CAR ; CAR ; SENDER ; COMPARE ; EQ } ;
+                                    IF {}
+                                       { PUSH string
+                                              "WrongCondition: (arg.owner == sp.sender) | (sp.sender == self.data.administrator)" ;
+                                         FAILWITH } ;
+                                    DIG 2 ;
+                                    UNPAIR ;
+                                    SWAP ;
+                                    UNPAIR ;
+                                    UNPAIR ;
+                                    SWAP ;
+                                    NONE unit ;
+                                    DIG 5 ;
+                                    DUP ;
+                                    GET 4 ;
+                                    SWAP ;
+                                    DUP ;
+                                    DUG 7 ;
+                                    GET 3 ;
+                                    PAIR %operator %token_id ;
+                                    DIG 6 ;
+                                    CAR ;
+                                    PAIR %owner ;
+                                    UPDATE ;
+                                    SWAP ;
+                                    PAIR ;
+                                    PAIR ;
+                                    SWAP ;
+                                    PAIR ;
+                                    SWAP } } ;
+                         DROP }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 3 ;
+                         COMPARE ;
+                         LT ;
+                         IF {} { PUSH string "NFT doesn't exist" ; FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         UNPAIR ;
+                         SWAP ;
+                         UNPAIR ;
+                         SWAP ;
+                         UNPAIR ;
+                         SWAP ;
+                         EMPTY_MAP string string ;
+                         DUP 6 ;
+                         GET 4 ;
+                         SOME ;
+                         PUSH string "" ;
+                         UPDATE ;
+                         DUP 6 ;
+                         CAR ;
+                         CDR ;
+                         SOME ;
+                         PUSH string "symbol" ;
+                         UPDATE ;
+                         DUP 6 ;
+                         CAR ;
+                         CAR ;
+                         SOME ;
+                         PUSH string "name" ;
+                         UPDATE ;
+                         PUSH (option string) (Some "0") ;
+                         PUSH string "decimals" ;
+                         UPDATE ;
+                         DIG 6 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR %token_id %token_info ;
+                         SOME ;
+                         DIG 5 ;
+                         GET 3 ;
+                         UPDATE ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } } ;
+                 NIL operation } } ;
+         PAIR } }

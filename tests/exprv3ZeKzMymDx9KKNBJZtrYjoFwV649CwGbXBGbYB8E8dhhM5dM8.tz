@@ -1,0 +1,61 @@
+{ parameter (list (pair (option %key key_hash) (sapling_transaction %transaction 8))) ;
+  storage (sapling_state 8) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DUP ;
+         NIL operation ;
+         SWAP ;
+         ITER { DIG 3 ;
+                SWAP ;
+                DUP ;
+                DUG 2 ;
+                CDR ;
+                SAPLING_VERIFY_UPDATE ;
+                IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+                DUP ;
+                CDR ;
+                DUG 4 ;
+                DUP ;
+                CAR ;
+                DUP ;
+                ABS ;
+                PUSH mutez 1 ;
+                MUL ;
+                PUSH int 0 ;
+                DIG 2 ;
+                DUP ;
+                DUG 3 ;
+                COMPARE ;
+                GT ;
+                IF { SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DROP ;
+                     DUG 2 ;
+                     CAR ;
+                     IF_NONE { PUSH int 15 ; FAILWITH } {} ;
+                     IMPLICIT_ACCOUNT ;
+                     DIG 2 ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { DIG 2 ;
+                     DROP ;
+                     DIG 2 ;
+                     CAR ;
+                     IF_NONE
+                       { SWAP ; DROP }
+                       { PUSH string "WrongCondition: ~ operation.key.is_some()" ; FAILWITH } ;
+                     AMOUNT ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.amount == amount_tez.value" ; FAILWITH } } } ;
+         SWAP ;
+         DROP ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

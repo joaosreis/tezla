@@ -1,0 +1,31 @@
+{ parameter (or int (or nat mutez)) ;
+  storage (big_map nat (lambda (or int (or nat mutez)) unit)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { LEFT (or nat mutez) ;
+             DUP 2 ;
+             PUSH nat 0 ;
+             GET ;
+             { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+             SWAP ;
+             EXEC }
+           { IF_LEFT
+               { LEFT mutez ;
+                 RIGHT int ;
+                 DUP 2 ;
+                 PUSH nat 1 ;
+                 GET ;
+                 { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                 SWAP ;
+                 EXEC }
+               { RIGHT nat ;
+                 RIGHT int ;
+                 DUP 2 ;
+                 PUSH nat 2 ;
+                 GET ;
+                 { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                 SWAP ;
+                 EXEC } } ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

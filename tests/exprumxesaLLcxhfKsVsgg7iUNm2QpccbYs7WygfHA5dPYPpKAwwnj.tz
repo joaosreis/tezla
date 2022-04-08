@@ -1,0 +1,20 @@
+{ parameter
+    (or (unit %dummy) (pair %get string (contract (pair string (pair timestamp nat))))) ;
+  storage unit ;
+  code { CAR ;
+         IF_LEFT
+           { DROP ; PUSH unit Unit ; NIL operation ; PAIR }
+           { UNPAIR ;
+             SWAP ;
+             PUSH mutez 0 ;
+             PUSH nat 500 ;
+             NOW ;
+             PAIR ;
+             DIG 3 ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             PUSH unit Unit ;
+             NIL operation ;
+             DIG 2 ;
+             CONS ;
+             PAIR } } }

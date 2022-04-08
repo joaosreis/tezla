@@ -1,0 +1,13 @@
+{ storage (option bls12_381_fr) ;
+  parameter mutez ;
+  code { CAR ;
+         PUSH bls12_381_fr 0x01 ;
+         PUSH mutez 1 ;
+         DIG 2 ;
+         EDIV ;
+         IF_NONE { PUSH int 9 ; FAILWITH } {} ;
+         CAR ;
+         MUL ;
+         SOME ;
+         NIL operation ;
+         PAIR } }

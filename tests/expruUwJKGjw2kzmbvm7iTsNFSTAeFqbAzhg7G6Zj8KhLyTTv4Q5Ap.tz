@@ -1,0 +1,47 @@
+{ storage (map string int) ;
+  parameter (or (string %removeVote) (string %vote)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             MEM ;
+             IF { SWAP ;
+                  DUP ;
+                  DIG 2 ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  IF_NONE { PUSH int 17 ; FAILWITH } {} ;
+                  PUSH int 1 ;
+                  SWAP ;
+                  SUB ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE }
+                { SWAP ; PUSH (option int) (Some -1) ; DIG 2 ; UPDATE } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             MEM ;
+             IF { SWAP ;
+                  DUP ;
+                  DIG 2 ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+                  PUSH int 1 ;
+                  ADD ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE }
+                { SWAP ; PUSH (option int) (Some 1) ; DIG 2 ; UPDATE } } ;
+         NIL operation ;
+         PAIR } }

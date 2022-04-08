@@ -1,0 +1,34 @@
+{ storage
+    (pair (option %fr int) (pair (option %fr2 bls12_381_fr) (option %g2 bls12_381_g2))) ;
+  parameter
+    (or (pair %mul bls12_381_g2 bls12_381_fr)
+        (or (pair %mulIntFr (bls12_381_fr %fr) (int %int)) (bls12_381_fr %toInt))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             UNPAIR ;
+             SWAP ;
+             CAR ;
+             DIG 2 ;
+             UNPAIR ;
+             MUL ;
+             SOME ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR }
+           { IF_LEFT
+               { SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 CDR ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 MUL ;
+                 SOME ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { SWAP ; CDR ; SWAP ; INT ; SOME ; PAIR } } ;
+         NIL operation ;
+         PAIR } }

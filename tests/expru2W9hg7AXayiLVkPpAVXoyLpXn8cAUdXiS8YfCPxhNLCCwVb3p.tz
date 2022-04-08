@@ -1,0 +1,25 @@
+{ storage unit ;
+  parameter (or (int %addThreeAndReturn) (int %addTwoAndReturn)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { NIL operation ;
+             SENDER ;
+             CONTRACT %recieveResponse int ;
+             IF_NONE { PUSH int 13 ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             PUSH int 3 ;
+             DIG 4 ;
+             ADD ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { NIL operation ;
+             SENDER ;
+             CONTRACT %recieveResponse int ;
+             IF_NONE { PUSH int 6 ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             PUSH int 2 ;
+             DIG 4 ;
+             ADD ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

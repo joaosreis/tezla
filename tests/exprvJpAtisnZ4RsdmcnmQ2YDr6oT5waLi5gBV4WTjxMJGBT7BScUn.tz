@@ -1,0 +1,3 @@
+{ parameter (ticket int) ;
+  storage (list (ticket int)) ;
+  code { UNPAIR ; CONS ; NIL operation ; PAIR } }

@@ -1,0 +1,54 @@
+{ parameter (or int (or int (or int (or int int)))) ;
+  storage (big_map nat (lambda (or int (or int (or int (or int int)))) unit)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DUP 2 ;
+             PUSH nat 0 ;
+             GET ;
+             { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+             SWAP ;
+             LEFT (or int (or int (or int int))) ;
+             EXEC }
+           { IF_LEFT
+               { DUP 2 ;
+                 PUSH nat 1 ;
+                 GET ;
+                 { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                 SWAP ;
+                 LEFT (or int (or int int)) ;
+                 RIGHT int ;
+                 EXEC }
+               { IF_LEFT
+                   { DUP 2 ;
+                     PUSH nat 2 ;
+                     GET ;
+                     { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                     SWAP ;
+                     LEFT (or int int) ;
+                     RIGHT int ;
+                     RIGHT int ;
+                     EXEC }
+                   { IF_LEFT
+                       { DUP 2 ;
+                         PUSH nat 3 ;
+                         GET ;
+                         { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                         SWAP ;
+                         LEFT int ;
+                         RIGHT int ;
+                         RIGHT int ;
+                         RIGHT int ;
+                         EXEC }
+                       { DUP 2 ;
+                         PUSH nat 4 ;
+                         GET ;
+                         { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                         SWAP ;
+                         RIGHT int ;
+                         RIGHT int ;
+                         RIGHT int ;
+                         RIGHT int ;
+                         EXEC } } } } ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

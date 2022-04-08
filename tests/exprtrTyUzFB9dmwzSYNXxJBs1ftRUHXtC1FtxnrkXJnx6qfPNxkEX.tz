@@ -1,0 +1,114 @@
+{ parameter (or (pair %reassign address (option (list nat))) (unit %transfer)) ;
+  storage
+    (big_map
+       address
+       (pair (map %allowances (pair address nat) unit) (map %balances nat nat))) ;
+  code { LAMBDA
+           (pair address (big_map address (pair (map (pair address nat) unit) (map nat nat))))
+           (pair (map (pair address nat) unit) (map nat nat))
+           { DROP ; EMPTY_MAP nat nat ; EMPTY_MAP (pair address nat) unit ; PAIR } ;
+         SWAP ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         NEQ ;
+         IF { PUSH string "This contract does not accept tezi deposits" ; FAILWITH }
+            {} ;
+         IF_LEFT
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             PAIR ;
+             LAMBDA
+               (pair (pair address
+                           (lambda
+                              (pair address (big_map address (pair (map (pair address nat) unit) (map nat nat))))
+                              (pair (map (pair address nat) unit) (map nat nat))))
+                     (pair (big_map address (pair (map (pair address nat) unit) (map nat nat))) nat))
+               (big_map address (pair (map (pair address nat) unit) (map nat nat)))
+               { { { DUP ; CAR ; DIP { CDR } } } ;
+                 { { DUP ; CAR ; DIP { CDR } } } ;
+                 DIG 2 ;
+                 { { DUP ; CAR ; DIP { CDR } } } ;
+                 DUP ;
+                 { DIP 3 { DUP } ; DIG 4 } ;
+                 PAIR ;
+                 { DIP 4 { DUP } ; DIG 5 } ;
+                 SWAP ;
+                 EXEC ;
+                 PUSH nat 1 ;
+                 DUG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 PUSH nat 0 ;
+                 { DIP 5 { DUP } ; DIG 6 } ;
+                 SWAP ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 DIG 3 ;
+                 CAR ;
+                 PAIR ;
+                 DIG 4 ;
+                 SWAP ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 DUP ;
+                 SENDER ;
+                 PAIR ;
+                 DIG 4 ;
+                 SWAP ;
+                 EXEC ;
+                 DUP ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 { DIP 5 { DUP } ; DIG 6 } ;
+                 GET ;
+                 IF_NONE { DIG 3 } { DIG 4 ; ADD } ;
+                 DIG 4 ;
+                 SWAP ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 SOME ;
+                 SENDER ;
+                 UPDATE } ;
+             SWAP ;
+             APPLY ;
+             DIG 2 ;
+             IF_NONE
+               { { DIP 2 { DUP } ; DIG 3 } ;
+                 DIG 2 ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DIG 2 ;
+                 SWAP ;
+                 CDR ;
+                 ITER { CAR ; SWAP ; PAIR ; SWAP ; DUP ; DUG 2 ; SWAP ; EXEC } ;
+                 SWAP ;
+                 DROP }
+               { DIG 2 ;
+                 DROP ;
+                 DIG 3 ;
+                 DROP ;
+                 DIG 2 ;
+                 SWAP ;
+                 ITER { SWAP ; PAIR ; SWAP ; DUP ; DUG 2 ; SWAP ; EXEC } ;
+                 SWAP ;
+                 DROP } ;
+             NIL operation ;
+             PAIR }
+           { DROP ; SWAP ; DROP ; NIL operation ; PAIR } } }

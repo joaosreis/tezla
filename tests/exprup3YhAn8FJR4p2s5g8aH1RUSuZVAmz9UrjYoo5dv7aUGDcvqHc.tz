@@ -1,0 +1,138 @@
+{ storage
+    (map string
+         (pair (pair (pair (string %address) (string %bloodGroup))
+                     (pair (bool %canDonate) (string %email)))
+               (pair (pair (string %name) (string %phone))
+                     (pair (string %pincode)
+                           (pair (timestamp %registredON)
+                                 (list %requests (pair (string %email) (pair (string %name) (string %phoneNumber))))))))) ;
+  parameter
+    (or (pair %addRequest
+           (pair (string %email) (string %name))
+           (pair (string %phoneNumber) (string %requestedTo)))
+        (or (pair %createUser
+               (pair (pair (string %address) (string %bloodGroup))
+                     (pair (bool %canDonate) (string %email)))
+               (pair (pair (string %phone) (string %pincode)) (pair (string %uid) (string %username))))
+            (pair %updateStatus (bool %canDonate) (string %uid)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             MEM ;
+             IF { SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  DUP ;
+                  DUP 3 ;
+                  GET 4 ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  IF_NONE { PUSH int 32 ; FAILWITH } {} ;
+                  DIG 4 ;
+                  DUP 5 ;
+                  GET 4 ;
+                  GET ;
+                  IF_NONE { PUSH int 32 ; FAILWITH } {} ;
+                  GET 8 ;
+                  DIG 4 ;
+                  DUP ;
+                  GET 3 ;
+                  SWAP ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  SWAP ;
+                  CAR ;
+                  CAR ;
+                  PAIR 3 ;
+                  CONS ;
+                  UPDATE 8 ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE }
+                { DROP } }
+           { IF_LEFT
+               { SWAP ;
+                 PUSH (pair timestamp (list (pair string (pair string string))))
+                      (Pair "2021-05-01T08:29:35Z" {}) ;
+                 DUP 3 ;
+                 GET 3 ;
+                 CDR ;
+                 PAIR ;
+                 DIG 2 ;
+                 DUP ;
+                 GET 3 ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 4 ;
+                 GET 6 ;
+                 PAIR ;
+                 PAIR ;
+                 DIG 2 ;
+                 DUP ;
+                 CAR ;
+                 GET 4 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 4 ;
+                 CAR ;
+                 GET 3 ;
+                 PAIR ;
+                 DIG 3 ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 5 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 PAIR ;
+                 SOME ;
+                 DIG 2 ;
+                 GET 5 ;
+                 UPDATE }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 MEM ;
+                 IF { SWAP ;
+                      DUP ;
+                      DUP 3 ;
+                      CDR ;
+                      DUP ;
+                      DUG 2 ;
+                      GET ;
+                      IF_NONE { PUSH int 37 ; FAILWITH } {} ;
+                      UNPAIR ;
+                      UNPAIR ;
+                      SWAP ;
+                      CDR ;
+                      DIG 5 ;
+                      CAR ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      PAIR ;
+                      SOME ;
+                      SWAP ;
+                      UPDATE }
+                    { DROP } } } ;
+         NIL operation ;
+         PAIR } }

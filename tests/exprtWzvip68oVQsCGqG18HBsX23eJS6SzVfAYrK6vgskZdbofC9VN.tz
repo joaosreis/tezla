@@ -1,5 +1,0 @@
-{ parameter unit ;
-  storage
-    (pair (map %apidata string (pair (int %humidity) (pair (int %pressure) (int %temperature))))
-          (set %keysset address)) ;
-  code { { CDR ; NIL operation ; PAIR } } }

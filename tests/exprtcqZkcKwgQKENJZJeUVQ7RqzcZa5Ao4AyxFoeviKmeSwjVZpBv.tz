@@ -1,0 +1,25 @@
+{ storage
+    (pair (big_map %ledger (pair (address %owner) (nat %token_id)) nat)
+          (big_map %token_metadata nat (pair (nat %token_id) (map %token_info string bytes)))) ;
+  parameter (pair (bytes %metadata) (nat %token_id)) ;
+  code { UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         EMPTY_MAP string bytes ;
+         DUP 4 ;
+         CAR ;
+         SOME ;
+         PUSH string "" ;
+         UPDATE ;
+         DUP 4 ;
+         CDR ;
+         PAIR %token_id %token_info ;
+         SOME ;
+         DIG 3 ;
+         CDR ;
+         UPDATE ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

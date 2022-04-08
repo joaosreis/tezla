@@ -1,0 +1,30 @@
+{ storage (pair (int %myParameter1) (int %myParameter2)) ;
+  parameter (or (int %myEntryPoint) (int %resetParam)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             COMPARE ;
+             LE ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.myParameter1 <= self.data.myParameter2" ;
+                  FAILWITH } ;
+             SWAP ;
+             DUP ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             DIG 2 ;
+             ADD ;
+             PAIR }
+           { SWAP ; CAR ; PAIR } ;
+         NIL operation ;
+         PAIR } }

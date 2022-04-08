@@ -1,3 +1,0 @@
-{ parameter (lambda unit unit) ;
-  storage (lambda unit unit) ;
-  code { CAR ; NIL operation ; PAIR } }

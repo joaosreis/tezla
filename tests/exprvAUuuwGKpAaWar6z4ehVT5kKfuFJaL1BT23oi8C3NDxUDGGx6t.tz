@@ -1,3 +1,0 @@
-{ parameter (unit %) ;
-  storage unit ;
-  code { PUSH string "suspense account for NBIT" ; FAILWITH } }

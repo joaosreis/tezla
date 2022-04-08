@@ -1,0 +1,30 @@
+{ storage nat ;
+  parameter (or (nat %set_value) (address %inspect)) ;
+  code { NIL operation ;
+         DIG 1 ;
+         UNPAIR ;
+         IF_LEFT
+           { DUP ; DIP { DIG 1 ; DROP } ; DUG 1 ; DROP ; DIG 1 ; PAIR }
+           { DUP ;
+             CONTRACT %get_n (pair unit (contract nat)) ;
+             IF_NONE { PUSH string "NoneValue" ; FAILWITH } {} ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             PUSH mutez 0 ;
+             SELF ;
+             ADDRESS ;
+             CONTRACT %set_value nat ;
+             IF_NONE { PUSH string "BadContract" ; FAILWITH } {} ;
+             PUSH unit Unit ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             DIP { DIG 3 ; DROP } ;
+             DUG 3 ;
+             DROP 2 ;
+             DIG 1 ;
+             PAIR } } }

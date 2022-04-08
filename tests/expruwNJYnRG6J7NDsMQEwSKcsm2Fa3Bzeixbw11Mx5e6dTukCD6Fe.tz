@@ -1,0 +1,254 @@
+{ parameter
+    (or (or (or (address %add_Admin) (unit %show_Store))
+            (or (int %subscribe) (pair %subscribe_Loto int int)))
+        (pair %subscribe_Roulette int int)) ;
+  storage
+    (pair (pair (pair (map %admin address bool)
+                      (map %blackjack address (pair (int %bet) (int %value_hand))))
+                (pair (int %casino_fund) (map %loto address (pair int int))))
+          (pair (pair (int %number_player_roulette) (map %player address int))
+                (pair (int %random) (map %roulette address (pair int int))))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     SOURCE ;
+                     GET ;
+                     IF_NONE
+                       { SWAP ; DROP ; PUSH string "not admin" ; FAILWITH }
+                       { DROP ;
+                         DUP ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         { DIP 2 { DUP } ; DIG 3 } ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PUSH bool True ;
+                         DIG 5 ;
+                         SWAP ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR } }
+                   { DROP } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     SOURCE ;
+                     GET ;
+                     IF_NONE
+                       { DUP ;
+                         CDR ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         DIG 3 ;
+                         SOME ;
+                         SOURCE ;
+                         UPDATE ;
+                         { DIP 2 { DUP } ; DIG 3 } ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         CAR ;
+                         PAIR }
+                       { DIG 2 ; DROP 2 ; PUSH string "already exist" ; FAILWITH } }
+                   { SWAP ;
+                     DUP ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     SOURCE ;
+                     GET ;
+                     IF_NONE
+                       { PUSH string "please subscribe first" ; FAILWITH }
+                       { DROP ; PUSH bool True } ;
+                     PUSH bool True ;
+                     SWAP ;
+                     COMPARE ;
+                     EQ ;
+                     IF { DUP ;
+                          CDR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CAR ;
+                          CDR ;
+                          CDR ;
+                          DIG 3 ;
+                          SOME ;
+                          SOURCE ;
+                          UPDATE ;
+                          { DIP 2 { DUP } ; DIG 3 } ;
+                          CAR ;
+                          CDR ;
+                          CAR ;
+                          PAIR ;
+                          DIG 2 ;
+                          CAR ;
+                          CAR ;
+                          PAIR ;
+                          PAIR }
+                        { SWAP ; DROP } } } }
+           { SWAP ;
+             DUP ;
+             CDR ;
+             CAR ;
+             CDR ;
+             SOURCE ;
+             GET ;
+             IF_NONE
+               { PUSH string "please subscribe first" ; FAILWITH }
+               { DROP ; PUSH bool True } ;
+             PUSH bool True ;
+             SWAP ;
+             COMPARE ;
+             EQ ;
+             IF { DUP ;
+                  CDR ;
+                  CDR ;
+                  CDR ;
+                  DIG 2 ;
+                  SOME ;
+                  SOURCE ;
+                  UPDATE ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  SWAP ;
+                  CAR ;
+                  PAIR ;
+                  DUP ;
+                  CDR ;
+                  CDR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  PUSH int 1 ;
+                  { DIP 3 { DUP } ; DIG 4 } ;
+                  CDR ;
+                  CAR ;
+                  CAR ;
+                  ADD ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  CAR ;
+                  PAIR ;
+                  PUSH int 10 ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  CAR ;
+                  CAR ;
+                  COMPARE ;
+                  EQ ;
+                  IF { DUP ;
+                       CDR ;
+                       CDR ;
+                       SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       CDR ;
+                       CAR ;
+                       CDR ;
+                       PUSH int 0 ;
+                       PAIR ;
+                       PAIR ;
+                       SWAP ;
+                       CAR ;
+                       PAIR ;
+                       DUP ;
+                       PUSH address "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" ;
+                       PAIR ;
+                       SWAP ;
+                       CDR ;
+                       CDR ;
+                       CDR ;
+                       ITER { SWAP ;
+                              PAIR ;
+                              DUP ;
+                              CAR ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CDR ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CDR ;
+                              { DIP 2 { DUP } ; DIG 3 } ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              { DIP 2 { DUP } ; DIG 3 } ;
+                              CDR ;
+                              { DIP 4 { DUP } ; DIG 5 } ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              ADD ;
+                              PAIR ;
+                              DIG 3 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              DUP ;
+                              DIG 2 ;
+                              CAR ;
+                              DIG 2 ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              COMPARE ;
+                              EQ ;
+                              IF { SWAP ; CDR ; CAR } { SWAP ; CAR ; CAR } ;
+                              PAIR } ;
+                       CDR }
+                     {} }
+                { SWAP ; DROP } } ;
+         NIL operation ;
+         PAIR } }

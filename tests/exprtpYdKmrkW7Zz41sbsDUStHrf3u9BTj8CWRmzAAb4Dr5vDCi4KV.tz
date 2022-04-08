@@ -1,0 +1,40 @@
+{ parameter (or (address %breakGlass) (lambda %runLambda unit (list operation))) ;
+  storage
+    (pair (address %daoAddress)
+          (pair (address %multisigAddress) (address %targetAddress))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "NOT_MSIG" ; FAILWITH } ;
+             NIL operation ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             GET 4 ;
+             CONTRACT %updateGovernorAddress address ;
+             { IF_NONE { PUSH int 37 ; FAILWITH } {} } ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "NOT_DAO" ; FAILWITH } ;
+             NIL operation ;
+             SWAP ;
+             UNIT ;
+             EXEC ;
+             ITER { CONS } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

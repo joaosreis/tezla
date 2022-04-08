@@ -1,0 +1,16 @@
+{ parameter
+    (list (pair (nat %token_id)
+                (pair (string %symbol)
+                      (pair (string %name) (pair (nat %decimals) (map %extras string string)))))) ;
+  storage
+    (list (list (pair (nat %token_id)
+                      (pair (string %symbol)
+                            (pair (string %name) (pair (nat %decimals) (map %extras string string))))))) ;
+  code { CAST (pair (list (pair nat (pair string (pair string (pair nat (map string string))))))
+                    (list (list (pair nat (pair string (pair string (pair nat (map string string)))))))) ;
+         DUP ;
+         CAR ;
+         DIP { CDR } ;
+         CONS ;
+         NIL operation ;
+         PAIR } }

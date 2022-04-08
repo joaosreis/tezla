@@ -1,0 +1,3 @@
+{ parameter (list %mintMultiple (pair (nat %amount) (address %to))) ;
+  storage unit ;
+  code { CDR ; NIL operation ; PAIR } }

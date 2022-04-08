@@ -1,0 +1,45 @@
+{ parameter
+    (or (pair %configure
+           (pair (bool %active) (address %admin))
+           (pair (nat %max_amount) (address %token)))
+        (set %request_tokens address)) ;
+  storage
+    (pair (pair (bool %active) (address %admin)) (pair (nat %max_amount) (address %token))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SENDER ;
+             DIG 2 ;
+             CAR ;
+             CDR ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "Privileged operation" ; FAILWITH } ;
+             NIL operation }
+           { NIL operation ;
+             DUP ;
+             DUP 4 ;
+             GET 4 ;
+             CONTRACT %transfer
+               (list (pair (address %from_)
+                           (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+             { IF_NONE { PUSH string "Incompatible token interface" ; FAILWITH } {} } ;
+             PUSH mutez 0 ;
+             NIL (pair (address %from_)
+                       (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))) ;
+             NIL address ;
+             DUP 7 ;
+             ITER { CONS } ;
+             NIL address ;
+             SWAP ;
+             ITER { CONS } ;
+             MAP { DUP 8 ; GET 3 ; PUSH nat 0 ; PAIR %token_id %amount ; SWAP ; PAIR %to_ } ;
+             DIG 5 ;
+             DROP ;
+             DIG 5 ;
+             DROP ;
+             SELF_ADDRESS ;
+             PAIR %from_ %txs ;
+             CONS ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

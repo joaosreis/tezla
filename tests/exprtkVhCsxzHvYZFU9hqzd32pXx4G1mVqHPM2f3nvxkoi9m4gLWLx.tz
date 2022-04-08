@@ -1,0 +1,15 @@
+{ parameter unit ;
+  storage unit ;
+  code { DROP ;
+         PUSH address "tz1ZZZZZZZZZZZZZZZZZZZZZZZZZZZZNkiRg" ;
+         CONTRACT %read (or (unit %read) (address %write)) ;
+         IF_NONE { PUSH string "cant-get-writer" ; FAILWITH } {} ;
+         PUSH mutez 0 ;
+         PUSH unit Unit ;
+         LEFT address ;
+         TRANSFER_TOKENS ;
+         UNIT ;
+         NIL operation ;
+         DIG 2 ;
+         CONS ;
+         PAIR } }

@@ -1,0 +1,195 @@
+{ parameter
+    (or (or (pair %balance_of
+               (list %requests (pair (address %owner) (nat %token_id)))
+               (contract %callback
+                  (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+            (list %transfer
+               (pair (address %from_)
+                     (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))
+        (list %update_operators
+           (or (pair %add_operator (address %owner) (pair (address %owner) (nat %token_id)))
+               (pair %remove_operator (address %owner) (pair (address %owner) (nat %token_id)))))) ;
+  storage
+    (pair (big_map %ledger (pair (address %owner) (nat %token_id)) nat)
+          (big_map %metadata string bytes)) ;
+  code { LAMBDA
+           (pair (pair address nat) (pair (big_map (pair address nat) nat) (big_map string bytes)))
+           nat
+           { DUP ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             DUP ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             DIG 2 ;
+             CAR ;
+             DUG 2 ;
+             PAIR ;
+             GET ;
+             IF_NONE { PUSH nat 0 } {} } ;
+         SWAP ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 MAP { DIG 2 ;
+                       DUP ;
+                       DUG 3 ;
+                       SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       PAIR ;
+                       DIG 4 ;
+                       DUP ;
+                       DUG 5 ;
+                       SWAP ;
+                       EXEC ;
+                       SWAP ;
+                       PAIR } ;
+                 DIG 3 ;
+                 DROP ;
+                 DIG 2 ;
+                 NIL operation ;
+                 DIG 3 ;
+                 PUSH mutez 0 ;
+                 DIG 4 ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 PAIR }
+               { ITER { SWAP ;
+                        PAIR ;
+                        DUP ;
+                        CDR ;
+                        DUP ;
+                        CAR ;
+                        DIG 2 ;
+                        CAR ;
+                        DIG 2 ;
+                        CDR ;
+                        ITER { DUP ;
+                               CDR ;
+                               CAR ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CDR ;
+                               CDR ;
+                               DIG 3 ;
+                               DUP ;
+                               DUG 4 ;
+                               DIG 2 ;
+                               DUP ;
+                               DUG 3 ;
+                               DIG 6 ;
+                               DUP ;
+                               DUG 7 ;
+                               PAIR ;
+                               PAIR ;
+                               DIG 6 ;
+                               DUP ;
+                               DUG 7 ;
+                               SWAP ;
+                               EXEC ;
+                               DIG 5 ;
+                               DUP ;
+                               DUG 6 ;
+                               SENDER ;
+                               COMPARE ;
+                               NEQ ;
+                               IF { PUSH string "FA2_OPERATORS_UNSUPPORTED" ; FAILWITH } {} ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               COMPARE ;
+                               LT ;
+                               IF { SWAP ;
+                                    DROP ;
+                                    SWAP ;
+                                    DROP ;
+                                    SWAP ;
+                                    DROP ;
+                                    PUSH string "FA2_INSUFFICIENT_BALANCE" ;
+                                    FAILWITH }
+                                  { SWAP ;
+                                    DUP ;
+                                    DUG 2 ;
+                                    SWAP ;
+                                    SUB ;
+                                    ABS ;
+                                    SWAP ;
+                                    DIG 4 ;
+                                    DUP ;
+                                    DUG 5 ;
+                                    DIG 3 ;
+                                    DUP ;
+                                    DUG 4 ;
+                                    DIG 5 ;
+                                    DUP ;
+                                    DUG 6 ;
+                                    CAR ;
+                                    PAIR ;
+                                    PAIR ;
+                                    DIG 7 ;
+                                    DUP ;
+                                    DUG 8 ;
+                                    SWAP ;
+                                    EXEC ;
+                                    ADD ;
+                                    DIG 4 ;
+                                    DUP ;
+                                    DUG 5 ;
+                                    CDR ;
+                                    DIG 5 ;
+                                    CAR ;
+                                    DIG 3 ;
+                                    DUP ;
+                                    DUG 4 ;
+                                    DIG 5 ;
+                                    DUP ;
+                                    DUG 6 ;
+                                    DIG 8 ;
+                                    DUP ;
+                                    DUG 9 ;
+                                    PAIR ;
+                                    SWAP ;
+                                    SOME ;
+                                    SWAP ;
+                                    UPDATE ;
+                                    PAIR ;
+                                    DIG 2 ;
+                                    SWAP ;
+                                    DUP ;
+                                    DUG 2 ;
+                                    CDR ;
+                                    DIG 2 ;
+                                    CAR ;
+                                    DIG 3 ;
+                                    DIG 4 ;
+                                    DIG 5 ;
+                                    CAR ;
+                                    PAIR ;
+                                    SWAP ;
+                                    SOME ;
+                                    SWAP ;
+                                    UPDATE ;
+                                    PAIR ;
+                                    PAIR } ;
+                               CAR } ;
+                        SWAP ;
+                        DROP } ;
+                 SWAP ;
+                 DROP ;
+                 NIL operation ;
+                 PAIR } }
+           { DIG 2 ; DROP 3 ; PUSH string "FA2_OPERATORS_UNSUPPORTED" ; FAILWITH } } }

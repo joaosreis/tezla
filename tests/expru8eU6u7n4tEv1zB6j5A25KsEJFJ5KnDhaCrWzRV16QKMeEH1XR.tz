@@ -1,0 +1,86 @@
+{ parameter
+    (or (list %check_ownership (pair (pair (address %owner) (nat %token_id)) (nat %balance)))
+        (pair %upforsale (nat %id) (mutez %price))) ;
+  storage
+    (pair (option %res (pair (pair (address %owner) (nat %token_id)) (nat %balance)))
+          (map %nft
+             nat
+             (pair (address %owner)
+                   (pair (option %bestbidder address) (pair (mutez %best) (timestamp %endofbid)))))) ;
+  code { NIL operation ;
+         DIG 1 ;
+         UNPAIR ;
+         DIP 1 { UNPAIR ; SWAP } ;
+         IF_LEFT
+           { DUP ;
+             IF_CONS
+               { PUSH nat 1 ;
+                 DIG 1 ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 COMPARE ;
+                 EQ ;
+                 NOT ;
+                 IF { PUSH string "Caller Is Not Owner" ; FAILWITH } {} ;
+                 DUP ;
+                 SOME ;
+                 DIP 1 { DIG 4 ; DROP 1 } ;
+                 DUG 4 ;
+                 DROP 2 }
+               { PUSH string "Empty Response" ; FAILWITH } ;
+             DROP 1 ;
+             SWAP ;
+             PAIR ;
+             DIG 1 ;
+             PAIR }
+           { UNPAIR ;
+             SWAP ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             PUSH int 3600 ;
+             NOW ;
+             ADD ;
+             PUSH mutez 0 ;
+             PAIR ;
+             NONE address ;
+             PAIR ;
+             SENDER ;
+             PAIR ;
+             SOME ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             UPDATE ;
+             DIP 1 { DIG 2 ; DROP 1 } ;
+             DUG 2 ;
+             DIG 4 ;
+             DUP ;
+             DUG 5 ;
+             PUSH address "KT1TxyQpZb73dKXXfbruZYyNrhwqV6sksC6q" ;
+             CONTRACT %balance_of
+               (pair (list (pair address nat)) (contract (list (pair (pair address nat) nat)))) ;
+             IF_NONE { PUSH string "BadContract" ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             SELF ;
+             ADDRESS ;
+             CONTRACT %check_ownership (list (pair (pair address nat) nat)) ;
+             IF_NONE { PUSH string "BadContract" ; FAILWITH } {} ;
+             NIL (pair (address %owner) (nat %token_id)) ;
+             DIG 6 ;
+             DUP ;
+             DUG 7 ;
+             SENDER ;
+             PAIR ;
+             CONS ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             DIP 1 { DIG 4 ; DROP 1 } ;
+             DUG 4 ;
+             DROP 2 ;
+             SWAP ;
+             PAIR ;
+             DIG 1 ;
+             PAIR } } }

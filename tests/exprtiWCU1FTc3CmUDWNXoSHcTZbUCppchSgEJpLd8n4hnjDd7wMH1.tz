@@ -1,3 +1,0 @@
-{ parameter timestamp ;
-  storage timestamp ;
-  code { CAR ; NIL operation ; PAIR } }

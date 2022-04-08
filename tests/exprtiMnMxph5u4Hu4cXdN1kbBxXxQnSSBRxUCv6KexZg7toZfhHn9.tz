@@ -1,0 +1,328 @@
+{ parameter
+    (or (or %installer
+           (pair %installLambda
+              (string %name)
+              (lambda %code
+                 (pair bytes
+                       (pair (pair %tokens
+                                (big_map %ledger_map (pair (address %owner) (nat %token_id)) nat)
+                                (big_map %supply_map nat (pair (nat %total_supply) (nat %in_reserve))))
+                             (pair %markets
+                                (big_map %market_map
+                                   nat
+                                   (pair (pair %metadata
+                                            (option %ipfs_hash string)
+                                            (pair (string %description)
+                                                  (pair (address %adjudicator)
+                                                        (or %currency (address %fa12) (pair %fa2 (address %token_address) (nat %token_id))))))
+                                         (or %state
+                                            (pair %auctionRunning
+                                               (timestamp %auction_period_end)
+                                               (pair (nat %quantity) (pair (nat %yes_preference) (nat %uniswap_contribution))))
+                                            (pair %marketBootstrapped
+                                               (pair %currency_pool
+                                                  (pair (nat %auction_reward_currency_pool) (nat %liquidity_reward_currency_pool))
+                                                  (nat %market_currency_pool))
+                                               (pair (nat %bootstrap_yes_probability)
+                                                     (pair (nat %bootstrapped_at_block)
+                                                           (pair (nat %liquidity_reward_supply_updated_at_block)
+                                                                 (option %resolution
+                                                                    (pair (or %winning_prediction (unit %no) (unit %yes)) (nat %resolved_at_block))))))))))
+                                (big_map %liquidity_provider_map
+                                   (pair (address %originator) (nat %market_id))
+                                   (or (pair %bet (nat %predicted_probability) (nat %quantity))
+                                       (nat %liquidity_reward_updated_at))))))
+                 (pair (list operation)
+                       (pair (pair %tokens
+                                (big_map %ledger_map (pair (address %owner) (nat %token_id)) nat)
+                                (big_map %supply_map nat (pair (nat %total_supply) (nat %in_reserve))))
+                             (pair %markets
+                                (big_map %market_map
+                                   nat
+                                   (pair (pair %metadata
+                                            (option %ipfs_hash string)
+                                            (pair (string %description)
+                                                  (pair (address %adjudicator)
+                                                        (or %currency (address %fa12) (pair %fa2 (address %token_address) (nat %token_id))))))
+                                         (or %state
+                                            (pair %auctionRunning
+                                               (timestamp %auction_period_end)
+                                               (pair (nat %quantity) (pair (nat %yes_preference) (nat %uniswap_contribution))))
+                                            (pair %marketBootstrapped
+                                               (pair %currency_pool
+                                                  (pair (nat %auction_reward_currency_pool) (nat %liquidity_reward_currency_pool))
+                                                  (nat %market_currency_pool))
+                                               (pair (nat %bootstrap_yes_probability)
+                                                     (pair (nat %bootstrapped_at_block)
+                                                           (pair (nat %liquidity_reward_supply_updated_at_block)
+                                                                 (option %resolution
+                                                                    (pair (or %winning_prediction (unit %no) (unit %yes)) (nat %resolved_at_block))))))))))
+                                (big_map %liquidity_provider_map
+                                   (pair (address %originator) (nat %market_id))
+                                   (or (pair %bet (nat %predicted_probability) (nat %quantity))
+                                       (nat %liquidity_reward_updated_at))))))))
+           (unit %sealContract))
+        (or %market
+           (or (or (or (pair %auctionBet
+                          (nat %market_id)
+                          (pair %bet (nat %predicted_probability) (nat %quantity)))
+                       (nat %auctionClear))
+                   (or (nat %auctionWithdraw) (nat %claimWinnings)))
+               (or (or (pair %marketCreate
+                          (nat %market_id)
+                          (pair (pair %metadata
+                                   (option %ipfs_hash string)
+                                   (pair (string %description)
+                                         (pair (address %adjudicator)
+                                               (or %currency (address %fa12) (pair %fa2 (address %token_address) (nat %token_id))))))
+                                (pair (timestamp %auction_period_end)
+                                      (pair %bet (nat %predicted_probability) (nat %quantity)))))
+                       (pair %marketEnterExit
+                          (or %direction (unit %payIn) (unit %payOut))
+                          (pair %params (nat %market_id) (nat %amount))))
+                   (or (pair %marketResolve
+                          (nat %market_id)
+                          (or %winning_prediction (unit %no) (unit %yes)))
+                       (pair %swapLiquidity
+                          (or %direction (unit %payIn) (unit %payOut))
+                          (pair %params (nat %market_id) (nat %amount))))))
+           (pair %swapTokens
+              (or %token_to_sell (unit %no) (unit %yes))
+              (pair %params (nat %market_id) (nat %amount))))) ;
+  storage
+    (pair (pair %lambda_repository
+             (option %creator address)
+             (big_map %lambda_map
+                string
+                (lambda
+                   (pair bytes
+                         (pair (pair %tokens
+                                  (big_map %ledger_map (pair (address %owner) (nat %token_id)) nat)
+                                  (big_map %supply_map nat (pair (nat %total_supply) (nat %in_reserve))))
+                               (pair %markets
+                                  (big_map %market_map
+                                     nat
+                                     (pair (pair %metadata
+                                              (option %ipfs_hash string)
+                                              (pair (string %description)
+                                                    (pair (address %adjudicator)
+                                                          (or %currency (address %fa12) (pair %fa2 (address %token_address) (nat %token_id))))))
+                                           (or %state
+                                              (pair %auctionRunning
+                                                 (timestamp %auction_period_end)
+                                                 (pair (nat %quantity) (pair (nat %yes_preference) (nat %uniswap_contribution))))
+                                              (pair %marketBootstrapped
+                                                 (pair %currency_pool
+                                                    (pair (nat %auction_reward_currency_pool) (nat %liquidity_reward_currency_pool))
+                                                    (nat %market_currency_pool))
+                                                 (pair (nat %bootstrap_yes_probability)
+                                                       (pair (nat %bootstrapped_at_block)
+                                                             (pair (nat %liquidity_reward_supply_updated_at_block)
+                                                                   (option %resolution
+                                                                      (pair (or %winning_prediction (unit %no) (unit %yes)) (nat %resolved_at_block))))))))))
+                                  (big_map %liquidity_provider_map
+                                     (pair (address %originator) (nat %market_id))
+                                     (or (pair %bet (nat %predicted_probability) (nat %quantity))
+                                         (nat %liquidity_reward_updated_at))))))
+                   (pair (list operation)
+                         (pair (pair %tokens
+                                  (big_map %ledger_map (pair (address %owner) (nat %token_id)) nat)
+                                  (big_map %supply_map nat (pair (nat %total_supply) (nat %in_reserve))))
+                               (pair %markets
+                                  (big_map %market_map
+                                     nat
+                                     (pair (pair %metadata
+                                              (option %ipfs_hash string)
+                                              (pair (string %description)
+                                                    (pair (address %adjudicator)
+                                                          (or %currency (address %fa12) (pair %fa2 (address %token_address) (nat %token_id))))))
+                                           (or %state
+                                              (pair %auctionRunning
+                                                 (timestamp %auction_period_end)
+                                                 (pair (nat %quantity) (pair (nat %yes_preference) (nat %uniswap_contribution))))
+                                              (pair %marketBootstrapped
+                                                 (pair %currency_pool
+                                                    (pair (nat %auction_reward_currency_pool) (nat %liquidity_reward_currency_pool))
+                                                    (nat %market_currency_pool))
+                                                 (pair (nat %bootstrap_yes_probability)
+                                                       (pair (nat %bootstrapped_at_block)
+                                                             (pair (nat %liquidity_reward_supply_updated_at_block)
+                                                                   (option %resolution
+                                                                      (pair (or %winning_prediction (unit %no) (unit %yes)) (nat %resolved_at_block))))))))))
+                                  (big_map %liquidity_provider_map
+                                     (pair (address %originator) (nat %market_id))
+                                     (or (pair %bet (nat %predicted_probability) (nat %quantity))
+                                         (nat %liquidity_reward_updated_at)))))))))
+          (pair %business_storage
+             (pair %tokens
+                (big_map %ledger_map (pair (address %owner) (nat %token_id)) nat)
+                (big_map %supply_map nat (pair (nat %total_supply) (nat %in_reserve))))
+             (pair %markets
+                (big_map %market_map
+                   nat
+                   (pair (pair %metadata
+                            (option %ipfs_hash string)
+                            (pair (string %description)
+                                  (pair (address %adjudicator)
+                                        (or %currency (address %fa12) (pair %fa2 (address %token_address) (nat %token_id))))))
+                         (or %state
+                            (pair %auctionRunning
+                               (timestamp %auction_period_end)
+                               (pair (nat %quantity) (pair (nat %yes_preference) (nat %uniswap_contribution))))
+                            (pair %marketBootstrapped
+                               (pair %currency_pool
+                                  (pair (nat %auction_reward_currency_pool) (nat %liquidity_reward_currency_pool))
+                                  (nat %market_currency_pool))
+                               (pair (nat %bootstrap_yes_probability)
+                                     (pair (nat %bootstrapped_at_block)
+                                           (pair (nat %liquidity_reward_supply_updated_at_block)
+                                                 (option %resolution
+                                                    (pair (or %winning_prediction (unit %no) (unit %yes)) (nat %resolved_at_block))))))))))
+                (big_map %liquidity_provider_map
+                   (pair (address %originator) (nat %market_id))
+                   (or (pair %bet (nat %predicted_probability) (nat %quantity))
+                       (nat %liquidity_reward_updated_at)))))) ;
+  code { LAMBDA
+           (pair (pair string bytes)
+                 (pair (pair (option address)
+                             (big_map
+                                string
+                                (lambda
+                                   (pair bytes
+                                         (pair (pair (big_map (pair address nat) nat) (big_map nat (pair nat nat)))
+                                               (pair (big_map
+                                                        nat
+                                                        (pair (pair (option string) (pair string (pair address (or address (pair address nat)))))
+                                                              (or (pair timestamp (pair nat (pair nat nat)))
+                                                                  (pair (pair (pair nat nat) nat)
+                                                                        (pair nat (pair nat (pair nat (option (pair (or unit unit) nat)))))))))
+                                                     (big_map (pair address nat) (or (pair nat nat) nat)))))
+                                   (pair (list operation)
+                                         (pair (pair (big_map (pair address nat) nat) (big_map nat (pair nat nat)))
+                                               (pair (big_map
+                                                        nat
+                                                        (pair (pair (option string) (pair string (pair address (or address (pair address nat)))))
+                                                              (or (pair timestamp (pair nat (pair nat nat)))
+                                                                  (pair (pair (pair nat nat) nat)
+                                                                        (pair nat (pair nat (pair nat (option (pair (or unit unit) nat)))))))))
+                                                     (big_map (pair address nat) (or (pair nat nat) nat))))))))
+                       (pair (pair (big_map (pair address nat) nat) (big_map nat (pair nat nat)))
+                             (pair (big_map
+                                      nat
+                                      (pair (pair (option string) (pair string (pair address (or address (pair address nat)))))
+                                            (or (pair timestamp (pair nat (pair nat nat)))
+                                                (pair (pair (pair nat nat) nat)
+                                                      (pair nat (pair nat (pair nat (option (pair (or unit unit) nat)))))))))
+                                   (big_map (pair address nat) (or (pair nat nat) nat))))))
+           (pair (list operation)
+                 (pair (pair (option address)
+                             (big_map
+                                string
+                                (lambda
+                                   (pair bytes
+                                         (pair (pair (big_map (pair address nat) nat) (big_map nat (pair nat nat)))
+                                               (pair (big_map
+                                                        nat
+                                                        (pair (pair (option string) (pair string (pair address (or address (pair address nat)))))
+                                                              (or (pair timestamp (pair nat (pair nat nat)))
+                                                                  (pair (pair (pair nat nat) nat)
+                                                                        (pair nat (pair nat (pair nat (option (pair (or unit unit) nat)))))))))
+                                                     (big_map (pair address nat) (or (pair nat nat) nat)))))
+                                   (pair (list operation)
+                                         (pair (pair (big_map (pair address nat) nat) (big_map nat (pair nat nat)))
+                                               (pair (big_map
+                                                        nat
+                                                        (pair (pair (option string) (pair string (pair address (or address (pair address nat)))))
+                                                              (or (pair timestamp (pair nat (pair nat nat)))
+                                                                  (pair (pair (pair nat nat) nat)
+                                                                        (pair nat (pair nat (pair nat (option (pair (or unit unit) nat)))))))))
+                                                     (big_map (pair address nat) (or (pair nat nat) nat))))))))
+                       (pair (pair (big_map (pair address nat) nat) (big_map nat (pair nat nat)))
+                             (pair (big_map
+                                      nat
+                                      (pair (pair (option string) (pair string (pair address (or address (pair address nat)))))
+                                            (or (pair timestamp (pair nat (pair nat nat)))
+                                                (pair (pair (pair nat nat) nat)
+                                                      (pair nat (pair nat (pair nat (option (pair (or unit unit) nat)))))))))
+                                   (big_map (pair address nat) (or (pair nat nat) nat))))))
+           { UNPAIR ;
+             UNPAIR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE
+               { PUSH string "No such lambda: " ; CONCAT ; FAILWITH }
+               { SWAP ; DROP } ;
+             DUP 3 ;
+             CDR ;
+             DIG 2 ;
+             PAIR ;
+             EXEC ;
+             UNPAIR ;
+             SWAP ;
+             DIG 2 ;
+             CAR ;
+             PAIR ;
+             SWAP ;
+             PAIR } ;
+         SWAP ;
+         UNPAIR ;
+         IF_LEFT
+           { DIG 2 ;
+             DROP ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             DUP ;
+             CAR ;
+             IF_NONE { PUSH string "Access denied: contract sealed" ; FAILWITH } {} ;
+             SENDER ;
+             SWAP ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "Access denied: unauthorized caller" ; FAILWITH } {} ;
+             DIG 2 ;
+             CDR ;
+             DIG 2 ;
+             IF_LEFT
+               { DIG 2 ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 SOME ;
+                 DIG 2 ;
+                 CAR ;
+                 UPDATE ;
+                 SWAP ;
+                 CAR ;
+                 PAIR }
+               { DROP ; SWAP ; CDR ; NONE address ; PAIR } ;
+             PAIR ;
+             NIL operation ;
+             PAIR }
+           { IF_LEFT
+               { IF_LEFT
+                   { IF_LEFT
+                       { IF_LEFT
+                           { PACK ; PUSH string "auction_bet_endpoint" ; PAIR ; PAIR ; EXEC }
+                           { PACK ; PUSH string "auction_clear_endpoint" ; PAIR ; PAIR ; EXEC } }
+                       { IF_LEFT
+                           { PACK ; PUSH string "auction_withdraw_endpoint" ; PAIR ; PAIR ; EXEC }
+                           { PACK ; PUSH string "market_claim_endpoint" ; PAIR ; PAIR ; EXEC } } }
+                   { IF_LEFT
+                       { IF_LEFT
+                           { PACK ; PUSH string "market_create_endpoint" ; PAIR ; PAIR ; EXEC }
+                           { PACK ; PUSH string "market_enter_exit_endpoint" ; PAIR ; PAIR ; EXEC } }
+                       { IF_LEFT
+                           { PACK ; PUSH string "market_resolve_endpoint" ; PAIR ; PAIR ; EXEC }
+                           { PACK ; PUSH string "swap_move_lqt_endpoint" ; PAIR ; PAIR ; EXEC } } } }
+               { PACK ; PUSH string "swap_swap_tokens_endpoint" ; PAIR ; PAIR ; EXEC } } } }

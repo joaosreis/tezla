@@ -1,0 +1,35 @@
+{ parameter (pair (pair int int) (list int)) ;
+  storage (big_map (pair int int) (pair (list int) mutez)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         DIG 2 ;
+         PUSH nat 64 ;
+         { DIP 3 { DUP } ; DIG 4 } ;
+         SIZE ;
+         COMPARE ;
+         EQ ;
+         IF { DUP ;
+              { DIP 2 { DUP } ; DIG 3 } ;
+              GET ;
+              IF_NONE { PUSH mutez 1000 } { CDR } ;
+              AMOUNT ;
+              COMPARE ;
+              GE ;
+              IF { PUSH nat 10 ;
+                   PUSH nat 15 ;
+                   PUSH mutez 1 ;
+                   AMOUNT ;
+                   ADD ;
+                   MUL ;
+                   EDIV ;
+                   IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                   CAR ;
+                   DIG 3 ;
+                   PAIR ;
+                   SOME ;
+                   DIG 2 ;
+                   UPDATE }
+                 { DROP 3 ; PUSH string "Failed to provide enough tezos." ; FAILWITH } }
+            { DROP 3 ; PUSH string "Chunks are exactly 64 elements long." ; FAILWITH } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,19 @@
+{ storage unit ;
+  parameter (pair (int %bottom) (pair (address %contractAddress) (int %top))) ;
+  code { UNPAIR ;
+         DUP ;
+         GET 3 ;
+         CONTRACT %placeBet (pair (int %bottom) (int %top)) ;
+         IF_NONE { PUSH int 6 ; FAILWITH } {} ;
+         NIL operation ;
+         SWAP ;
+         PUSH mutez 0 ;
+         DIG 3 ;
+         DUP ;
+         GET 4 ;
+         SWAP ;
+         CAR ;
+         PAIR %bottom %top ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

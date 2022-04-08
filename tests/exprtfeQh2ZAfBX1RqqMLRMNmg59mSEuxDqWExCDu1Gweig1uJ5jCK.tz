@@ -1,0 +1,6 @@
+{ storage int ;
+  parameter (or (unit %double) (int %replace)) ;
+  code { UNPAIR ;
+         IF_LEFT { DROP ; PUSH int 2 ; MUL } { SWAP ; DROP } ;
+         NIL operation ;
+         PAIR } }

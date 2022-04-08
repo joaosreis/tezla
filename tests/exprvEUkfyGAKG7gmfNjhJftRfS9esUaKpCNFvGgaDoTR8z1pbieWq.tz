@@ -1,0 +1,7 @@
+{ parameter (or (unit %getHelloEP) (string %updateNameEP)) ;
+  storage string ;
+  code { DUP ;
+         CAR ;
+         IF_LEFT { DROP ; CDR } { SWAP ; DROP ; PUSH string "Hello " ; CONCAT } ;
+         NIL operation ;
+         PAIR } }

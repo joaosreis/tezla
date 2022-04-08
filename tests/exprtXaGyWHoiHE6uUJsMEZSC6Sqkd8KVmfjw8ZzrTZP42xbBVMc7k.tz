@@ -1,0 +1,324 @@
+{ parameter
+    (or (or (or (string %add_ticket_type)
+                (pair %add_tickets (address %user) (pair (string %ticket_type) (nat %ticket_amount))))
+            (or (pair %get_balance
+                   (address %user)
+                   (pair (string %ticket_type)
+                         (contract %callback (pair address (pair string (pair nat timestamp))))))
+                (string %remove_ticket_type)))
+        (or (or (pair %sub_tickets
+                   (address %user)
+                   (pair (string %ticket_type) (pair (nat %amount_to_sub) (int %ticket_expiry))))
+                (address %update_admin))
+            (or (address %update_controls) (address %withdraw_balance)))) ;
+  storage
+    (pair (pair %data
+             (pair (address %admin) (set %controls address))
+             (set %ticket_types string))
+          (big_map %tickets (pair address string) (pair timestamp (ticket string)))) ;
+  code { UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         DIG 2 ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "UNAUTHORIZED_TX" ; FAILWITH }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          SWAP ;
+                          PUSH bool True ;
+                          SWAP ;
+                          UPDATE ;
+                          SWAP ;
+                          CAR ;
+                          PAIR } ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR }
+                   { DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     MEM ;
+                     NOT ;
+                     IF { DROP 3 ; PUSH string "UNAUTHORIZED_TX" ; FAILWITH }
+                        { DIG 2 ;
+                          UNPAIR 3 ;
+                          DUP 4 ;
+                          CDR ;
+                          DUP 3 ;
+                          MEM ;
+                          NOT ;
+                          IF { DROP 5 ; PUSH string "UNKNOWN_TICKET_TYPE" ; FAILWITH }
+                             { PUSH nat 1 ;
+                               DUP 4 ;
+                               COMPARE ;
+                               LT ;
+                               IF { DROP 5 ; PUSH string "ZERO_TICKET" ; FAILWITH }
+                                  { DIG 4 ;
+                                    NONE (pair timestamp (ticket string)) ;
+                                    DUP 4 ;
+                                    DUP 4 ;
+                                    PAIR ;
+                                    GET_AND_UPDATE ;
+                                    IF_NONE
+                                      { DIG 3 ;
+                                        DUP 4 ;
+                                        TICKET ;
+                                        NOW ;
+                                        PAIR ;
+                                        SOME ;
+                                        DIG 3 ;
+                                        DIG 3 ;
+                                        PAIR ;
+                                        GET_AND_UPDATE ;
+                                        PAIR }
+                                      { DIG 4 ;
+                                        DUP 5 ;
+                                        TICKET ;
+                                        SWAP ;
+                                        CDR ;
+                                        PAIR ;
+                                        JOIN_TICKETS ;
+                                        IF_NONE
+                                          { DROP 3 ; PUSH string "UNJOIGNABLE_TICKETS" ; FAILWITH }
+                                          { NOW ; PAIR ; SOME ; DIG 3 ; DIG 3 ; PAIR ; GET_AND_UPDATE ; PAIR } } ;
+                                    CDR ;
+                                    SWAP ;
+                                    PAIR } } } ;
+                     NIL operation ;
+                     PAIR } }
+               { IF_LEFT
+                   { UNPAIR 3 ;
+                     DIG 4 ;
+                     NONE (pair timestamp (ticket string)) ;
+                     DUP 4 ;
+                     DUP 4 ;
+                     PAIR ;
+                     GET_AND_UPDATE ;
+                     IF_NONE
+                       { PUSH timestamp 0 ; PUSH nat 0 ; PAIR ; SWAP ; PAIR }
+                       { UNPAIR ;
+                         SWAP ;
+                         READ_TICKET ;
+                         CDR ;
+                         CDR ;
+                         DIG 3 ;
+                         DIG 2 ;
+                         DUP 4 ;
+                         PAIR ;
+                         SOME ;
+                         DUP 6 ;
+                         DUP 6 ;
+                         PAIR ;
+                         GET_AND_UPDATE ;
+                         DROP ;
+                         DUG 2 ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     DIG 5 ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     DIG 3 ;
+                     PAIR ;
+                     DIG 5 ;
+                     PAIR ;
+                     DIG 4 ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     DUG 2 ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation ;
+                     DIG 2 ;
+                     CONS ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "UNAUTHORIZED_TX" ; FAILWITH }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          SWAP ;
+                          PUSH bool False ;
+                          SWAP ;
+                          UPDATE ;
+                          SWAP ;
+                          CAR ;
+                          PAIR } ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     MEM ;
+                     NOT ;
+                     IF { DROP 3 ; PUSH string "UNAUTHORIZED_TX" ; FAILWITH }
+                        { DIG 2 ;
+                          UNPAIR 4 ;
+                          DIG 5 ;
+                          NONE (pair timestamp (ticket string)) ;
+                          DUP 4 ;
+                          DUP 4 ;
+                          PAIR ;
+                          GET_AND_UPDATE ;
+                          IF_NONE
+                            { DROP 5 ; PUSH string "NO_TICKET" ; FAILWITH }
+                            { UNPAIR ;
+                              SWAP ;
+                              READ_TICKET ;
+                              SWAP ;
+                              DROP ;
+                              CDR ;
+                              CDR ;
+                              DUP 6 ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              COMPARE ;
+                              LT ;
+                              IF { DROP 7 ; PUSH string "INSUFFICIENT_TICKETS" ; FAILWITH }
+                                 { NOW ;
+                                   DIG 7 ;
+                                   DIG 3 ;
+                                   ADD ;
+                                   COMPARE ;
+                                   LT ;
+                                   IF { DROP 5 ; PUSH string "EXPIRED_TICKETS" ; FAILWITH }
+                                      { DIG 4 ;
+                                        SWAP ;
+                                        SUB ;
+                                        ABS ;
+                                        DUP 4 ;
+                                        TICKET ;
+                                        NOW ;
+                                        PAIR ;
+                                        SOME ;
+                                        DIG 3 ;
+                                        DIG 3 ;
+                                        PAIR ;
+                                        GET_AND_UPDATE ;
+                                        PAIR } } } ;
+                          CDR ;
+                          SWAP ;
+                          PAIR } ;
+                     NIL operation ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "UNAUTHORIZED_TX" ; FAILWITH }
+                        { SWAP ; DUP ; DUG 2 ; CDR ; DIG 2 ; CAR ; CDR ; DIG 2 ; PAIR ; PAIR } ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "UNAUTHORIZED_TX" ; FAILWITH }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CAR ;
+                          CDR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          MEM ;
+                          NOT ;
+                          IF { SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CDR ;
+                               DUP 3 ;
+                               CAR ;
+                               CDR ;
+                               DIG 2 ;
+                               PUSH bool True ;
+                               SWAP ;
+                               UPDATE ;
+                               DIG 2 ;
+                               CAR ;
+                               CAR ;
+                               PAIR ;
+                               PAIR }
+                             { SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CDR ;
+                               DUP 3 ;
+                               CAR ;
+                               CDR ;
+                               DIG 2 ;
+                               PUSH bool False ;
+                               SWAP ;
+                               UPDATE ;
+                               DIG 2 ;
+                               CAR ;
+                               CAR ;
+                               PAIR ;
+                               PAIR } } ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR }
+                   { DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 3 ; PUSH string "UNAUTHORIZED_TX" ; FAILWITH }
+                        { DIG 2 ;
+                          CONTRACT unit ;
+                          IF_NONE { PUSH string "UNKNOWN_ADDRESS" ; FAILWITH } {} ;
+                          SWAP ;
+                          DIG 2 ;
+                          SWAP ;
+                          PAIR ;
+                          NIL operation ;
+                          DIG 2 ;
+                          BALANCE ;
+                          UNIT ;
+                          TRANSFER_TOKENS ;
+                          CONS ;
+                          PAIR } } } } } }

@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (lambda (list operation) (pair (list operation) address)) ;
+  code { CDR ; DUP ; NIL operation ; EXEC ; UNPAIR ; SWAP ; DROP ; PAIR } }

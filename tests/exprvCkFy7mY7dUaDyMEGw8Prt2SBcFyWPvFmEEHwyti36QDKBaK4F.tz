@@ -1,0 +1,35 @@
+{ storage
+    (pair (big_map %my_big_map string string)
+          (pair (big_map %my_big_map_2 string string) (map %my_map string string))) ;
+  parameter (pair %add_value (string %my_key) (string %my_val)) ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         CAR ;
+         DUP 3 ;
+         CDR ;
+         SOME ;
+         DUP 4 ;
+         CAR ;
+         UPDATE ;
+         UPDATE 1 ;
+         DUP ;
+         GET 3 ;
+         DUP 3 ;
+         CDR ;
+         SOME ;
+         DUP 4 ;
+         CAR ;
+         UPDATE ;
+         UPDATE 3 ;
+         DUP ;
+         GET 4 ;
+         DUP 3 ;
+         CDR ;
+         SOME ;
+         DIG 3 ;
+         CAR ;
+         UPDATE ;
+         UPDATE 4 ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,458 @@
+{ storage
+    (pair (pair (map %administrator_allowmap address bool)
+                (pair (big_map %administrators (pair (address %owner) (nat %token_id)) nat)
+                      (big_map %ledger (pair (address %owner) (nat %token_id)) nat)))
+          (pair (big_map %operators
+                   (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                   bool)
+                (pair (big_map %token_metadata
+                         nat
+                         (pair (nat %token_id) (map %token_metadata string bytes)))
+                      (big_map %total_supply nat nat)))) ;
+  parameter
+    (or (or (pair %balance_of
+               (list %requests (pair (address %owner) (nat %token_id)))
+               (contract %callback
+                  (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+            (or (pair %propose_administrator (address %owner) (nat %token_id))
+                (pair %remove_administrator (address %owner) (nat %token_id))))
+        (or (or (nat %set_administrator)
+                (list %set_token_metadata (pair (nat %token_id) (map %token_metadata string bytes))))
+            (or (list %transfer
+                   (pair (address %from_)
+                         (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+                (list %update_operators
+                   (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                       (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { NIL (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)) ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 ITER { DUP 4 ;
+                        GET 5 ;
+                        SWAP ;
+                        DUP ;
+                        DUG 2 ;
+                        CDR ;
+                        MEM ;
+                        IF {} { PUSH string "FA2_TOKEN_UNDEFINED" ; FAILWITH } ;
+                        SWAP ;
+                        DUP 4 ;
+                        CAR ;
+                        CDR ;
+                        CDR ;
+                        DIG 2 ;
+                        DUP ;
+                        CDR ;
+                        SWAP ;
+                        DUP ;
+                        DUG 4 ;
+                        CAR ;
+                        PAIR %owner %token_id ;
+                        GET ;
+                        IF_NONE { PUSH nat 0 } {} ;
+                        DIG 2 ;
+                        PAIR %request %balance ;
+                        CONS } ;
+                 NIL operation ;
+                 DIG 2 ;
+                 CDR ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 TRANSFER_TOKENS ;
+                 CONS }
+               { IF_LEFT
+                   { PUSH nat 1 ;
+                     DUP 3 ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     DUP 3 ;
+                     CDR ;
+                     SENDER ;
+                     PAIR %owner %token_id ;
+                     GET ;
+                     IF_NONE { PUSH nat 0 } {} ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "ADM_NOT_ADMIN" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     PUSH (option nat) (Some 2) ;
+                     DIG 5 ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR }
+                   { PUSH nat 1 ;
+                     DUP 3 ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     DUP 3 ;
+                     CDR ;
+                     SENDER ;
+                     PAIR %owner %token_id ;
+                     GET ;
+                     IF_NONE { PUSH nat 0 } {} ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "ADM_NOT_ADMIN" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     NONE nat ;
+                     DIG 5 ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR } ;
+                 NIL operation } }
+           { IF_LEFT
+               { IF_LEFT
+                   { PUSH nat 2 ;
+                     DUP 3 ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     DUP 3 ;
+                     SENDER ;
+                     PAIR %owner %token_id ;
+                     GET ;
+                     IF_NONE { PUSH nat 0 } {} ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "ADM_NOT_ADMIN" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     PUSH (option nat) (Some 1) ;
+                     DIG 5 ;
+                     SENDER ;
+                     PAIR %owner %token_id ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR }
+                   { DUP ;
+                     ITER { DUP 3 ;
+                            GET 5 ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            CAR ;
+                            MEM ;
+                            IF { PUSH nat 1 ;
+                                 DUP 4 ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 DUP 3 ;
+                                 CAR ;
+                                 SENDER ;
+                                 PAIR %owner %token_id ;
+                                 GET ;
+                                 IF_NONE { PUSH nat 0 } {} ;
+                                 COMPARE ;
+                                 EQ ;
+                                 IF {} { PUSH string "ADM_NOT_ADMIN" ; FAILWITH } }
+                               { PUSH nat 0 ;
+                                 DUP 4 ;
+                                 CAR ;
+                                 CAR ;
+                                 SIZE ;
+                                 COMPARE ;
+                                 GT ;
+                                 IF { DUP 3 ;
+                                      CAR ;
+                                      CAR ;
+                                      SENDER ;
+                                      GET ;
+                                      IF_NONE { PUSH bool False } {} ;
+                                      IF {} { PUSH string "ADM_NOT_ADMIN" ; FAILWITH } }
+                                    {} ;
+                                 DIG 2 ;
+                                 UNPAIR ;
+                                 UNPAIR ;
+                                 SWAP ;
+                                 UNPAIR ;
+                                 PUSH (option nat) (Some 1) ;
+                                 DUP 6 ;
+                                 CAR ;
+                                 SENDER ;
+                                 PAIR %owner %token_id ;
+                                 UPDATE ;
+                                 PAIR ;
+                                 SWAP ;
+                                 PAIR ;
+                                 PAIR ;
+                                 DUG 2 } ;
+                            DIG 2 ;
+                            UNPAIR ;
+                            SWAP ;
+                            UNPAIR ;
+                            SWAP ;
+                            UNPAIR ;
+                            DIG 4 ;
+                            DUP ;
+                            SOME ;
+                            SWAP ;
+                            CAR ;
+                            UPDATE ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR ;
+                            SWAP } ;
+                     DROP } }
+               { IF_LEFT
+                   { DUP ;
+                     ITER { DUP ;
+                            CDR ;
+                            ITER { DUP ;
+                                   GET 4 ;
+                                   DUP 5 ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   DUP 3 ;
+                                   GET 3 ;
+                                   DUP 5 ;
+                                   CAR ;
+                                   PAIR %owner %token_id ;
+                                   GET ;
+                                   IF_NONE { PUSH nat 0 } {} ;
+                                   COMPARE ;
+                                   GE ;
+                                   IF {} { PUSH string "FA2_INSUFFICIENT_BALANCE" ; FAILWITH } ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   SENDER ;
+                                   COMPARE ;
+                                   EQ ;
+                                   IF { PUSH bool True }
+                                      { DUP 4 ;
+                                        GET 3 ;
+                                        SWAP ;
+                                        DUP ;
+                                        DUG 2 ;
+                                        GET 3 ;
+                                        SENDER ;
+                                        PAIR %operator %token_id ;
+                                        DUP 4 ;
+                                        CAR ;
+                                        PAIR %owner ;
+                                        GET ;
+                                        IF_NONE { PUSH bool False } {} } ;
+                                   IF {} { PUSH string "FA2__NOT_OWNER" ; FAILWITH } ;
+                                   DUP 4 ;
+                                   UNPAIR ;
+                                   UNPAIR ;
+                                   SWAP ;
+                                   UNPAIR ;
+                                   SWAP ;
+                                   DUP 5 ;
+                                   GET 4 ;
+                                   DIG 8 ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   DUP 7 ;
+                                   GET 3 ;
+                                   DUP 9 ;
+                                   CAR ;
+                                   PAIR %owner %token_id ;
+                                   GET ;
+                                   IF_NONE { PUSH int 162 ; FAILWITH } {} ;
+                                   SUB ;
+                                   ISNAT ;
+                                   IF_NONE { PUSH int 162 ; FAILWITH } {} ;
+                                   SOME ;
+                                   DUP 6 ;
+                                   GET 3 ;
+                                   DUP 8 ;
+                                   CAR ;
+                                   PAIR %owner %token_id ;
+                                   UPDATE ;
+                                   SWAP ;
+                                   PAIR ;
+                                   SWAP ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DUP ;
+                                   DUG 4 ;
+                                   UNPAIR ;
+                                   UNPAIR ;
+                                   SWAP ;
+                                   UNPAIR ;
+                                   SWAP ;
+                                   DUP 5 ;
+                                   GET 4 ;
+                                   DIG 8 ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   DIG 6 ;
+                                   DUP ;
+                                   GET 3 ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 8 ;
+                                   CAR ;
+                                   PAIR %owner %token_id ;
+                                   GET ;
+                                   IF_NONE { PUSH nat 0 } {} ;
+                                   ADD ;
+                                   SOME ;
+                                   DIG 5 ;
+                                   DUP ;
+                                   GET 3 ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 7 ;
+                                   CAR ;
+                                   PAIR %owner %token_id ;
+                                   UPDATE ;
+                                   SWAP ;
+                                   PAIR ;
+                                   SWAP ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DUG 3 ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   SENDER ;
+                                   COMPARE ;
+                                   NEQ ;
+                                   IF { DIG 3 ;
+                                        UNPAIR ;
+                                        SWAP ;
+                                        UNPAIR ;
+                                        NONE bool ;
+                                        DUP 5 ;
+                                        GET 3 ;
+                                        SENDER ;
+                                        PAIR %operator %token_id ;
+                                        DUP 7 ;
+                                        CAR ;
+                                        PAIR %owner ;
+                                        UPDATE ;
+                                        PAIR ;
+                                        SWAP ;
+                                        PAIR ;
+                                        DUG 3 }
+                                      {} ;
+                                   PUSH nat 0 ;
+                                   DUP 5 ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   DUP 3 ;
+                                   GET 3 ;
+                                   DUP 5 ;
+                                   CAR ;
+                                   PAIR %owner %token_id ;
+                                   GET ;
+                                   IF_NONE { PUSH nat 0 } {} ;
+                                   COMPARE ;
+                                   EQ ;
+                                   IF { DIG 3 ;
+                                        UNPAIR ;
+                                        UNPAIR ;
+                                        SWAP ;
+                                        UNPAIR ;
+                                        SWAP ;
+                                        NONE nat ;
+                                        DIG 5 ;
+                                        GET 3 ;
+                                        DUP 7 ;
+                                        CAR ;
+                                        PAIR %owner %token_id ;
+                                        UPDATE ;
+                                        SWAP ;
+                                        PAIR ;
+                                        SWAP ;
+                                        PAIR ;
+                                        PAIR ;
+                                        DUG 2 }
+                                      { DROP } } ;
+                            DROP } ;
+                     DROP }
+                   { DUP ;
+                     ITER { IF_LEFT
+                              { DUP ;
+                                CAR ;
+                                SENDER ;
+                                COMPARE ;
+                                EQ ;
+                                IF {} { PUSH string "FA2__NOT_OWNER" ; FAILWITH } ;
+                                DIG 2 ;
+                                UNPAIR ;
+                                SWAP ;
+                                UNPAIR ;
+                                PUSH (option bool) (Some True) ;
+                                DIG 4 ;
+                                DUP ;
+                                GET 4 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 6 ;
+                                GET 3 ;
+                                PAIR %operator %token_id ;
+                                DIG 5 ;
+                                CAR ;
+                                PAIR %owner ;
+                                UPDATE ;
+                                PAIR ;
+                                SWAP ;
+                                PAIR ;
+                                SWAP }
+                              { DUP ;
+                                CAR ;
+                                SENDER ;
+                                COMPARE ;
+                                EQ ;
+                                IF {} { PUSH string "FA2__NOT_OWNER" ; FAILWITH } ;
+                                DIG 2 ;
+                                UNPAIR ;
+                                SWAP ;
+                                UNPAIR ;
+                                NONE bool ;
+                                DIG 4 ;
+                                DUP ;
+                                GET 4 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 6 ;
+                                GET 3 ;
+                                PAIR %operator %token_id ;
+                                DIG 5 ;
+                                CAR ;
+                                PAIR %owner ;
+                                UPDATE ;
+                                PAIR ;
+                                SWAP ;
+                                PAIR ;
+                                SWAP } } ;
+                     DROP } } ;
+             NIL operation } ;
+         PAIR } }

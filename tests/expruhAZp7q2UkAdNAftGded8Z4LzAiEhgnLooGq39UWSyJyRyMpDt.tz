@@ -1,0 +1,3 @@
+{ storage string ;
+  parameter unit ;
+  code { UNPAIR ; DROP ; NIL operation ; PAIR } }

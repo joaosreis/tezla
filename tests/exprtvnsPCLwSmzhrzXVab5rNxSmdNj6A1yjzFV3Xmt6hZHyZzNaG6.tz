@@ -1,0 +1,3 @@
+{ parameter (pair int nat) ;
+  storage int ;
+  code { DROP ; PUSH nat 9 ; PUSH int 7 ; ADD ; NIL operation ; PAIR } }

@@ -1,3 +1,0 @@
-{ parameter unit ;
-  storage (or unit (or unit unit)) ;
-  code { CDR ; NIL operation ; PAIR } }

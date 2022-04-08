@@ -1,0 +1,32 @@
+{ parameter (or (unit %deposit) (mutez %withdraw)) ;
+  storage mutez ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ;
+             PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             LE ;
+             IF { DROP ; PUSH string "Deposit amount must be greater than zero" ; FAILWITH }
+                { AMOUNT ; ADD ; NIL operation ; PAIR } }
+           { DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             COMPARE ;
+             LT ;
+             IF { DROP 2 ; PUSH string "Not enough liquidity" ; FAILWITH }
+                { SENDER ;
+                  CONTRACT unit ;
+                  IF_NONE
+                    { DROP 2 ; PUSH string "Invalid receiver" ; FAILWITH }
+                    { DUP 3 ;
+                      UNIT ;
+                      TRANSFER_TOKENS ;
+                      DUG 2 ;
+                      SUB ;
+                      NIL operation ;
+                      DIG 2 ;
+                      CONS ;
+                      PAIR } } } } }

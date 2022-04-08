@@ -1,0 +1,13 @@
+{ parameter
+    (or (or (or (unit %bet) (unit %close)) (or (unit %closeCallback) (unit %initialize)))
+        (unit %withdraw)) ;
+  storage
+    (pair (pair (pair (address %adminAddress) (big_map %betsAgainstLedger address mutez))
+                (pair (big_map %betsForLedger address mutez) (string %currencyPair)))
+          (pair (pair (address %oracleAddress) (nat %targetRate)) (nat %targetTime))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT { DROP ; NIL operation ; PAIR } { DROP ; NIL operation ; PAIR } }
+               { IF_LEFT { DROP ; NIL operation ; PAIR } { DROP ; NIL operation ; PAIR } } }
+           { DROP ; NIL operation ; PAIR } } }

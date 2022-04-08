@@ -1,0 +1,27 @@
+{ storage (pair (address %tokenContract) (set %validatedBakers key_hash)) ;
+  parameter key_hash ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         SENDER ;
+         COMPARE ;
+         EQ ;
+         IF {} { PUSH string "Wrong Permition" ; FAILWITH } ;
+         DUP ;
+         SOME ;
+         SET_DELEGATE ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         DIG 2 ;
+         UNPAIR ;
+         SWAP ;
+         PUSH bool True ;
+         DIG 4 ;
+         UPDATE ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         PAIR } }

@@ -1,0 +1,213 @@
+{ parameter
+    (or (or (address %changeAddressToPay) (pair %changeOwner address bool))
+        (or (int %closeGame) (int %participate))) ;
+  storage
+    (pair (pair (address %addressToPay) (mutez %bet))
+          (pair (map %loto int (set address)) (map %owners address bool))) ;
+  code { NIL operation ;
+         LAMBDA
+           (pair bool string)
+           unit
+           { UNPAIR ;
+             PUSH bool True ;
+             SWAP ;
+             COMPARE ;
+             EQ ;
+             IF { FAILWITH } { DROP ; UNIT } } ;
+         DUP ;
+         LAMBDA
+           (pair (lambda (pair bool string) unit)
+                 (pair (pair address mutez) (pair (map int (set address)) (map address bool))))
+           unit
+           { UNPAIR ;
+             SWAP ;
+             CDR ;
+             CDR ;
+             SENDER ;
+             GET ;
+             IF_NONE { PUSH string "NOT OWNER" ; FAILWITH } {} ;
+             PUSH string "Owner privilege Revoke" ;
+             PUSH bool False ;
+             DIG 2 ;
+             COMPARE ;
+             EQ ;
+             PAIR ;
+             EXEC ;
+             DROP ;
+             UNIT } ;
+         SWAP ;
+         APPLY ;
+         DIG 3 ;
+         UNPAIR ;
+         IF_LEFT
+           { DIG 3 ;
+             DROP ;
+             IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 DIG 2 ;
+                 CAR ;
+                 CDR ;
+                 DIG 2 ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 DIG 2 ;
+                 CAR ;
+                 SWAP ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CAR ;
+                 PAIR ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH string "NOT A VALID VALUE" ;
+                 PUSH int 1 ;
+                 DUP 3 ;
+                 COMPARE ;
+                 LT ;
+                 PAIR ;
+                 DUP 4 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH string "NOT A VALID VALUE" ;
+                 PUSH int 1000 ;
+                 DUP 3 ;
+                 COMPARE ;
+                 GT ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 DUG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 CAR ;
+                 DIG 2 ;
+                 GET ;
+                 IF_NONE
+                   { EMPTY_SET address ; DUP 3 ; CAR ; CAR ; PUSH bool True ; SWAP ; UPDATE }
+                   {} ;
+                 ITER { SWAP ;
+                        PAIR ;
+                        DUP ;
+                        CDR ;
+                        CONTRACT unit ;
+                        IF_NONE { PUSH string "Contract not found." ; FAILWITH } {} ;
+                        BALANCE ;
+                        UNIT ;
+                        TRANSFER_TOKENS ;
+                        SWAP ;
+                        CAR ;
+                        SWAP ;
+                        CONS } ;
+                 PAIR }
+               { DIG 2 ;
+                 DROP ;
+                 PUSH string "NOT A VALID VALUE" ;
+                 PUSH int 1 ;
+                 DUP 3 ;
+                 COMPARE ;
+                 LT ;
+                 PAIR ;
+                 DUP 4 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH string "NOT A VALID VALUE" ;
+                 PUSH int 1000 ;
+                 DUP 3 ;
+                 COMPARE ;
+                 GT ;
+                 PAIR ;
+                 DUP 4 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH string "NOT ENOUGH FUND" ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 AMOUNT ;
+                 COMPARE ;
+                 NEQ ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE
+                   { EMPTY_SET address ; PUSH bool True ; SENDER ; UPDATE }
+                   { PUSH bool True ; SENDER ; UPDATE } ;
+                 DUP 3 ;
+                 CDR ;
+                 CDR ;
+                 DUP 4 ;
+                 CDR ;
+                 CAR ;
+                 DIG 2 ;
+                 DIG 3 ;
+                 SWAP ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 PAIR ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } } } }

@@ -1,0 +1,152 @@
+{ storage (pair (address %admin) (set %refunds bytes)) ;
+  parameter
+    (or (pair %refund (address %address) (pair (nat %amount) (bytes %data)))
+        (or (or %request
+               (pair %bid
+                  (pair (nat %amount) (pair (bytes %data) (address %ft_address)))
+                  (pair (address %target_address) (pair (nat %target_id) (address %user))))
+               (pair %print
+                  (pair (nat %amount) (pair (bytes %data) (address %ft_address)))
+                  (pair (address %target_address) (pair (nat %target_id) (address %user)))))
+            (pair %update_operator (address %address) (address %operator)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DUP ;
+             CAR ;
+             CONTRACT %burn (pair (address %address) (nat %amount)) ;
+             IF_NONE { PUSH int 805 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DUP 4 ;
+             GET 3 ;
+             SELF_ADDRESS ;
+             PAIR %address %amount ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             DIG 2 ;
+             UNPAIR ;
+             SWAP ;
+             PUSH bool True ;
+             DIG 4 ;
+             GET 4 ;
+             UPDATE ;
+             SWAP ;
+             PAIR ;
+             SWAP }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+                 IF_LEFT
+                   { DUP ;
+                     CAR ;
+                     GET 4 ;
+                     CONTRACT %mint (pair (address %address) (nat %amount)) ;
+                     IF_NONE { PUSH int 773 ; FAILWITH } {} ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     DUP 4 ;
+                     CAR ;
+                     CAR ;
+                     SELF_ADDRESS ;
+                     PAIR %address %amount ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CONTRACT %bid
+                       (pair (pair (nat %auction_id) (nat %bid_price))
+                             (pair (address %bidder) (pair (bytes %data) (address %payer)))) ;
+                     IF_NONE { PUSH int 794 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     SELF_ADDRESS ;
+                     DUP 5 ;
+                     CAR ;
+                     GET 3 ;
+                     PAIR %data %payer ;
+                     DUP 5 ;
+                     GET 6 ;
+                     PAIR %bidder ;
+                     DIG 4 ;
+                     DUP ;
+                     CAR ;
+                     CAR ;
+                     SWAP ;
+                     GET 5 ;
+                     PAIR %auction_id %bid_price ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { DUP ;
+                     CAR ;
+                     GET 4 ;
+                     CONTRACT %mint (pair (address %address) (nat %amount)) ;
+                     IF_NONE { PUSH int 773 ; FAILWITH } {} ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     DUP 4 ;
+                     CAR ;
+                     CAR ;
+                     SELF_ADDRESS ;
+                     PAIR %address %amount ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CONTRACT %print (pair (nat %artwork_id) (pair (address %owner) (address %payer))) ;
+                     IF_NONE { PUSH int 798 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     SELF_ADDRESS ;
+                     DUP 5 ;
+                     GET 6 ;
+                     PAIR %owner %payer ;
+                     DIG 4 ;
+                     GET 5 ;
+                     PAIR %artwork_id ;
+                     TRANSFER_TOKENS ;
+                     CONS } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 CONTRACT %update_operators
+                   (list (or (pair %add_operator (address %operator) (address %owner))
+                             (pair %remove_operator (address %operator) (address %owner)))) ;
+                 IF_NONE { PUSH int 781 ; FAILWITH } {} ;
+                 NIL operation ;
+                 SWAP ;
+                 PUSH mutez 0 ;
+                 NIL (or (pair %add_operator (address %operator) (address %owner))
+                         (pair %remove_operator (address %operator) (address %owner))) ;
+                 SELF_ADDRESS ;
+                 DIG 5 ;
+                 CDR ;
+                 PAIR %operator %owner ;
+                 LEFT %add_operator %remove_operator (pair (address %operator) (address %owner)) ;
+                 CONS ;
+                 TRANSFER_TOKENS ;
+                 CONS } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

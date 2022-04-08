@@ -1,0 +1,29 @@
+{ parameter nat ;
+  storage
+    (pair (nat %maxTokensPerDrip)
+          (pair (big_map %metadata string bytes) (address %tokenContractAddress))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         COMPARE ;
+         LE ;
+         IF {} { PUSH string "Requested too many tokens." ; FAILWITH } ;
+         NIL operation ;
+         { DIP 2 { DUP } ; DIG 3 } ;
+         GET 4 ;
+         CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+         { IF_NONE { PUSH int 48 ; FAILWITH } {} } ;
+         PUSH mutez 0 ;
+         DIG 3 ;
+         SENDER ;
+         PAIR %to %value ;
+         SELF_ADDRESS ;
+         PAIR %from ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

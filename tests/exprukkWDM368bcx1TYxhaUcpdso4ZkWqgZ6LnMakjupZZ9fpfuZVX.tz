@@ -1,0 +1,690 @@
+{ parameter
+    (or (or (nat %bid)
+            (pair %preConfigure
+               (address %minter)
+               (pair (address %seller)
+                     (pair (mutez %opening_price)
+                           (pair (nat %min_raise_percent)
+                                 (pair (mutez %min_raise)
+                                       (pair (nat %round_time)
+                                             (pair (nat %extend_time)
+                                                   (pair %asset (address %fa2_address) (pair (nat %token_id) (nat %amount)))))))))))
+        (nat %resolve)) ;
+  storage
+    (pair (nat %current_id)
+          (pair (nat %max_auction_time)
+                (pair (big_map %auctions
+                         nat
+                         (pair (address %minter)
+                               (pair (address %seller)
+                                     (pair (mutez %current_bid)
+                                           (pair (timestamp %start_time)
+                                                 (pair (timestamp %last_bid_time)
+                                                       (pair (int %round_time)
+                                                             (pair (int %extend_time)
+                                                                   (pair (pair %asset (address %fa2_address) (pair (nat %token_id) (nat %amount)))
+                                                                         (pair (nat %min_raise_percent)
+                                                                               (pair (mutez %min_raise) (pair (timestamp %end_time) (address %highest_bidder)))))))))))))
+                      (pair (big_map %preconfigured_auctions
+                               nat
+                               (pair (address %minter)
+                                     (pair (address %seller)
+                                           (pair (mutez %opening_price)
+                                                 (pair (int %round_time)
+                                                       (pair (int %extend_time)
+                                                             (pair (pair %asset (address %fa2_address) (pair (nat %token_id) (nat %amount)))
+                                                                   (pair (nat %min_raise_percent) (mutez %min_raise)))))))))
+                            (pair %fee (address %fee_address) (nat %fee_percent)))))) ;
+  code { LAMBDA
+           (pair nat mutez)
+           mutez
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             PUSH nat 100 ;
+             SWAP ;
+             DIG 2 ;
+             MUL ;
+             EDIV ;
+             IF_NONE
+               { PUSH string "DIVISION_BY_ZERO" ; FAILWITH }
+               { { { DUP ; CAR ; DIP { CDR } } } ;
+                 PUSH mutez 0 ;
+                 DIG 2 ;
+                 COMPARE ;
+                 GT ;
+                 IF { PUSH mutez 1 ; ADD } {} } } ;
+         LAMBDA
+           (pair bool string)
+           unit
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             NOT ;
+             IF { FAILWITH } { DROP ; UNIT } } ;
+         LAMBDA
+           address
+           (contract unit)
+           { CONTRACT unit ;
+             IF_NONE
+               { PUSH string "Return address does not resolve to contract" ; FAILWITH }
+               {} } ;
+         LAMBDA
+           (pair (pair (pair address (pair nat nat)) address) address)
+           operation
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             DUP ;
+             CAR ;
+             CONTRACT %transfer
+               (list (pair (address %from_)
+                           (list %destinations (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+             IF_NONE { PUSH string "Invalid FA2 Address" ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             NIL (pair address (list (pair address (pair nat nat)))) ;
+             DIG 4 ;
+             NIL (pair address (pair nat nat)) ;
+             DIG 6 ;
+             { DIP 6 { DUP } ; DIG 7 } ;
+             GET 3 ;
+             DIG 7 ;
+             GET 4 ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             CONS ;
+             SWAP ;
+             PAIR ;
+             CONS ;
+             TRANSFER_TOKENS } ;
+         LAMBDA
+           (pair nat
+                 (pair nat
+                       (pair nat
+                             (pair (big_map
+                                      nat
+                                      (pair address
+                                            (pair address
+                                                  (pair mutez
+                                                        (pair timestamp
+                                                              (pair timestamp
+                                                                    (pair int
+                                                                          (pair int
+                                                                                (pair (pair address (pair nat nat)) (pair nat (pair mutez (pair timestamp address))))))))))))
+                                   (pair (big_map
+                                            nat
+                                            (pair address
+                                                  (pair address
+                                                        (pair mutez (pair int (pair int (pair (pair address (pair nat nat)) (pair nat mutez))))))))
+                                         (pair address nat))))))
+           (pair address
+                 (pair address
+                       (pair mutez
+                             (pair timestamp
+                                   (pair timestamp
+                                         (pair int
+                                               (pair int
+                                                     (pair (pair address (pair nat nat)) (pair nat (pair mutez (pair timestamp address)))))))))))
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             GET 5 ;
+             SWAP ;
+             GET ;
+             IF_NONE
+               { PUSH string "Auction does not exist for given asset_id" ; FAILWITH }
+               {} } ;
+         LAMBDA
+           (pair address
+                 (pair address
+                       (pair mutez
+                             (pair timestamp
+                                   (pair timestamp
+                                         (pair int
+                                               (pair int
+                                                     (pair (pair address (pair nat nat)) (pair nat (pair mutez (pair timestamp address)))))))))))
+           bool
+           { DUP ;
+             GET 11 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 9 ;
+             ADD ;
+             NOW ;
+             COMPARE ;
+             GT ;
+             SWAP ;
+             GET 21 ;
+             NOW ;
+             COMPARE ;
+             GE ;
+             OR } ;
+         { DIP 5 { DUP } ; DIG 6 } ;
+         LAMBDA
+           (pair (lambda (pair nat mutez) mutez)
+                 (pair address
+                       (pair address
+                             (pair mutez
+                                   (pair timestamp
+                                         (pair timestamp
+                                               (pair int
+                                                     (pair int
+                                                           (pair (pair address (pair nat nat)) (pair nat (pair mutez (pair timestamp address))))))))))))
+           bool
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             DUP ;
+             GET 3 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 22 ;
+             COMPARE ;
+             EQ ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 5 ;
+             AMOUNT ;
+             COMPARE ;
+             GE ;
+             AND ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 19 ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             GET 5 ;
+             ADD ;
+             AMOUNT ;
+             COMPARE ;
+             GE ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             GET 5 ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             GET 17 ;
+             PAIR ;
+             DIG 4 ;
+             SWAP ;
+             EXEC ;
+             DIG 3 ;
+             GET 5 ;
+             ADD ;
+             AMOUNT ;
+             COMPARE ;
+             GE ;
+             OR ;
+             OR } ;
+         SWAP ;
+         APPLY ;
+         DIG 7 ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { DIG 8 ;
+             DROP ;
+             IF_LEFT
+               { DIG 5 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 GET 5 ;
+                 SWAP ;
+                 MEM ;
+                 IF { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      PAIR ;
+                      DIG 5 ;
+                      SWAP ;
+                      EXEC ;
+                      PUSH string "Auction must be in progress" ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      DIG 6 ;
+                      SWAP ;
+                      EXEC ;
+                      NOT ;
+                      { DIP 2 { DUP } ; DIG 3 } ;
+                      GET 7 ;
+                      NOW ;
+                      COMPARE ;
+                      GE ;
+                      AND ;
+                      PAIR ;
+                      { DIP 6 { DUP } ; DIG 7 } ;
+                      SWAP ;
+                      EXEC ;
+                      DROP ;
+                      PUSH string "Seller cannot place a bid" ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      GET 3 ;
+                      SENDER ;
+                      COMPARE ;
+                      NEQ ;
+                      PAIR ;
+                      DIG 6 ;
+                      SWAP ;
+                      EXEC ;
+                      DROP ;
+                      DUP ;
+                      DIG 4 ;
+                      SWAP ;
+                      EXEC ;
+                      NOT ;
+                      IF { NOW ;
+                           SWAP ;
+                           DUP ;
+                           DUG 2 ;
+                           GET 9 ;
+                           { DIP 2 { DUP } ; DIG 3 } ;
+                           GET 22 ;
+                           PAIR ;
+                           AMOUNT ;
+                           { DIP 3 { DUP } ; DIG 4 } ;
+                           GET 5 ;
+                           PAIR ;
+                           PAIR ;
+                           PAIR ;
+                           PUSH string "Invalid Bid amount" ;
+                           PAIR ;
+                           FAILWITH }
+                         {} ;
+                      DUP ;
+                      GET 22 ;
+                      DIG 4 ;
+                      SWAP ;
+                      EXEC ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      GET 5 ;
+                      UNIT ;
+                      TRANSFER_TOKENS ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      GET 13 ;
+                      NOW ;
+                      { DIP 3 { DUP } ; DIG 4 } ;
+                      GET 21 ;
+                      SUB ;
+                      COMPARE ;
+                      LE ;
+                      IF { SWAP ; DUP ; DUG 2 ; GET 13 ; NOW ; ADD }
+                         { SWAP ; DUP ; DUG 2 ; GET 21 } ;
+                      DIG 2 ;
+                      AMOUNT ;
+                      UPDATE 5 ;
+                      SENDER ;
+                      UPDATE 22 ;
+                      NOW ;
+                      UPDATE 9 ;
+                      SWAP ;
+                      UPDATE 21 ;
+                      DIG 3 ;
+                      DUP ;
+                      GET 5 ;
+                      DIG 2 ;
+                      SOME ;
+                      DIG 4 ;
+                      UPDATE ;
+                      UPDATE 5 ;
+                      NIL operation ;
+                      DIG 2 ;
+                      CONS ;
+                      PAIR }
+                    { DIG 3 ;
+                      DIG 4 ;
+                      DIG 5 ;
+                      DROP 3 ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      GET 7 ;
+                      SWAP ;
+                      GET ;
+                      IF_NONE { PUSH string "Auction is not preconfigured" ; FAILWITH } {} ;
+                      DUP ;
+                      CAR ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      GET 3 ;
+                      AMOUNT ;
+                      NOW ;
+                      NOW ;
+                      { DIP 5 { DUP } ; DIG 6 } ;
+                      GET 7 ;
+                      { DIP 6 { DUP } ; DIG 7 } ;
+                      GET 9 ;
+                      { DIP 7 { DUP } ; DIG 8 } ;
+                      GET 11 ;
+                      { DIP 8 { DUP } ; DIG 9 } ;
+                      GET 13 ;
+                      DIG 9 ;
+                      GET 14 ;
+                      PUSH int 86400 ;
+                      NOW ;
+                      ADD ;
+                      SENDER ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      DUP ;
+                      DIG 3 ;
+                      SWAP ;
+                      EXEC ;
+                      NOT ;
+                      IF { PUSH string "Invalid bid amount" ; FAILWITH }
+                         { PUSH string "Bidder must be an implicit account" ;
+                           SOURCE ;
+                           SENDER ;
+                           COMPARE ;
+                           EQ ;
+                           PAIR ;
+                           { DIP 3 { DUP } ; DIG 4 } ;
+                           SWAP ;
+                           EXEC ;
+                           DROP } ;
+                      PUSH string "Seller cannot place a bid" ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      GET 3 ;
+                      SENDER ;
+                      COMPARE ;
+                      NEQ ;
+                      PAIR ;
+                      DIG 3 ;
+                      SWAP ;
+                      EXEC ;
+                      DROP ;
+                      SWAP ;
+                      DUP ;
+                      DUP ;
+                      DUG 3 ;
+                      GET 5 ;
+                      DIG 2 ;
+                      SOME ;
+                      { DIP 3 { DUP } ; DIG 4 } ;
+                      CAR ;
+                      UPDATE ;
+                      UPDATE 5 ;
+                      PUSH nat 1 ;
+                      DIG 2 ;
+                      CAR ;
+                      ADD ;
+                      UPDATE 1 ;
+                      NIL operation ;
+                      PAIR } }
+               { DIG 2 ;
+                 DIG 3 ;
+                 DIG 4 ;
+                 DIG 6 ;
+                 DROP 4 ;
+                 PUSH string
+                      "Fee_percent must be less than 100%. Please originate another contract." ;
+                 PUSH nat 100 ;
+                 { DIP 3 { DUP } ; DIG 4 } ;
+                 GET 8 ;
+                 CDR ;
+                 COMPARE ;
+                 LE ;
+                 PAIR ;
+                 { DIP 4 { DUP } ; DIG 5 } ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH string "Only seller can preconfigure auction" ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 { DIP 4 { DUP } ; DIG 5 } ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 SENDER ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 PUSH string "Opening price must be greater than 0mutez" ;
+                 PUSH mutez 0 ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 GET 5 ;
+                 COMPARE ;
+                 GT ;
+                 PAIR ;
+                 { DIP 6 { DUP } ; DIG 7 } ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH string "Amount sent must be 0mutez" ;
+                 PUSH mutez 0 ;
+                 AMOUNT ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 { DIP 6 { DUP } ; DIG 7 } ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH string "Round_time must be greater than 0 seconds" ;
+                 PUSH nat 0 ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 GET 11 ;
+                 COMPARE ;
+                 GT ;
+                 PAIR ;
+                 DIG 6 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 DIG 2 ;
+                 DUP ;
+                 GET 7 ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 CAR ;
+                 DIG 4 ;
+                 { DIP 4 { DUP } ; DIG 5 } ;
+                 GET 5 ;
+                 { DIP 5 { DUP } ; DIG 6 } ;
+                 GET 11 ;
+                 INT ;
+                 { DIP 6 { DUP } ; DIG 7 } ;
+                 GET 13 ;
+                 INT ;
+                 { DIP 7 { DUP } ; DIG 8 } ;
+                 GET 14 ;
+                 { DIP 8 { DUP } ; DIG 9 } ;
+                 GET 7 ;
+                 { DIP 9 { DUP } ; DIG 10 } ;
+                 GET 9 ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 DIG 3 ;
+                 GET 14 ;
+                 GET 3 ;
+                 UPDATE ;
+                 UPDATE 7 ;
+                 SELF_ADDRESS ;
+                 SENDER ;
+                 DIG 3 ;
+                 GET 14 ;
+                 PAIR ;
+                 PAIR ;
+                 DIG 2 ;
+                 SWAP ;
+                 EXEC ;
+                 SWAP ;
+                 NIL operation ;
+                 DIG 2 ;
+                 CONS ;
+                 PAIR } }
+           { DIG 2 ;
+             DROP ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             PAIR ;
+             DIG 4 ;
+             SWAP ;
+             EXEC ;
+             PUSH string "Auction must have ended" ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             DIG 5 ;
+             SWAP ;
+             EXEC ;
+             PAIR ;
+             { DIP 6 { DUP } ; DIG 7 } ;
+             SWAP ;
+             EXEC ;
+             DROP ;
+             PUSH string "Amount must be 0mutez" ;
+             PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             EQ ;
+             PAIR ;
+             DIG 6 ;
+             SWAP ;
+             EXEC ;
+             DROP ;
+             NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 22 ;
+             SELF_ADDRESS ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             GET 15 ;
+             PAIR ;
+             PAIR ;
+             DIG 5 ;
+             SWAP ;
+             EXEC ;
+             CONS ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             { DIP 5 { DUP } ; DIG 6 } ;
+             SWAP ;
+             EXEC ;
+             { DIP 4 { DUP } ; DIG 5 } ;
+             GET 8 ;
+             CAR ;
+             DIG 6 ;
+             SWAP ;
+             EXEC ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             GET 5 ;
+             PUSH int 10 ;
+             ABS ;
+             PAIR ;
+             { DIP 7 { DUP } ; DIG 8 } ;
+             SWAP ;
+             EXEC ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             { DIP 5 { DUP } ; DIG 6 } ;
+             GET 5 ;
+             { DIP 8 { DUP } ; DIG 9 } ;
+             GET 8 ;
+             CDR ;
+             PAIR ;
+             DIG 9 ;
+             SWAP ;
+             EXEC ;
+             DIG 3 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             DIG 4 ;
+             DIG 4 ;
+             DIG 3 ;
+             DIG 6 ;
+             GET 5 ;
+             SUB ;
+             SUB ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             DIG 5 ;
+             DUP ;
+             GET 5 ;
+             DIG 6 ;
+             NONE (pair address
+                        (pair address
+                              (pair mutez
+                                    (pair timestamp
+                                          (pair timestamp
+                                                (pair int
+                                                      (pair int
+                                                            (pair (pair address (pair nat nat)) (pair nat (pair mutez (pair timestamp address))))))))))) ;
+             SWAP ;
+             UPDATE ;
+             UPDATE 5 ;
+             DIG 4 ;
+             DIG 2 ;
+             CONS ;
+             DIG 2 ;
+             CONS ;
+             DIG 2 ;
+             CONS ;
+             PAIR } } }

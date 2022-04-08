@@ -1,0 +1,149 @@
+{ storage
+    (pair (address %admin)
+          (pair (mutez %cost)
+                (map %identities
+                   address
+                   (map string (pair (timestamp %register_date) (bool %verified)))))) ;
+  parameter
+    (or (or (unit %registerAddress) (string %registerProof))
+        (or (pair %send (mutez %amount) (address %receiverAddress))
+            (or (mutez %setCost) (pair %verifyProof (string %type) (address %tzaddr))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DROP ;
+                 DUP ;
+                 GET 3 ;
+                 AMOUNT ;
+                 COMPARE ;
+                 LT ;
+                 IF { PUSH string "Amount too low" ; FAILWITH } {} ;
+                 DUP ;
+                 GET 4 ;
+                 SENDER ;
+                 MEM ;
+                 IF { PUSH string "Address already registered" ; FAILWITH } {} ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 PUSH (option (map string (pair (timestamp %register_date) (bool %verified)))) (Some {}) ;
+                 SENDER ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 AMOUNT ;
+                 COMPARE ;
+                 LT ;
+                 IF { PUSH string "Amount too low" ; FAILWITH } {} ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 DUP ;
+                 SENDER ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 32 ; FAILWITH } {} ;
+                 PUSH bool False ;
+                 NOW ;
+                 PAIR %register_date %verified ;
+                 SOME ;
+                 DIG 6 ;
+                 UPDATE ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } ;
+             NIL operation }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "Only admin can send" ; FAILWITH } {} ;
+                 DUP ;
+                 CDR ;
+                 CONTRACT unit ;
+                 IF_NONE { PUSH int 49 ; FAILWITH } {} ;
+                 NIL operation ;
+                 SWAP ;
+                 DIG 2 ;
+                 CAR ;
+                 UNIT ;
+                 TRANSFER_TOKENS ;
+                 CONS }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "Only admin can set cost" ; FAILWITH } {} ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DIG 2 ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "Only admin can verify" ; FAILWITH } {} ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUP 5 ;
+                     CDR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 43 ; FAILWITH } {} ;
+                     DUP ;
+                     DIG 6 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 43 ; FAILWITH } {} ;
+                     CAR ;
+                     PUSH bool True ;
+                     SWAP ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } ;
+                 NIL operation } } ;
+         PAIR } }

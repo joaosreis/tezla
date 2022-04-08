@@ -1,0 +1,6 @@
+{ storage (pair (string %audio) (string %image)) ;
+  parameter (or (string %storeaudio) (string %storeimg)) ;
+  code { UNPAIR ;
+         IF_LEFT { SWAP ; CDR ; SWAP ; PAIR } { SWAP ; CAR ; PAIR } ;
+         NIL operation ;
+         PAIR } }

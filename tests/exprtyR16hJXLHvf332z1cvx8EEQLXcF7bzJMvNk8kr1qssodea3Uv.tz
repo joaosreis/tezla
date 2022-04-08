@@ -1,0 +1,57 @@
+{ storage (pair (int %mrp) (int %stock)) ;
+  parameter
+    (or (int %get_suppliers_mrp)
+        (or (int %process_request)
+            (pair %request_crops_from_supplier
+               (int %_rate)
+               (pair (address %address) (int %quantity))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { UPDATE 1 ; NIL operation }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 CDR ;
+                 DIG 2 ;
+                 ADD ;
+                 UPDATE 2 ;
+                 PUSH int 0 ;
+                 UPDATE 1 ;
+                 NIL operation }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 COMPARE ;
+                 LE ;
+                 IF { DUP ;
+                      GET 3 ;
+                      CONTRACT %customer_Requirement int ;
+                      IF_NONE { PUSH int 13 ; FAILWITH } {} ;
+                      NIL operation ;
+                      SWAP ;
+                      PUSH mutez 0 ;
+                      DUP 4 ;
+                      GET 4 ;
+                      TRANSFER_TOKENS ;
+                      CONS ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      GET 3 ;
+                      CONTRACT %customer_rate_check int ;
+                      IF_NONE { PUSH int 14 ; FAILWITH } {} ;
+                      PUSH mutez 0 ;
+                      DIG 3 ;
+                      CAR ;
+                      TRANSFER_TOKENS ;
+                      CONS }
+                    { DROP ; NIL operation } } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

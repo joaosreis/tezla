@@ -1,0 +1,19 @@
+{ storage unit ;
+  parameter
+    (or (unit %entry_point_1)
+        (pair %entry_point_2 (mutez %amount) (address %destination))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ; NIL operation }
+           { DUP ;
+             CDR ;
+             CONTRACT unit ;
+             IF_NONE { PUSH string "FAILED" ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             DIG 2 ;
+             CAR ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

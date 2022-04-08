@@ -1,0 +1,16 @@
+{ parameter (ticket int) ;
+  storage unit ;
+  code { CAR ;
+         PUSH string "a" ;
+         PUSH nat 0 ;
+         SWAP ;
+         TICKET @a ;
+         PUSH string "a" ;
+         PUSH nat 9 ;
+         SWAP ;
+         TICKET @b ;
+         PAIR ;
+         JOIN_TICKETS ;
+         DROP ;
+         READ_TICKET ;
+         FAILWITH } }

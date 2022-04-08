@@ -1,0 +1,41 @@
+{ parameter
+    (or (or (or (or (pair %addAchievement
+                       (pair (string %accountname) (string %achievementid))
+                       (pair (string %achievementname) (string %createdate)))
+                    (pair %addBadge
+                       (pair (string %accountname) (string %badgeid))
+                       (pair (string %badgename) (string %createdate))))
+                (or (pair %addChallenge
+                       (pair (string %accountname) (string %challengeid))
+                       (pair (string %challengename) (string %createdate)))
+                    (pair %addSocial
+                       (pair (string %createdate) (string %fromaccount))
+                       (pair (string %socialdata) (string %toaccount)))))
+            (or (or (pair %addTask
+                       (pair (pair (string %accountname) (string %challengeid))
+                             (pair (string %createdate) (string %metadata)))
+                       (pair (pair (string %quantity) (string %taskid)) (string %taskname)))
+                    (pair %earnXP (pair (string %accountname) (string %createdate)) (string %data)))
+                (or (pair %endorseUser
+                       (pair (string %createdate) (string %fromaccount))
+                       (pair (string %socialdata) (string %toaccount)))
+                    (pair %levelUp (pair (string %accountname) (string %createdate)) (string %data)))))
+        (pair %logTask
+           (pair (pair (string %accountname) (string %challengeid))
+                 (pair (string %createdate) (string %metadata)))
+           (pair (pair (string %quantity) (string %taskid)) (string %taskname)))) ;
+  storage unit ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         DROP ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { IF_LEFT { DROP ; PUSH unit Unit } { DROP ; PUSH unit Unit } }
+                   { IF_LEFT { DROP ; PUSH unit Unit } { DROP ; PUSH unit Unit } } }
+               { IF_LEFT
+                   { IF_LEFT { DROP ; PUSH unit Unit } { DROP ; PUSH unit Unit } }
+                   { IF_LEFT { DROP ; PUSH unit Unit } { DROP ; PUSH unit Unit } } } }
+           { DROP ; PUSH unit Unit } ;
+         NIL operation ;
+         PAIR } }

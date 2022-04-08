@@ -1,0 +1,3 @@
+{ parameter bytes ;
+  storage unit ;
+  code { UNPAIR ; UNPACK (lambda unit unit) ; DROP ; NIL operation ; PAIR } }

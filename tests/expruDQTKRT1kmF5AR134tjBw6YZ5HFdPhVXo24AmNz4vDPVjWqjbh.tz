@@ -1,3 +1,0 @@
-{ parameter (list (pair address (list (pair address (pair nat nat))))) ;
-  storage unit ;
-  code { CDR ; NIL operation ; PAIR } }

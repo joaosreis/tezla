@@ -1,0 +1,351 @@
+{ parameter
+    (or (bytes %administrate)
+        (pair %approve
+           (nat %amount)
+           (pair (address %destination) (pair (string %token) (string %txID))))) ;
+  storage
+    (pair (pair (pair (bool %active) (set %admins address))
+                (pair (address %bridgeAddress) (set %federators address)))
+          (pair (pair (big_map %metadata string bytes)
+                      (big_map %orders
+                         bytes
+                         (pair (bool %complete)
+                               (pair (set %confirmations address)
+                                     (pair (timestamp %startedAt)
+                                           (pair %subject
+                                              (nat %amount)
+                                              (pair (address %destination) (pair (string %token) (string %txID)))))))))
+                (pair (nat %quorum) (int %timeout)))) ;
+  code { CAST (pair (or bytes (pair nat (pair address (pair string string))))
+                    (pair (pair (pair bool (set address)) (pair address (set address)))
+                          (pair (pair (big_map string bytes)
+                                      (big_map
+                                         bytes
+                                         (pair bool
+                                               (pair (set address) (pair timestamp (pair nat (pair address (pair string string))))))))
+                                (pair nat int)))) ;
+         UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             CDR ;
+             SENDER ;
+             MEM ;
+             IF {} { PUSH string "FEDERATION_NotAdmin" ; FAILWITH } ;
+             DUP ;
+             UNPACK
+               (list (or address
+                         (or bool (or address (or (or (set address) (set address)) (or nat (or int address))))))) ;
+             { IF_NONE
+                 { PUSH string "FEDERATION_AdministrationActionsInvalid" ; FAILWITH }
+                 {} } ;
+             ITER { DUP ;
+                    IF_LEFT
+                      { SWAP ;
+                        DROP ;
+                        DIG 2 ;
+                        UNPAIR ;
+                        UNPAIR ;
+                        UNPAIR ;
+                        SWAP ;
+                        PUSH bool True ;
+                        DIG 5 ;
+                        UPDATE ;
+                        SWAP ;
+                        PAIR ;
+                        PAIR ;
+                        PAIR ;
+                        SWAP }
+                      { IF_LEFT
+                          { SWAP ;
+                            DROP ;
+                            DIG 2 ;
+                            UNPAIR ;
+                            UNPAIR ;
+                            CDR ;
+                            DIG 3 ;
+                            PAIR ;
+                            PAIR ;
+                            PAIR ;
+                            SWAP }
+                          { IF_LEFT
+                              { SWAP ;
+                                DROP ;
+                                DIG 2 ;
+                                UNPAIR ;
+                                UNPAIR ;
+                                SWAP ;
+                                CDR ;
+                                DIG 3 ;
+                                PAIR ;
+                                SWAP ;
+                                PAIR ;
+                                PAIR ;
+                                SWAP }
+                              { IF_LEFT
+                                  { DUP ;
+                                    IF_LEFT
+                                      { DUP ;
+                                        ITER { DIG 5 ;
+                                               UNPAIR ;
+                                               UNPAIR ;
+                                               SWAP ;
+                                               UNPAIR ;
+                                               SWAP ;
+                                               PUSH bool True ;
+                                               DIG 5 ;
+                                               UPDATE ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               PAIR ;
+                                               DUG 4 } ;
+                                        DROP 3 }
+                                      { DUP ;
+                                        ITER { DIG 5 ;
+                                               UNPAIR ;
+                                               UNPAIR ;
+                                               SWAP ;
+                                               UNPAIR ;
+                                               SWAP ;
+                                               PUSH bool False ;
+                                               DIG 5 ;
+                                               UPDATE ;
+                                               SWAP ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               PAIR ;
+                                               DUG 4 } ;
+                                        DROP 3 } ;
+                                    SWAP ;
+                                    DUP ;
+                                    DUG 2 ;
+                                    CAR ;
+                                    GET 4 ;
+                                    SIZE ;
+                                    DUP 3 ;
+                                    GET 5 ;
+                                    COMPARE ;
+                                    LE ;
+                                    IF {} { PUSH string "FEDERATION_MoreQuorumThanVoters" ; FAILWITH } }
+                                  { IF_LEFT
+                                      { SWAP ; DROP ; DIG 2 ; SWAP ; UPDATE 5 ; SWAP }
+                                      { IF_LEFT
+                                          { SWAP ; DROP ; DIG 2 ; SWAP ; UPDATE 6 ; SWAP }
+                                          { PUSH nat 1 ;
+                                            DUP 5 ;
+                                            CAR ;
+                                            CAR ;
+                                            CDR ;
+                                            SIZE ;
+                                            COMPARE ;
+                                            GT ;
+                                            IF { SWAP ;
+                                                 DROP ;
+                                                 DIG 2 ;
+                                                 UNPAIR ;
+                                                 UNPAIR ;
+                                                 UNPAIR ;
+                                                 SWAP ;
+                                                 PUSH bool False ;
+                                                 DIG 5 ;
+                                                 UPDATE ;
+                                                 SWAP ;
+                                                 PAIR ;
+                                                 PAIR ;
+                                                 PAIR ;
+                                                 SWAP }
+                                               { DROP 2 } } } } } } } } ;
+             DROP ;
+             NIL operation }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             GET 4 ;
+             SENDER ;
+             MEM ;
+             IF {} { PUSH string "FEDERATION_FederatorUnknown" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             PACK ;
+             SHA3 ;
+             MEM ;
+             IF { PUSH bool False ;
+                  DUP 3 ;
+                  GET 3 ;
+                  CDR ;
+                  DUP 3 ;
+                  PACK ;
+                  SHA3 ;
+                  GET ;
+                  { IF_NONE { PUSH int 79 ; FAILWITH } {} } ;
+                  CAR ;
+                  COMPARE ;
+                  EQ ;
+                  IF {} { PUSH string "FEDERATION_OrderIsComplete" ; FAILWITH } ;
+                  NOW ;
+                  DUP 3 ;
+                  GET 3 ;
+                  CDR ;
+                  DUP 3 ;
+                  PACK ;
+                  SHA3 ;
+                  GET ;
+                  { IF_NONE { PUSH int 79 ; FAILWITH } {} } ;
+                  GET 5 ;
+                  PUSH int 60 ;
+                  DUP 5 ;
+                  GET 6 ;
+                  MUL ;
+                  ADD ;
+                  COMPARE ;
+                  GE ;
+                  IF {} { PUSH string "FEDERATION_OrderTimedout" ; FAILWITH } ;
+                  SWAP ;
+                  UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  UNPAIR ;
+                  SWAP ;
+                  DUP ;
+                  DUP 6 ;
+                  PACK ;
+                  SHA3 ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  { IF_NONE { PUSH int 87 ; FAILWITH } {} } ;
+                  DUP ;
+                  GET 3 ;
+                  PUSH bool True ;
+                  SENDER ;
+                  UPDATE ;
+                  UPDATE 3 ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP }
+                { SWAP ;
+                  UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  UNPAIR ;
+                  SWAP ;
+                  DUP 5 ;
+                  NOW ;
+                  EMPTY_SET address ;
+                  PUSH bool True ;
+                  SENDER ;
+                  UPDATE ;
+                  PUSH bool False ;
+                  PAIR 4 ;
+                  SOME ;
+                  DUP 6 ;
+                  PACK ;
+                  SHA3 ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             PACK ;
+             SHA3 ;
+             GET ;
+             { IF_NONE { PUSH int 79 ; FAILWITH } {} } ;
+             GET 3 ;
+             SIZE ;
+             DUP 3 ;
+             GET 5 ;
+             COMPARE ;
+             LE ;
+             IF { SWAP ;
+                  UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  UNPAIR ;
+                  SWAP ;
+                  DUP ;
+                  DUP 6 ;
+                  PACK ;
+                  SHA3 ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  { IF_NONE { PUSH int 99 ; FAILWITH } {} } ;
+                  PUSH bool True ;
+                  UPDATE 1 ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  NIL operation ;
+                  DUP 3 ;
+                  CAR ;
+                  GET 3 ;
+                  CONTRACT %wrap (pair nat (pair address string)) ;
+                  { IF_NONE { PUSH string "FEDERATION_BridgeTokenInvalid" ; FAILWITH } {} } ;
+                  PUSH mutez 0 ;
+                  DUP 5 ;
+                  GET 3 ;
+                  CDR ;
+                  DUP 5 ;
+                  PACK ;
+                  SHA3 ;
+                  GET ;
+                  { IF_NONE { PUSH int 98 ; FAILWITH } {} } ;
+                  GET 11 ;
+                  DUP 6 ;
+                  GET 3 ;
+                  CDR ;
+                  DUP 6 ;
+                  PACK ;
+                  SHA3 ;
+                  GET ;
+                  { IF_NONE { PUSH int 98 ; FAILWITH } {} } ;
+                  GET 9 ;
+                  DUP 7 ;
+                  GET 3 ;
+                  CDR ;
+                  DIG 6 ;
+                  PACK ;
+                  SHA3 ;
+                  GET ;
+                  { IF_NONE { PUSH int 98 ; FAILWITH } {} } ;
+                  GET 7 ;
+                  PAIR 3 ;
+                  TRANSFER_TOKENS ;
+                  CONS }
+                { DROP ; NIL operation } } ;
+         PAIR } }

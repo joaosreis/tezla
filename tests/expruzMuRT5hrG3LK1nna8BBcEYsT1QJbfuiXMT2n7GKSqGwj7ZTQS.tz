@@ -1,0 +1,118 @@
+{ storage nat ;
+  parameter
+    (or (or (pair %add (nat %x) (nat %y)) (or (nat %factorial) (nat %log2)))
+        (or (pair %multiply (nat %x) (nat %y)) (or (nat %square) (nat %squareRoot)))) ;
+  code { CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { UNPAIR ; ADD }
+               { IF_LEFT
+                   { PUSH nat 1 ;
+                     SWAP ;
+                     DUP ;
+                     PUSH nat 1 ;
+                     ADD ;
+                     PUSH nat 1 ;
+                     DUP ;
+                     DUP 3 ;
+                     COMPARE ;
+                     GT ;
+                     LOOP { DIG 3 ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            MUL ;
+                            DUG 3 ;
+                            PUSH nat 1 ;
+                            ADD ;
+                            DUP ;
+                            DUP 3 ;
+                            COMPARE ;
+                            GT } ;
+                     DROP 3 }
+                   { PUSH nat 0 ;
+                     SWAP ;
+                     DUP ;
+                     DUP ;
+                     PUSH nat 1 ;
+                     COMPARE ;
+                     LT ;
+                     LOOP { DIG 2 ;
+                            PUSH nat 1 ;
+                            ADD ;
+                            DUG 2 ;
+                            PUSH nat 2 ;
+                            SWAP ;
+                            EDIV ;
+                            IF_NONE { PUSH int 42 ; FAILWITH } { CAR } ;
+                            DUP ;
+                            PUSH nat 1 ;
+                            COMPARE ;
+                            LT } ;
+                     DROP 2 } } }
+           { IF_LEFT
+               { UNPAIR ; MUL }
+               { IF_LEFT
+                   { DUP ; MUL }
+                   { DUP ;
+                     PUSH nat 0 ;
+                     SWAP ;
+                     COMPARE ;
+                     GE ;
+                     IF {} { PUSH string "WrongCondition: params >= 0" ; FAILWITH } ;
+                     DUP ;
+                     DUP ;
+                     DUG 2 ;
+                     SWAP ;
+                     DUP ;
+                     DUP ;
+                     DUG 3 ;
+                     MUL ;
+                     COMPARE ;
+                     GT ;
+                     LOOP { PUSH nat 2 ;
+                            SWAP ;
+                            DUP ;
+                            DUP 4 ;
+                            EDIV ;
+                            IF_NONE { PUSH int 26 ; FAILWITH } { CAR } ;
+                            ADD ;
+                            EDIV ;
+                            IF_NONE { PUSH int 26 ; FAILWITH } { CAR } ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            SWAP ;
+                            DUP ;
+                            DUP ;
+                            DUG 3 ;
+                            MUL ;
+                            COMPARE ;
+                            GT } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     SWAP ;
+                     DUP ;
+                     DUP ;
+                     DUG 3 ;
+                     MUL ;
+                     COMPARE ;
+                     LE ;
+                     IF { DUP ;
+                          PUSH nat 1 ;
+                          ADD ;
+                          PUSH nat 1 ;
+                          DUP 3 ;
+                          ADD ;
+                          MUL ;
+                          DIG 2 ;
+                          COMPARE ;
+                          LT }
+                        { SWAP ; DROP ; PUSH bool False } ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: ((y.value * y.value) <= params) & (params < ((y.value + 1) * (y.value + 1)))" ;
+                          FAILWITH } } } } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,308 @@
+{ storage
+    (pair (address %owner)
+          (pair (mutez %fee)
+                (map %gem
+                   string
+                   (pair string
+                         (pair address (pair mutez (pair string (pair string (pair string (option string)))))))))) ;
+  parameter
+    (or (pair %create_gem
+           (string %create_gem_p1)
+           (pair (string %create_gem_p2)
+                 (pair (string %create_gem_p3)
+                       (pair (string %create_gem_p4)
+                             (pair (string %create_gem_p5) (option %create_gem_p6 string))))))
+        (or (pair %update_gem_meta
+               (string %update_gem_meta_p1)
+               (option %update_gem_meta_p2 string))
+            (or (string %destroy_gem)
+                (or (address %change_owner) (or (mutez %change_fee) (unit %claim_balance)))))) ;
+  code { NIL operation ;
+         DIG 1 ;
+         UNPAIR ;
+         DIP { UNPAIR ; SWAP ; UNPAIR ; SWAP } ;
+         IF_LEFT
+           { UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             DIG 7 ;
+             DUP ;
+             DUG 8 ;
+             AMOUNT ;
+             COMPARE ;
+             GE ;
+             NOT ;
+             IF { PUSH string "InvalidCondition: create_gem_c1" ; FAILWITH } {} ;
+             DIG 6 ;
+             DUP ;
+             DUG 7 ;
+             DIG 6 ;
+             DUP ;
+             DUG 7 ;
+             MEM ;
+             IF { PUSH string "KeyAlreadyExists" ; FAILWITH }
+                { DIG 6 ;
+                  DUP ;
+                  DUG 7 ;
+                  DIG 1 ;
+                  DUP ;
+                  DUG 2 ;
+                  DIG 3 ;
+                  DUP ;
+                  DUG 4 ;
+                  PAIR ;
+                  DIG 4 ;
+                  DUP ;
+                  DUG 5 ;
+                  PAIR ;
+                  DIG 5 ;
+                  DUP ;
+                  DUG 6 ;
+                  PAIR ;
+                  DIG 9 ;
+                  DUP ;
+                  DUG 10 ;
+                  AMOUNT ;
+                  SUB ;
+                  PAIR ;
+                  SENDER ;
+                  PAIR ;
+                  DIG 6 ;
+                  DUP ;
+                  DUG 7 ;
+                  PAIR ;
+                  SOME ;
+                  DIG 7 ;
+                  DUP ;
+                  DUG 8 ;
+                  UPDATE ;
+                  DIP { DIG 6 ; DROP } ;
+                  DUG 6 } ;
+             DROP 6 ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             DIG 1 ;
+             PAIR }
+           { IF_LEFT
+               { UNPAIR ;
+                 SWAP ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 GET ;
+                 IF_NONE { PUSH string "GetNoneValue" ; FAILWITH } {} ;
+                 CDR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 NOT ;
+                 IF { PUSH string "InvalidCaller" ; FAILWITH } {} ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 GET ;
+                 IF_NONE { PUSH string "GetNoneValue" ; FAILWITH } {} ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 DROP ;
+                 DIG 7 ;
+                 DUP ;
+                 DUG 8 ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 UPDATE ;
+                 DIP { DIG 2 ; DROP } ;
+                 DUG 2 ;
+                 DROP 2 ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 DIG 1 ;
+                 PAIR }
+               { IF_LEFT
+                   { DIG 1 ;
+                     DUP ;
+                     DUG 2 ;
+                     DIG 1 ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH string "GetNoneValue" ; FAILWITH } {} ;
+                     CDR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     NOT ;
+                     IF { PUSH string "InvalidCaller" ; FAILWITH } {} ;
+                     DIG 4 ;
+                     DUP ;
+                     DUG 5 ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     GET ;
+                     IF_NONE { PUSH string "GetNoneValue" ; FAILWITH } {} ;
+                     CDR ;
+                     CAR ;
+                     CONTRACT unit ;
+                     IF_NONE { PUSH string "BadContract" ; FAILWITH } {} ;
+                     DIG 3 ;
+                     DUP ;
+                     DUG 4 ;
+                     DIG 3 ;
+                     DUP ;
+                     DUG 4 ;
+                     GET ;
+                     IF_NONE { PUSH string "GetNoneValue" ; FAILWITH } {} ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DIP { DIG 4 ; DROP } ;
+                     DUG 4 ;
+                     DIG 1 ;
+                     DUP ;
+                     DUG 2 ;
+                     NONE (pair string
+                                (pair address (pair mutez (pair string (pair string (pair string (option string))))))) ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     UPDATE ;
+                     DIP { DIG 1 ; DROP } ;
+                     DUG 1 ;
+                     DROP ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     DIG 1 ;
+                     PAIR }
+                   { IF_LEFT
+                       { DIG 3 ;
+                         DUP ;
+                         DUG 4 ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         NOT ;
+                         IF { PUSH string "InvalidCaller" ; FAILWITH } {} ;
+                         DUP ;
+                         DIP { DIG 3 ; DROP } ;
+                         DUG 3 ;
+                         DROP ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         DIG 1 ;
+                         PAIR }
+                       { IF_LEFT
+                           { DIG 3 ;
+                             DUP ;
+                             DUG 4 ;
+                             SENDER ;
+                             COMPARE ;
+                             EQ ;
+                             NOT ;
+                             IF { PUSH string "InvalidCaller" ; FAILWITH } {} ;
+                             PUSH nat 0 ;
+                             PUSH mutez 1 ;
+                             DIG 2 ;
+                             DUP ;
+                             DUG 3 ;
+                             EDIV ;
+                             IF_NONE { PUSH string "DivByZero" ; FAILWITH } { DUP ; CAR ; SWAP ; DROP } ;
+                             COMPARE ;
+                             GE ;
+                             NOT ;
+                             IF { PUSH string "InvalidCondition: change_fee_c1" ; FAILWITH } {} ;
+                             DUP ;
+                             DIP { DIG 2 ; DROP } ;
+                             DUG 2 ;
+                             DROP ;
+                             SWAP ;
+                             PAIR ;
+                             SWAP ;
+                             PAIR ;
+                             DIG 1 ;
+                             PAIR }
+                           { DROP ;
+                             DIG 2 ;
+                             DUP ;
+                             DUG 3 ;
+                             SENDER ;
+                             COMPARE ;
+                             EQ ;
+                             NOT ;
+                             IF { PUSH string "InvalidCaller" ; FAILWITH } {} ;
+                             DIG 3 ;
+                             DUP ;
+                             DUG 4 ;
+                             DIG 3 ;
+                             DUP ;
+                             DUG 4 ;
+                             CONTRACT unit ;
+                             IF_NONE { PUSH string "BadContract" ; FAILWITH } {} ;
+                             BALANCE ;
+                             UNIT ;
+                             TRANSFER_TOKENS ;
+                             CONS ;
+                             DIP { DIG 3 ; DROP } ;
+                             DUG 3 ;
+                             SWAP ;
+                             PAIR ;
+                             SWAP ;
+                             PAIR ;
+                             DIG 1 ;
+                             PAIR } } } } } } }

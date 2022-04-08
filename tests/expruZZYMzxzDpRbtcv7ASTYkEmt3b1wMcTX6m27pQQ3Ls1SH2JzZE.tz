@@ -1,0 +1,7 @@
+{ parameter unit ;
+  storage bytes ;
+  code { DROP ;
+         LAMBDA unit unit { PUSH timestamp 0 ; DROP } ;
+         PACK ;
+         NIL operation ;
+         PAIR } }

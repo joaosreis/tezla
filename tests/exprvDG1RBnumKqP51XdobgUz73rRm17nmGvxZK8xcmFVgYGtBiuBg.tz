@@ -1,0 +1,156 @@
+{ parameter
+    (or (or (contract %prophecyHook bytes) (list %setProphecy bytes))
+        (pair %setupContract (set %owners address) (set %contracts address))) ;
+  storage
+    (pair (pair (pair (set %contracts address) (string %game_dest))
+                (pair (bool %init) (set %owners address)))
+          (list %prophecies bytes)) ;
+  code { NIL operation ;
+         LAMBDA
+           (pair bool string)
+           unit
+           { UNPAIR ; IF { FAILWITH } { DROP ; UNIT } } ;
+         DIG 2 ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DIG 3 ;
+                 DROP ;
+                 PUSH string "TZC_NOT_AUTHORIZED_CONTRACT" ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 MEM ;
+                 NOT ;
+                 PAIR ;
+                 DUP 4 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH string "TZC_ORACLE_NOT_READY" ;
+                 PUSH bool False ;
+                 DUP 4 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 IF_CONS { SWAP ; DROP ; SOME } { NONE bytes } ;
+                 IF_NONE { PUSH string "TZC_ORACLE_NO_PROPHECY" ; FAILWITH } {} ;
+                 DUP 3 ;
+                 CDR ;
+                 IF_CONS { DROP ; SOME } { NONE (list bytes) } ;
+                 IF_NONE { PUSH string "TZC_NO_TAIL" ; FAILWITH } {} ;
+                 DIG 2 ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 TRANSFER_TOKENS ;
+                 SWAP ;
+                 DIG 2 ;
+                 CAR ;
+                 PAIR ;
+                 NIL operation ;
+                 DIG 2 ;
+                 CONS ;
+                 PAIR }
+               { PUSH string "TZC_NOT_OWNER" ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 SOURCE ;
+                 MEM ;
+                 NOT ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH bool False ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF { SWAP ;
+                      CAR ;
+                      PAIR ;
+                      DUP ;
+                      CDR ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CAR ;
+                      CDR ;
+                      CDR ;
+                      PUSH bool True ;
+                      PAIR ;
+                      DIG 2 ;
+                      CAR ;
+                      CAR ;
+                      PAIR ;
+                      PAIR }
+                    { SWAP ; DUP ; DUG 2 ; CDR ; SWAP ; ITER { CONS } ; SWAP ; CAR ; PAIR } ;
+                 SWAP ;
+                 PAIR } }
+           { PUSH string "TZC_NOT_OWNER" ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             SOURCE ;
+             MEM ;
+             NOT ;
+             PAIR ;
+             DIG 3 ;
+             SWAP ;
+             EXEC ;
+             DROP ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             DUP 4 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             DIG 3 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR ;
+             DUP ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             DIG 2 ;
+             CAR ;
+             CAR ;
+             CDR ;
+             DIG 3 ;
+             CDR ;
+             PAIR ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             PAIR } } }

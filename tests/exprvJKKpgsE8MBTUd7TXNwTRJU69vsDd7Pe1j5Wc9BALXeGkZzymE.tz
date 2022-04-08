@@ -1,0 +1,26 @@
+{ storage
+    (pair (address %admin)
+          (pair (map %my_data (pair address int) (map string int)) (int %uid))) ;
+  parameter int ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         PUSH (option (map string int)) (Some { Elt "hello" 123 ; Elt "hello2" 344 }) ;
+         DIG 4 ;
+         SENDER ;
+         PAIR ;
+         UPDATE ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

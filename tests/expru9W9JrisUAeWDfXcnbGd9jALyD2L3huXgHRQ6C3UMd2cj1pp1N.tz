@@ -1,3 +1,0 @@
-{ storage (lambda unit unit) ;
-  parameter unit ;
-  code { CDR ; NIL operation ; PAIR } }

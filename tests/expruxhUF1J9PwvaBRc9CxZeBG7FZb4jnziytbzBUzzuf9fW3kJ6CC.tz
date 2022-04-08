@@ -1,0 +1,14 @@
+{ storage (pair (map %m int string) (pair (int %totOrg) (option %y unit))) ;
+  parameter (or (map %test_map_get_opt int unit) (unit %test_update_map)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { PUSH int 12 ; GET ; UPDATE 4 }
+           { DROP ;
+             DUP ;
+             CAR ;
+             PUSH (option string) (Some "one") ;
+             PUSH int 1 ;
+             UPDATE ;
+             UPDATE 1 } ;
+         NIL operation ;
+         PAIR } }

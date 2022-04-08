@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (set never) ;
+  code { DROP ; EMPTY_SET never ; NIL operation ; PAIR } }

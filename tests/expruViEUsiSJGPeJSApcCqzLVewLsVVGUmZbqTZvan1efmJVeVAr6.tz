@@ -1,0 +1,294 @@
+{ storage
+    (pair (pair (address %admin) (pair (address %escrow) (bytes %job_id)))
+          (pair (nat %next_request_id) (pair (address %oracle) (option %value int)))) ;
+  parameter
+    (or (or (pair %add_remove_escrow_operator (bool %add_operator) (address %token))
+            (bool %cancel_value))
+        (or (pair %request_value
+               (pair (nat %amount) (int %cancel_timeout_minutes))
+               (pair (int %fulfill_timeout_minutes)
+                     (option %parameters (or (bytes %bytes) (or (int %int) (string %string))))))
+            (or (pair %set_value
+                   (ticket %request
+                      (pair (pair (pair (timestamp %cancel_timeout) (nat %client_request_id))
+                                  (pair (timestamp %fulfill_timeout) (bytes %job_id)))
+                            (pair (pair (address %oracle)
+                                        (option %parameters (or (bytes %bytes) (or (int %int) (string %string)))))
+                                  (pair (string %tag) (address %target)))))
+                   (ticket %result
+                      (pair (pair (address %client) (nat %client_request_id))
+                            (pair (or %result (bytes %bytes) (or (int %int) (string %string))) (string %tag)))))
+                (pair %setup
+                   (pair (address %admin) (address %escrow))
+                   (pair (bytes %job_id) (address %oracle)))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DUP ;
+                 CAR ;
+                 IF { CDR ;
+                      CONTRACT %update_operators
+                        (list (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                                  (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))) ;
+                      IF_NONE { PUSH int 330 ; FAILWITH } {} ;
+                      NIL operation ;
+                      SWAP ;
+                      PUSH mutez 0 ;
+                      NIL (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                              (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))) ;
+                      PUSH nat 0 ;
+                      DUP 6 ;
+                      CAR ;
+                      CDR ;
+                      CAR ;
+                      PAIR %operator %token_id ;
+                      SELF_ADDRESS ;
+                      PAIR %owner ;
+                      LEFT %add_operator %remove_operator
+                        (pair (address %owner) (pair (address %operator) (nat %token_id))) ;
+                      CONS ;
+                      TRANSFER_TOKENS ;
+                      CONS }
+                    { CDR ;
+                      CONTRACT %update_operators
+                        (list (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                                  (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))) ;
+                      IF_NONE { PUSH int 330 ; FAILWITH } {} ;
+                      NIL operation ;
+                      SWAP ;
+                      PUSH mutez 0 ;
+                      NIL (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                              (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))) ;
+                      PUSH nat 0 ;
+                      DUP 6 ;
+                      CAR ;
+                      CDR ;
+                      CAR ;
+                      PAIR %operator %token_id ;
+                      SELF_ADDRESS ;
+                      PAIR %owner ;
+                      RIGHT %add_operator %remove_operator
+                        (pair (address %owner) (pair (address %operator) (nat %token_id))) ;
+                      CONS ;
+                      TRANSFER_TOKENS ;
+                      CONS } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "RequesterNotAdmin" ; FAILWITH } ;
+                 NIL operation ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CONTRACT %cancel_request
+                   (pair (nat %client_request_id) (pair (bool %force) (address %oracle))) ;
+                 IF_NONE { PUSH int 395 ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 DUP 5 ;
+                 GET 5 ;
+                 DIG 4 ;
+                 PAIR %force %oracle ;
+                 PUSH nat 1 ;
+                 DUP 6 ;
+                 GET 3 ;
+                 SUB ;
+                 ISNAT ;
+                 IF_NONE { PUSH int 392 ; FAILWITH } {} ;
+                 PAIR %client_request_id ;
+                 TRANSFER_TOKENS ;
+                 CONS } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "RequesterNotAdmin" ; FAILWITH } ;
+                 PUSH nat 1 ;
+                 SELF %set_value ;
+                 ADDRESS ;
+                 PUSH string "OracleRequest" ;
+                 PAIR %tag %target ;
+                 DUP 3 ;
+                 GET 4 ;
+                 DUP 5 ;
+                 GET 5 ;
+                 PAIR %oracle %parameters ;
+                 PAIR ;
+                 DUP 4 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 NOW ;
+                 PUSH int 60 ;
+                 DUP 6 ;
+                 GET 3 ;
+                 MUL ;
+                 ADD ;
+                 PAIR %fulfill_timeout %job_id ;
+                 DUP 5 ;
+                 GET 3 ;
+                 NOW ;
+                 PUSH int 60 ;
+                 DUP 7 ;
+                 CAR ;
+                 CDR ;
+                 MUL ;
+                 ADD ;
+                 PAIR %cancel_timeout %client_request_id ;
+                 PAIR ;
+                 PAIR ;
+                 TICKET ;
+                 NIL operation ;
+                 DUP 4 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CONTRACT %send_request
+                   (pair (nat %amount)
+                         (ticket %request
+                            (pair (pair (pair (timestamp %cancel_timeout) (nat %client_request_id))
+                                        (pair (timestamp %fulfill_timeout) (bytes %job_id)))
+                                  (pair (pair (address %oracle)
+                                              (option %parameters (or (bytes %bytes) (or (int %int) (string %string)))))
+                                        (pair (string %tag) (address %target)))))) ;
+                 IF_NONE { PUSH int 384 ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 DIG 4 ;
+                 CAR ;
+                 CAR ;
+                 PAIR %amount %request ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 PUSH nat 1 ;
+                 ADD ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "ReceiverNotEscrow" ; FAILWITH } ;
+                     UNPAIR ;
+                     READ_TICKET ;
+                     SWAP ;
+                     DROP ;
+                     UNPAIR 3 ;
+                     DIG 2 ;
+                     DROP ;
+                     DIG 2 ;
+                     READ_TICKET ;
+                     SWAP ;
+                     DROP ;
+                     GET 3 ;
+                     SELF_ADDRESS ;
+                     DIG 2 ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "ReceiverBadRequester" ; FAILWITH } ;
+                     PUSH nat 1 ;
+                     DUP 4 ;
+                     GET 3 ;
+                     SUB ;
+                     ISNAT ;
+                     IF_NONE { PUSH int 481 ; FAILWITH } {} ;
+                     DIG 2 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "ReceiverBadRequester" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 3 ;
+                     GET 3 ;
+                     IF_LEFT
+                       { PUSH int 41 ; FAILWITH }
+                       { IF_LEFT {} { PUSH int 41 ; FAILWITH } } ;
+                     SOME ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "RequesterNotAdmin" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     CDR ;
+                     DUP 3 ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DUP 4 ;
+                     CAR ;
+                     CDR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DUP 4 ;
+                     GET 4 ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 3 ;
+                     GET 3 ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR } ;
+                 NIL operation } } ;
+         PAIR } }

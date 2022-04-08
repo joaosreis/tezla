@@ -1,0 +1,56 @@
+{ parameter
+    (or (pair %receive
+           (pair (timestamp %expiration) (string %hash))
+           (pair (string %sendr) (int %threadID)))
+        (pair %send
+           (pair (timestamp %expiration) (string %hash))
+           (pair (string %receiver) (int %threadID)))) ;
+  storage
+    (pair (pair (address %owner)
+                (list %received
+                   (pair (pair (timestamp %expiration) (string %hash))
+                         (pair (string %sendr) (int %threadID)))))
+          (list %sent
+             (pair (pair (timestamp %expiration) (string %hash))
+                   (pair (string %receiver) (int %threadID))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             DIG 3 ;
+             CONS ;
+             DIG 2 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR }
+           { SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SOURCE ;
+             COMPARE ;
+             EQ ;
+             IF { DUP ;
+                  CDR ;
+                  DIG 2 ;
+                  CONS ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CAR ;
+                  CDR ;
+                  DIG 2 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  PAIR }
+                { DROP 2 ; PUSH string "Not Authorized." ; FAILWITH } } ;
+         NIL operation ;
+         PAIR } }

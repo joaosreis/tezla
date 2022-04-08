@@ -1,0 +1,18 @@
+{ parameter (pair (address %from_) (pair (address %to) (nat %value))) ;
+  storage (pair (address %contract1) (address %contract2)) ;
+  code { UNPAIR ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         CDR ;
+         PAIR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         CAR ;
+         DIG 2 ;
+         DROP 2 ;
+         CDR ;
+         PUSH string "notImplemented" ;
+         FAILWITH } }

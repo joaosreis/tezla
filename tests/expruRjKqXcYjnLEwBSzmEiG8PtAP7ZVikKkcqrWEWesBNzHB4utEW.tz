@@ -1,0 +1,6 @@
+{ storage (pair int int int int int) ;
+  parameter (pair int int int int int) ;
+  code { DROP ;
+         PUSH (pair int int int int int) (Pair 1 2 3 4 5) ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,1416 @@
+{ parameter
+    (or (or (nat %cancelProposal)
+            (list %multiVote
+               (pair (nat %initiatorId)
+                     (pair (nat %proposalId)
+                           (list %votes (pair (signature %signature) (pair (nat %voterId) (bool %yay))))))))
+        (or (list %newProposal
+               (or (list %selfAdmin
+                      (or (or (nat %changeQuorum) (address %changeTarget))
+                          (or (int %changeTimeout)
+                              (pair %changeVoters
+                                 (list %added (pair (address %addr) (key %publicKey)))
+                                 (set %removed nat)))))
+                   (list %targetAdmin
+                      (or (or (bool %changeActive) (address %changeAdmin))
+                          (or (pair %changeOracles
+                                 (list %added
+                                    (pair address
+                                          (pair (address %adminAddress) (pair (option %endingRound nat) (nat %startingRound)))))
+                                 (list %removed address))
+                              (pair %updateFutureRounds
+                                 (pair (nat %maxSubmissions) (nat %minSubmissions))
+                                 (pair (nat %oraclePayment) (pair (nat %restartDelay) (nat %timeout)))))))))
+            (list %vote (pair (nat %initiatorId) (pair (nat %proposalId) (bool %yay)))))) ;
+  storage
+    (pair (pair (pair (big_map %addrVoterId address nat) (big_map %keyVoterId key nat))
+                (pair (timestamp %lastVoteTimestamp)
+                      (pair (nat %lastVoterId) (big_map %metadata string bytes))))
+          (pair (pair (nat %nbVoters)
+                      (pair (map %proposals
+                               nat
+                               (pair (pair (list %batchs
+                                              (or (list %selfAdmin
+                                                     (or (or (nat %changeQuorum) (address %changeTarget))
+                                                         (or (int %changeTimeout)
+                                                             (pair %changeVoters
+                                                                (list %added (pair (address %addr) (key %publicKey)))
+                                                                (set %removed nat)))))
+                                                  (list %targetAdmin
+                                                     (or (or (bool %changeActive) (address %changeAdmin))
+                                                         (or (pair %changeOracles
+                                                                (list %added
+                                                                   (pair address
+                                                                         (pair (address %adminAddress) (pair (option %endingRound nat) (nat %startingRound)))))
+                                                                (list %removed address))
+                                                             (pair %updateFutureRounds
+                                                                (pair (nat %maxSubmissions) (nat %minSubmissions))
+                                                                (pair (nat %oraclePayment) (pair (nat %restartDelay) (nat %timeout)))))))))
+                                           (pair (bool %canceled) (nat %id)))
+                                     (pair (set %nay nat) (pair (timestamp %startedAt) (set %yay nat)))))
+                            (nat %quorum)))
+                (pair (option %target address)
+                      (pair (int %timeout)
+                            (big_map %voters
+                               nat
+                               (pair (address %addr) (pair (nat %lastProposalId) (key %publicKey)))))))) ;
+  code { LAMBDA
+           (pair (pair %in_param
+                    (pair (list %batchs
+                             (or (list %selfAdmin
+                                    (or (or (nat %changeQuorum) (address %changeTarget))
+                                        (or (int %changeTimeout)
+                                            (pair %changeVoters
+                                               (list %added (pair (address %addr) (key %publicKey)))
+                                               (set %removed nat)))))
+                                 (list %targetAdmin
+                                    (or (or (bool %changeActive) (address %changeAdmin))
+                                        (or (pair %changeOracles
+                                               (list %added
+                                                  (pair address
+                                                        (pair (address %adminAddress) (pair (option %endingRound nat) (nat %startingRound)))))
+                                               (list %removed address))
+                                            (pair %updateFutureRounds
+                                               (pair (nat %maxSubmissions) (nat %minSubmissions))
+                                               (pair (nat %oraclePayment) (pair (nat %restartDelay) (nat %timeout)))))))))
+                          (pair (bool %canceled) (nat %id)))
+                    (pair (set %nay nat) (pair (timestamp %startedAt) (set %yay nat))))
+                 (pair %in_storage
+                    (pair (pair (big_map %addrVoterId address nat) (big_map %keyVoterId key nat))
+                          (pair (timestamp %lastVoteTimestamp)
+                                (pair (nat %lastVoterId) (big_map %metadata string bytes))))
+                    (pair (pair (nat %nbVoters)
+                                (pair (map %proposals
+                                         nat
+                                         (pair (pair (list %batchs
+                                                        (or (list %selfAdmin
+                                                               (or (or (nat %changeQuorum) (address %changeTarget))
+                                                                   (or (int %changeTimeout)
+                                                                       (pair %changeVoters
+                                                                          (list %added (pair (address %addr) (key %publicKey)))
+                                                                          (set %removed nat)))))
+                                                            (list %targetAdmin
+                                                               (or (or (bool %changeActive) (address %changeAdmin))
+                                                                   (or (pair %changeOracles
+                                                                          (list %added
+                                                                             (pair address
+                                                                                   (pair (address %adminAddress) (pair (option %endingRound nat) (nat %startingRound)))))
+                                                                          (list %removed address))
+                                                                       (pair %updateFutureRounds
+                                                                          (pair (nat %maxSubmissions) (nat %minSubmissions))
+                                                                          (pair (nat %oraclePayment) (pair (nat %restartDelay) (nat %timeout)))))))))
+                                                     (pair (bool %canceled) (nat %id)))
+                                               (pair (set %nay nat) (pair (timestamp %startedAt) (set %yay nat)))))
+                                      (nat %quorum)))
+                          (pair (option %target address)
+                                (pair (int %timeout)
+                                      (big_map %voters
+                                         nat
+                                         (pair (address %addr) (pair (nat %lastProposalId) (key %publicKey)))))))))
+           (pair (list %operations operation)
+                 (pair (unit %result)
+                       (pair %storage
+                          (pair (pair (big_map %addrVoterId address nat) (big_map %keyVoterId key nat))
+                                (pair (timestamp %lastVoteTimestamp)
+                                      (pair (nat %lastVoterId) (big_map %metadata string bytes))))
+                          (pair (pair (nat %nbVoters)
+                                      (pair (map %proposals
+                                               nat
+                                               (pair (pair (list %batchs
+                                                              (or (list %selfAdmin
+                                                                     (or (or (nat %changeQuorum) (address %changeTarget))
+                                                                         (or (int %changeTimeout)
+                                                                             (pair %changeVoters
+                                                                                (list %added (pair (address %addr) (key %publicKey)))
+                                                                                (set %removed nat)))))
+                                                                  (list %targetAdmin
+                                                                     (or (or (bool %changeActive) (address %changeAdmin))
+                                                                         (or (pair %changeOracles
+                                                                                (list %added
+                                                                                   (pair address
+                                                                                         (pair (address %adminAddress) (pair (option %endingRound nat) (nat %startingRound)))))
+                                                                                (list %removed address))
+                                                                             (pair %updateFutureRounds
+                                                                                (pair (nat %maxSubmissions) (nat %minSubmissions))
+                                                                                (pair (nat %oraclePayment) (pair (nat %restartDelay) (nat %timeout)))))))))
+                                                           (pair (bool %canceled) (nat %id)))
+                                                     (pair (set %nay nat) (pair (timestamp %startedAt) (set %yay nat)))))
+                                            (nat %quorum)))
+                                (pair (option %target address)
+                                      (pair (int %timeout)
+                                            (big_map %voters
+                                               nat
+                                               (pair (address %addr) (pair (nat %lastProposalId) (key %publicKey))))))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             UNPAIR ;
+             UNPAIR ;
+             SWAP ;
+             CDR ;
+             NOW ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             DIG 2 ;
+             CAR ;
+             CAR ;
+             CAR ;
+             ITER { DUP ;
+                    IF_LEFT
+                      { DUP ;
+                        ITER { DUP ;
+                               IF_LEFT
+                                 { SWAP ;
+                                   DROP ;
+                                   IF_LEFT
+                                     { DUP 4 ;
+                                       CDR ;
+                                       CAR ;
+                                       CAR ;
+                                       SWAP ;
+                                       DUP ;
+                                       DUG 2 ;
+                                       COMPARE ;
+                                       LE ;
+                                       IF {} { PUSH string "MultisignAdmin_QuorumInferiorVoters" ; FAILWITH } ;
+                                       DIG 3 ;
+                                       UNPAIR ;
+                                       SWAP ;
+                                       UNPAIR ;
+                                       UNPAIR ;
+                                       SWAP ;
+                                       CAR ;
+                                       DIG 4 ;
+                                       SWAP ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       DUG 2 }
+                                     { DIG 3 ;
+                                       UNPAIR ;
+                                       SWAP ;
+                                       UNPAIR ;
+                                       SWAP ;
+                                       CDR ;
+                                       DIG 3 ;
+                                       SOME ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       DUG 2 } }
+                                 { IF_LEFT
+                                     { SWAP ;
+                                       DROP ;
+                                       DIG 3 ;
+                                       UNPAIR ;
+                                       SWAP ;
+                                       UNPAIR ;
+                                       SWAP ;
+                                       UNPAIR ;
+                                       SWAP ;
+                                       CDR ;
+                                       DIG 4 ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       DUG 2 }
+                                     { DUP ;
+                                       CDR ;
+                                       ITER { DUP 6 ;
+                                              GET 8 ;
+                                              SWAP ;
+                                              DUP ;
+                                              DUG 2 ;
+                                              MEM ;
+                                              IF {} { PUSH string "MultisignAdmin_VoterUnknown" ; FAILWITH } ;
+                                              DUP 6 ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              NONE nat ;
+                                              DIG 10 ;
+                                              GET 8 ;
+                                              DUP 7 ;
+                                              GET ;
+                                              { IF_NONE { PUSH int 326 ; FAILWITH } {} } ;
+                                              CAR ;
+                                              UPDATE ;
+                                              PAIR ;
+                                              PAIR ;
+                                              PAIR ;
+                                              DUP ;
+                                              DUG 6 ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              NONE nat ;
+                                              DIG 10 ;
+                                              GET 8 ;
+                                              DUP 7 ;
+                                              GET ;
+                                              { IF_NONE { PUSH int 327 ; FAILWITH } {} } ;
+                                              GET 4 ;
+                                              UPDATE ;
+                                              SWAP ;
+                                              PAIR ;
+                                              PAIR ;
+                                              SWAP ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              UNPAIR ;
+                                              NONE (pair (pair (list %batchs
+                                                                  (or (list %selfAdmin
+                                                                         (or (or (nat %changeQuorum) (address %changeTarget))
+                                                                             (or (int %changeTimeout)
+                                                                                 (pair %changeVoters
+                                                                                    (list %added (pair (address %addr) (key %publicKey)))
+                                                                                    (set %removed nat)))))
+                                                                      (list %targetAdmin
+                                                                         (or (or (bool %changeActive) (address %changeAdmin))
+                                                                             (or (pair %changeOracles
+                                                                                    (list %added
+                                                                                       (pair address
+                                                                                             (pair (address %adminAddress) (pair (option %endingRound nat) (nat %startingRound)))))
+                                                                                    (list %removed address))
+                                                                                 (pair %updateFutureRounds
+                                                                                    (pair (nat %maxSubmissions) (nat %minSubmissions))
+                                                                                    (pair (nat %oraclePayment) (pair (nat %restartDelay) (nat %timeout)))))))))
+                                                               (pair (bool %canceled) (nat %id)))
+                                                         (pair (set %nay nat) (pair (timestamp %startedAt) (set %yay nat)))) ;
+                                              DUP 7 ;
+                                              UPDATE ;
+                                              PAIR ;
+                                              SWAP ;
+                                              PAIR ;
+                                              SWAP ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              NONE (pair (address %addr) (pair (nat %lastProposalId) (key %publicKey))) ;
+                                              DIG 6 ;
+                                              UPDATE ;
+                                              SWAP ;
+                                              PAIR ;
+                                              SWAP ;
+                                              PAIR ;
+                                              SWAP ;
+                                              PAIR ;
+                                              SWAP ;
+                                              PAIR ;
+                                              DUG 4 } ;
+                                       DUP 5 ;
+                                       UNPAIR ;
+                                       SWAP ;
+                                       UNPAIR ;
+                                       CDR ;
+                                       DUP 4 ;
+                                       CDR ;
+                                       SIZE ;
+                                       DIG 8 ;
+                                       CDR ;
+                                       CAR ;
+                                       CAR ;
+                                       SUB ;
+                                       ISNAT ;
+                                       { IF_NONE { PUSH int 330 ; FAILWITH } {} } ;
+                                       PAIR ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       DUG 4 ;
+                                       DUP ;
+                                       CAR ;
+                                       ITER { DUP 6 ;
+                                              CAR ;
+                                              CAR ;
+                                              CAR ;
+                                              SWAP ;
+                                              DUP ;
+                                              DUG 2 ;
+                                              CAR ;
+                                              MEM ;
+                                              IF { PUSH bool False }
+                                                 { DUP 6 ; CAR ; CAR ; CDR ; SWAP ; DUP ; DUG 2 ; CDR ; MEM ; NOT } ;
+                                              IF {} { PUSH string "MultisignAdmin_VoterAlreadyknown" ; FAILWITH } ;
+                                              DIG 5 ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              UNPAIR ;
+                                              PUSH nat 1 ;
+                                              ADD ;
+                                              PAIR ;
+                                              SWAP ;
+                                              PAIR ;
+                                              SWAP ;
+                                              PAIR ;
+                                              PAIR ;
+                                              DUP ;
+                                              DUG 6 ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              DUP 6 ;
+                                              CDR ;
+                                              PUSH nat 0 ;
+                                              PAIR %lastProposalId %publicKey ;
+                                              DUP 7 ;
+                                              CAR ;
+                                              PAIR %addr ;
+                                              SOME ;
+                                              DIG 11 ;
+                                              CAR ;
+                                              CDR ;
+                                              CDR ;
+                                              CAR ;
+                                              UPDATE ;
+                                              SWAP ;
+                                              PAIR ;
+                                              SWAP ;
+                                              PAIR ;
+                                              SWAP ;
+                                              PAIR ;
+                                              SWAP ;
+                                              PAIR ;
+                                              DUP ;
+                                              DUG 6 ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              DIG 9 ;
+                                              CAR ;
+                                              CDR ;
+                                              CDR ;
+                                              CAR ;
+                                              SOME ;
+                                              DUP 6 ;
+                                              CAR ;
+                                              UPDATE ;
+                                              PAIR ;
+                                              PAIR ;
+                                              PAIR ;
+                                              DUP ;
+                                              DUG 6 ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              UNPAIR ;
+                                              SWAP ;
+                                              DIG 9 ;
+                                              CAR ;
+                                              CDR ;
+                                              CDR ;
+                                              CAR ;
+                                              SOME ;
+                                              DIG 5 ;
+                                              CDR ;
+                                              UPDATE ;
+                                              SWAP ;
+                                              PAIR ;
+                                              PAIR ;
+                                              PAIR ;
+                                              DUG 4 } ;
+                                       SWAP ;
+                                       DROP ;
+                                       DIG 3 ;
+                                       UNPAIR ;
+                                       SWAP ;
+                                       UNPAIR ;
+                                       UNPAIR ;
+                                       DIG 4 ;
+                                       CAR ;
+                                       SIZE ;
+                                       ADD ;
+                                       PAIR ;
+                                       PAIR ;
+                                       SWAP ;
+                                       PAIR ;
+                                       DUG 2 ;
+                                       PUSH nat 0 ;
+                                       DUP 4 ;
+                                       CDR ;
+                                       CAR ;
+                                       CAR ;
+                                       COMPARE ;
+                                       GT ;
+                                       IF {} { PUSH string "MultisignAdmin_VotersLessThan1" ; FAILWITH } ;
+                                       DIG 2 ;
+                                       DUP ;
+                                       CDR ;
+                                       CAR ;
+                                       CAR ;
+                                       SWAP ;
+                                       DUP ;
+                                       DUG 4 ;
+                                       CDR ;
+                                       CAR ;
+                                       CDR ;
+                                       CDR ;
+                                       COMPARE ;
+                                       LE ;
+                                       IF {} { PUSH string "MultisignAdmin_QuorumInferiorVoters" ; FAILWITH } } } } ;
+                        DROP 2 }
+                      { SWAP ;
+                        DROP ;
+                        DUG 2 ;
+                        DUP ;
+                        DUG 3 ;
+                        GET 5 ;
+                        { IF_NONE { PUSH string "MultisignAdmin_TargetNotSet" ; FAILWITH } {} } ;
+                        CONTRACT
+                          (list (or (or (bool %changeActive) (address %changeAdmin))
+                                    (or (pair %changeOracles
+                                           (list %added
+                                              (pair address
+                                                    (pair (address %adminAddress) (pair (option %endingRound nat) (nat %startingRound)))))
+                                           (list %removed address))
+                                        (pair %updateFutureRounds
+                                           (pair (nat %maxSubmissions) (nat %minSubmissions))
+                                           (pair (nat %oraclePayment) (pair (nat %restartDelay) (nat %timeout))))))) ;
+                        { IF_NONE { PUSH string "MultisignAdmin_TargetUnkown" ; FAILWITH } {} } ;
+                        PUSH mutez 0 ;
+                        DIG 3 ;
+                        TRANSFER_TOKENS ;
+                        CONS ;
+                        SWAP } } ;
+             UNIT ;
+             PAIR %result %storage ;
+             SWAP ;
+             PAIR %operations } ;
+         SWAP ;
+         LAMBDA
+           (pair (pair %in_param
+                    (pair (nat %initiatorId) (nat %proposalId))
+                    (pair (nat %voterId) (bool %yay)))
+                 (pair %in_storage
+                    (pair (pair (big_map %addrVoterId address nat) (big_map %keyVoterId key nat))
+                          (pair (timestamp %lastVoteTimestamp)
+                                (pair (nat %lastVoterId) (big_map %metadata string bytes))))
+                    (pair (pair (nat %nbVoters)
+                                (pair (map %proposals
+                                         nat
+                                         (pair (pair (list %batchs
+                                                        (or (list %selfAdmin
+                                                               (or (or (nat %changeQuorum) (address %changeTarget))
+                                                                   (or (int %changeTimeout)
+                                                                       (pair %changeVoters
+                                                                          (list %added (pair (address %addr) (key %publicKey)))
+                                                                          (set %removed nat)))))
+                                                            (list %targetAdmin
+                                                               (or (or (bool %changeActive) (address %changeAdmin))
+                                                                   (or (pair %changeOracles
+                                                                          (list %added
+                                                                             (pair address
+                                                                                   (pair (address %adminAddress) (pair (option %endingRound nat) (nat %startingRound)))))
+                                                                          (list %removed address))
+                                                                       (pair %updateFutureRounds
+                                                                          (pair (nat %maxSubmissions) (nat %minSubmissions))
+                                                                          (pair (nat %oraclePayment) (pair (nat %restartDelay) (nat %timeout)))))))))
+                                                     (pair (bool %canceled) (nat %id)))
+                                               (pair (set %nay nat) (pair (timestamp %startedAt) (set %yay nat)))))
+                                      (nat %quorum)))
+                          (pair (option %target address)
+                                (pair (int %timeout)
+                                      (big_map %voters
+                                         nat
+                                         (pair (address %addr) (pair (nat %lastProposalId) (key %publicKey)))))))))
+           (pair (list %operations operation)
+                 (pair (unit %result)
+                       (pair %storage
+                          (pair (pair (big_map %addrVoterId address nat) (big_map %keyVoterId key nat))
+                                (pair (timestamp %lastVoteTimestamp)
+                                      (pair (nat %lastVoterId) (big_map %metadata string bytes))))
+                          (pair (pair (nat %nbVoters)
+                                      (pair (map %proposals
+                                               nat
+                                               (pair (pair (list %batchs
+                                                              (or (list %selfAdmin
+                                                                     (or (or (nat %changeQuorum) (address %changeTarget))
+                                                                         (or (int %changeTimeout)
+                                                                             (pair %changeVoters
+                                                                                (list %added (pair (address %addr) (key %publicKey)))
+                                                                                (set %removed nat)))))
+                                                                  (list %targetAdmin
+                                                                     (or (or (bool %changeActive) (address %changeAdmin))
+                                                                         (or (pair %changeOracles
+                                                                                (list %added
+                                                                                   (pair address
+                                                                                         (pair (address %adminAddress) (pair (option %endingRound nat) (nat %startingRound)))))
+                                                                                (list %removed address))
+                                                                             (pair %updateFutureRounds
+                                                                                (pair (nat %maxSubmissions) (nat %minSubmissions))
+                                                                                (pair (nat %oraclePayment) (pair (nat %restartDelay) (nat %timeout)))))))))
+                                                           (pair (bool %canceled) (nat %id)))
+                                                     (pair (set %nay nat) (pair (timestamp %startedAt) (set %yay nat)))))
+                                            (nat %quorum)))
+                                (pair (option %target address)
+                                      (pair (int %timeout)
+                                            (big_map %voters
+                                               nat
+                                               (pair (address %addr) (pair (nat %lastProposalId) (key %publicKey))))))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             CDR ;
+             CAR ;
+             CDR ;
+             CAR ;
+             DUP 4 ;
+             CAR ;
+             CAR ;
+             CAR ;
+             MEM ;
+             IF { DUP 3 ;
+                  CAR ;
+                  CAR ;
+                  CDR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  DUP 5 ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  GET ;
+                  { IF_NONE { PUSH int 284 ; FAILWITH } {} } ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  COMPARE ;
+                  EQ }
+                { PUSH bool False } ;
+             IF {} { PUSH string "MultisignAdmin_ProposalUnknown" ; FAILWITH } ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             NOW ;
+             COMPARE ;
+             GT ;
+             IF { DUP ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  DUP 4 ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  GET ;
+                  { IF_NONE { PUSH int 284 ; FAILWITH } {} } ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  NOT }
+                { PUSH bool False } ;
+             IF {} { PUSH string "MultisignAdmin_ProposalClosed" ; FAILWITH } ;
+             DUP ;
+             CDR ;
+             CAR ;
+             CDR ;
+             CAR ;
+             DUP 4 ;
+             CAR ;
+             CAR ;
+             CAR ;
+             GET ;
+             { IF_NONE { PUSH int 284 ; FAILWITH } {} } ;
+             GET 5 ;
+             PUSH int 60 ;
+             DUP 3 ;
+             GET 7 ;
+             MUL ;
+             ADD ;
+             NOW ;
+             COMPARE ;
+             LT ;
+             IF {} { PUSH string "MultisignAdmin_ProposalTimedout" ; FAILWITH } ;
+             DUP ;
+             CDR ;
+             CAR ;
+             CDR ;
+             CAR ;
+             DUP 4 ;
+             CAR ;
+             CAR ;
+             CAR ;
+             GET ;
+             { IF_NONE { PUSH int 284 ; FAILWITH } {} } ;
+             GET 6 ;
+             DUP 4 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             MEM ;
+             IF { PUSH bool False }
+                { DUP ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  DUP 4 ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  GET ;
+                  { IF_NONE { PUSH int 284 ; FAILWITH } {} } ;
+                  GET 3 ;
+                  DUP 4 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  MEM ;
+                  NOT } ;
+             IF {} { PUSH string "MultisignAdmin_AlreadyVoted" ; FAILWITH } ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             IF { UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  DUP ;
+                  DUP 8 ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  { IF_NONE { PUSH int 297 ; FAILWITH } {} } ;
+                  UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  SWAP ;
+                  PUSH bool True ;
+                  DIG 12 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR }
+                { UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  DUP ;
+                  DUP 8 ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  { IF_NONE { PUSH int 299 ; FAILWITH } {} } ;
+                  UNPAIR ;
+                  SWAP ;
+                  UNPAIR ;
+                  PUSH bool True ;
+                  DIG 11 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR } ;
+             UNIT ;
+             PAIR %result %storage ;
+             SWAP ;
+             PAIR %operations } ;
+         SWAP ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DIG 2 ;
+                 DROP ;
+                 DIG 2 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 MEM ;
+                 IF {} { PUSH string "MultisignAdmin_VoterUnknown" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 GET ;
+                 { IF_NONE { PUSH int 237 ; FAILWITH } {} } ;
+                 MEM ;
+                 IF { SWAP ;
+                      DUP ;
+                      CDR ;
+                      CAR ;
+                      CDR ;
+                      CAR ;
+                      SWAP ;
+                      DUP ;
+                      DUG 3 ;
+                      CAR ;
+                      CAR ;
+                      CAR ;
+                      SENDER ;
+                      GET ;
+                      { IF_NONE { PUSH int 237 ; FAILWITH } {} } ;
+                      GET ;
+                      { IF_NONE { PUSH int 238 ; FAILWITH } {} } ;
+                      CAR ;
+                      CDR ;
+                      CDR ;
+                      COMPARE ;
+                      EQ }
+                    { DROP ; PUSH bool False } ;
+                 IF {} { PUSH string "MultisignAdmin_ProposalUnknown" ; FAILWITH } ;
+                 DUP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 DUP ;
+                 DIG 6 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 GET ;
+                 { IF_NONE { PUSH int 237 ; FAILWITH } {} } ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 242 ; FAILWITH } {} } ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 CDR ;
+                 PUSH bool True ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 NIL operation }
+               { DUP ;
+                 NIL operation ;
+                 SWAP ;
+                 ITER { DUP ;
+                        GET 4 ;
+                        ITER { DUP 5 ;
+                               GET 8 ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               GET 3 ;
+                               MEM ;
+                               IF {} { PUSH string "MultisignAdmin_VoterUnknown" ; FAILWITH } ;
+                               SWAP ;
+                               DUP ;
+                               GET 3 ;
+                               SWAP ;
+                               DUP ;
+                               DUG 3 ;
+                               CAR ;
+                               PAIR ;
+                               SELF_ADDRESS ;
+                               PAIR ;
+                               PACK ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CAR ;
+                               DUP 7 ;
+                               GET 8 ;
+                               DUP 4 ;
+                               GET 3 ;
+                               GET ;
+                               { IF_NONE { PUSH int 213 ; FAILWITH } {} } ;
+                               GET 4 ;
+                               CHECK_SIGNATURE ;
+                               IF {} { PUSH string "MultisignAdmin_Badsig" ; FAILWITH } ;
+                               DUP 6 ;
+                               DIG 5 ;
+                               DIG 2 ;
+                               DUP ;
+                               GET 4 ;
+                               SWAP ;
+                               DUP ;
+                               DUG 4 ;
+                               GET 3 ;
+                               PAIR %voterId %yay ;
+                               DIG 4 ;
+                               DUP ;
+                               GET 3 ;
+                               SWAP ;
+                               DUP ;
+                               DUG 6 ;
+                               CAR ;
+                               PAIR %initiatorId %proposalId ;
+                               PAIR ;
+                               PAIR %in_param %in_storage ;
+                               EXEC ;
+                               DUP ;
+                               GET 4 ;
+                               DUG 5 ;
+                               DUP ;
+                               CAR ;
+                               ITER { DIG 4 ; SWAP ; CONS ; DUG 3 } ;
+                               DROP 2 } ;
+                        DIG 3 ;
+                        DUP ;
+                        CDR ;
+                        CAR ;
+                        CDR ;
+                        CDR ;
+                        SWAP ;
+                        DUP ;
+                        DUG 5 ;
+                        CDR ;
+                        CAR ;
+                        CDR ;
+                        CAR ;
+                        DUP 3 ;
+                        CAR ;
+                        GET ;
+                        { IF_NONE { PUSH int 226 ; FAILWITH } {} } ;
+                        GET 6 ;
+                        SIZE ;
+                        DUP 6 ;
+                        CDR ;
+                        CAR ;
+                        CDR ;
+                        CAR ;
+                        DUP 4 ;
+                        CAR ;
+                        GET ;
+                        { IF_NONE { PUSH int 226 ; FAILWITH } {} } ;
+                        GET 3 ;
+                        SIZE ;
+                        ADD ;
+                        COMPARE ;
+                        GE ;
+                        IF { DUP 4 ;
+                             CDR ;
+                             CAR ;
+                             CDR ;
+                             CAR ;
+                             SWAP ;
+                             DUP ;
+                             DUG 2 ;
+                             CAR ;
+                             GET ;
+                             { IF_NONE { PUSH int 226 ; FAILWITH } {} } ;
+                             GET 6 ;
+                             SIZE ;
+                             DUP 5 ;
+                             CDR ;
+                             CAR ;
+                             CDR ;
+                             CAR ;
+                             DUP 3 ;
+                             CAR ;
+                             GET ;
+                             { IF_NONE { PUSH int 226 ; FAILWITH } {} } ;
+                             GET 3 ;
+                             SIZE ;
+                             COMPARE ;
+                             GE ;
+                             IF { DIG 3 ;
+                                  UNPAIR ;
+                                  SWAP ;
+                                  UNPAIR ;
+                                  UNPAIR ;
+                                  SWAP ;
+                                  UNPAIR ;
+                                  DUP ;
+                                  DIG 6 ;
+                                  CAR ;
+                                  DUP ;
+                                  DUG 2 ;
+                                  GET ;
+                                  { IF_NONE { PUSH int 229 ; FAILWITH } {} } ;
+                                  UNPAIR ;
+                                  UNPAIR ;
+                                  SWAP ;
+                                  CDR ;
+                                  PUSH bool True ;
+                                  PAIR ;
+                                  SWAP ;
+                                  PAIR ;
+                                  PAIR ;
+                                  SOME ;
+                                  SWAP ;
+                                  UPDATE ;
+                                  PAIR ;
+                                  SWAP ;
+                                  PAIR ;
+                                  PAIR ;
+                                  SWAP ;
+                                  PAIR ;
+                                  DUG 2 }
+                                { DUP 6 ;
+                                  DIG 4 ;
+                                  DUP ;
+                                  CDR ;
+                                  CAR ;
+                                  CDR ;
+                                  CAR ;
+                                  DUP 4 ;
+                                  CAR ;
+                                  GET ;
+                                  { IF_NONE { PUSH int 226 ; FAILWITH } {} } ;
+                                  PAIR %in_param %in_storage ;
+                                  EXEC ;
+                                  DUP ;
+                                  GET 4 ;
+                                  DUG 4 ;
+                                  DUP ;
+                                  CAR ;
+                                  ITER { DIG 3 ; SWAP ; CONS ; DUG 2 } ;
+                                  DROP 2 } }
+                           { DROP } } ;
+                 SWAP ;
+                 DROP ;
+                 DIG 2 ;
+                 DROP ;
+                 DIG 2 ;
+                 DROP } }
+           { IF_LEFT
+               { DIG 2 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 MEM ;
+                 IF {} { PUSH string "MultisignAdmin_VoterUnknown" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 DUP ;
+                 DIG 7 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 GET ;
+                 { IF_NONE { PUSH int 152 ; FAILWITH } {} } ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 153 ; FAILWITH } {} } ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 PUSH nat 1 ;
+                 ADD ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 DUP ;
+                 DUG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 EMPTY_SET nat ;
+                 PUSH bool True ;
+                 DUP 9 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 GET ;
+                 { IF_NONE { PUSH int 152 ; FAILWITH } {} } ;
+                 UPDATE ;
+                 NOW ;
+                 PAIR %startedAt %yay ;
+                 EMPTY_SET nat ;
+                 PAIR %nay ;
+                 DIG 7 ;
+                 DUP ;
+                 GET 8 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 9 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 GET ;
+                 { IF_NONE { PUSH int 152 ; FAILWITH } {} } ;
+                 GET ;
+                 { IF_NONE { PUSH int 156 ; FAILWITH } {} } ;
+                 GET 3 ;
+                 PUSH bool False ;
+                 PAIR %canceled %id ;
+                 DIG 7 ;
+                 PAIR %batchs ;
+                 PAIR ;
+                 SOME ;
+                 DIG 6 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 GET ;
+                 { IF_NONE { PUSH int 152 ; FAILWITH } {} } ;
+                 UPDATE ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 PUSH nat 2 ;
+                 COMPARE ;
+                 GT ;
+                 IF { DUP ;
+                      DUP ;
+                      CDR ;
+                      CAR ;
+                      CDR ;
+                      CAR ;
+                      SWAP ;
+                      CAR ;
+                      CAR ;
+                      CAR ;
+                      SENDER ;
+                      GET ;
+                      { IF_NONE { PUSH int 152 ; FAILWITH } {} } ;
+                      GET ;
+                      { IF_NONE { PUSH int 163 ; FAILWITH } {} } ;
+                      PAIR %in_param %in_storage ;
+                      EXEC ;
+                      DUP ;
+                      GET 4 ;
+                      SWAP ;
+                      CAR ;
+                      NIL operation ;
+                      SWAP ;
+                      ITER { CONS } }
+                    { SWAP ;
+                      DROP ;
+                      DUP ;
+                      UNPAIR ;
+                      SWAP ;
+                      UNPAIR ;
+                      UNPAIR ;
+                      SWAP ;
+                      UNPAIR ;
+                      DUP ;
+                      DUP 7 ;
+                      CAR ;
+                      CAR ;
+                      CAR ;
+                      SENDER ;
+                      GET ;
+                      { IF_NONE { PUSH int 152 ; FAILWITH } {} } ;
+                      DUP ;
+                      DUG 2 ;
+                      GET ;
+                      { IF_NONE { PUSH int 165 ; FAILWITH } {} } ;
+                      UNPAIR ;
+                      SWAP ;
+                      UNPAIR ;
+                      SWAP ;
+                      UNPAIR ;
+                      SWAP ;
+                      PUSH bool True ;
+                      DIG 11 ;
+                      CAR ;
+                      CAR ;
+                      CAR ;
+                      SENDER ;
+                      GET ;
+                      { IF_NONE { PUSH int 152 ; FAILWITH } {} } ;
+                      UPDATE ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SOME ;
+                      SWAP ;
+                      UPDATE ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      NIL operation } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 MEM ;
+                 IF {} { PUSH string "MultisignAdmin_VoterUnknown" ; FAILWITH } ;
+                 DUP ;
+                 NIL operation ;
+                 SWAP ;
+                 ITER { DUP 5 ;
+                        DUP 5 ;
+                        DUP 3 ;
+                        GET 4 ;
+                        DIG 6 ;
+                        CAR ;
+                        CAR ;
+                        CAR ;
+                        SENDER ;
+                        GET ;
+                        { IF_NONE { PUSH int 171 ; FAILWITH } {} } ;
+                        PAIR %voterId %yay ;
+                        DIG 3 ;
+                        DUP ;
+                        GET 3 ;
+                        SWAP ;
+                        DUP ;
+                        DUG 5 ;
+                        CAR ;
+                        PAIR %initiatorId %proposalId ;
+                        PAIR ;
+                        PAIR %in_param %in_storage ;
+                        EXEC ;
+                        DUP ;
+                        GET 4 ;
+                        DUG 4 ;
+                        DUP ;
+                        CAR ;
+                        ITER { DIG 3 ; SWAP ; CONS ; DUG 2 } ;
+                        DIG 4 ;
+                        DUP ;
+                        CDR ;
+                        CAR ;
+                        CDR ;
+                        CDR ;
+                        SWAP ;
+                        DUP ;
+                        DUG 6 ;
+                        CDR ;
+                        CAR ;
+                        CDR ;
+                        CAR ;
+                        DUP 4 ;
+                        CAR ;
+                        GET ;
+                        { IF_NONE { PUSH int 181 ; FAILWITH } {} } ;
+                        GET 6 ;
+                        SIZE ;
+                        DUP 7 ;
+                        CDR ;
+                        CAR ;
+                        CDR ;
+                        CAR ;
+                        DUP 5 ;
+                        CAR ;
+                        GET ;
+                        { IF_NONE { PUSH int 181 ; FAILWITH } {} } ;
+                        GET 3 ;
+                        SIZE ;
+                        ADD ;
+                        COMPARE ;
+                        GE ;
+                        IF { DUP 5 ;
+                             CDR ;
+                             CAR ;
+                             CDR ;
+                             CAR ;
+                             DUP 3 ;
+                             CAR ;
+                             GET ;
+                             { IF_NONE { PUSH int 181 ; FAILWITH } {} } ;
+                             GET 6 ;
+                             SIZE ;
+                             DUP 6 ;
+                             CDR ;
+                             CAR ;
+                             CDR ;
+                             CAR ;
+                             DUP 4 ;
+                             CAR ;
+                             GET ;
+                             { IF_NONE { PUSH int 181 ; FAILWITH } {} } ;
+                             GET 3 ;
+                             SIZE ;
+                             COMPARE ;
+                             GE ;
+                             IF { DROP ;
+                                  DIG 3 ;
+                                  UNPAIR ;
+                                  SWAP ;
+                                  UNPAIR ;
+                                  UNPAIR ;
+                                  SWAP ;
+                                  UNPAIR ;
+                                  DUP ;
+                                  DIG 6 ;
+                                  CAR ;
+                                  DUP ;
+                                  DUG 2 ;
+                                  GET ;
+                                  { IF_NONE { PUSH int 184 ; FAILWITH } {} } ;
+                                  UNPAIR ;
+                                  UNPAIR ;
+                                  SWAP ;
+                                  CDR ;
+                                  PUSH bool True ;
+                                  PAIR ;
+                                  SWAP ;
+                                  PAIR ;
+                                  PAIR ;
+                                  SOME ;
+                                  SWAP ;
+                                  UPDATE ;
+                                  PAIR ;
+                                  SWAP ;
+                                  PAIR ;
+                                  PAIR ;
+                                  SWAP ;
+                                  PAIR ;
+                                  DUG 2 }
+                                { DUP 7 ;
+                                  DIG 5 ;
+                                  DUP ;
+                                  CDR ;
+                                  CAR ;
+                                  CDR ;
+                                  CAR ;
+                                  DUP 5 ;
+                                  CAR ;
+                                  GET ;
+                                  { IF_NONE { PUSH int 181 ; FAILWITH } {} } ;
+                                  PAIR %in_param %in_storage ;
+                                  EXEC ;
+                                  DUP ;
+                                  GET 4 ;
+                                  DUG 5 ;
+                                  DUP ;
+                                  CAR ;
+                                  ITER { DIG 4 ; SWAP ; CONS ; DUG 3 } ;
+                                  DROP 3 } }
+                           { DROP 2 } } ;
+                 SWAP ;
+                 DROP ;
+                 DIG 2 ;
+                 DROP ;
+                 DIG 2 ;
+                 DROP } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

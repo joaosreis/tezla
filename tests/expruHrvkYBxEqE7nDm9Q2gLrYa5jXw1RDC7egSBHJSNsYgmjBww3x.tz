@@ -1,0 +1,3 @@
+{ storage (pair (list %entries string) (string %name)) ;
+  parameter unit ;
+  code { CDR ; NIL operation ; PAIR } }

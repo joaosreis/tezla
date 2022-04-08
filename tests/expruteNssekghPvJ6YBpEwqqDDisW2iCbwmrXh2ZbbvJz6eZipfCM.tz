@@ -1,0 +1,27 @@
+{ parameter
+    (or (or (pair %add int int) (pair %divide int int))
+        (or (pair %multiply int int) (pair %subtract int int))) ;
+  storage int ;
+  code { CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { DUP ; CDR ; SWAP ; CAR ; ADD ; NIL operation ; PAIR }
+               { DUP ;
+                 CDR ;
+                 PUSH int 0 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { SWAP ;
+                      CAR ;
+                      EDIV ;
+                      IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                      CAR ;
+                      NIL operation ;
+                      PAIR }
+                    { DROP 2 ; PUSH string "Div by 0" ; FAILWITH } } }
+           { IF_LEFT
+               { DUP ; CDR ; SWAP ; CAR ; MUL ; NIL operation ; PAIR }
+               { DUP ; CDR ; SWAP ; CAR ; SUB ; NIL operation ; PAIR } } } }

@@ -1,7 +1,8 @@
-open Core_kernel
+open! Core
 
 module T = struct
-  type t = { var_name : string; var_type : Typ.t } [@@deriving ord, sexp]
+  type t = { var_name : string; var_type : Edo_adt.Typ.t Lazy.t }
+  [@@deriving ord, sexp]
 end
 
 include T

@@ -1,3 +1,0 @@
-{ parameter (big_map string string) ;
-  storage (big_map string string) ;
-  code { CAR ; NIL operation ; PAIR } }

@@ -1,0 +1,21 @@
+{ parameter (pair (pair int int) int) ;
+  storage int ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         DROP ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         CDR ;
+         DIG 2 ;
+         CAR ;
+         CAR ;
+         ADD ;
+         EDIV ;
+         IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+         CAR ;
+         NIL operation ;
+         PAIR } }

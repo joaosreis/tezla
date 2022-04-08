@@ -1,11 +1,9 @@
 module S = Functional_stack
 
 type elem = Adt.var
-
 type env = Failed | Stack of elem Functional_stack.t
 
 let empty_env = Stack S.empty
-
 let failed_env = Failed
 
 let next_var var_counter =
@@ -58,10 +56,9 @@ let dip env n =
     in
     aux ([], env) n
 
-let dup env =
-  let x = peek env in
-  let env' = push x env in
-  (x, env')
+let dup env n =
+  let s = stack_or_failed env in
+  Stack (S.dup s n)
 
 (* let rename v = function (x, _) :: t -> (x, v) :: t | l -> l *)
 

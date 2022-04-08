@@ -1,0 +1,42 @@
+{ storage
+    (pair (int %totOrg)
+          (map %usersMap
+             int
+             (pair (pair (address %adress) (int %collected))
+                   (pair (timestamp %date) (pair (string %email) (string %name)))))) ;
+  parameter (or (pair %addCause (string %email) (string %name)) (int %donate)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             CAR ;
+             PUSH int 1 ;
+             ADD ;
+             UPDATE 1 ;
+             DUP ;
+             DUG 2 ;
+             DUP ;
+             CDR ;
+             DIG 2 ;
+             PUSH timestamp "2021-05-02T06:56:44Z" ;
+             PAIR ;
+             PUSH int 0 ;
+             SENDER ;
+             PAIR ;
+             PAIR ;
+             SOME ;
+             DIG 3 ;
+             CAR ;
+             UPDATE ;
+             UPDATE 2 }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SWAP ;
+             MEM ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.usersMap.contains(params.no)" ;
+                  FAILWITH } } ;
+         NIL operation ;
+         PAIR } }

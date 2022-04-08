@@ -1,8 +1,0 @@
-{ parameter unit ;
-  storage int ;
-  code { {} ;
-         { DUP ; CDR ; DIP { CAR } } ;
-         { { PUSH int 1 ; { DIG 1 ; DUP ; DUG 2 } ; ADD } ;
-           NIL operation ;
-           PAIR } ;
-         DIP { DROP 2 } } }

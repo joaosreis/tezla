@@ -1,0 +1,83 @@
+{ parameter
+    (or (pair %getIssuer unit (contract address))
+        (or (pair %getUser (address %user) (contract (option nat)))
+            (or (list %assertReceivers address)
+                (or (list %assertTransfers (pair address (list address)))
+                    (or (address %setIssuer)
+                        (or (pair %updateUser (address %user) (option %transferlistId nat))
+                            (or (pair %updateTransferlist
+                                   (nat %transferlistId)
+                                   (option %a (pair bool (pair (list nat) (set nat)))))
+                                (pair %assertTransferlist (nat %transferlistId) (option %a (pair bool (set nat))))))))))) ;
+  storage
+    (pair (address %issuer)
+          (pair (big_map %users address nat) (big_map %whitelists nat (pair (set nat) bool)))) ;
+  code { NIL operation ;
+         DIG 1 ;
+         UNPAIR ;
+         DIP 1 { UNPAIR ; SWAP ; UNPAIR ; SWAP } ;
+         IF_LEFT
+           { UNPAIR ;
+             DROP 1 ;
+             DIG 4 ;
+             DUP ;
+             DUG 5 ;
+             DIG 1 ;
+             DUP ;
+             DUG 2 ;
+             AMOUNT ;
+             DIG 6 ;
+             DUP ;
+             DUG 7 ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             DIP 1 { DIG 4 ; DROP 1 } ;
+             DUG 4 ;
+             DROP 1 ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             DIG 1 ;
+             PAIR }
+           { IF_LEFT
+               { UNPAIR ;
+                 DIG 5 ;
+                 DUP ;
+                 DUG 6 ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 AMOUNT ;
+                 NONE nat ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIP 1 { DIG 5 ; DROP 1 } ;
+                 DUG 5 ;
+                 DROP 2 ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 DIG 1 ;
+                 PAIR }
+               { IF_LEFT
+                   { DROP 1 ; SWAP ; PAIR ; SWAP ; PAIR ; DIG 1 ; PAIR }
+                   { IF_LEFT
+                       { DROP 1 ; SWAP ; PAIR ; SWAP ; PAIR ; DIG 1 ; PAIR }
+                       { IF_LEFT
+                           { DUP ;
+                             DIP 1 { DIG 3 ; DROP 1 } ;
+                             DUG 3 ;
+                             DROP 1 ;
+                             SWAP ;
+                             PAIR ;
+                             SWAP ;
+                             PAIR ;
+                             DIG 1 ;
+                             PAIR }
+                           { IF_LEFT
+                               { UNPAIR ; SWAP ; DROP 2 ; SWAP ; PAIR ; SWAP ; PAIR ; DIG 1 ; PAIR }
+                               { IF_LEFT
+                                   { UNPAIR ; SWAP ; DROP 2 ; SWAP ; PAIR ; SWAP ; PAIR ; DIG 1 ; PAIR }
+                                   { UNPAIR ; SWAP ; DROP 2 ; SWAP ; PAIR ; SWAP ; PAIR ; DIG 1 ; PAIR } } } } } } } } }

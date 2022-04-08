@@ -1,0 +1,67 @@
+{ parameter
+    (or (or (pair %addblock
+               (pair (pair (pair (int %block_current_owner_id) (int %block_first_owner_id))
+                           (pair (string %block_hash) (int %block_id)))
+                     (pair (pair (string %block_previous_hash) (mutez %block_price))
+                           (pair (address %block_tezos) (string %block_token_data))))
+               (pair (pair (int %block_token_id) (timestamp %block_tran_date))
+                     (int %block_tran_index)))
+            (int %test1))
+        (unit %test2)) ;
+  storage
+    (pair (pair (pair (pair (int %block_current_owner_id) (int %block_first_owner_id))
+                      (pair (string %block_hash) (int %block_id)))
+                (pair (pair (string %block_previous_hash) (mutez %block_price))
+                      (pair (address %block_tezos) (string %block_token_data))))
+          (pair (pair (int %block_token_id) (timestamp %block_tran_date))
+                (int %block_tran_index))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ; DROP }
+               { SWAP ;
+                 DUP ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 DIG 3 ;
+                 DUP 4 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 PAIR ;
+                 DIG 3 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 PAIR } }
+           { DROP ;
+             DUP ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             PUSH int 0 ;
+             DUP 4 ;
+             CAR ;
+             CAR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             DIG 3 ;
+             CAR ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR ;
+             PAIR } ;
+         NIL operation ;
+         PAIR } }

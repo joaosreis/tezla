@@ -1,0 +1,15 @@
+{ storage
+    (pair (option %address address) (lambda %c int (pair (list operation) address))) ;
+  parameter unit ;
+  code { CDR ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CDR ;
+         PUSH int 1 ;
+         EXEC ;
+         CDR ;
+         SOME ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

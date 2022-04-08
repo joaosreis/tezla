@@ -1,0 +1,5 @@
+{ storage
+    (pair (pair (int %a) (address %abc))
+          (pair (string %b) (pair (big_map %m1 string string) (big_map %m2 address address)))) ;
+  parameter unit ;
+  code { CDR ; NIL operation ; PAIR } }

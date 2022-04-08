@@ -1,0 +1,415 @@
+{ storage
+    (pair (pair (address %admin) (mutez %cost))
+          (pair (address %idstore) (map %updateProofCache address (map string string)))) ;
+  parameter
+    (or (or (or (string %registerProof) (or (unit %removeIdentity) (string %removeProof)))
+            (or (or (pair %send (mutez %amount) (address %receiverAddress)) (address %setAdmin))
+                (or (option %setBaker key_hash) (mutez %setCost))))
+        (or (or (pair %setProofMeta
+                   (pair (address %address) (string %key))
+                   (pair (string %prooftype) (string %value)))
+                (or (address %setStore) (address %setStoreAdmin)))
+            (or (or (option %setStoreBaker key_hash)
+                    (pair %storeSend (mutez %amount) (address %receiverAddress)))
+                (or (pair %updateProofCallback
+                       (address %address)
+                       (map %proofs
+                          string
+                          (pair (map %meta string string) (pair (timestamp %register_date) (bool %verified)))))
+                    (pair %verifyProof (address %address) (string %prooftype)))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     AMOUNT ;
+                     COMPARE ;
+                     LT ;
+                     IF { PUSH string "Amount too low" ; FAILWITH } {} ;
+                     NIL operation ;
+                     DUP 3 ;
+                     GET 3 ;
+                     CONTRACT %setProof
+                       (pair address (pair (pair (map string string) (pair timestamp bool)) string)) ;
+                     IF_NONE { PUSH int 176 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     PUSH bool False ;
+                     NOW ;
+                     EMPTY_MAP string string ;
+                     PAIR 3 ;
+                     SENDER ;
+                     PAIR 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { IF_LEFT
+                       { DROP ;
+                         DUP ;
+                         CAR ;
+                         CDR ;
+                         AMOUNT ;
+                         COMPARE ;
+                         LT ;
+                         IF { PUSH string "Amount too low" ; FAILWITH } {} ;
+                         DUP ;
+                         GET 3 ;
+                         CONTRACT %removeIdentity address ;
+                         IF_NONE { PUSH int 241 ; FAILWITH } {} ;
+                         NIL operation ;
+                         SWAP ;
+                         PUSH mutez 0 ;
+                         SENDER ;
+                         TRANSFER_TOKENS ;
+                         CONS }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         AMOUNT ;
+                         COMPARE ;
+                         LT ;
+                         IF { PUSH string "Amount too low" ; FAILWITH } {} ;
+                         NIL operation ;
+                         DUP 3 ;
+                         GET 3 ;
+                         CONTRACT %delProof (pair address string) ;
+                         IF_NONE { PUSH int 234 ; FAILWITH } {} ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         SENDER ;
+                         PAIR ;
+                         TRANSFER_TOKENS ;
+                         CONS } } }
+               { IF_LEFT
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only admin can send" ; FAILWITH } {} ;
+                         DUP ;
+                         CDR ;
+                         CONTRACT unit ;
+                         IF_NONE { PUSH int 132 ; FAILWITH } {} ;
+                         NIL operation ;
+                         SWAP ;
+                         DIG 2 ;
+                         CAR ;
+                         UNIT ;
+                         TRANSFER_TOKENS ;
+                         CONS }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only admin can setAdmin" ; FAILWITH } {} ;
+                         SWAP ;
+                         UNPAIR ;
+                         CDR ;
+                         DIG 2 ;
+                         PAIR ;
+                         PAIR ;
+                         NIL operation } }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only admin can setBaker" ; FAILWITH } {} ;
+                         SET_DELEGATE ;
+                         NIL operation ;
+                         SWAP ;
+                         CONS }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only admin can setCost" ; FAILWITH } {} ;
+                         SWAP ;
+                         UNPAIR ;
+                         CAR ;
+                         DIG 2 ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         NIL operation } } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "Only admin can setProofMeta" ; FAILWITH } {} ;
+                     SWAP ;
+                     DUP ;
+                     GET 4 ;
+                     EMPTY_MAP string string ;
+                     DUP 4 ;
+                     GET 3 ;
+                     SOME ;
+                     PUSH string "prooftype" ;
+                     UPDATE ;
+                     PUSH (option string) (Some "meta") ;
+                     PUSH string "operation" ;
+                     UPDATE ;
+                     DUP 4 ;
+                     CAR ;
+                     CDR ;
+                     SOME ;
+                     PUSH string "key" ;
+                     UPDATE ;
+                     DUP 4 ;
+                     GET 4 ;
+                     SOME ;
+                     PUSH string "value" ;
+                     UPDATE ;
+                     SOME ;
+                     DUP 4 ;
+                     CAR ;
+                     CAR ;
+                     UPDATE ;
+                     UPDATE 4 ;
+                     SWAP ;
+                     NIL operation ;
+                     DUP 3 ;
+                     GET 3 ;
+                     CONTRACT %getProofs (pair address address) ;
+                     IF_NONE { PUSH int 227 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     SELF %updateProofCallback ;
+                     ADDRESS ;
+                     DIG 4 ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only admin can setStore" ; FAILWITH } {} ;
+                         UPDATE 3 ;
+                         NIL operation }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only admin can setStoreAdmin" ; FAILWITH } {} ;
+                         NIL operation ;
+                         DUP 3 ;
+                         GET 3 ;
+                         CONTRACT %setAdmin address ;
+                         IF_NONE { PUSH int 147 ; FAILWITH } {} ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS } } }
+               { IF_LEFT
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only admin can setStoreBaker" ; FAILWITH } {} ;
+                         NIL operation ;
+                         DUP 3 ;
+                         GET 3 ;
+                         CONTRACT %setBaker (option key_hash) ;
+                         IF_NONE { PUSH int 154 ; FAILWITH } {} ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only admin can storeSend" ; FAILWITH } {} ;
+                         NIL operation ;
+                         DUP 3 ;
+                         GET 3 ;
+                         CONTRACT %send (pair mutez address) ;
+                         IF_NONE { PUSH int 161 ; FAILWITH } {} ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS } }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 3 ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only idstore can call getProofsCallback" ; FAILWITH } {} ;
+                         PUSH bool False ;
+                         DUP 3 ;
+                         GET 4 ;
+                         DUP 3 ;
+                         CAR ;
+                         MEM ;
+                         COMPARE ;
+                         EQ ;
+                         IF { PUSH string "No cache entry for address" ; FAILWITH } {} ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 4 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         GET ;
+                         IF_NONE { PUSH int 187 ; FAILWITH } {} ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         PUSH string "prooftype" ;
+                         GET ;
+                         IF_NONE { PUSH int 188 ; FAILWITH } {} ;
+                         GET ;
+                         IF_NONE { PUSH int 190 ; FAILWITH } {} ;
+                         PUSH string "verify" ;
+                         DUP 3 ;
+                         PUSH string "operation" ;
+                         GET ;
+                         IF_NONE { PUSH int 189 ; FAILWITH } {} ;
+                         COMPARE ;
+                         EQ ;
+                         IF { PUSH bool True ; UPDATE 4 } {} ;
+                         PUSH string "meta" ;
+                         DUP 3 ;
+                         PUSH string "operation" ;
+                         GET ;
+                         IF_NONE { PUSH int 189 ; FAILWITH } {} ;
+                         COMPARE ;
+                         EQ ;
+                         IF { DUP ;
+                              CAR ;
+                              DUP 3 ;
+                              PUSH string "value" ;
+                              GET ;
+                              IF_NONE { PUSH int 197 ; FAILWITH } {} ;
+                              SOME ;
+                              DUP 4 ;
+                              PUSH string "key" ;
+                              GET ;
+                              IF_NONE { PUSH int 196 ; FAILWITH } {} ;
+                              UPDATE ;
+                              UPDATE 1 }
+                            {} ;
+                         DIG 3 ;
+                         DUP ;
+                         GET 4 ;
+                         NONE (map string string) ;
+                         DUP 6 ;
+                         CAR ;
+                         UPDATE ;
+                         UPDATE 4 ;
+                         DUG 3 ;
+                         NIL operation ;
+                         DUP 5 ;
+                         GET 3 ;
+                         CONTRACT %setProof
+                           (pair address (pair (pair (map string string) (pair timestamp bool)) string)) ;
+                         IF_NONE { PUSH int 201 ; FAILWITH } {} ;
+                         PUSH mutez 0 ;
+                         DIG 4 ;
+                         PUSH string "prooftype" ;
+                         GET ;
+                         IF_NONE { PUSH int 188 ; FAILWITH } {} ;
+                         DIG 4 ;
+                         DIG 5 ;
+                         CAR ;
+                         PAIR 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH string "Only admin can verifyProof" ; FAILWITH } {} ;
+                         SWAP ;
+                         DUP ;
+                         GET 4 ;
+                         EMPTY_MAP string string ;
+                         DUP 4 ;
+                         CDR ;
+                         SOME ;
+                         PUSH string "prooftype" ;
+                         UPDATE ;
+                         PUSH (option string) (Some "verify") ;
+                         PUSH string "operation" ;
+                         UPDATE ;
+                         SOME ;
+                         DUP 4 ;
+                         CAR ;
+                         UPDATE ;
+                         UPDATE 4 ;
+                         SWAP ;
+                         NIL operation ;
+                         DUP 3 ;
+                         GET 3 ;
+                         CONTRACT %getProofs (pair address address) ;
+                         IF_NONE { PUSH int 213 ; FAILWITH } {} ;
+                         PUSH mutez 0 ;
+                         SELF %updateProofCallback ;
+                         ADDRESS ;
+                         DIG 4 ;
+                         CAR ;
+                         PAIR ;
+                         TRANSFER_TOKENS ;
+                         CONS } } } } ;
+         PAIR } }

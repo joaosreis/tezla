@@ -1,0 +1,92 @@
+{ parameter
+    (or (pair %balance_of
+           (list %requests (pair (address %owner) (nat %token_id)))
+           (contract %callback
+              (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+        (or (list %transfer
+               (pair (address %from_)
+                     (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+            (list %update_operators
+               (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                   (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))))) ;
+  storage
+    (pair (big_map %ledger (pair address nat) nat)
+          (pair (big_map %operators (pair address address) unit)
+                (big_map %token_metadata nat (map string bytes)))) ;
+  code { CAST (pair (or (pair (list (pair address nat)) (contract (list (pair (pair address nat) nat))))
+                        (or (list (pair address (list (pair address (pair nat nat)))))
+                            (list (or (pair address (pair address nat)) (pair address (pair address nat))))))
+                    (pair (big_map (pair address nat) nat)
+                          (pair (big_map (pair address address) unit) (big_map nat (map string bytes))))) ;
+         NIL operation ;
+         SWAP ;
+         DUP ;
+         CAR ;
+         DIP { CDR ; DUP ; CAR ; DIP { CDR ; DUP ; CAR ; DIP { CDR } } } ;
+         DUP 1 ;
+         DUP 1 ;
+         IF_LEFT
+           { DUP 4 ;
+             PUSH (list (pair (pair address nat) nat)) {} ;
+             PUSH (list nat) {} ;
+             DUP 4 ;
+             CAR ;
+             ITER { DUP 2 ;
+                    DUP 2 ;
+                    CDR ;
+                    CONS ;
+                    DIP 2 { DROP } ;
+                    DUG 1 ;
+                    DUP 4 ;
+                    DUP 2 ;
+                    CDR ;
+                    DUP 3 ;
+                    CAR ;
+                    PAIR ;
+                    GET ;
+                    IF_NONE
+                      { DUP 3 ;
+                        DUP 2 ;
+                        DIP { PUSH nat 0 } ;
+                        PAIR ;
+                        CONS ;
+                        DIP 3 { DROP } ;
+                        DUG 2 }
+                      { DUP 4 ;
+                        DUP 3 ;
+                        DIP { DUP 2 } ;
+                        PAIR ;
+                        CONS ;
+                        DIP 4 { DROP } ;
+                        DUG 3 ;
+                        DROP } ;
+                    DROP } ;
+             DUP 1 ;
+             ITER { PUSH bool False ;
+                    PUSH (list nat) { 0 } ;
+                    ITER { DUP 1 ; DUP 4 ; COMPARE ; EQ ; SWAP ; DROP ; OR } ;
+                    DUP 1 ;
+                    IF {} { UNIT ; PUSH string "FA2_TOKEN_UNDEFINED" ; PAIR ; FAILWITH } ;
+                    DROP 2 } ;
+             PUSH (list (pair (pair address nat) nat)) {} ;
+             DUP 3 ;
+             ITER { DUP 2 ; DUP 2 ; CONS ; DIP 2 { DROP } ; DUG 1 ; DROP } ;
+             DUP 5 ;
+             CDR ;
+             AMOUNT ;
+             DUP 3 ;
+             TRANSFER_TOKENS ;
+             DUG 10 ;
+             DIP 10 { CONS } ;
+             DROP 2 ;
+             DROP 2 ;
+             DROP }
+           { IF_LEFT
+               { UNIT ; PUSH string "FA2_TX_DENIED" ; PAIR ; FAILWITH }
+               { UNIT ; PUSH string "FA2_OPERATORS_UNSUPPORTED" ; PAIR ; FAILWITH } } ;
+         DROP ;
+         DROP ;
+         DIP { PAIR } ;
+         PAIR ;
+         SWAP ;
+         PAIR } }

@@ -1,6 +1,6 @@
 (library
  (name converter)
  (public_name tezla.converter)
- (libraries core_kernel adt functional_stack)
+ (libraries core adt functional_stack)
  (preprocess
   (pps ppx_inline_test ppx_jane)))

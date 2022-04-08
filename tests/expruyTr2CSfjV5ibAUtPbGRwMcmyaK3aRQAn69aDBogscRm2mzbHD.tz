@@ -1,0 +1,22 @@
+{ parameter
+    (or (pair %ask (contract (pair string nat)) string)
+        (lambda %admin unit (pair (list operation) (pair (address %owner) (mutez %price))))) ;
+  storage (pair (address %owner) (mutez %price)) ;
+  code { DUP ;
+         CAR ;
+         DIP { CDR } ;
+         IF_LEFT
+           { DROP ;
+             DUP ;
+             CDR ;
+             AMOUNT ;
+             COMPARE ;
+             EQ ;
+             IF { NIL operation ; PAIR } { PUSH string "wrong price" ; FAILWITH } }
+           { SWAP ;
+             DUP ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF { DROP ; UNIT ; EXEC } { PUSH string "not admin" ; FAILWITH } } } }

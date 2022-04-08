@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (unit :storage) ;
+  code { DROP ; PUSH string "TestNoErrorArg" ; FAILWITH } }

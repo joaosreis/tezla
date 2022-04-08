@@ -1,0 +1,13 @@
+{ parameter unit ;
+  storage nat ;
+  code { CDR ;
+         DUP ;
+         PUSH bool True ;
+         LOOP { PUSH int 1 ;
+                SWAP ;
+                SUB ;
+                ISNAT ;
+                { IF_NONE { PUSH nat 0 ; PUSH bool False } { PUSH bool True } } } ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

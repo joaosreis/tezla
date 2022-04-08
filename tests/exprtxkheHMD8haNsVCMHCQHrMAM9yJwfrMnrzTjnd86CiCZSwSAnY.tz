@@ -1,0 +1,3 @@
+{ parameter (pair nat nat) ;
+  storage (list (pair nat nat)) ;
+  code { UNPAIR ; CONS ; NIL operation ; PAIR } }

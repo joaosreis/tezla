@@ -1,0 +1,152 @@
+{ parameter
+    (or (bytes %administrate)
+        (or (pair %unwrap (nat %amount) (pair (address %destination) (string %token)))
+            (pair %wrap (nat %amount) (pair (address %destination) (string %token))))) ;
+  storage
+    (pair (bool %active)
+          (pair (set %admins address)
+                (pair (option %federationAddress address) (map %tokens string address)))) ;
+  code { CAST (pair (or bytes (or (pair nat (pair address string)) (pair nat (pair address string))))
+                    (pair bool (pair (set address) (pair (option address) (map string address))))) ;
+         UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             SENDER ;
+             MEM ;
+             IF {} { PUSH string "BRIDGE_NotAdmin" ; FAILWITH } ;
+             DUP ;
+             UNPACK
+               (list (or address (or bool (or address (or (or (list (pair address string)) (set string)) address))))) ;
+             { IF_NONE { PUSH string "BRIDGE_AdministrationActionsInvalid" ; FAILWITH } {} } ;
+             ITER { DUP ;
+                    IF_LEFT
+                      { SWAP ;
+                        DROP ;
+                        DIG 2 ;
+                        DUP ;
+                        GET 3 ;
+                        PUSH bool True ;
+                        DIG 3 ;
+                        UPDATE ;
+                        UPDATE 3 ;
+                        SWAP }
+                      { IF_LEFT
+                          { SWAP ; DROP ; DIG 2 ; SWAP ; UPDATE 1 ; SWAP }
+                          { IF_LEFT
+                              { SWAP ; DROP ; DIG 2 ; SWAP ; SOME ; UPDATE 5 ; SWAP }
+                              { IF_LEFT
+                                  { DUP ;
+                                    IF_LEFT
+                                      { DUP ;
+                                        ITER { DIG 5 ;
+                                               DUP ;
+                                               GET 6 ;
+                                               DUP 3 ;
+                                               CAR ;
+                                               SOME ;
+                                               DIG 3 ;
+                                               CDR ;
+                                               UPDATE ;
+                                               UPDATE 6 ;
+                                               DUG 4 } ;
+                                        DROP 3 }
+                                      { DUP ;
+                                        ITER { DIG 5 ; DUP ; GET 6 ; NONE address ; DIG 3 ; UPDATE ; UPDATE 6 ; DUG 4 } ;
+                                        DROP 3 } }
+                                  { PUSH nat 1 ;
+                                    DUP 5 ;
+                                    GET 3 ;
+                                    SIZE ;
+                                    COMPARE ;
+                                    GT ;
+                                    IF { SWAP ;
+                                         DROP ;
+                                         DIG 2 ;
+                                         DUP ;
+                                         GET 3 ;
+                                         PUSH bool False ;
+                                         DIG 3 ;
+                                         UPDATE ;
+                                         UPDATE 3 ;
+                                         SWAP }
+                                       { DROP 2 } } } } } } ;
+             DROP ;
+             NIL operation }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 IF {} { PUSH string "BRIDGE_Inactive" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 6 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 4 ;
+                 MEM ;
+                 IF { NIL operation ;
+                      DUP 3 ;
+                      GET 6 ;
+                      DUP 3 ;
+                      GET 4 ;
+                      GET ;
+                      { IF_NONE { PUSH int 33 ; FAILWITH } {} } ;
+                      CONTRACT %burn (pair address nat) ;
+                      { IF_NONE { PUSH string "BRIDGE_TokenInvalidInterface" ; FAILWITH } {} } ;
+                      PUSH mutez 0 ;
+                      DIG 3 ;
+                      CAR ;
+                      SENDER ;
+                      PAIR ;
+                      TRANSFER_TOKENS ;
+                      CONS }
+                    { PUSH string "BRIDGE_UnknownToken" ; FAILWITH } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 IF {} { PUSH string "BRIDGE_Inactive" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 5 ;
+                 SENDER ;
+                 SOME ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "BRIDGE_NotFederation" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 6 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 4 ;
+                 MEM ;
+                 IF { NIL operation ;
+                      DUP 3 ;
+                      GET 6 ;
+                      DUP 3 ;
+                      GET 4 ;
+                      GET ;
+                      { IF_NONE { PUSH int 33 ; FAILWITH } {} } ;
+                      CONTRACT %mint (pair address nat) ;
+                      { IF_NONE { PUSH string "BRIDGE_TokenInvalidInterface" ; FAILWITH } {} } ;
+                      PUSH mutez 0 ;
+                      DIG 3 ;
+                      DUP ;
+                      CAR ;
+                      SWAP ;
+                      GET 3 ;
+                      PAIR ;
+                      TRANSFER_TOKENS ;
+                      CONS }
+                    { PUSH string "BRIDGE_UnknownToken" ; FAILWITH } } } ;
+         PAIR } }

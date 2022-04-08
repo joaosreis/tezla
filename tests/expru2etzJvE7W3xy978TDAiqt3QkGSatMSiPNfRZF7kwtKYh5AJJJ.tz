@@ -1,0 +1,38 @@
+{ parameter (pair (string %a) (string %e)) ;
+  storage
+    (pair (list %authors string) (pair (list %dates timestamp) (list %entries string))) ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         UNPAIR ;
+         SWAP ;
+         CDR ;
+         DIG 3 ;
+         GET 3 ;
+         NOW ;
+         CONS ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         DUP ;
+         DUG 2 ;
+         UNPAIR ;
+         SWAP ;
+         CAR ;
+         DIG 3 ;
+         GET 4 ;
+         DUP 4 ;
+         CDR ;
+         CONS ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         UNPAIR ;
+         DIG 2 ;
+         CAR ;
+         CONS ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

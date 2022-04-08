@@ -1,0 +1,34 @@
+{ parameter
+    (or (option %startup (pair string (option (or int string))))
+        (or (or (pair %callCustom string bytes)
+                (or (or (or (or (unit %accept_ownership)
+                                (pair %burn (address %from_) (pair (nat %token_id) (nat %amount))))
+                            (or (or %call_FA2
+                                   (or (pair %balance_of
+                                          (list %requests (pair (address %owner) (nat %token_id)))
+                                          (contract %callback
+                                             (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                                       (list %transfer
+                                          (pair (address %from_)
+                                                (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))
+                                   (list %update_operators
+                                      (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                                          (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))))
+                                (unit %confirm_migration)))
+                        (or (or (bytes %drop_proposal) (nat %flush))
+                            (or (pair %getVotePermitCounter (unit %param) (contract %callback nat))
+                                (pair %get_total_supply (nat %token_id) (contract %callback nat)))))
+                    (or (or (or (address %migrate) (pair %mint (address %to_) (pair (nat %token_id) (nat %amount))))
+                            (or (pair %propose (nat %frozen_token) (map %proposal_metadata string bytes))
+                                (nat %set_quorum_threshold)))
+                        (or (or (nat %set_voting_period) (address %transfer_ownership))
+                            (list %vote
+                               (pair (pair %argument (bytes %proposal_key) (pair (bool %vote_type) (nat %vote_amount)))
+                                     (option %permit (pair (key %key) (signature %signature)))))))))
+            (pair %transfer_contract_tokens
+               (address %contract_address)
+               (list %params
+                  (pair (address %from_)
+                        (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))))) ;
+  storage int ;
+  code { CDR ; NIL operation ; PAIR } }

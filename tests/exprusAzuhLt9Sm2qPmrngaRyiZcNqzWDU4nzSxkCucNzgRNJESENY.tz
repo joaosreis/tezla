@@ -1,3 +1,0 @@
-{ parameter (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))) ;
-  storage (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))) ;
-  code { CAR ; NIL operation ; PAIR } }

@@ -1,0 +1,12 @@
+{ parameter unit ;
+  storage (pair bytes bytes bytes) ;
+  code { DROP ;
+         LAMBDA unit unit { PUSH timestamp 42 ; DROP } ;
+         PACK ;
+         LAMBDA unit unit { PUSH timestamp "42" ; DROP } ;
+         PACK ;
+         LAMBDA unit unit { PUSH timestamp "1970-01-01T00:00:42Z" ; DROP } ;
+         PACK ;
+         PAIR 3 ;
+         NIL operation ;
+         PAIR } }

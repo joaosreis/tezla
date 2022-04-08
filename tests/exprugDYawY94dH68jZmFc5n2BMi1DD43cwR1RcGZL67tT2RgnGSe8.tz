@@ -1,0 +1,24 @@
+{ storage (pair (address %contract_address) (nat %token_id)) ;
+  parameter (pair %minter_entry (address %address) (bytes %image)) ;
+  code { UNPAIR ;
+         NIL operation ;
+         DUP 3 ;
+         CAR ;
+         CONTRACT %mint (pair address (pair bytes nat)) ;
+         IF_NONE { PUSH int 65 ; FAILWITH } {} ;
+         PUSH mutez 0 ;
+         DUP 5 ;
+         CDR ;
+         DIG 4 ;
+         UNPAIR ;
+         PAIR 3 ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         SWAP ;
+         DUP ;
+         CDR ;
+         PUSH nat 1 ;
+         ADD ;
+         UPDATE 2 ;
+         SWAP ;
+         PAIR } }

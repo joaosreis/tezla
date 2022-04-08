@@ -1,3 +1,0 @@
-{ parameter (lambda string string) ;
-  storage (lambda string string) ;
-  code { CAR ; NIL operation ; PAIR } }

@@ -1,0 +1,176 @@
+{ storage
+    (pair (big_map %accessRequests
+             (pair (pair (string %dataSourceUriHash) (address %providerAddress))
+                   (pair (address %requesterAddress) (string %scopeHash)))
+             (map string
+                  (pair (timestamp %createdAt) (pair (option %jwtToken string) (string %status)))))
+          (pair (big_map %latest_AR_ids
+                   (pair (pair (string %dataSourceUriHash) (address %providerAddress))
+                         (pair (address %requesterAddress) (string %scopeHash)))
+                   string)
+                (map %organizations
+                   address
+                   (pair (string %name) (pair (string %publicKey) (address %publicKeyHash)))))) ;
+  parameter
+    (pair %requestAccess
+       (pair (string %dataSourceUriHash)
+             (pair (string %identifier) (option %jwtToken string)))
+       (pair (pair (address %providerAddress) (address %requesterAddress))
+             (pair (string %scopeHash) (string %status)))) ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         GET 4 ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         GET 3 ;
+         CDR ;
+         MEM ;
+         IF {}
+            { PUSH string
+                   "WrongCondition: self.data.organizations.contains(params.requesterAddress)" ;
+              FAILWITH } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         GET 4 ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         GET 3 ;
+         CAR ;
+         MEM ;
+         IF {}
+            { PUSH string
+                   "WrongCondition: self.data.organizations.contains(params.providerAddress)" ;
+              FAILWITH } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         GET 5 ;
+         SWAP ;
+         DUP ;
+         DUG 3 ;
+         GET 3 ;
+         CDR ;
+         PAIR ;
+         DIG 2 ;
+         DUP ;
+         GET 3 ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         DUG 4 ;
+         CAR ;
+         CAR ;
+         PAIR ;
+         PAIR ;
+         MEM ;
+         IF {}
+            { SWAP ;
+              DUP ;
+              CAR ;
+              PUSH (option (map string (pair timestamp (pair (option string) string)))) (Some {}) ;
+              DIG 3 ;
+              DUP ;
+              GET 5 ;
+              SWAP ;
+              DUP ;
+              DUG 5 ;
+              GET 3 ;
+              CDR ;
+              PAIR ;
+              DIG 4 ;
+              DUP ;
+              GET 3 ;
+              CAR ;
+              SWAP ;
+              DUP ;
+              DUG 6 ;
+              CAR ;
+              CAR ;
+              PAIR ;
+              PAIR ;
+              UPDATE ;
+              UPDATE 1 ;
+              SWAP } ;
+         SWAP ;
+         DUP ;
+         CAR ;
+         DUP ;
+         DIG 3 ;
+         DUP ;
+         GET 5 ;
+         SWAP ;
+         DUP ;
+         DUG 5 ;
+         GET 3 ;
+         CDR ;
+         PAIR ;
+         DIG 4 ;
+         DUP ;
+         GET 3 ;
+         CAR ;
+         SWAP ;
+         DUP ;
+         DUG 6 ;
+         CAR ;
+         CAR ;
+         PAIR ;
+         PAIR ;
+         DUP ;
+         DUG 2 ;
+         GET ;
+         IF_NONE { PUSH int 73 ; FAILWITH } {} ;
+         DIG 4 ;
+         DUP ;
+         GET 6 ;
+         SWAP ;
+         DUP ;
+         DUG 6 ;
+         CAR ;
+         GET 4 ;
+         NOW ;
+         PAIR 3 ;
+         SOME ;
+         DUP 6 ;
+         CAR ;
+         GET 3 ;
+         UPDATE ;
+         SOME ;
+         SWAP ;
+         UPDATE ;
+         UPDATE 1 ;
+         DUP ;
+         GET 3 ;
+         DUP 3 ;
+         CAR ;
+         GET 3 ;
+         SOME ;
+         DIG 3 ;
+         DUP ;
+         GET 5 ;
+         SWAP ;
+         DUP ;
+         DUG 5 ;
+         GET 3 ;
+         CDR ;
+         PAIR ;
+         DIG 4 ;
+         DUP ;
+         GET 3 ;
+         CAR ;
+         SWAP ;
+         CAR ;
+         CAR ;
+         PAIR ;
+         PAIR ;
+         UPDATE ;
+         UPDATE 3 ;
+         NIL operation ;
+         PAIR } }

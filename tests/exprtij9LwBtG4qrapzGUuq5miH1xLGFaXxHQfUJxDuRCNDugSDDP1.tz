@@ -1,0 +1,16 @@
+{ parameter (pair (ticket int) (contract (ticket int))) ;
+  storage unit ;
+  code { CAR ;
+         UNPAIR ;
+         PUSH mutez 0 ;
+         SWAP ;
+         TRANSFER_TOKENS ;
+         DUP ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         SWAP ;
+         CONS ;
+         UNIT ;
+         SWAP ;
+         PAIR } }

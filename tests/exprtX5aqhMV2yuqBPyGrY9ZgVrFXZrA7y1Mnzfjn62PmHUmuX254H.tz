@@ -1,3 +1,0 @@
-{ parameter unit ;
-  storage (big_map int (or string int)) ;
-  code { CDR ; NIL operation ; PAIR } }

@@ -1,0 +1,15 @@
+{ parameter string ;
+  storage string ;
+  code { CAR ;
+         PUSH mutez 1300 ;
+         BALANCE ;
+         { COMPARE ; GT ; IF { { UNIT ; FAILWITH } } {} } ;
+         NIL operation ;
+         PUSH address 0x0000dac9f52543da1aed0bc1d6b46bf7c10db7014cd6 ;
+         CONTRACT unit ;
+         { IF_NONE { UNIT ; FAILWITH } {} } ;
+         PUSH mutez 5 ;
+         UNIT ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

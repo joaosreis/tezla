@@ -1,0 +1,331 @@
+{ storage
+    (pair (big_map %accessRequests
+             (pair (string %param1) (pair (string %param2) (string %param3)))
+             (pair (pair (timestamp %createdAt) (pair (nat %datasourceId) (option %jwtToken string)))
+                   (pair (pair (address %providerAddress) (address %requesterAddress))
+                         (pair (string %scopeId) (string %status)))))
+          (map %organizations
+             address
+             (pair (string %name) (pair (string %publicKey) (address %publicKeyHash))))) ;
+  parameter
+    (or (pair %grantAccess
+           (pair (string %id) (string %jwtToken))
+           (pair (address %providerAddress) (address %requesterAddress)))
+        (pair %requestAccess
+           (pair (nat %datasourceId) (string %id))
+           (pair (address %providerAddress) (pair (address %requesterAddress) (string %scopeId))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SENDER ;
+             MEM ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.organizations.contains(sp.sender)" ;
+                  FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 4 ;
+             CAR ;
+             CAR ;
+             PAIR 3 ;
+             MEM ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: self.data.accessRequests.contains(sp.record(param1 = params.id, param2 = params.id, param3 = params.id))" ;
+                  FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 4 ;
+             CAR ;
+             CAR ;
+             PAIR 3 ;
+             GET ;
+             IF_NONE { PUSH int 81 ; FAILWITH } {} ;
+             GET 3 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: sp.sender == self.data.accessRequests[sp.record(param1 = params.id, param2 = params.id, param3 = params.id)].providerAddress" ;
+                  FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 4 ;
+             CAR ;
+             CAR ;
+             PAIR 3 ;
+             GET ;
+             IF_NONE { PUSH int 81 ; FAILWITH } {} ;
+             GET 3 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: params.providerAddress == self.data.accessRequests[sp.record(param1 = params.id, param2 = params.id, param3 = params.id)].providerAddress" ;
+                  FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 4 ;
+             CAR ;
+             CAR ;
+             PAIR 3 ;
+             GET ;
+             IF_NONE { PUSH int 81 ; FAILWITH } {} ;
+             GET 3 ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: params.requesterAddress == self.data.accessRequests[sp.record(param1 = params.id, param2 = params.id, param3 = params.id)].requesterAddress" ;
+                  FAILWITH } ;
+             PUSH string "requested" ;
+             DUP 3 ;
+             CAR ;
+             DIG 2 ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             CAR ;
+             CAR ;
+             PAIR 3 ;
+             GET ;
+             IF_NONE { PUSH int 81 ; FAILWITH } {} ;
+             GET 6 ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: self.data.accessRequests[sp.record(param1 = params.id, param2 = params.id, param3 = params.id)].status == 'requested'" ;
+                  FAILWITH } ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             DUP ;
+             DIG 3 ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 6 ;
+             CAR ;
+             CAR ;
+             PAIR 3 ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 87 ; FAILWITH } {} ;
+             UNPAIR ;
+             UNPAIR ;
+             SWAP ;
+             CAR ;
+             DUP 7 ;
+             CAR ;
+             CDR ;
+             SOME ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             UPDATE 1 ;
+             DUP ;
+             CAR ;
+             DUP ;
+             DIG 3 ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             CAR ;
+             CAR ;
+             PAIR 3 ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 88 ; FAILWITH } {} ;
+             PUSH string "granted" ;
+             UPDATE 6 ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             UPDATE 1 }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 5 ;
+             MEM ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: self.data.organizations.contains(params.requesterAddress)" ;
+                  FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             MEM ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: self.data.organizations.contains(params.providerAddress)" ;
+                  FAILWITH } ;
+             DUP ;
+             GET 5 ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: sp.sender == params.requesterAddress" ;
+                  FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 4 ;
+             CAR ;
+             CDR ;
+             PAIR 3 ;
+             MEM ;
+             IF { PUSH string
+                       "WrongCondition: ~ (self.data.accessRequests.contains(sp.record(param1 = params.id, param2 = params.id, param3 = params.id)))" ;
+                  FAILWITH }
+                {} ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             PUSH string "requested" ;
+             DUP 4 ;
+             GET 6 ;
+             PAIR ;
+             DIG 3 ;
+             DUP ;
+             GET 5 ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             GET 3 ;
+             PAIR ;
+             PAIR ;
+             NONE string ;
+             DUP 5 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             NOW ;
+             PAIR ;
+             PAIR ;
+             SOME ;
+             DIG 3 ;
+             DUP ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             CDR ;
+             PAIR 3 ;
+             UPDATE ;
+             UPDATE 1 } ;
+         NIL operation ;
+         PAIR } }

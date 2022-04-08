@@ -1,0 +1,177 @@
+{ parameter
+    (or (or (or (unit %betAgainst) (unit %betFor))
+            (or (unit %close)
+                (pair %closeCallback
+                   (string %currencyPair)
+                   (pair (timestamp %lastUpdate) (nat %rate)))))
+        (unit %withdraw)) ;
+  storage
+    (pair (pair (pair (pair (address %adminAddress) (big_map %betsAgainstLedger address mutez))
+                      (pair (big_map %betsForLedger address mutez) (string %currencyPair)))
+                (pair (pair (nat %debugRate) (timestamp %debugTime))
+                      (pair (address %oracleAddress) (nat %targetRate))))
+          (timestamp %targetTime)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DROP ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     DIG 3 ;
+                     DUP ;
+                     DUG 4 ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     AMOUNT ;
+                     SOME ;
+                     SENDER ;
+                     UPDATE ;
+                     DIG 4 ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR }
+                   { DROP ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     DIG 3 ;
+                     DUP ;
+                     DUG 4 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     AMOUNT ;
+                     SOME ;
+                     SENDER ;
+                     UPDATE ;
+                     PAIR ;
+                     DIG 3 ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR } }
+               { IF_LEFT
+                   { DROP ;
+                     DUP ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     CONTRACT %get
+                       (pair string
+                             (contract (pair (string %currencyPair) (pair (timestamp %lastUpdate) (nat %rate))))) ;
+                     IF_NONE { PUSH string "NO_ORACLE_FOUND" ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     SELF %closeCallback ;
+                     PUSH string "XTZ-USD" ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     NIL operation ;
+                     SWAP ;
+                     CONS ;
+                     PAIR }
+                   { DUP ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     DIG 2 ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     CDR ;
+                     DIG 4 ;
+                     DUP ;
+                     DUG 5 ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     DIG 3 ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     DIG 4 ;
+                     CDR ;
+                     PAIR ;
+                     PAIR ;
+                     DIG 2 ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR } } }
+           { DROP ; NIL operation ; PAIR } } }

@@ -1,0 +1,64 @@
+{ parameter
+    (or (or (nat %permitSpend) (ticket %permitAllow unit))
+        (or (pair %permitGet (unit %voidParam) (lambda %voidResProxy nat nat))
+            (address %permitSetAdmin))) ;
+  storage (pair (option %ptsPermittedTokens (ticket unit)) (address %ptsAdmin)) ;
+  code { CAST (pair (or (or nat (ticket unit)) (or (pair unit (lambda nat nat)) address))
+                    (option (ticket unit))
+                    address) ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DIP { UNPAIR } ;
+                 SWAP ;
+                 IF_NONE
+                   { DROP ; NONE (ticket unit) }
+                   { SWAP ;
+                     DIP { READ_TICKET ; CDR ; CDR } ;
+                     SWAP ;
+                     DUP 2 ;
+                     DUP 2 ;
+                     SUB ;
+                     ISNAT ;
+                     IF_NONE
+                       { PAIR ;
+                         PUSH string "Insufficient_tokens_permitted_by_ticket" ;
+                         PAIR ;
+                         FAILWITH }
+                       { SWAP ; DROP } ;
+                     PAIR ;
+                     SWAP ;
+                     SPLIT_TICKET ;
+                     IF_NONE { {} ; {} ; UNIT ; FAILWITH } {} ;
+                     CAR ;
+                     SOME } ;
+                 PAIR }
+               { DIP { UNPAIR } ;
+                 DUP 3 ;
+                 DIP { READ_TICKET ; UNPAIR ; DIP { UNPAIR } ; DIP 2 { DROP } } ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "WRONG_TICKETER" ; FAILWITH } ;
+                 DROP ;
+                 SWAP ;
+                 IF_NONE
+                   {}
+                   { PAIR ;
+                     JOIN_TICKETS ;
+                     IF_NONE { PUSH string "badtjoin" ; FAILWITH } {} } ;
+                 SOME ;
+                 PAIR } }
+           { IF_LEFT
+               { UNPAIR ;
+                 SWAP ;
+                 DIP { DROP ;
+                       CAR ;
+                       IF_NONE { PUSH nat 0 } { READ_TICKET ; CDR ; CDR ; SWAP ; DROP } } ;
+                 SWAP ;
+                 EXEC ;
+                 PUSH string "VoidResult" ;
+                 PAIR ;
+                 FAILWITH }
+               { SWAP ; DROP ; NONE (ticket unit) ; PAIR } } ;
+         NIL operation ;
+         PAIR } }

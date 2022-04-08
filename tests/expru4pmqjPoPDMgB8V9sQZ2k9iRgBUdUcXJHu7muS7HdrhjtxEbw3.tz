@@ -1,0 +1,11 @@
+{ storage (pair (big_map %metadata string bytes) (int %x)) ;
+  parameter (or (big_map %change_metadata string bytes) (unit %incr)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { SWAP ; CDR ; SWAP ; PAIR }
+           { DROP ; DUP ; CAR ; SWAP ; CDR ; PUSH int 1 ; ADD ; SWAP ; PAIR } ;
+         NIL operation ;
+         PAIR } }

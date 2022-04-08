@@ -1,0 +1,48 @@
+{ storage (pair (address %address) (pair (int %req) (int %vaccineAvailable))) ;
+  parameter
+    (or (int %distributerReq)
+        (or (pair %transferVaccToDistributer (address %address) (int %reqVaccine))
+            (int %updateVacc))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; SENDER ; UPDATE 1 ; SWAP ; UPDATE 3 ; NIL operation }
+           { IF_LEFT
+               { DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 UPDATE 1 ;
+                 SWAP ;
+                 NIL operation ;
+                 DUP 3 ;
+                 CAR ;
+                 CONTRACT %incrementCounter int ;
+                 IF_NONE { PUSH int 19 ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 DUP 4 ;
+                 CDR ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIG 2 ;
+                 DUP ;
+                 GET 4 ;
+                 DUP 4 ;
+                 CDR ;
+                 SWAP ;
+                 SUB ;
+                 UPDATE 4 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 DIG 2 ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF { SWAP ;
+                      PUSH address "KT1L8qeX792DVYzdWHWWjS5aDNGKWNWztaWK" ;
+                      UPDATE 1 ;
+                      PUSH int 0 ;
+                      UPDATE 3 ;
+                      SWAP }
+                    {} }
+               { UPDATE 4 ; NIL operation } } ;
+         PAIR } }

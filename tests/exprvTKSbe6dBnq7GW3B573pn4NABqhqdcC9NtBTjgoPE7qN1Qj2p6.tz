@@ -1,0 +1,17 @@
+{ storage (pair (int %myParameter1) (int %myParameter2)) ;
+  parameter int ;
+  code { UNPAIR ;
+         PUSH int 123 ;
+         DUP 3 ;
+         CAR ;
+         COMPARE ;
+         LE ;
+         IF {}
+            { PUSH string "WrongCondition: self.data.myParameter1 <= 123" ; FAILWITH } ;
+         SWAP ;
+         UNPAIR ;
+         DIG 2 ;
+         ADD ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

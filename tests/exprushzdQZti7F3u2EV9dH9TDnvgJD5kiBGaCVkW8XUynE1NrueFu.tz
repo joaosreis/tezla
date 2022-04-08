@@ -1,0 +1,91 @@
+{ parameter
+    (or (or (or %admin (unit %confirm_admin) (address %set_admin))
+            (pair %transfer_tokens
+               (address %fa2)
+               (list %transfers
+                  (pair (address %from_)
+                        (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))))
+        (pair %update_ops
+           (address %fa2)
+           (list %updates
+              (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                  (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))))) ;
+  storage (pair (address %admin) (option %pending_admin address)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DROP ;
+                     CDR ;
+                     IF_NONE
+                       { PUSH string "NO_PENDING_ADMIN" ; FAILWITH }
+                       { SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF { NONE address ; SENDER ; PAIR }
+                            { PUSH string "NOT_A_PENDING_ADMIN" ; FAILWITH } } ;
+                     NIL operation ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "NOT_AN_ADMIN" ; FAILWITH } {} ;
+                     PAIR ;
+                     DUP ;
+                     CAR ;
+                     SOME ;
+                     SWAP ;
+                     CDR ;
+                     CAR ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "NOT_AN_ADMIN" ; FAILWITH } {} ;
+                 DUP ;
+                 CAR ;
+                 CONTRACT %transfer
+                   (list (pair (address %from_)
+                               (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+                 IF_NONE
+                   { DROP ; PUSH string "NO_TRANSFER" ; FAILWITH }
+                   { PUSH mutez 0 ; DIG 2 ; CDR ; TRANSFER_TOKENS } ;
+                 SWAP ;
+                 NIL operation ;
+                 DIG 2 ;
+                 CONS ;
+                 PAIR } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "NOT_AN_ADMIN" ; FAILWITH } {} ;
+             DUP ;
+             CAR ;
+             CONTRACT %update_operators
+               (list (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                         (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))) ;
+             IF_NONE
+               { DROP ; PUSH string "NO_UPDATE_OPERATORS" ; FAILWITH }
+               { PUSH mutez 0 ; DIG 2 ; CDR ; TRANSFER_TOKENS } ;
+             SWAP ;
+             NIL operation ;
+             DIG 2 ;
+             CONS ;
+             PAIR } } }

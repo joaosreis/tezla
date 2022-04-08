@@ -1,0 +1,3 @@
+{ storage (list string) ;
+  parameter (unit %entry_point_1) ;
+  code { CDR ; NIL operation ; PAIR } }

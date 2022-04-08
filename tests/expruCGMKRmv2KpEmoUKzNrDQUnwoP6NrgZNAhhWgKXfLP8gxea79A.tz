@@ -1,0 +1,94 @@
+{ storage
+    (pair (pair (map %m int string) (string %x))
+          (pair (option %y string) (option %z string))) ;
+  parameter
+    (or (or (or (unit %test_get_and_update) (map %test_map_get int string))
+            (or (map %test_map_get2 int string) (map %test_map_get_default_values int string)))
+        (or (or (map %test_map_get_missing_value int string)
+                (map %test_map_get_missing_value2 int string))
+            (or (map %test_map_get_opt int string) (unit %test_update_map)))) ;
+  code { CAST (pair (or (or (or unit (map int string)) (or (map int string) (map int string)))
+                        (or (or (map int string) (map int string)) (or (map int string) unit)))
+                    (pair (pair (map int string) string) (pair (option string) (option string)))) ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     PUSH (option string) (Some "one") ;
+                     PUSH int 1 ;
+                     GET_AND_UPDATE ;
+                     SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DROP ;
+                     UPDATE 4 }
+                   { SWAP ;
+                     UNPAIR ;
+                     CAR ;
+                     DIG 2 ;
+                     PUSH int 12 ;
+                     GET ;
+                     IF_NONE { PUSH int 12 ; FAILWITH } {} ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR } }
+               { IF_LEFT
+                   { SWAP ;
+                     UNPAIR ;
+                     CAR ;
+                     DIG 2 ;
+                     PUSH int 12 ;
+                     GET ;
+                     IF_NONE { PUSH int 17 ; FAILWITH } {} ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR }
+                   { SWAP ;
+                     UNPAIR ;
+                     CAR ;
+                     DIG 2 ;
+                     PUSH int 12 ;
+                     GET ;
+                     IF_NONE { PUSH string "abc" } {} ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     UNPAIR ;
+                     CAR ;
+                     DIG 2 ;
+                     PUSH int 12 ;
+                     GET ;
+                     IF_NONE { PUSH string "missing 12" ; FAILWITH } {} ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR }
+                   { SWAP ;
+                     UNPAIR ;
+                     CAR ;
+                     DIG 2 ;
+                     PUSH int 12 ;
+                     GET ;
+                     IF_NONE { PUSH int 1234 ; FAILWITH } {} ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR } }
+               { IF_LEFT
+                   { PUSH int 12 ; GET ; UPDATE 3 }
+                   { DROP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     PUSH (option string) (Some "one") ;
+                     PUSH int 1 ;
+                     UPDATE ;
+                     PAIR ;
+                     PAIR } } } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,96 @@
+{ parameter (or (unit %deposit) (pair %withdraw (mutez %summ) (address %to))) ;
+  storage
+    (pair (pair (address %developer) (address %judge))
+          (pair (mutez %judgeBounty) (address %tester))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.developer == sp.sender" ; FAILWITH } ;
+             PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             GT ;
+             IF {} { PUSH string "WrongCondition: sp.amount > sp.tez(0)" ; FAILWITH } ;
+             NIL operation }
+           { SENDER ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.judge == sp.sender" ; FAILWITH } ;
+             DUP ;
+             CDR ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { DUP ;
+                  CDR ;
+                  DUP 3 ;
+                  GET 4 ;
+                  COMPARE ;
+                  EQ ;
+                  IF {} { PUSH string "Incorrect destination address" ; FAILWITH } } ;
+             BALANCE ;
+             DUP 3 ;
+             GET 3 ;
+             DUP 3 ;
+             CAR ;
+             ADD ;
+             COMPARE ;
+             LE ;
+             IF {}
+                { PUSH string "WrongCondition: (params.summ + self.data.judgeBounty) <= sp.balance" ;
+                  FAILWITH } ;
+             NIL operation ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CONTRACT unit ;
+             IF_NONE { PUSH int 22 ; FAILWITH } {} ;
+             DUP 4 ;
+             GET 3 ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CONTRACT unit ;
+             IF_NONE { PUSH int 23 ; FAILWITH } {} ;
+             DUP 3 ;
+             CAR ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             CONTRACT unit ;
+             IF_NONE { PUSH int 24 ; FAILWITH } {} ;
+             DUP 4 ;
+             GET 3 ;
+             DIG 3 ;
+             CAR ;
+             BALANCE ;
+             SUB ;
+             SUB ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

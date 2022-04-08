@@ -1,0 +1,122 @@
+{ parameter
+    (or (or (address %cancel)
+            (pair %place_bid (pair (mutez %amount) (address %bidder)) (contract %contr mutez)))
+        (pair %withdraw address (contract unit))) ;
+  storage
+    (pair (pair (map %bid_list address mutez) (mutez %current_price))
+          (pair (timestamp %end_time) (address %owner))) ;
+  code { SOURCE ;
+         AMOUNT ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CDR ;
+         DIG 3 ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { DROP ;
+                 SWAP ;
+                 DROP ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 DIG 2 ;
+                 GET ;
+                 IF_NONE
+                   { DROP ; PUSH string "no such bid" ; FAILWITH }
+                   { DROP ; NIL operation ; PAIR } }
+               { DIG 3 ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 CDR ;
+                 COMPARE ;
+                 EQ ;
+                 IF { DROP 3 ; PUSH string "Cant bid on owned artifact" ; FAILWITH }
+                    { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CDR ;
+                      CAR ;
+                      NOW ;
+                      COMPARE ;
+                      GT ;
+                      IF { DROP 3 ; PUSH string "Auction is over" ; FAILWITH }
+                         { SWAP ;
+                           DUP ;
+                           DUG 2 ;
+                           CAR ;
+                           CDR ;
+                           DIG 3 ;
+                           COMPARE ;
+                           LT ;
+                           IF { DROP 2 ; PUSH string "Bid is too low" ; FAILWITH }
+                              { SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                CAR ;
+                                CAR ;
+                                AMOUNT ;
+                                SOME ;
+                                SOURCE ;
+                                UPDATE ;
+                                DIG 2 ;
+                                DUP ;
+                                DUG 3 ;
+                                CDR ;
+                                AMOUNT ;
+                                DIG 4 ;
+                                CAR ;
+                                CAR ;
+                                PAIR ;
+                                CDR ;
+                                DIG 2 ;
+                                PAIR ;
+                                PAIR ;
+                                NIL operation ;
+                                DIG 2 ;
+                                DUP ;
+                                DUG 3 ;
+                                CDR ;
+                                AMOUNT ;
+                                DIG 4 ;
+                                CAR ;
+                                CAR ;
+                                TRANSFER_TOKENS ;
+                                CONS ;
+                                PAIR } } } } }
+           { DIG 2 ;
+             DROP ;
+             PAIR ;
+             DUP ;
+             CDR ;
+             DUP ;
+             CAR ;
+             CAR ;
+             DIG 3 ;
+             GET ;
+             IF_NONE
+               { DROP 2 ; PUSH string "No bid found" ; FAILWITH }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP 3 ; PUSH string "You cannot withdraw" ; FAILWITH }
+                    { SWAP ;
+                      NIL operation ;
+                      DIG 3 ;
+                      CAR ;
+                      CDR ;
+                      DIG 3 ;
+                      UNIT ;
+                      TRANSFER_TOKENS ;
+                      CONS ;
+                      PAIR } } } } }

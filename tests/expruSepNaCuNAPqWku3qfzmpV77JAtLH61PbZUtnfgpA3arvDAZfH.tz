@@ -1,0 +1,205 @@
+{ parameter
+    (or (or (string %answer)
+            (pair %answer_callback
+               (string %currency_pair)
+               (pair (timestamp %last_update) (nat %rate))))
+        (pair %ask
+           (string %ipfs_hash)
+           (pair (string %question_id)
+                 (pair (string %currency_pair) (pair (nat %value) (timestamp %answer_at)))))) ;
+  storage
+    (pair (option %current_question string)
+          (pair (map %questions
+                   string
+                   (pair (address %answer_to)
+                         (pair (string %question_id)
+                               (pair (string %currency_pair) (pair (nat %value) (timestamp %answer_at))))))
+                (pair (address %owner) (address %oracle)))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH string "3" ; FAILWITH } {} ;
+                 DUP ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 NOW ;
+                 COMPARE ;
+                 LT ;
+                 IF { PUSH string "4" ; FAILWITH } {} ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CONTRACT %get
+                   (pair string
+                         (contract (pair (string %currency_pair) (pair (timestamp %last_update) (nat %rate))))) ;
+                 IF_NONE { PUSH string "5" ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 SELF %answer_callback ;
+                 DIG 3 ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 PAIR ;
+                 TRANSFER_TOKENS ;
+                 DIG 2 ;
+                 CDR ;
+                 DIG 2 ;
+                 SOME ;
+                 PAIR ;
+                 NIL operation ;
+                 DIG 2 ;
+                 CONS ;
+                 PAIR }
+               { PAIR ;
+                 DUP ;
+                 CDR ;
+                 DUP ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "2" ; FAILWITH } {} ;
+                 DUP ;
+                 CAR ;
+                 IF_NONE { PUSH string "6" ; FAILWITH } {} ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH string "3" ; FAILWITH } {} ;
+                 DUP ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 NOW ;
+                 COMPARE ;
+                 LT ;
+                 IF { PUSH string "4" ; FAILWITH } {} ;
+                 DUP ;
+                 CAR ;
+                 CONTRACT %closeMarket (pair string bool) ;
+                 IF_NONE { PUSH string "5" ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 DIG 6 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 COMPARE ;
+                 GT ;
+                 IF { PUSH bool True } { PUSH bool False } ;
+                 DIG 3 ;
+                 CDR ;
+                 CAR ;
+                 PAIR ;
+                 TRANSFER_TOKENS ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 CDR ;
+                 DIG 3 ;
+                 CDR ;
+                 CAR ;
+                 DIG 3 ;
+                 NONE (pair address (pair string (pair string (pair nat timestamp)))) ;
+                 SWAP ;
+                 UPDATE ;
+                 PAIR ;
+                 NONE string ;
+                 PAIR ;
+                 NIL operation ;
+                 DIG 2 ;
+                 CONS ;
+                 PAIR } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             GET ;
+             IF_NONE {} { DROP ; PUSH string "1" ; FAILWITH } ;
+             DUP ;
+             CDR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             SENDER ;
+             PAIR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             CDR ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             CDR ;
+             CAR ;
+             DIG 2 ;
+             SOME ;
+             DIG 3 ;
+             CAR ;
+             UPDATE ;
+             PAIR ;
+             SWAP ;
+             CAR ;
+             PAIR ;
+             NIL operation ;
+             PAIR } } }

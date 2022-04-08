@@ -1,0 +1,51 @@
+{ storage (pair (list %deck (list int)) (pair (bool %flag) (nat %storedValue))) ;
+  parameter
+    (or (or (nat %divide) (unit %double))
+        (or (nat %factorial) (or (unit %reverseFlag) (nat %set)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DUP ;
+                 PUSH nat 0 ;
+                 COMPARE ;
+                 LT ;
+                 IF {} { PUSH string "WrongCondition: params.op > 0" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 GET 4 ;
+                 DIG 2 ;
+                 SWAP ;
+                 EDIV ;
+                 IF_NONE { PUSH int 18 ; FAILWITH } { CAR } ;
+                 UPDATE 4 }
+               { DROP ; DUP ; GET 4 ; PUSH nat 2 ; MUL ; UPDATE 4 } }
+           { IF_LEFT
+               { SWAP ;
+                 PUSH nat 1 ;
+                 UPDATE 4 ;
+                 SWAP ;
+                 DUP ;
+                 PUSH nat 1 ;
+                 ADD ;
+                 PUSH nat 1 ;
+                 DUP ;
+                 DUP 3 ;
+                 COMPARE ;
+                 GT ;
+                 LOOP { DIG 3 ;
+                        DUP ;
+                        GET 4 ;
+                        DUP 3 ;
+                        MUL ;
+                        UPDATE 4 ;
+                        DUG 3 ;
+                        PUSH nat 1 ;
+                        ADD ;
+                        DUP ;
+                        DUP 3 ;
+                        COMPARE ;
+                        GT } ;
+                 DROP 3 }
+               { IF_LEFT { DROP ; DUP ; GET 3 ; NOT ; UPDATE 3 } { UPDATE 4 } } } ;
+         NIL operation ;
+         PAIR } }

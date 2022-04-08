@@ -1,0 +1,100 @@
+{ storage (pair (address %admin) (pair (bool %allowUpdate) (map %owners address nat))) ;
+  parameter
+    (or (unit %distribute) (or (unit %lockUpdates) (map %setOwners address nat))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { BALANCE ;
+             BALANCE ;
+             NIL operation ;
+             DUP 5 ;
+             GET 4 ;
+             ITER { DUP ;
+                    DUG 2 ;
+                    CAR ;
+                    CONTRACT unit ;
+                    IF_NONE { PUSH int 35 ; FAILWITH } {} ;
+                    PUSH nat 100 ;
+                    DUP 6 ;
+                    DUP 5 ;
+                    CDR ;
+                    MUL ;
+                    EDIV ;
+                    IF_NONE { PUSH int 34 ; FAILWITH } {} ;
+                    CAR ;
+                    UNIT ;
+                    TRANSFER_TOKENS ;
+                    CONS ;
+                    SWAP ;
+                    PUSH nat 100 ;
+                    DUP 5 ;
+                    DIG 2 ;
+                    CDR ;
+                    MUL ;
+                    EDIV ;
+                    IF_NONE { PUSH int 34 ; FAILWITH } {} ;
+                    CAR ;
+                    DIG 2 ;
+                    SUB ;
+                    SWAP } ;
+             DIG 2 ;
+             DROP ;
+             DIG 2 ;
+             DROP ;
+             PUSH mutez 0 ;
+             DUP 3 ;
+             COMPARE ;
+             GT ;
+             IF { DUP 3 ;
+                  CAR ;
+                  CONTRACT unit ;
+                  IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                  DIG 2 ;
+                  UNIT ;
+                  TRANSFER_TOKENS ;
+                  CONS }
+                { SWAP ; DROP } }
+           { IF_LEFT
+               { DROP ;
+                 DUP ;
+                 GET 3 ;
+                 IF {} { PUSH string "WrongCondition: self.data.allowUpdate" ; FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.admin == sp.sender" ; FAILWITH } ;
+                 UNPAIR ;
+                 SWAP ;
+                 CDR ;
+                 PUSH bool False ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 IF {} { PUSH string "WrongCondition: self.data.allowUpdate" ; FAILWITH } ;
+                 SENDER ;
+                 DUP 3 ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.admin == sp.sender" ; FAILWITH } ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 2 ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } ;
+             NIL operation } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

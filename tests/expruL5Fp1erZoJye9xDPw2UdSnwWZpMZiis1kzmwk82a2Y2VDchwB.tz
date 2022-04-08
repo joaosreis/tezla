@@ -1,0 +1,18 @@
+{ storage (option address) ;
+  parameter unit ;
+  code { DROP ;
+         PUSH int 0 ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter (or (int %decrement) (int %increment)) ;
+             storage int ;
+             code { UNPAIR ; IF_LEFT { SWAP ; SUB } { ADD } ; NIL operation ; PAIR } } ;
+         PAIR ;
+         CAR ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         NONE address ;
+         SWAP ;
+         PAIR } }

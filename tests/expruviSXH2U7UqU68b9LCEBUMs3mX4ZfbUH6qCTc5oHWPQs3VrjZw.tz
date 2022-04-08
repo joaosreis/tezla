@@ -1,0 +1,3 @@
+{ storage unit ;
+  parameter unit ;
+  code { PUSH address 0x0000107c4009f2bcfcc248d6952998af5b7203b8ff59 ; FAILWITH } }

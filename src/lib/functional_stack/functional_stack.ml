@@ -1,67 +1,19 @@
-open Core_kernel
+open Core
 
 type 'a t = 'a list
 
 exception Unsufficient_length
 
 let empty = []
-
 let push = List.cons
-
-let%test "push empty" = List.equal Int.equal (push 1 []) [ 1 ]
-
-let%test "push" = List.equal Int.equal (push 2 [ 1 ]) [ 2; 1 ]
-
 let pop = function [] -> raise Unsufficient_length | hd :: tl -> (hd, tl)
-
-let%test "pop empty" =
-  try
-    let _ = pop [] in
-    false
-  with Unsufficient_length -> true
-
-let%test "pop" =
-  let x, y = pop [ 1; 2 ] in
-  x = 1 && List.equal Int.equal y [ 2 ]
-
 let drop = function [] -> raise Unsufficient_length | _ :: tl -> tl
-
-let%test "drop empty" =
-  try
-    let _ = drop [] in
-    false
-  with Unsufficient_length -> true
-
-let%test "drop" = List.equal Int.equal (drop [ 1; 2 ]) [ 2 ]
-
 let peek = function [] -> raise Unsufficient_length | hd :: _ -> hd
-
-let%test "peek empty" =
-  try
-    let _ = peek [] in
-    false
-  with Unsufficient_length -> true
-
-let%test "peek" = peek [ 1; 2 ] = 1
 
 let swap = function
   | hd_1 :: hd_2 :: tl -> hd_2 :: hd_1 :: tl
   | _ :: _ -> raise Unsufficient_length
   | [] -> raise Unsufficient_length
-
-let%test "swap empty" =
-  try
-    let _ = swap [] in
-    false
-  with Unsufficient_length -> true
-
-let%test "swap size 1" =
-  try
-    let _ = swap [ 1 ] in
-    false
-  with Unsufficient_length -> true
-
-let%test "swap" = List.equal Int.equal (swap [ 1; 2 ]) [ 2; 1 ]
 
 let dig s n =
   if Bigint.(n = zero) then s
@@ -108,11 +60,28 @@ let%test "dug invalid length" =
   with Unsufficient_length -> true
 
 let%test "dug 0" = List.equal Int.equal (dug [ 1 ] Bigint.zero) [ 1 ]
-
 let%test "dug 1" = List.equal Int.equal (dug [ 1; 2; 3 ] Bigint.one) [ 2; 1; 3 ]
 
 let%test "dug 2" =
   List.equal Int.equal (dug [ 1; 2; 3 ] Bigint.(of_int 2)) [ 2; 3; 1 ]
+
+let dup s n =
+  if Bigint.(of_int (List.length s) < n) then raise Unsufficient_length
+  else
+    let rec aux i s =
+      if Bigint.(i = one) then peek s else aux Bigint.(i - one) (drop s)
+    in
+    let x = aux n s in
+    push x s
+
+let%test "dup 1" =
+  List.equal Int.equal (dup [ 1; 2; 3 ] Bigint.(one)) [ 1; 1; 2; 3 ]
+
+let%test "dup 2" =
+  List.equal Int.equal (dup [ 1; 2; 3 ] Bigint.(one)) [ 2; 1; 2; 3 ]
+
+let%test "dup 3" =
+  List.equal Int.equal (dup [ 1; 2; 3 ] Bigint.(one)) [ 3; 1; 2; 3 ]
 
 let map f = List.map ~f
 

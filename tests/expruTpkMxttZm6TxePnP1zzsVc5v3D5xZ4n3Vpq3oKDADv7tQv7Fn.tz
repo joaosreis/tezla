@@ -1,8 +1,0 @@
-{ parameter (or (unit %get) (int %set)) ;
-  storage int ;
-  code { DUP ;
-         CAR ;
-         IF_LEFT
-           { DIG 1 ; DUP ; DUG 2 ; CDR ; NIL operation ; PAIR ; DIP { DROP } }
-           { DUP ; NIL operation ; PAIR ; DIP { DROP } } ;
-         DIP { DROP } } }

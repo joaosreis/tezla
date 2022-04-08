@@ -1,0 +1,20 @@
+{ parameter (or (ticket %receive int) unit) ;
+  storage (list (ticket int)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { CONS ; NIL operation ; PAIR }
+           { DROP ;
+             PUSH address "KT1P2gVqevEBQzshQWNnmYoGY3C1aDV8e3k9" ;
+             CONTRACT (pair (ticket int) (contract (ticket int))) ;
+             { IF_NONE { PUSH string "no contract" ; FAILWITH } {} } ;
+             PUSH mutez 0 ;
+             SELF %receive ;
+             PUSH nat 42 ;
+             PUSH int 42 ;
+             TICKET ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             NIL operation ;
+             SWAP ;
+             CONS ;
+             PAIR } } }

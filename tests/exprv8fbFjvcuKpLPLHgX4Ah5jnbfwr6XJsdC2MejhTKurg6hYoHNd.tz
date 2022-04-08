@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (pair (big_map %metadata string bytes) unit) ;
+  code { CAR ; FAILWITH } }

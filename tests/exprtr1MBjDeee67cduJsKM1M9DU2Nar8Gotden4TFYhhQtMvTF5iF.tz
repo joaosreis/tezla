@@ -1,0 +1,33 @@
+{ parameter
+    (or (or (or (pair %InstrumentListed (address %address) (pair (string %isin) (string %name)))
+                (pair %InstrumentUnlisted (address %address) (pair (string %isin) (string %name))))
+            (or (nat %PaymentReceived)
+                (or (nat %PaymentTransferred) (nat %SubscriptionInitiated))))
+        (or (or (pair %Transfer (address %_from) (pair (address %_to) (nat %_value)))
+                (pair %forgeBondCreated
+                   (pair (address %owner) (address %registrar))
+                   (pair (address %settler)
+                         (pair (address %tokenAddress)
+                               (pair %tokenMetadata
+                                  (pair (nat %initialSupply) (string %isinCode))
+                                  (pair (string %name) (string %symbol)))))))
+            (or (pair %forgeStructuredProductCreated
+                   (pair (address %owner) (address %registrar))
+                   (pair (address %settler)
+                         (pair (address %tokenAddress)
+                               (pair %tokenMetadata
+                                  (pair (nat %initialSupply) (string %isinCode))
+                                  (pair (string %name) (string %symbol))))))
+                (or (pair %newOperator (address %by) (pair (address %operator) (nat %operatorRole)))
+                    (pair %revokeOperator (address %by) (pair (address %operator) (nat %operatorRole))))))) ;
+  storage unit ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT { DROP } { DROP } }
+               { IF_LEFT { DROP } { IF_LEFT { DROP } { DROP } } } }
+           { IF_LEFT
+               { IF_LEFT { DROP } { DROP } }
+               { IF_LEFT { DROP } { IF_LEFT { DROP } { DROP } } } } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,3 @@
+{ parameter (or (int %decrement) (int %increment)) ;
+  storage int ;
+  code { CDR ; NIL operation ; PAIR } }

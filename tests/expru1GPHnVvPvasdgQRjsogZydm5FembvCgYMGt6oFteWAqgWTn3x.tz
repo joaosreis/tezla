@@ -1,0 +1,33 @@
+{ parameter unit ;
+  storage address ;
+  code { DROP ;
+         NIL operation ;
+         PUSH (pair address nat) (Pair "tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" 0) ;
+         EMPTY_BIG_MAP (pair address address) unit ;
+         PUSH (or unit (or address address)) (Left Unit) ;
+         PAIR ;
+         PAIR ;
+         EMPTY_BIG_MAP string bytes ;
+         EMPTY_BIG_MAP (pair address nat) nat ;
+         PAIR ;
+         PUSH (pair address (map string bytes))
+              (Pair "tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" {}) ;
+         PAIR ;
+         PAIR ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter unit ;
+             storage
+               (pair (pair (pair (address %admin) (map %extra string bytes))
+                           (pair (big_map %ledger (pair address nat) nat) (big_map %metadata string bytes)))
+                     (pair (pair (or %migration_status
+                                    (unit %not_in_migration)
+                                    (or (address %migratingTo) (address %migratedTo)))
+                                 (big_map %operators (pair (address %owner) (address %operator)) unit))
+                           (pair (address %pending_owner) (nat %permits_counter)))) ;
+             code { PUSH string "ERROR_TEST" ; FAILWITH } } ;
+         SWAP ;
+         DIP { CONS } ;
+         SWAP ;
+         PAIR } }

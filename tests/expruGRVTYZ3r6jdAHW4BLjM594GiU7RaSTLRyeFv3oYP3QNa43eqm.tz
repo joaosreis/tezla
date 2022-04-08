@@ -1,0 +1,261 @@
+{ storage
+    (pair (pair (pair %x1 (pair (nat %a) (int %b)) (pair (bool %c) (string %d)))
+                (pair (pair %x2 (nat %a) (pair (int %b) (pair (bool %c) (string %d))))
+                      (pair %x3 (pair (pair (nat %a) (int %b)) (bool %c)) (string %d))))
+          (pair (pair %x4 (pair (nat %a) (int %b)) (pair (bool %c) (string %d)))
+                (pair (pair %y nat (pair int (pair bool string)))
+                      (pair %z (pair (nat %a) (int %b)) (pair (bool %c) (pair %d (int %e) (string %f))))))) ;
+  parameter
+    (or (or (unit %ep1) (or (unit %ep2) (unit %ep3)))
+        (or (or (unit %ep4) (address %ep5)) (or (unit %ep6) (unit %ep7)))) ;
+  code { CAST (pair (or (or unit (or unit unit)) (or (or unit address) (or unit unit)))
+                    (pair (pair (pair (pair nat int) (pair bool string))
+                                (pair (pair nat (pair int (pair bool string))) (pair (pair (pair nat int) bool) string)))
+                          (pair (pair (pair nat int) (pair bool string))
+                                (pair (pair nat (pair int (pair bool string)))
+                                      (pair (pair nat int) (pair bool (pair int string))))))) ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DROP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 PUSH nat 1 ;
+                 DUP 4 ;
+                 ADD ;
+                 DUP 5 ;
+                 ABS ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string
+                           "WrongCondition: (abs(modify_record___main___21.b)) == (modify_record___main___21.a + 1)" ;
+                      FAILWITH } ;
+                 PAIR ;
+                 DUG 2 ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 UNPAIR 4 ;
+                 DIG 3 ;
+                 DROP ;
+                 DUP ;
+                 PUSH nat 1 ;
+                 ADD ;
+                 DUP 3 ;
+                 ABS ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string
+                           "WrongCondition: (abs(modify_record___main___23.b)) == (modify_record___main___23.a + 1)" ;
+                      FAILWITH } ;
+                 PUSH string "xyz" ;
+                 DIG 3 ;
+                 PAIR ;
+                 DIG 2 ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 CAR ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 DIG 2 ;
+                 PUSH nat 1 ;
+                 DUP 3 ;
+                 ADD ;
+                 DUP 4 ;
+                 ABS ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string
+                           "WrongCondition: (abs(modify_record___main___26.b)) == (modify_record___main___26.a + 1)" ;
+                      FAILWITH } ;
+                 PUSH string "xyz" ;
+                 SWAP ;
+                 DIG 3 ;
+                 DIG 3 ;
+                 PAIR ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 DUP ;
+                 GET 3 ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 DIG 2 ;
+                 CAR ;
+                 PUSH nat 1 ;
+                 DUP 3 ;
+                 ADD ;
+                 DUP 4 ;
+                 ABS ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string
+                           "WrongCondition: (abs(modify_record___main___29.b)) == (modify_record___main___29.a + 1)" ;
+                      FAILWITH } ;
+                 PUSH string "xyz" ;
+                 SWAP ;
+                 PAIR ;
+                 DUG 2 ;
+                 PAIR ;
+                 PAIR ;
+                 UPDATE 3 }
+               { IF_LEFT
+                   { DROP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     DIG 2 ;
+                     CAR ;
+                     PUSH nat 1 ;
+                     DUP 3 ;
+                     ADD ;
+                     DUP 4 ;
+                     ABS ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: (abs(modify_record___main___35.b)) == (modify_record___main___35.a + 1)" ;
+                          FAILWITH } ;
+                     PUSH string "xyz" ;
+                     SWAP ;
+                     PAIR ;
+                     DUG 2 ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR }
+                   { DROP ;
+                     DUP ;
+                     GET 5 ;
+                     UNPAIR 4 ;
+                     DIG 3 ;
+                     DROP ;
+                     DUP ;
+                     PUSH nat 1 ;
+                     ADD ;
+                     DUP 3 ;
+                     ABS ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: (abs(b.value)) == (a.value + 1)" ; FAILWITH } ;
+                     PUSH string "xyz" ;
+                     DIG 3 ;
+                     PAIR ;
+                     DIG 2 ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     UPDATE 5 } } ;
+             NIL operation }
+           { IF_LEFT
+               { IF_LEFT
+                   { DROP ; NIL operation }
+                   { NIL operation ;
+                     DIG 2 ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     DIG 2 ;
+                     CAR ;
+                     DIG 5 ;
+                     DIG 6 ;
+                     CONTRACT unit ;
+                     IF_NONE { PUSH int 62 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DUG 5 ;
+                     PUSH string "xyz" ;
+                     SWAP ;
+                     PAIR ;
+                     DUG 2 ;
+                     PUSH nat 5 ;
+                     ADD ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP } }
+               { IF_LEFT
+                   { DROP ;
+                     DUP ;
+                     GET 6 ;
+                     UNPAIR ;
+                     CAR ;
+                     SWAP ;
+                     CAR ;
+                     PUSH int 100 ;
+                     DUG 2 ;
+                     PUSH int 2 ;
+                     PUSH string "y" ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     DUG 2 ;
+                     PAIR ;
+                     PAIR ;
+                     UPDATE 6 }
+                   { DROP ;
+                     DUP ;
+                     GET 11 ;
+                     PUSH int 2 ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "WrongCondition: self.data.z.d.e == 2" ; FAILWITH } ;
+                     DUP ;
+                     GET 6 ;
+                     DUP ;
+                     GET 4 ;
+                     CAR ;
+                     PUSH int 2 ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: modify_record___main___77.e == 2" ; FAILWITH } ;
+                     PUSH int 3 ;
+                     PUSH string "z" ;
+                     SWAP ;
+                     PUSH int 3 ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: modify_record___main___77.e == 3" ; FAILWITH } ;
+                     PUSH int 4 ;
+                     DUP ;
+                     PUSH int 4 ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: modify_record___main___77.e == 4" ; FAILWITH } ;
+                     PAIR ;
+                     UPDATE 4 ;
+                     UPDATE 6 ;
+                     DUP ;
+                     GET 11 ;
+                     PUSH int 4 ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "WrongCondition: self.data.z.d.e == 4" ; FAILWITH } } ;
+                 NIL operation } } ;
+         PAIR } }

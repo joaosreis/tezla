@@ -1,0 +1,8 @@
+{ storage (pair (big_map %metadata string bytes) (int %x)) ;
+  parameter (or (bytes %change_metadata) (unit %incr)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; DUP ; CAR ; DIG 2 ; SOME ; PUSH string "" ; UPDATE ; UPDATE 1 }
+           { DROP ; DUP ; CDR ; PUSH int 1 ; ADD ; UPDATE 2 } ;
+         NIL operation ;
+         PAIR } }

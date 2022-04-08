@@ -1,0 +1,15 @@
+{ parameter
+    (or (or (int %decrement)
+            (pair %new_Tran
+               (pair (int %nft_id) (mutez %nft_price))
+               (pair (address %owner_addr) (timestamp %tran_date))))
+        (unit %reset)) ;
+  storage
+    (pair (pair (int %nft_id) (mutez %nft_price))
+          (pair (address %owner_addr) (timestamp %tran_date))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT { SWAP ; UNPAIR ; CDR ; DIG 2 ; PAIR ; PAIR } { SWAP ; DROP } }
+           { DROP ; UNPAIR ; CDR ; PUSH int 0 ; PAIR ; PAIR } ;
+         NIL operation ;
+         PAIR } }

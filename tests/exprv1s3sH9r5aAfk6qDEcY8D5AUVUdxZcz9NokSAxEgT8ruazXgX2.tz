@@ -1,0 +1,18 @@
+{ parameter unit ;
+  storage unit ;
+  code { DROP ;
+         EMPTY_BIG_MAP int int ;
+         PUSH (option int) (Some 0) ;
+         PUSH int 0 ;
+         UPDATE ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter unit ;
+             storage (big_map int int) ;
+             code { CDR ; NIL operation ; PAIR } } ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         DIP { DROP ; UNIT } ;
+         PAIR } }

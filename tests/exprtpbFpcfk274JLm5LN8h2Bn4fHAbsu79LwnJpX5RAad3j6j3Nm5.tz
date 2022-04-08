@@ -1,0 +1,37 @@
+{ parameter (list nat) ;
+  storage
+    (pair (pair (pair (bytes %last_round_id) (address %oracle_contract))
+                (pair (address %oracle_owner) (nat %player_limit)))
+          (pair (pair (big_map %rounds
+                         bytes
+                         (pair (pair (list %players address) (bytes %prophecy)) (bytes %prophecyHash)))
+                      (list %temp_guess_for_compile nat))
+                (pair (address %token_contract) (address %token_owner)))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         CDR ;
+         CDR ;
+         SENDER ;
+         COMPARE ;
+         NEQ ;
+         IF { PUSH string "Unauthorized" ; FAILWITH } {} ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         CDR ;
+         SWAP ;
+         { DIP 2 { DUP } ; DIG 3 } ;
+         CDR ;
+         CAR ;
+         CAR ;
+         PAIR ;
+         PAIR ;
+         SWAP ;
+         CAR ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

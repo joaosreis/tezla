@@ -1,0 +1,5 @@
+{ parameter nat ;
+  storage unit ;
+  code { PUSH string
+              "{\"label\":\"ERX Trade Snapshot (06 May 2021 11:00:00.144053 \\u002B00:00)\",\"uri\":\"https://erx.blob.core.windows.net/cdn/archives%2Fexchange%2F20210506_110000144053_ERX_TradeSnapshot.csv\",\"checksum\":\"9F00952D105758F401C60718AD671044\"}" ;
+         FAILWITH } }

@@ -1,0 +1,104 @@
+{ parameter (or (unit %buy) (mutez %start_sale)) ;
+  storage
+    (pair (pair (address %issuer) (address %owner))
+          (or %state (mutez %on_sale) (unit %resting))) ;
+  code { LAMBDA
+           (pair mutez address)
+           operation
+           { UNPAIR ;
+             SWAP ;
+             CONTRACT unit ;
+             IF_NONE
+               { DROP ; PUSH string "Unknown receiver" ; FAILWITH }
+               { SWAP ; PUSH unit Unit ; TRANSFER_TOKENS } } ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         UNPAIR ;
+         DIG 2 ;
+         IF_LEFT
+           { DIG 3 ;
+             IF_LEFT
+               { DROP ;
+                 SENDER ;
+                 DUP 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 COMPARE ;
+                 EQ ;
+                 IF { DROP 5 ; PUSH string "the issuer cannot buy the item" ; FAILWITH }
+                    { DUP 4 ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      COMPARE ;
+                      EQ ;
+                      IF { DROP 5 ; PUSH string "the owner cannot buy the item" ; FAILWITH }
+                         { AMOUNT ;
+                           DIG 2 ;
+                           SWAP ;
+                           DUP ;
+                           DUG 2 ;
+                           COMPARE ;
+                           NEQ ;
+                           IF { DROP 5 ; PUSH string "Incorrect payment" ; FAILWITH }
+                              { PUSH nat 30 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                EDIV ;
+                                IF_NONE
+                                  { DROP ; PUSH string "this should not happen" ; FAILWITH }
+                                  { UNPAIR ;
+                                    PUSH mutez 0 ;
+                                    DIG 2 ;
+                                    COMPARE ;
+                                    GT ;
+                                    IF { PUSH mutez 1 } { PUSH mutez 0 } ;
+                                    ADD ;
+                                    DUP ;
+                                    DIG 2 ;
+                                    SUB ;
+                                    PAIR } ;
+                                UNPAIR ;
+                                DUP 4 ;
+                                DIG 2 ;
+                                PAIR ;
+                                DUP 6 ;
+                                SWAP ;
+                                EXEC ;
+                                DIG 4 ;
+                                DIG 2 ;
+                                PAIR ;
+                                DIG 4 ;
+                                SWAP ;
+                                EXEC ;
+                                PUSH unit Unit ;
+                                RIGHT mutez ;
+                                DIG 3 ;
+                                DIG 4 ;
+                                PAIR ;
+                                PAIR ;
+                                NIL operation ;
+                                DIG 2 ;
+                                CONS ;
+                                DIG 2 ;
+                                CONS ;
+                                PAIR } } } }
+               { DROP 5 ; PUSH string "sale already started" ; FAILWITH } }
+           { DROP ;
+             DIG 3 ;
+             DROP ;
+             DIG 2 ;
+             IF_LEFT
+               { DROP 3 ; PUSH string "cannot buy a resting item" ; FAILWITH }
+               { PUSH mutez 0 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 COMPARE ;
+                 EQ ;
+                 IF { DROP 3 ; PUSH string "cannot set the price to 0tz" ; FAILWITH }
+                    { LEFT unit ; DUG 2 ; PAIR ; PAIR ; NIL operation ; PAIR } } } } }

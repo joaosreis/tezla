@@ -1,0 +1,82 @@
+{ parameter unit ;
+  storage address ;
+  code { DROP ;
+         NIL operation ;
+         PUSH nat 11 ;
+         PUSH (pair nat address) (Pair 2 0x000038bb193df0965b3a87badd3600f294493b5cd608) ;
+         EMPTY_BIG_MAP
+           bytes
+           (pair (pair (pair nat (map string bytes)) (pair address nat))
+                 (pair (pair timestamp nat) (list (pair address nat)))) ;
+         PUSH (set (pair timestamp bytes)) {} ;
+         PAIR ;
+         PAIR ;
+         PAIR ;
+         PUSH (pair address nat) (Pair 0x000038bb193df0965b3a87badd3600f294493b5cd608 0) ;
+         EMPTY_BIG_MAP (pair address address) unit ;
+         PUSH (or unit (or address address)) (Left Unit) ;
+         PAIR ;
+         PAIR ;
+         EMPTY_BIG_MAP string bytes ;
+         EMPTY_BIG_MAP (pair address nat) nat ;
+         PAIR ;
+         PUSH (pair address (map string bytes))
+              (Pair 0x000038bb193df0965b3a87badd3600f294493b5cd608 {}) ;
+         PAIR ;
+         PAIR ;
+         PAIR ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter
+               (or (or (pair %callCustom string bytes)
+                       (or (or (or (or (unit %accept_ownership)
+                                       (pair %burn (address %from_) (pair (nat %token_id) (nat %amount))))
+                                   (or (or %call_FA2
+                                          (or (pair %balance_of
+                                                 (list %requests (pair (address %owner) (nat %token_id)))
+                                                 (contract %callback
+                                                    (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                                              (list %transfer
+                                                 (pair (address %from_)
+                                                       (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))
+                                          (list %update_operators
+                                             (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                                                 (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))))
+                                       (unit %confirm_migration)))
+                               (or (or (bytes %drop_proposal) (nat %flush))
+                                   (or (pair %getVotePermitCounter (unit %param) (contract %callback nat))
+                                       (address %migrate))))
+                           (or (or (or (pair %mint (address %to_) (pair (nat %token_id) (nat %amount)))
+                                       (pair %propose (nat %frozen_token) (map %proposal_metadata string bytes)))
+                                   (or (nat %set_quorum_threshold) (nat %set_voting_period)))
+                               (or (address %transfer_ownership)
+                                   (list %vote
+                                      (pair (pair %argument (bytes %proposal_key) (pair (bool %vote_type) (nat %vote_amount)))
+                                            (option %permit (pair (key %key) (signature %signature)))))))))
+                   (pair %transfer_contract_tokens
+                      (address %contract_address)
+                      (list %params
+                         (pair (address %from_)
+                               (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))) ;
+             storage
+               (pair (pair (pair (pair (address %admin) (map %extra string bytes))
+                                 (pair (big_map %ledger (pair address nat) nat) (big_map %metadata string bytes)))
+                           (pair (pair (or %migration_status
+                                          (unit %not_in_migration)
+                                          (or (address %migratingTo) (address %migratedTo)))
+                                       (big_map %operators (pair (address %owner) (address %operator)) unit))
+                                 (pair (address %pending_owner) (nat %permits_counter))))
+                     (pair (pair (pair (set %proposal_key_list_sort_by_date (pair timestamp bytes))
+                                       (big_map %proposals
+                                          bytes
+                                          (pair (pair (pair (nat %downvotes) (map %metadata string bytes))
+                                                      (pair (address %proposer) (nat %proposer_frozen_token)))
+                                                (pair (pair (timestamp %start_date) (nat %upvotes)) (list %voters (pair address nat))))))
+                                 (pair (nat %quorum_threshold) (address %token_address)))
+                           (nat %voting_period))) ;
+             code { PUSH string "FA2_INSUFFICIENT_BALANCE" ; FAILWITH } } ;
+         SWAP ;
+         DIP { CONS } ;
+         SWAP ;
+         PAIR } }

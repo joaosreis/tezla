@@ -1,0 +1,14 @@
+{ parameter (option address) ;
+  storage (pair (mutez %initaltacoz) (option %lastorder address)) ;
+  code { UNPAIR ;
+         PUSH mutez 1000000 ;
+         AMOUNT ;
+         DUP 4 ;
+         CAR ;
+         SUB ;
+         COMPARE ;
+         LT ;
+         IF { DROP 2 ; PUSH string "All Tacoz sold." ; FAILWITH }
+            { AMOUNT ; DIG 2 ; CAR ; SUB ; PAIR } ;
+         NIL operation ;
+         PAIR } }

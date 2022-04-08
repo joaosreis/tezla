@@ -1,0 +1,33 @@
+{ parameter (or (int %myEntryPoint) (int %myEntryPoint2)) ;
+  storage (pair (int %myParameter1) (int %myParameter2)) ;
+  code { CAST (pair (or int int) (pair int int)) ;
+         UNPAIR ;
+         IF_LEFT
+           { PUSH int 123 ;
+             DUP 3 ;
+             CAR ;
+             COMPARE ;
+             LE ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.myParameter1 <= 123" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             DIG 2 ;
+             ADD ;
+             UPDATE 1 }
+           { PUSH int 123 ;
+             DUP 3 ;
+             CAR ;
+             COMPARE ;
+             LE ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.myParameter1 <= 123" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             DIG 2 ;
+             ADD ;
+             UPDATE 1 } ;
+         NIL operation ;
+         PAIR } }

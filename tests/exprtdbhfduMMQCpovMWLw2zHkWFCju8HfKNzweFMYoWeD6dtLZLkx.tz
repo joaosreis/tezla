@@ -1,0 +1,9 @@
+{ storage (option bytes) ;
+  parameter (unit %ep) ;
+  code { DROP ;
+         PUSH bytes 0x050a000000190138560805b4c8d7b7fbbafad5c59dbfa3878ca70500616263 ;
+         PUSH nat 32 ;
+         PUSH nat 1 ;
+         SLICE ;
+         NIL operation ;
+         PAIR } }

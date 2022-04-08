@@ -1,9 +1,0 @@
-{ parameter (or :param (unit %Deposit) (mutez %Withdraw)) ;
-  storage mutez ;
-  code { {} ;
-         { DUP ; CDR ; DIP { CAR } } ;
-         { { DIG 1 ; DUP ; DUG 2 } ;
-           IF_LEFT
-             { PUSH mutez 1000000 ; NIL operation ; PAIR ; DIP { DROP } }
-             { PUSH mutez 2000000 ; NIL operation ; PAIR ; DIP { DROP } } } ;
-         DIP { DROP 2 } } }

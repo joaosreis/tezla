@@ -1,0 +1,6 @@
+{ storage int ;
+  parameter (or (unit %reset) (option %test nat)) ;
+  code { CAR ;
+         IF_LEFT { DROP ; PUSH int 0 } { DROP ; PUSH int 1 } ;
+         NIL operation ;
+         PAIR } }

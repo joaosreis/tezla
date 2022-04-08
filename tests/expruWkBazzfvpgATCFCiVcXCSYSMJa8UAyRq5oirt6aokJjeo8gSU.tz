@@ -1,0 +1,131 @@
+{ storage
+    (pair (pair (option %checkResult bool) (bls12_381_fr %fr))
+          (pair (bls12_381_g1 %g1) (pair (bls12_381_g2 %g2) (option %mulResult bls12_381_fr)))) ;
+  parameter
+    (or (or (pair %add (bls12_381_fr %fr) (pair (bls12_381_g1 %g1) (bls12_381_g2 %g2)))
+            (pair %mul bls12_381_fr bls12_381_fr))
+        (or (unit %negate)
+            (or (list %pairing_check (pair bls12_381_g1 bls12_381_g2)) (unit %toInt)))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 4 ;
+                 CDR ;
+                 CAR ;
+                 ADD ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 4 ;
+                 DUP ;
+                 DUG 5 ;
+                 CDR ;
+                 CDR ;
+                 ADD ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 DIG 3 ;
+                 CAR ;
+                 ADD ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 CAR ;
+                 DIG 3 ;
+                 DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 MUL ;
+                 SOME ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } }
+           { IF_LEFT
+               { DROP ;
+                 DUP ;
+                 DUP ;
+                 CAR ;
+                 SWAP ;
+                 CDR ;
+                 CDR ;
+                 DIG 2 ;
+                 CDR ;
+                 CAR ;
+                 NEG ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     CAR ;
+                     CDR ;
+                     DIG 2 ;
+                     PAIRING_CHECK ;
+                     SOME ;
+                     PAIR ;
+                     PAIR }
+                   { DROP ;
+                     DUP ;
+                     CAR ;
+                     CDR ;
+                     INT ;
+                     PUSH int
+                          42464891526387597118296418373234097444996300047457149716884383324723207029826 ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Failed to cast field element Fr to Int" ; FAILWITH } } } } ;
+         NIL operation ;
+         PAIR } }

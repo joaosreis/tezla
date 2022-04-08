@@ -1,0 +1,107 @@
+{ parameter (or (string %post) (unit %rocket)) ;
+  storage
+    (pair (pair (nat %max_message_length) (nat %max_num_messages))
+          (list %messages (pair (pair (address %sender) (string %text)) (timestamp %timestamp)))) ;
+  code { LAMBDA
+           (pair string (pair (pair nat nat) (list (pair (pair address string) timestamp))))
+           (pair (pair nat nat) (list (pair (pair address string) timestamp)))
+           { DUP ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             SIZE ;
+             COMPARE ;
+             GT ;
+             IF { DROP 2 ; PUSH string "Max message length exceeded" ; FAILWITH }
+                { NOW ;
+                  SWAP ;
+                  SENDER ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  PUSH int 1 ;
+                  DIG 3 ;
+                  DUP ;
+                  DUG 4 ;
+                  CAR ;
+                  CDR ;
+                  SUB ;
+                  ABS ;
+                  NIL (pair (pair address string) timestamp) ;
+                  PAIR ;
+                  PAIR ;
+                  LEFT (list (pair (pair address string) timestamp)) ;
+                  LOOP_LEFT
+                    { DUP ;
+                      CAR ;
+                      CDR ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CAR ;
+                      CAR ;
+                      PUSH nat 0 ;
+                      DIG 2 ;
+                      DUP ;
+                      DUG 3 ;
+                      COMPARE ;
+                      LE ;
+                      IF { SWAP ;
+                           DROP ;
+                           SWAP ;
+                           DROP ;
+                           RIGHT
+                             (pair (pair (list (pair (pair address string) timestamp)) nat)
+                                   (list (pair (pair address string) timestamp))) }
+                         { DIG 2 ;
+                           CDR ;
+                           IF_CONS
+                             { SWAP ;
+                               PUSH int 1 ;
+                               DIG 4 ;
+                               SUB ;
+                               ABS ;
+                               DIG 3 ;
+                               DIG 3 ;
+                               CONS ;
+                               PAIR ;
+                               PAIR ;
+                               LEFT (list (pair (pair address string) timestamp)) }
+                             { SWAP ;
+                               DROP ;
+                               RIGHT
+                                 (pair (pair (list (pair (pair address string) timestamp)) nat)
+                                       (list (pair (pair address string) timestamp))) } } } ;
+                  NIL (pair (pair address string) timestamp) ;
+                  SWAP ;
+                  ITER { CONS } ;
+                  SWAP ;
+                  CONS ;
+                  SWAP ;
+                  CAR ;
+                  PAIR } } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         GT ;
+         IF { DROP 3 ; PUSH string "Don't send money to this contract!" ; FAILWITH }
+            { DIG 2 ;
+              CAR ;
+              IF_LEFT { PAIR ; EXEC } { DROP ; PUSH string "U+1F680" ; PAIR ; EXEC } ;
+              NIL operation ;
+              PAIR } } }

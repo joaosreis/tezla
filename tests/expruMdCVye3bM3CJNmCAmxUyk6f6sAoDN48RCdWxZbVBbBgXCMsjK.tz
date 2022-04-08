@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (big_map string (pair int string)) ;
+  code { PUSH int 5 ; FAILWITH } }

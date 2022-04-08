@@ -1,0 +1,50 @@
+{ parameter (or (address %buy) (mutez %withdraw)) ;
+  storage (pair (pair (mutez %initaltacoz) (address %lastorder)) (address %owner)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { PUSH mutez 1000000 ;
+             AMOUNT ;
+             DUP 4 ;
+             CAR ;
+             CAR ;
+             SUB ;
+             COMPARE ;
+             LT ;
+             IF { DROP 2 ; PUSH string "All Tacoz sold." ; FAILWITH }
+                { SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  DUP 3 ;
+                  CAR ;
+                  CDR ;
+                  AMOUNT ;
+                  DIG 4 ;
+                  CAR ;
+                  CAR ;
+                  SUB ;
+                  PAIR ;
+                  PAIR ;
+                  DUP ;
+                  CDR ;
+                  DUG 2 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  PAIR ;
+                  NIL operation ;
+                  PAIR } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CONTRACT unit ;
+             IF_NONE { PUSH string "Contract not found." ; FAILWITH } {} ;
+             SWAP ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             SWAP ;
+             NIL operation ;
+             DIG 2 ;
+             CONS ;
+             PAIR } } }

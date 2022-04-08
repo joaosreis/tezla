@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (big_map unit unit) ;
+  code { { UNIT ; FAILWITH } } }

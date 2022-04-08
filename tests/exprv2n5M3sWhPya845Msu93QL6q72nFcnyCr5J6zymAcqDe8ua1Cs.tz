@@ -1,0 +1,12 @@
+{ storage unit ;
+  parameter (unit %testhash) ;
+  code { CDR ;
+         PUSH string "ADMIN" ;
+         PACK ;
+         BLAKE2B ;
+         PUSH bytes 0x1189b3413a2038edf2d4c5b12a5de9aa753110000d02d9a90a2f463ef07e8f43 ;
+         COMPARE ;
+         EQ ;
+         IF {} { PUSH string "Unreferenced sender" ; FAILWITH } ;
+         NIL operation ;
+         PAIR } }

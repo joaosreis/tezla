@@ -1,0 +1,56 @@
+{ parameter (or (address %createProposition) (unit %signProposition)) ;
+  storage
+    (pair (pair (set %owners address) (set %ownersSigned address))
+          (pair (mutez %proposition) (address %recipient))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             UNPAIR ;
+             SWAP ;
+             CDR ;
+             AMOUNT ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             UNPAIR ;
+             UNPAIR ;
+             PUSH bool True ;
+             SENDER ;
+             UPDATE ;
+             PAIR ;
+             PAIR ;
+             UNPAIR ;
+             UNPAIR ;
+             PUSH bool True ;
+             DUP 5 ;
+             UPDATE ;
+             PAIR ;
+             PAIR ;
+             UNPAIR ;
+             SWAP ;
+             CAR ;
+             DIG 2 ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR }
+           { DROP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SENDER ;
+             MEM ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.owners.contains(sp.sender)" ;
+                  FAILWITH } ;
+             UNPAIR ;
+             UNPAIR ;
+             SWAP ;
+             PUSH bool True ;
+             SENDER ;
+             UPDATE ;
+             SWAP ;
+             PAIR ;
+             PAIR } ;
+         NIL operation ;
+         PAIR } }

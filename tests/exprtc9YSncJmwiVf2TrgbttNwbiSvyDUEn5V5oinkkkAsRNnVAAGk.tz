@@ -1,0 +1,13 @@
+{ parameter unit ;
+  storage unit ;
+  code { CAR ;
+         SENDER ;
+         CONTRACT unit ;
+         { IF_NONE { PUSH unit Unit ; FAILWITH } {} } ;
+         PUSH mutez 5 ;
+         UNIT ;
+         TRANSFER_TOKENS ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         PAIR } }

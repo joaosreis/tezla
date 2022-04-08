@@ -1,0 +1,41 @@
+{ parameter int ;
+  storage (pair int address) ;
+  code { PUSH mutez 1000000 ;
+         AMOUNT ;
+         { COMPARE ;
+           GE ;
+           IF {} { PUSH string "You did not provide enough tez." ; FAILWITH } } ;
+         UNPAIR ;
+         SWAP ;
+         DUP ;
+         CAR ;
+         DIP { PUSH int 15 } ;
+         { COMPARE ;
+           LT ;
+           IF { SWAP ;
+                PUSH int 34 ;
+                { COMPARE ;
+                  EQ ;
+                  IF { SENDER ;
+                       CONTRACT unit ;
+                       { IF_NONE { FAILWITH } {} } ;
+                       BALANCE ;
+                       UNIT ;
+                       TRANSFER_TOKENS ;
+                       NIL operation ;
+                       SWAP ;
+                       CONS ;
+                       PAIR }
+                     { UNPAIR ; PUSH int 1 ; ADD ; PAIR ; NIL operation ; PAIR } } }
+              { DIP { DROP } ;
+                DUP ;
+                CDR ;
+                CONTRACT unit ;
+                { IF_NONE { FAILWITH } {} } ;
+                BALANCE ;
+                UNIT ;
+                TRANSFER_TOKENS ;
+                NIL operation ;
+                SWAP ;
+                CONS ;
+                PAIR } } } }

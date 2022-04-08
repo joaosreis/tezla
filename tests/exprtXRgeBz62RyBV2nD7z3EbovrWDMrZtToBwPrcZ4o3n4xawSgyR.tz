@@ -1,0 +1,15 @@
+{ parameter
+    (or (or (or (address %expectAddress) (unit %triggerFailWith))
+            (or (unit %triggerShiftOverflow)
+                (or (pair %voidEP (bool %voidParam) (lambda %voidResProxy bool bool))
+                    (unit %triggerFailWithCustomError))))
+        (or (or (unit %triggerFailWithCustomErrorUnit1)
+                (unit %triggerFailWithCustomErrorUnit2))
+            (or (unit %triggerFailWithCustomErrorNoArg)
+                (or (unit %triggerFailWithRightCombedPair) (unit %triggerFailWithChainIdBytes))))) ;
+  storage unit ;
+  code { CAST (pair (or (or (or address unit) (or unit (or (pair bool (lambda bool bool)) unit)))
+                        (or (or unit unit) (or unit (or unit unit))))
+                    unit) ;
+         PUSH (pair int int int) { 1 ; 2 ; 3 } ;
+         FAILWITH } }

@@ -1,0 +1,12 @@
+{ storage unit ;
+  parameter (address %Award) ;
+  code { UNPAIR ;
+         CONTRACT unit ;
+         IF_NONE { PUSH int 9 ; FAILWITH } {} ;
+         NIL operation ;
+         SWAP ;
+         AMOUNT ;
+         UNIT ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

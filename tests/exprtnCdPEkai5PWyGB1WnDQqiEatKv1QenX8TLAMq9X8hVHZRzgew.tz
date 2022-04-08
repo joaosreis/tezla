@@ -1,0 +1,335 @@
+{ parameter
+    (or (or (or (pair %approve address nat)
+                (pair %getAllowance (pair address address) (contract nat)))
+            (or (pair %getBalance address (contract nat))
+                (pair %getTotalSupply unit (contract nat))))
+        (pair %transfer address (pair address nat))) ;
+  storage
+    (pair (big_map %accounts address (pair (nat %balance) (map %allowances address nat)))
+          (nat %s)) ;
+  code { LAMBDA
+           (pair address (big_map address (pair nat (map address nat))))
+           (pair nat (map address nat))
+           { DUP ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             GET ;
+             IF_NONE { PUSH string "Owner does not have a balance" ; FAILWITH } {} } ;
+         SWAP ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DIG 2 ;
+                     DROP ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     SENDER ;
+                     GET ;
+                     IF_NONE { EMPTY_MAP address nat ; PUSH nat 0 ; PAIR } {} ;
+                     DUP ;
+                     CDR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     GET ;
+                     IF_NONE
+                       { PUSH unit Unit }
+                       { PUSH nat 0 ;
+                         SWAP ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { PUSH nat 0 ;
+                              DIG 3 ;
+                              DUP ;
+                              DUG 4 ;
+                              COMPARE ;
+                              NEQ ;
+                              IF { PUSH string "UnsafeAllowanceChange" ; FAILWITH } { PUSH unit Unit } }
+                            { PUSH unit Unit } } ;
+                     DROP ;
+                     DIG 3 ;
+                     DUP ;
+                     DUG 4 ;
+                     CDR ;
+                     DIG 4 ;
+                     CAR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CDR ;
+                     DIG 5 ;
+                     DIG 5 ;
+                     SWAP ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     DIG 3 ;
+                     CAR ;
+                     PAIR ;
+                     SOME ;
+                     SENDER ;
+                     UPDATE ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CDR ;
+                     PAIR ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     CDR ;
+                     DIG 3 ;
+                     CAR ;
+                     CAR ;
+                     DIG 2 ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     CAR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 2 ;
+                     PAIR ;
+                     DIG 4 ;
+                     SWAP ;
+                     EXEC ;
+                     CDR ;
+                     DIG 2 ;
+                     GET ;
+                     IF_NONE
+                       { PUSH string "Spender does not have an allowance for this owner" ; FAILWITH }
+                       {} ;
+                     NIL operation ;
+                     DIG 2 ;
+                     AMOUNT ;
+                     DIG 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     PAIR } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DIG 2 ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 2 ;
+                     CAR ;
+                     SWAP ;
+                     PAIR ;
+                     DIG 3 ;
+                     SWAP ;
+                     EXEC ;
+                     NIL operation ;
+                     DIG 2 ;
+                     AMOUNT ;
+                     DIG 3 ;
+                     CAR ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     PAIR }
+                   { DIG 2 ;
+                     DROP ;
+                     SWAP ;
+                     DUP ;
+                     DIG 2 ;
+                     CDR ;
+                     NIL operation ;
+                     SWAP ;
+                     AMOUNT ;
+                     DIG 3 ;
+                     CDR ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     PAIR } } }
+           { DUP ;
+             DUG 2 ;
+             CDR ;
+             CDR ;
+             PAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CAR ;
+             DIG 2 ;
+             CAR ;
+             DIG 2 ;
+             DUP ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             DIG 4 ;
+             DUP ;
+             DUG 5 ;
+             DUP ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { DIG 2 ;
+                  CAR ;
+                  SWAP ;
+                  GET ;
+                  IF_NONE
+                    { DROP ;
+                      PUSH string "is_allowed: the owner does not own any tokens." ;
+                      FAILWITH }
+                    { CDR ;
+                      SENDER ;
+                      GET ;
+                      IF_NONE { DROP ; PUSH bool False } { COMPARE ; GE } } }
+                { DROP 3 ; PUSH bool True } ;
+             IF {} { PUSH string "NotEnoughAllowance" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             PAIR ;
+             DIG 5 ;
+             SWAP ;
+             EXEC ;
+             DUP ;
+             CAR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             COMPARE ;
+             GT ;
+             IF { PUSH string "NotEnoughBalance" ; FAILWITH } {} ;
+             SENDER ;
+             DIG 4 ;
+             DUP ;
+             DUG 5 ;
+             COMPARE ;
+             NEQ ;
+             IF { DUP ;
+                  CDR ;
+                  SENDER ;
+                  GET ;
+                  IF_NONE
+                    { PUSH string "Sender does not have an allowance for this owner" ; FAILWITH }
+                    {} }
+                { DUP ; CAR } ;
+             DUP ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             COMPARE ;
+             GT ;
+             IF { PUSH string "NotEnoughAllowance" ; FAILWITH } {} ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             SUB ;
+             PUSH int 0 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             COMPARE ;
+             GE ;
+             IF { DIG 2 ; CDR ; SWAP ; ABS ; PAIR }
+                { DROP ; PUSH string "balance - value is negative." ; FAILWITH } ;
+             SENDER ;
+             DIG 5 ;
+             DUP ;
+             DUG 6 ;
+             COMPARE ;
+             NEQ ;
+             IF { DIG 2 ;
+                  DUP ;
+                  DUG 3 ;
+                  DIG 2 ;
+                  SUB ;
+                  PUSH int 0 ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  COMPARE ;
+                  GE ;
+                  IF { SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       CDR ;
+                       SWAP ;
+                       ABS ;
+                       SOME ;
+                       SENDER ;
+                       UPDATE ;
+                       SWAP ;
+                       CAR ;
+                       PAIR }
+                     { DROP ; PUSH string "allowance - value is negative." ; FAILWITH } }
+                { SWAP ; DROP } ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             DIG 3 ;
+             CAR ;
+             DIG 2 ;
+             DIG 4 ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             PAIR ;
+             DUP ;
+             CAR ;
+             DIG 3 ;
+             DUP ;
+             DUG 4 ;
+             GET ;
+             IF_NONE { EMPTY_MAP address nat ; PUSH nat 0 ; PAIR } {} ;
+             DUP ;
+             CDR ;
+             DIG 3 ;
+             DIG 2 ;
+             CAR ;
+             ADD ;
+             PAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DIG 2 ;
+             CAR ;
+             DIG 2 ;
+             DIG 3 ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             PAIR ;
+             NIL operation ;
+             PAIR } } }

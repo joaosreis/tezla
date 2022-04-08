@@ -1,0 +1,20 @@
+{ storage string ;
+  parameter (or (unit %check) (string %updateId)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { DROP ;
+             NIL operation ;
+             PUSH address "KT1UHsaKeuGUwJ7PZNLcRxJEx3gdSxK7A8D2" ;
+             CONTRACT (pair unit (contract string)) ;
+             IF_NONE { PUSH string "Target contract doesn't exist." ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             SELF %updateId ;
+             UNIT ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SWAP ; DROP ; NIL operation } ;
+         PAIR } }

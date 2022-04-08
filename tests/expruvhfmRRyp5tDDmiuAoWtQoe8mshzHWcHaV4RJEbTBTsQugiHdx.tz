@@ -1,0 +1,17 @@
+{ parameter (pair unit (contract nat)) ;
+  storage unit ;
+  code { CAR ;
+         CDR ;
+         DUP ;
+         ADDRESS ;
+         SENDER ;
+         COMPARE ;
+         EQ ;
+         IF { PUSH mutez 0 ; PUSH nat 1 ; TRANSFER_TOKENS }
+            { { UNIT ; FAILWITH } } ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         UNIT ;
+         SWAP ;
+         PAIR } }

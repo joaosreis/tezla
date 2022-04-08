@@ -1,0 +1,9 @@
+{ storage int ;
+  parameter (int %entry_point_1) ;
+  code { UNPAIR ;
+         PUSH int 0 ;
+         COMPARE ;
+         EQ ;
+         IF {} { PUSH string "WrongCondition: params == 0" ; FAILWITH } ;
+         NIL operation ;
+         PAIR } }

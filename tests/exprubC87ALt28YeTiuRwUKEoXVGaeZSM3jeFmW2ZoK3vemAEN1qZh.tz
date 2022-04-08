@@ -1,0 +1,88 @@
+{ storage
+    (pair (map %blog
+             string
+             (pair (pair (string %content) (pair (int %date) (string %imageUrl)))
+                   (pair (pair (int %likes) (string %publicKey)) (pair (string %title) (string %topic)))))
+          (map %user string string)) ;
+  parameter
+    (or (pair %addUser (string %name) (string %publicKey))
+        (or (pair %createBlog
+               (pair (string %blogKey) (pair (string %content) (int %date)))
+               (pair (pair (string %imageUrl) (string %publicKey))
+                     (pair (string %title) (string %topic))))
+            (string %like))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             UNPAIR ;
+             SWAP ;
+             DUP 3 ;
+             CAR ;
+             SOME ;
+             DIG 3 ;
+             CDR ;
+             UPDATE ;
+             SWAP ;
+             PAIR }
+           { IF_LEFT
+               { SWAP ;
+                 UNPAIR ;
+                 DIG 2 ;
+                 DUP ;
+                 GET 6 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 4 ;
+                 GET 5 ;
+                 PAIR %title %topic ;
+                 DUP 4 ;
+                 GET 3 ;
+                 CDR ;
+                 PUSH int 0 ;
+                 PAIR %likes %publicKey ;
+                 PAIR ;
+                 DIG 3 ;
+                 DUP ;
+                 GET 3 ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 5 ;
+                 CAR ;
+                 GET 4 ;
+                 PAIR %date %imageUrl ;
+                 DUP 5 ;
+                 CAR ;
+                 GET 3 ;
+                 PAIR %content ;
+                 PAIR ;
+                 SOME ;
+                 DIG 3 ;
+                 CAR ;
+                 CAR ;
+                 UPDATE ;
+                 PAIR }
+               { SWAP ;
+                 UNPAIR ;
+                 DUP ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 28 ; FAILWITH } {} ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 PUSH int 1 ;
+                 ADD ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 PAIR } } ;
+         NIL operation ;
+         PAIR } }

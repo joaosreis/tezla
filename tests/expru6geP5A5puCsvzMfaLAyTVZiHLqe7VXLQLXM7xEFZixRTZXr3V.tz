@@ -1,5 +1,0 @@
-{ parameter int ;
-  storage nat ;
-  code { CAR ;
-         EQ ;
-         IF { PUSH string "oops" ; FAILWITH } { PUSH string "oops" ; FAILWITH } } }

@@ -1,0 +1,377 @@
+{ storage
+    (pair (pair (address %FA12TokenContract) (pair (address %admin) (address %reserve)))
+          (pair (big_map %stakingOptions
+                   nat
+                   (pair (pair (nat %maxStake) (nat %minStake))
+                         (pair (nat %stakingDuration) (nat %stakingRate))))
+                (pair (big_map %userStakePack
+                         address
+                         (map nat (map nat (pair (int %rate) (pair (timestamp %timestamp) (int %value))))))
+                      (option %votingContract address)))) ;
+  parameter
+    (or (or (or (pair %createStakingOption
+                   (nat %id)
+                   (pair (nat %rate) (pair (nat %max) (pair (nat %min) (nat %duration)))))
+                (address %updateAdmin))
+            (or (address %updateContract) (address %updateReserve)))
+        (or (or (pair %updateStakingOptionDuration (nat %id) (nat %duration))
+                (pair %updateStakingOptionMax (nat %id) (nat %max)))
+            (or (pair %updateStakingOptionMin (nat %id) (nat %min))
+                (or (pair %updateStakingOptionRate (nat %id) (nat %rate))
+                    (address %updateVotingContract))))) ;
+  code { LAMBDA
+           (pair address
+                 (pair (pair address (pair address address))
+                       (pair (big_map nat (pair (pair nat nat) (pair nat nat)))
+                             (pair (big_map address (map nat (map nat (pair int (pair timestamp int))))) (option address)))))
+           (pair (list operation)
+                 (pair bool
+                       (pair (pair address (pair address address))
+                             (pair (big_map nat (pair (pair nat nat) (pair nat nat)))
+                                   (pair (big_map address (map nat (map nat (pair int (pair timestamp int))))) (option address))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             GET 6 ;
+             IF_NONE
+               { DIG 2 ; DROP ; PUSH bool False }
+               { DROP ;
+                 DIG 2 ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 6 ;
+                 IF_NONE { PUSH int 77 ; FAILWITH } {} ;
+                 COMPARE ;
+                 EQ } ;
+             DIG 2 ;
+             PAIR 3 } ;
+         SWAP ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     MEM ;
+                     IF { PUSH string "WrongCondition: ~ (self.data.stakingOptions.contains(params._id))" ;
+                          FAILWITH }
+                        {} ;
+                     DUG 2 ;
+                     SENDER ;
+                     PAIR ;
+                     EXEC ;
+                     DUP ;
+                     GET 4 ;
+                     DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     NIL operation ;
+                     SWAP ;
+                     ITER { CONS } ;
+                     SWAP ;
+                     GET 3 ;
+                     IF { PUSH bool True } { SENDER ; DUP 4 ; CAR ; GET 3 ; COMPARE ; EQ } ;
+                     IF {} { PUSH string "Access denied" ; FAILWITH } ;
+                     DIG 2 ;
+                     DUP ;
+                     GET 3 ;
+                     DIG 3 ;
+                     DUP ;
+                     GET 3 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 5 ;
+                     GET 8 ;
+                     PAIR ;
+                     DIG 4 ;
+                     DUP ;
+                     GET 7 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 6 ;
+                     GET 5 ;
+                     PAIR ;
+                     PAIR ;
+                     SOME ;
+                     DIG 4 ;
+                     CAR ;
+                     UPDATE ;
+                     UPDATE 3 ;
+                     SWAP }
+                   { DIG 2 ;
+                     DROP ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET 3 ;
+                     PACK ;
+                     SENDER ;
+                     PACK ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Access denied" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DIG 3 ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     NIL operation } }
+               { DIG 2 ;
+                 DROP ;
+                 IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET 3 ;
+                     PACK ;
+                     SENDER ;
+                     PACK ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Access denied" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     CDR ;
+                     DIG 2 ;
+                     PAIR ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET 3 ;
+                     PACK ;
+                     SENDER ;
+                     PACK ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Access denied" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 3 ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR } ;
+                 NIL operation } }
+           { IF_LEFT
+               { IF_LEFT
+                   { DUG 2 ;
+                     SENDER ;
+                     PAIR ;
+                     EXEC ;
+                     DUP ;
+                     GET 4 ;
+                     DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     NIL operation ;
+                     SWAP ;
+                     ITER { CONS } ;
+                     SWAP ;
+                     GET 3 ;
+                     IF { PUSH bool True } { SENDER ; DUP 4 ; CAR ; GET 3 ; COMPARE ; EQ } ;
+                     IF {} { PUSH string "Access denied" ; FAILWITH } ;
+                     DUP 3 ;
+                     GET 3 ;
+                     DUP 3 ;
+                     CAR ;
+                     MEM ;
+                     IF {}
+                        { PUSH string "WrongCondition: self.data.stakingOptions.contains(params._id)" ;
+                          FAILWITH } ;
+                     DIG 2 ;
+                     DUP ;
+                     GET 3 ;
+                     DUP ;
+                     DUP 5 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 108 ; FAILWITH } {} ;
+                     DIG 5 ;
+                     CDR ;
+                     UPDATE 3 ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 3 ;
+                     SWAP }
+                   { DUG 2 ;
+                     SENDER ;
+                     PAIR ;
+                     EXEC ;
+                     DUP ;
+                     GET 4 ;
+                     DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     NIL operation ;
+                     SWAP ;
+                     ITER { CONS } ;
+                     SWAP ;
+                     GET 3 ;
+                     IF { PUSH bool True } { SENDER ; DUP 4 ; CAR ; GET 3 ; COMPARE ; EQ } ;
+                     IF {} { PUSH string "Access denied" ; FAILWITH } ;
+                     DUP 3 ;
+                     GET 3 ;
+                     DUP 3 ;
+                     CAR ;
+                     MEM ;
+                     IF {}
+                        { PUSH string "WrongCondition: self.data.stakingOptions.contains(params._id)" ;
+                          FAILWITH } ;
+                     DIG 2 ;
+                     DUP ;
+                     GET 3 ;
+                     DUP ;
+                     DUP 5 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 115 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     CDR ;
+                     DIG 6 ;
+                     CDR ;
+                     PAIR ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 3 ;
+                     SWAP } }
+               { IF_LEFT
+                   { DUG 2 ;
+                     SENDER ;
+                     PAIR ;
+                     EXEC ;
+                     DUP ;
+                     GET 4 ;
+                     DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     NIL operation ;
+                     SWAP ;
+                     ITER { CONS } ;
+                     SWAP ;
+                     GET 3 ;
+                     IF { PUSH bool True } { SENDER ; DUP 4 ; CAR ; GET 3 ; COMPARE ; EQ } ;
+                     IF {} { PUSH string "Access denied" ; FAILWITH } ;
+                     DUP 3 ;
+                     GET 3 ;
+                     DUP 3 ;
+                     CAR ;
+                     MEM ;
+                     IF {}
+                        { PUSH string "WrongCondition: self.data.stakingOptions.contains(params._id)" ;
+                          FAILWITH } ;
+                     DIG 2 ;
+                     DUP ;
+                     GET 3 ;
+                     DUP ;
+                     DUP 5 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 122 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     CAR ;
+                     DIG 6 ;
+                     CDR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 3 ;
+                     SWAP }
+                   { IF_LEFT
+                       { DUG 2 ;
+                         SENDER ;
+                         PAIR ;
+                         EXEC ;
+                         DUP ;
+                         GET 4 ;
+                         DUG 2 ;
+                         DUP ;
+                         CAR ;
+                         NIL operation ;
+                         SWAP ;
+                         ITER { CONS } ;
+                         SWAP ;
+                         GET 3 ;
+                         IF { PUSH bool True } { SENDER ; DUP 4 ; CAR ; GET 3 ; COMPARE ; EQ } ;
+                         IF {} { PUSH string "Access denied" ; FAILWITH } ;
+                         DUP 3 ;
+                         GET 3 ;
+                         DUP 3 ;
+                         CAR ;
+                         MEM ;
+                         IF {}
+                            { PUSH string "WrongCondition: self.data.stakingOptions.contains(params._id)" ;
+                              FAILWITH } ;
+                         DIG 2 ;
+                         DUP ;
+                         GET 3 ;
+                         DUP ;
+                         DUP 5 ;
+                         CAR ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE { PUSH int 101 ; FAILWITH } {} ;
+                         DIG 5 ;
+                         CDR ;
+                         UPDATE 4 ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         UPDATE 3 ;
+                         SWAP }
+                       { DIG 2 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         GET 3 ;
+                         PACK ;
+                         SENDER ;
+                         PACK ;
+                         COMPARE ;
+                         EQ ;
+                         IF {} { PUSH string "Access denied" ; FAILWITH } ;
+                         SOME ;
+                         UPDATE 6 ;
+                         NIL operation } } } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

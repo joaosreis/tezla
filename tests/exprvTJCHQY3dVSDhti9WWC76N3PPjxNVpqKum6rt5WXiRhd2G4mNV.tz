@@ -1,0 +1,15 @@
+{ parameter
+    (or (pair %addChallenge
+           (pair (string %accountname) (string %challengeid))
+           (pair (string %challengename) (string %createdate)))
+        (pair %logTask
+           (pair (pair (string %accountname) (string %challengeid))
+                 (pair (string %createdate) (string %metadata)))
+           (pair (pair (string %quantity) (string %taskid)) (string %taskname)))) ;
+  storage unit ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         DROP ;
+         IF_LEFT { DROP ; PUSH unit Unit } { DROP ; PUSH unit Unit } ;
+         NIL operation ;
+         PAIR } }

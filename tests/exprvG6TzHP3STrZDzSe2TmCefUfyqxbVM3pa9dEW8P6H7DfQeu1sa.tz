@@ -1,0 +1,19 @@
+{ storage int ;
+  parameter
+    (or (int %processRequest)
+        (pair %reqVaccFromDistributer (address %address) (int %amtVaccine))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { ADD ; NIL operation }
+           { DUP ;
+             CAR ;
+             CONTRACT %endUserRequest int ;
+             IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             CDR ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

@@ -1,0 +1,111 @@
+{ storage unit ;
+  parameter unit ;
+  code { CDR ;
+         PUSH (pair (pair (address %cOwner) (mutez %limit))
+                    (pair (bool %locked) (pair (timestamp %locked_timestamp) (mutez %used_limit))))
+              (Pair (Pair "tz1PBFjWa3X6aW5bmvpuuRrbkRfFGpnigtTn" 10000000)
+                    (Pair False (Pair "1970-01-01T00:00:00Z" 0))) ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter (or (or (key %delegate) (unit %lock)) (or (mutez %send) (unit %unlock))) ;
+             storage
+               (pair (pair (address %cOwner) (mutez %limit))
+                     (pair (bool %locked) (pair (timestamp %locked_timestamp) (mutez %used_limit)))) ;
+             code { UNPAIR ;
+                    IF_LEFT
+                      { IF_LEFT
+                          { HASH_KEY ; SOME ; SET_DELEGATE ; NIL operation ; SWAP ; CONS }
+                          { DROP ;
+                            PUSH bool False ;
+                            PACK ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            GET 3 ;
+                            PACK ;
+                            COMPARE ;
+                            EQ ;
+                            IF {} { PUSH string "Wallet is already locked" ; FAILWITH } ;
+                            UNPAIR ;
+                            SWAP ;
+                            CDR ;
+                            PUSH bool True ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR ;
+                            UNPAIR ;
+                            SWAP ;
+                            UNPAIR ;
+                            SWAP ;
+                            CDR ;
+                            NOW ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR ;
+                            NIL operation } }
+                      { IF_LEFT
+                          { SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            GET 3 ;
+                            IF { PUSH string "Wallet is locked" ; FAILWITH } {} ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            CAR ;
+                            CDR ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            DUP 4 ;
+                            GET 6 ;
+                            ADD ;
+                            COMPARE ;
+                            GT ;
+                            IF { PUSH string "Sending later" ; FAILWITH }
+                               { SWAP ;
+                                 UNPAIR ;
+                                 SWAP ;
+                                 UNPAIR ;
+                                 SWAP ;
+                                 UNPAIR ;
+                                 SWAP ;
+                                 DUP 5 ;
+                                 ADD ;
+                                 SWAP ;
+                                 PAIR ;
+                                 SWAP ;
+                                 PAIR ;
+                                 SWAP ;
+                                 PAIR ;
+                                 SWAP ;
+                                 NIL operation ;
+                                 PUSH address "tz1PBFjWa3X6aW5bmvpuuRrbkRfFGpnigtTn" ;
+                                 CONTRACT unit ;
+                                 IF_NONE { PUSH int 46 ; FAILWITH } {} ;
+                                 DIG 2 ;
+                                 UNIT ;
+                                 TRANSFER_TOKENS ;
+                                 CONS } }
+                          { DROP ;
+                            PUSH bool True ;
+                            PACK ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            GET 3 ;
+                            PACK ;
+                            COMPARE ;
+                            EQ ;
+                            IF {} { PUSH string "Wallet isn't locked" ; FAILWITH } ;
+                            NIL operation } } ;
+                    PAIR } } ;
+         PAIR ;
+         CAR ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         PAIR } }

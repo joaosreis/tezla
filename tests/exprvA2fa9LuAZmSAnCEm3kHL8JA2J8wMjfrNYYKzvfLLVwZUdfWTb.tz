@@ -1,0 +1,32 @@
+{ storage
+    (pair (int %totOrg)
+          (map %usersMap
+             int
+             (pair (pair (address %adress) (int %collected))
+                   (pair (timestamp %date) (pair (string %email) (string %name)))))) ;
+  parameter (pair %addCause (string %email) (pair (string %name) (int %no))) ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         CDR ;
+         DIG 2 ;
+         DUP ;
+         GET 3 ;
+         SWAP ;
+         DUP ;
+         DUG 4 ;
+         CAR ;
+         PAIR ;
+         PUSH timestamp "2021-05-02T06:50:23Z" ;
+         PAIR ;
+         PUSH int 0 ;
+         SENDER ;
+         PAIR ;
+         PAIR ;
+         SOME ;
+         DIG 3 ;
+         GET 4 ;
+         UPDATE ;
+         UPDATE 2 ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,8 @@
+{ storage (pair (option %fr int) (option %g2 bls12_381_g2)) ;
+  parameter (or (pair %mul bls12_381_g2 bls12_381_fr) (bls12_381_fr %toInt)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; CAR ; SWAP ; UNPAIR ; MUL ; SOME ; SWAP ; PAIR }
+           { SWAP ; CDR ; SWAP ; INT ; SOME ; PAIR } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,106 @@
+{ storage
+    (pair (map %blog
+             string
+             (pair (pair (string %content) (pair (int %date) (string %imageUrl)))
+                   (pair (pair (int %likes) (string %publicKey)) (pair (string %title) (string %topic)))))
+          (pair (address %owner) (map %user string string))) ;
+  parameter
+    (or (or (pair %addUser (string %name) (string %publicKey))
+            (pair %createBlog
+               (pair (string %blogKey) (pair (string %content) (int %date)))
+               (pair (pair (string %imageUrl) (string %publicKey))
+                     (pair (string %title) (string %topic)))))
+        (or (string %deleteBlog) (string %like))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 GET 4 ;
+                 DUP 3 ;
+                 CAR ;
+                 SOME ;
+                 DIG 3 ;
+                 CDR ;
+                 UPDATE ;
+                 UPDATE 4 }
+               { SWAP ;
+                 DUP ;
+                 CAR ;
+                 DIG 2 ;
+                 DUP ;
+                 GET 6 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 4 ;
+                 GET 5 ;
+                 PAIR ;
+                 DUP 4 ;
+                 GET 3 ;
+                 CDR ;
+                 PUSH int 0 ;
+                 PAIR ;
+                 PAIR ;
+                 DIG 3 ;
+                 DUP ;
+                 GET 3 ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 5 ;
+                 CAR ;
+                 GET 4 ;
+                 PAIR ;
+                 DUP 5 ;
+                 CAR ;
+                 GET 3 ;
+                 PAIR ;
+                 PAIR ;
+                 SOME ;
+                 DIG 3 ;
+                 CAR ;
+                 CAR ;
+                 UPDATE ;
+                 UPDATE 1 } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.sender == self.data.owner" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 CAR ;
+                 NONE (pair (pair string (pair int string)) (pair (pair int string) (pair string string))) ;
+                 DIG 3 ;
+                 UPDATE ;
+                 UPDATE 1 }
+               { SWAP ;
+                 DUP ;
+                 CAR ;
+                 DUP ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 28 ; FAILWITH } {} ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 PUSH int 1 ;
+                 ADD ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 1 } } ;
+         NIL operation ;
+         PAIR } }

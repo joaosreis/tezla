@@ -1,0 +1,6 @@
+{ parameter unit ;
+  storage
+    (pair (big_map (pair int int int int int int) unit)
+          (big_map (pair int int int int int int) unit)
+          (big_map (pair int int int int int int) unit)) ;
+  code { { UNIT ; FAILWITH } } }

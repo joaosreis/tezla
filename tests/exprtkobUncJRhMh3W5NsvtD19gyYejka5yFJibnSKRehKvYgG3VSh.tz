@@ -1,0 +1,267 @@
+{ storage
+    (pair (pair (address %admin)
+                (big_map %auctions
+                   address
+                   (list (pair (pair (pair (nat %assetId) (nat %bidCount)) (pair (bool %claimed) (address %creator)))
+                               (pair (pair (mutez %currentBidAmount) (address %currentBidOwner))
+                                     (pair (nat %duration) (nat %startTime)))))))
+          (pair (big_map %authorizedSC address bool)
+                (pair (bool %paused)
+                      (map %selling address (big_map nat (pair (address %owner) (mutez %price))))))) ;
+  parameter
+    (or (or (pair %buyNFT (mutez %amount) (pair (address %buyer) (nat %id)))
+            (or (address %cancelFanClub) (pair %cancelSelling (nat %id) (address %seller))))
+        (or (or (unit %pauseContract)
+                (pair %putToSell (nat %id) (pair (address %owner) (nat %price))))
+            (or (address %registerFanClub) (unit %unpauseContract)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 5 ;
+                 IF { PUSH string "WrongCondition: ~ self.data.paused" ; FAILWITH } {} ;
+                 DUP ;
+                 CAR ;
+                 DUP 3 ;
+                 GET 6 ;
+                 SENDER ;
+                 GET ;
+                 IF_NONE { PUSH int 91 ; FAILWITH } {} ;
+                 DUP 3 ;
+                 GET 4 ;
+                 GET ;
+                 IF_NONE { PUSH int 91 ; FAILWITH } {} ;
+                 CDR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Not the price" ; FAILWITH } ;
+                 DUP ;
+                 GET 3 ;
+                 DUP 3 ;
+                 GET 6 ;
+                 SENDER ;
+                 GET ;
+                 IF_NONE { PUSH int 92 ; FAILWITH } {} ;
+                 DUP 3 ;
+                 GET 4 ;
+                 GET ;
+                 IF_NONE { PUSH int 92 ; FAILWITH } {} ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF { PUSH string "It is your token" ; FAILWITH } {} ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 SENDER ;
+                 GET ;
+                 IF_NONE { PUSH int 93 ; FAILWITH } {} ;
+                 IF {} { PUSH string "engine: not auth" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 6 ;
+                 SENDER ;
+                 GET ;
+                 IF_NONE { PUSH int 100 ; FAILWITH } {} ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 4 ;
+                 MEM ;
+                 IF {} { PUSH string "This token is not to sell" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 GET 6 ;
+                 DUP ;
+                 SENDER ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 96 ; FAILWITH } {} ;
+                 NONE (pair address mutez) ;
+                 DIG 5 ;
+                 GET 4 ;
+                 UPDATE ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 6 }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Not admin" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     GET 3 ;
+                     PUSH (option bool) (Some False) ;
+                     DUP 4 ;
+                     UPDATE ;
+                     UPDATE 3 ;
+                     DUP ;
+                     GET 6 ;
+                     NONE (big_map nat (pair address mutez)) ;
+                     DIG 3 ;
+                     UPDATE ;
+                     UPDATE 6 }
+                   { DUP ;
+                     CDR ;
+                     DUP 3 ;
+                     GET 6 ;
+                     SENDER ;
+                     GET ;
+                     IF_NONE { PUSH int 78 ; FAILWITH } {} ;
+                     DUP 3 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 78 ; FAILWITH } {} ;
+                     CAR ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "It is not your token" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     SENDER ;
+                     GET ;
+                     IF_NONE { PUSH int 79 ; FAILWITH } {} ;
+                     IF {} { PUSH string "engine: not auth" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 6 ;
+                     SENDER ;
+                     GET ;
+                     IF_NONE { PUSH int 100 ; FAILWITH } {} ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     MEM ;
+                     IF {} { PUSH string "This token is not to sell" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     GET 6 ;
+                     DUP ;
+                     SENDER ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 83 ; FAILWITH } {} ;
+                     NONE (pair address mutez) ;
+                     DIG 5 ;
+                     CAR ;
+                     UPDATE ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 6 } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { DROP ;
+                     DUP ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Not admin" ; FAILWITH } ;
+                     PUSH bool True ;
+                     UPDATE 5 }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     SENDER ;
+                     GET ;
+                     IF_NONE { PUSH int 68 ; FAILWITH } {} ;
+                     IF {} { PUSH string "engine: not auth" ; FAILWITH } ;
+                     DUP ;
+                     GET 4 ;
+                     PUSH nat 0 ;
+                     COMPARE ;
+                     LT ;
+                     IF {} { PUSH string "Price invalid" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 6 ;
+                     SENDER ;
+                     GET ;
+                     IF_NONE { PUSH int 100 ; FAILWITH } {} ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     MEM ;
+                     IF { PUSH string "This token is to sell" ; FAILWITH } {} ;
+                     SWAP ;
+                     DUP ;
+                     GET 6 ;
+                     DUP ;
+                     SENDER ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 72 ; FAILWITH } {} ;
+                     PUSH mutez 1000000 ;
+                     DUP 6 ;
+                     GET 4 ;
+                     MUL ;
+                     DUP 6 ;
+                     GET 3 ;
+                     PAIR ;
+                     SOME ;
+                     DIG 5 ;
+                     CAR ;
+                     UPDATE ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 6 } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Not admin" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     GET 3 ;
+                     PUSH (option bool) (Some True) ;
+                     DUP 4 ;
+                     UPDATE ;
+                     UPDATE 3 ;
+                     DUP ;
+                     GET 6 ;
+                     EMPTY_BIG_MAP nat (pair address mutez) ;
+                     SOME ;
+                     DIG 3 ;
+                     UPDATE ;
+                     UPDATE 6 }
+                   { DROP ;
+                     DUP ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Not admin" ; FAILWITH } ;
+                     PUSH bool False ;
+                     UPDATE 5 } } } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,17 @@
+{ parameter (pair (unit %viewParam) (contract %viewCallbackTo address)) ;
+  storage unit ;
+  code { CAST (pair (pair unit (contract address)) unit) ;
+         DUP ;
+         CAR ;
+         DIP { CDR } ;
+         DUP ;
+         CAR ;
+         DIP { CDR ; DUP 2 } ;
+         DROP 2 ;
+         AMOUNT ;
+         SENDER ;
+         TRANSFER_TOKENS ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         PAIR } }

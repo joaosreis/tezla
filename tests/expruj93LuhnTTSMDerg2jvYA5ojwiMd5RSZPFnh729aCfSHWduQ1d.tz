@@ -1,0 +1,63 @@
+{ parameter
+    (or (pair %breakGlass
+           (address %governorContract)
+           (pair (address %tokenContract)
+                 (pair (address %ovenProxyContract)
+                       (pair (address %stabilityFundContract) (address %developerFundContract)))))
+        (lambda %runLambda unit (list operation))) ;
+  storage
+    (pair (address %daoAddress)
+          (pair (address %multisigAddress) (address %targetAddress))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "NOT_MSIG" ; FAILWITH } ;
+             NIL operation ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             GET 4 ;
+             CONTRACT %updateContracts
+               (pair address (pair address (pair address (pair address address)))) ;
+             { IF_NONE { PUSH int 46 ; FAILWITH } {} } ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             DUP ;
+             GET 8 ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             GET 7 ;
+             PAIR ;
+             { DIP 4 { DUP } ; DIG 5 } ;
+             GET 5 ;
+             PAIR ;
+             { DIP 4 { DUP } ; DIG 5 } ;
+             GET 3 ;
+             PAIR ;
+             DIG 4 ;
+             CAR ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "NOT_DAO" ; FAILWITH } ;
+             NIL operation ;
+             SWAP ;
+             UNIT ;
+             EXEC ;
+             ITER { CONS } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

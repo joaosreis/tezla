@@ -1,0 +1,21 @@
+{ storage (pair (bool %active) (pair (address %admin) (option %value int))) ;
+  parameter
+    (or (list %administrate (or (bool %setActive) (address %setAdmin))) (unit %setValue)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "NOT ADMIN" ; FAILWITH } ;
+             DUP ;
+             ITER { IF_LEFT
+                      { DIG 2 ; CDR ; SWAP ; PAIR ; SWAP }
+                      { DIG 2 ; UNPAIR ; SWAP ; CDR ; DIG 2 ; PAIR ; SWAP ; PAIR ; SWAP } } ;
+             DROP }
+           { DROP ; DUP ; CAR ; IF {} { PUSH string "NOT ACTIVE" ; FAILWITH } } ;
+         NIL operation ;
+         PAIR } }

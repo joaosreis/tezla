@@ -1,0 +1,22 @@
+{ parameter nat ;
+  storage
+    (pair (pair (pair (address %admin)
+                      (set %big_swaps
+                         (pair (pair (mutez %biggest_swap) (address %biggest_swapper))
+                               (pair (int %duration) (timestamp %next_result)))))
+                (pair (nat %limit) (set %lucky nat)))
+          (pair (nat %temp) (nat %val))) ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         CAR ;
+         CAR ;
+         SENDER ;
+         COMPARE ;
+         EQ ;
+         IF { SWAP ; DUP ; DUG 2 ; CDR ; CAR ; PAIR ; SWAP ; CAR ; PAIR }
+            { SWAP ; DUP ; DUG 2 ; CDR ; CDR ; SWAP ; PAIR ; SWAP ; CAR ; PAIR } ;
+         NIL operation ;
+         PAIR } }

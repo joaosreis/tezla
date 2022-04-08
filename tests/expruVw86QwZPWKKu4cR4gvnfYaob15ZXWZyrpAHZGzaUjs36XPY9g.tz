@@ -1,0 +1,44 @@
+{ parameter (nat %v) ;
+  storage nat ;
+  code { UNPAIR ;
+         PUSH address "tz1MZrh8CvYkp7BfLQMcm6mg5FvL5HRZfACw" ;
+         SENDER ;
+         COMPARE ;
+         EQ ;
+         NOT ;
+         IF { PUSH string "InvalidCaller" ; FAILWITH } {} ;
+         PUSH nat 20 ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         COMPARE ;
+         LT ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         PUSH nat 10 ;
+         COMPARE ;
+         LE ;
+         AND ;
+         NOT ;
+         IF { PUSH string "InvalidCondition: r1" ; FAILWITH } {} ;
+         PUSH nat 0 ;
+         PUSH int 2 ;
+         DIG 3 ;
+         DUP ;
+         DUG 4 ;
+         INT ;
+         EDIV ;
+         IF_NONE
+           { PUSH string "DivByZero" ; FAILWITH }
+           { DUP ; CDR ; SWAP ; DROP 1 } ;
+         COMPARE ;
+         EQ ;
+         NOT ;
+         IF { PUSH string "EXPECTED EVEN VALUE" ; FAILWITH } {} ;
+         DUP ;
+         DIP 1 { DIG 1 ; DROP 1 } ;
+         DUG 1 ;
+         DROP 1 ;
+         NIL operation ;
+         PAIR } }

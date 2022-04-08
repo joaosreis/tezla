@@ -1,0 +1,15 @@
+{ parameter unit ;
+  storage address ;
+  code { DROP ;
+         NIL operation ;
+         EMPTY_BIG_MAP string bytes ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter unit ;
+             storage (big_map string bytes) ;
+             code { PUSH string "ERROR_TEST" ; FAILWITH } } ;
+         SWAP ;
+         DIP { CONS } ;
+         SWAP ;
+         PAIR } }

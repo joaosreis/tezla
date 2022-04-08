@@ -1,0 +1,21 @@
+{ storage (pair (list %contracts string) (big_map %main string address)) ;
+  parameter (pair %registerAnswer (address %address) (string %caseno)) ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         CDR ;
+         DUP 3 ;
+         CAR ;
+         SOME ;
+         DUP 4 ;
+         CDR ;
+         UPDATE ;
+         UPDATE 2 ;
+         DUP ;
+         CAR ;
+         DIG 2 ;
+         CDR ;
+         CONS ;
+         UPDATE 1 ;
+         NIL operation ;
+         PAIR } }

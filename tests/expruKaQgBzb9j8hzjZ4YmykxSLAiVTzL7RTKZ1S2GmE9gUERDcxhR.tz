@@ -1,0 +1,109 @@
+{ storage
+    (pair (pair (address %bot_manager) (pair (int %coordinate_x) (nat %coordinate_y)))
+          (pair (pair (bool %is_alive) (string %name))
+                (pair (int %plasma_bullet_count) (map %record_alien_kills string nat)))) ;
+  parameter
+    (or (or (string %change_name) (int %move_horizontally))
+        (or (nat %move_vertically) (string %shoot_alien))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SENDER ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Error: non manager call" ; FAILWITH } ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 CAR ;
+                 DIG 3 ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { SENDER ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Error: non manager call" ; FAILWITH } ;
+                 SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 DIG 4 ;
+                 ADD ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR } }
+           { IF_LEFT
+               { SENDER ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Error: non manager call" ; FAILWITH } ;
+                 SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 DIG 4 ;
+                 ADD ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR }
+               { SENDER ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Error: non manager call" ; FAILWITH } ;
+                 PUSH int 1 ;
+                 DUP 3 ;
+                 GET 5 ;
+                 COMPARE ;
+                 GE ;
+                 IF { SWAP ;
+                      UNPAIR ;
+                      SWAP ;
+                      UNPAIR ;
+                      SWAP ;
+                      UNPAIR ;
+                      PUSH int 1 ;
+                      SWAP ;
+                      SUB ;
+                      SWAP ;
+                      DUP ;
+                      DIG 5 ;
+                      DUP ;
+                      DUG 2 ;
+                      GET ;
+                      IF_NONE { PUSH int 64 ; FAILWITH } {} ;
+                      PUSH nat 1 ;
+                      ADD ;
+                      SOME ;
+                      SWAP ;
+                      UPDATE ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR }
+                    { PUSH string "Error: you ran out of bullets! Please buy more!" ; FAILWITH } } } ;
+         NIL operation ;
+         PAIR } }

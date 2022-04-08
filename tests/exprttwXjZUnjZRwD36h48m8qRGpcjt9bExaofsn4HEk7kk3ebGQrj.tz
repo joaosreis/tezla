@@ -1,0 +1,77 @@
+{ parameter (or (string %post) (unit %rocket)) ;
+  storage
+    (pair (pair (nat %max_message_length) (nat %max_num_messages))
+          (list %messages (pair (address %sender) (string %text)))) ;
+  code { LAMBDA
+           (pair string (pair (pair nat nat) (list (pair address string))))
+           (pair (pair nat nat) (list (pair address string)))
+           { DUP ;
+             CDR ;
+             SWAP ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             SIZE ;
+             COMPARE ;
+             GT ;
+             IF { DROP 2 ; PUSH string "Max message length exceeded" ; FAILWITH }
+                { SENDER ;
+                  PAIR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  PUSH int 1 ;
+                  DIG 3 ;
+                  DUP ;
+                  DUG 4 ;
+                  CAR ;
+                  CDR ;
+                  SUB ;
+                  ABS ;
+                  PAIR ;
+                  NIL (pair address string) ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  ITER { SWAP ;
+                         PAIR ;
+                         DUP ;
+                         CAR ;
+                         DIG 2 ;
+                         DUP ;
+                         DUG 3 ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SIZE ;
+                         COMPARE ;
+                         LT ;
+                         IF { SWAP ; CDR ; CONS } { SWAP ; DROP } } ;
+                  SWAP ;
+                  DROP ;
+                  NIL (pair address string) ;
+                  SWAP ;
+                  ITER { CONS } ;
+                  SWAP ;
+                  CONS ;
+                  SWAP ;
+                  CAR ;
+                  PAIR } } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         DIG 2 ;
+         CAR ;
+         IF_LEFT { PAIR ; EXEC } { DROP ; PUSH string "Rocket!" ; PAIR ; EXEC } ;
+         NIL operation ;
+         PAIR } }

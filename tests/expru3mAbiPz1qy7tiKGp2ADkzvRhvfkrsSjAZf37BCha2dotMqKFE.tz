@@ -1,0 +1,6 @@
+{ parameter (or (pair %concat string string) (string %extract)) ;
+  storage string ;
+  code { CAR ;
+         IF_LEFT
+           { DROP ; PUSH string "Not Written" ; FAILWITH }
+           { DROP ; PUSH string "Not Written" ; FAILWITH } } }

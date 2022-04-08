@@ -1,0 +1,22 @@
+{ parameter (pair string (set string)) ;
+  storage (map string (set string)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         { DIP 2 { DUP } ; DIG 3 } ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         GET ;
+         IF_NONE
+           { SWAP ; SOME ; SWAP ; UPDATE }
+           { DIG 2 ;
+             DROP ;
+             DIG 2 ;
+             EMPTY_SET string ;
+             DIG 2 ;
+             ITER { PUSH bool True ; SWAP ; UPDATE } ;
+             SOME ;
+             DIG 2 ;
+             UPDATE } ;
+         NIL operation ;
+         PAIR } }

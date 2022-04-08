@@ -1,0 +1,211 @@
+{ parameter
+    (or (lambda %admin_update
+           (pair (pair (big_map %actions
+                          string
+                          (lambda
+                             (pair (pair (bytes %payload) (pair (address %original_sender) (address %self_addr)))
+                                   (pair (pair (pair (pair (big_map %auctions
+                                                              bytes
+                                                              (pair (pair (timestamp %ends_at) (mutez %last_bid))
+                                                                    (pair (address %last_bidder) (nat %ownership_period))))
+                                                           (big_map %bidder_balances address mutez))
+                                                     (pair (big_map %commitments bytes timestamp) (map %config nat nat)))
+                                               (pair (pair (big_map %data bytes bytes) (big_map %metadata string bytes))
+                                                     (pair (address %name_registry) (address %owner))))
+                                         (pair (big_map %records
+                                                  bytes
+                                                  (pair (timestamp %expiry) (map %internal_data string bytes)))
+                                               (bytes %tld))))
+                             (pair (list operation)
+                                   (pair (pair (pair (pair (big_map %auctions
+                                                              bytes
+                                                              (pair (pair (timestamp %ends_at) (mutez %last_bid))
+                                                                    (pair (address %last_bidder) (nat %ownership_period))))
+                                                           (big_map %bidder_balances address mutez))
+                                                     (pair (big_map %commitments bytes timestamp) (map %config nat nat)))
+                                               (pair (pair (big_map %data bytes bytes) (big_map %metadata string bytes))
+                                                     (pair (address %name_registry) (address %owner))))
+                                         (pair (big_map %records
+                                                  bytes
+                                                  (pair (timestamp %expiry) (map %internal_data string bytes)))
+                                               (bytes %tld))))))
+                       (pair %store
+                          (pair (pair (pair (big_map %auctions
+                                               bytes
+                                               (pair (pair (timestamp %ends_at) (mutez %last_bid))
+                                                     (pair (address %last_bidder) (nat %ownership_period))))
+                                            (big_map %bidder_balances address mutez))
+                                      (pair (big_map %commitments bytes timestamp) (map %config nat nat)))
+                                (pair (pair (big_map %data bytes bytes) (big_map %metadata string bytes))
+                                      (pair (address %name_registry) (address %owner))))
+                          (pair (big_map %records
+                                   bytes
+                                   (pair (timestamp %expiry) (map %internal_data string bytes)))
+                                (bytes %tld))))
+                 (set %trusted_senders address))
+           (pair (list operation)
+                 (pair (pair (big_map %actions
+                                string
+                                (lambda
+                                   (pair (pair (bytes %payload) (pair (address %original_sender) (address %self_addr)))
+                                         (pair (pair (pair (pair (big_map %auctions
+                                                                    bytes
+                                                                    (pair (pair (timestamp %ends_at) (mutez %last_bid))
+                                                                          (pair (address %last_bidder) (nat %ownership_period))))
+                                                                 (big_map %bidder_balances address mutez))
+                                                           (pair (big_map %commitments bytes timestamp) (map %config nat nat)))
+                                                     (pair (pair (big_map %data bytes bytes) (big_map %metadata string bytes))
+                                                           (pair (address %name_registry) (address %owner))))
+                                               (pair (big_map %records
+                                                        bytes
+                                                        (pair (timestamp %expiry) (map %internal_data string bytes)))
+                                                     (bytes %tld))))
+                                   (pair (list operation)
+                                         (pair (pair (pair (pair (big_map %auctions
+                                                                    bytes
+                                                                    (pair (pair (timestamp %ends_at) (mutez %last_bid))
+                                                                          (pair (address %last_bidder) (nat %ownership_period))))
+                                                                 (big_map %bidder_balances address mutez))
+                                                           (pair (big_map %commitments bytes timestamp) (map %config nat nat)))
+                                                     (pair (pair (big_map %data bytes bytes) (big_map %metadata string bytes))
+                                                           (pair (address %name_registry) (address %owner))))
+                                               (pair (big_map %records
+                                                        bytes
+                                                        (pair (timestamp %expiry) (map %internal_data string bytes)))
+                                                     (bytes %tld))))))
+                             (pair %store
+                                (pair (pair (pair (big_map %auctions
+                                                     bytes
+                                                     (pair (pair (timestamp %ends_at) (mutez %last_bid))
+                                                           (pair (address %last_bidder) (nat %ownership_period))))
+                                                  (big_map %bidder_balances address mutez))
+                                            (pair (big_map %commitments bytes timestamp) (map %config nat nat)))
+                                      (pair (pair (big_map %data bytes bytes) (big_map %metadata string bytes))
+                                            (pair (address %name_registry) (address %owner))))
+                                (pair (big_map %records
+                                         bytes
+                                         (pair (timestamp %expiry) (map %internal_data string bytes)))
+                                      (bytes %tld))))
+                       (set %trusted_senders address))))
+        (pair %execute
+           (pair (string %action_name) (address %original_sender))
+           (bytes %payload))) ;
+  storage
+    (pair (pair (big_map %actions
+                   string
+                   (lambda
+                      (pair (pair (bytes %payload) (pair (address %original_sender) (address %self_addr)))
+                            (pair (pair (pair (pair (big_map %auctions
+                                                       bytes
+                                                       (pair (pair (timestamp %ends_at) (mutez %last_bid))
+                                                             (pair (address %last_bidder) (nat %ownership_period))))
+                                                    (big_map %bidder_balances address mutez))
+                                              (pair (big_map %commitments bytes timestamp) (map %config nat nat)))
+                                        (pair (pair (big_map %data bytes bytes) (big_map %metadata string bytes))
+                                              (pair (address %name_registry) (address %owner))))
+                                  (pair (big_map %records
+                                           bytes
+                                           (pair (timestamp %expiry) (map %internal_data string bytes)))
+                                        (bytes %tld))))
+                      (pair (list operation)
+                            (pair (pair (pair (pair (big_map %auctions
+                                                       bytes
+                                                       (pair (pair (timestamp %ends_at) (mutez %last_bid))
+                                                             (pair (address %last_bidder) (nat %ownership_period))))
+                                                    (big_map %bidder_balances address mutez))
+                                              (pair (big_map %commitments bytes timestamp) (map %config nat nat)))
+                                        (pair (pair (big_map %data bytes bytes) (big_map %metadata string bytes))
+                                              (pair (address %name_registry) (address %owner))))
+                                  (pair (big_map %records
+                                           bytes
+                                           (pair (timestamp %expiry) (map %internal_data string bytes)))
+                                        (bytes %tld))))))
+                (pair %store
+                   (pair (pair (pair (big_map %auctions
+                                        bytes
+                                        (pair (pair (timestamp %ends_at) (mutez %last_bid))
+                                              (pair (address %last_bidder) (nat %ownership_period))))
+                                     (big_map %bidder_balances address mutez))
+                               (pair (big_map %commitments bytes timestamp) (map %config nat nat)))
+                         (pair (pair (big_map %data bytes bytes) (big_map %metadata string bytes))
+                               (pair (address %name_registry) (address %owner))))
+                   (pair (big_map %records
+                            bytes
+                            (pair (timestamp %expiry) (map %internal_data string bytes)))
+                         (bytes %tld))))
+          (set %trusted_senders address)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { PAIR ;
+             DUP ;
+             CDR ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF { SWAP ; CAR ; SWAP ; EXEC }
+                { DROP 2 ; PUSH string "NOT_AUTHORIZED" ; FAILWITH } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SENDER ;
+             MEM ;
+             IF {} { PUSH string "NOT_TRUSTED_SENDER" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             GET ;
+             IF_NONE
+               { DROP 2 ; PUSH string "UNKNOWN_ACTION" ; FAILWITH }
+               { SELF ;
+                 ADDRESS ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CDR ;
+                 PAIR ;
+                 DIG 2 ;
+                 CDR ;
+                 PAIR ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CDR ;
+                 SWAP ;
+                 PAIR ;
+                 EXEC ;
+                 DUP ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CDR ;
+                 DIG 2 ;
+                 DIG 3 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } } } }

@@ -1,0 +1,485 @@
+{ storage
+    (pair (pair (pair (nat %USDPrice) (timestamp %duration))
+                (pair (set %keysset address) (address %owner)))
+          (pair (pair (nat %penality) (nat %ratio))
+                (pair (address %securities) (pair (nat %stabilityFees) (set %validator address))))) ;
+  parameter
+    (or (or (or (pair %GovernanceFeed (nat %fee) (pair (nat %fine) (nat %ratio)))
+                (pair %LiquidateVault (address %address) (address %vault)))
+            (or (pair %MintToken
+                   (pair (nat %collateral) (nat %loan))
+                   (pair (address %owner) (pair (nat %token) (address %validator))))
+                (or (address %SecuritiesExercise)
+                    (pair %SecuritiesPurchase
+                       (pair (nat %duration) (pair (nat %order) (address %spender)))
+                       (pair (nat %token) (pair (address %vault) (nat %xtz)))))))
+        (or (or (pair %ValidatorOperation (nat %Operation) (address %address))
+                (pair %WithdrawCollateral (nat %collateral) (nat %token)))
+            (or (pair %addDataContributor (nat %Operation) (address %contributor))
+                (or (address %changeSecurities) (nat %feedData))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET 4 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "Only Governance Contract will update the Parameters" ;
+                          FAILWITH } ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     UPDATE 7 ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DUP 3 ;
+                     GET 4 ;
+                     DIG 3 ;
+                     GET 3 ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 8 ;
+                     SENDER ;
+                     MEM ;
+                     IF {}
+                        { PUSH string " Sender is not a Registered vault factory contract" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     PUSH int 3600 ;
+                     ADD ;
+                     NOW ;
+                     COMPARE ;
+                     LE ;
+                     IF {}
+                        { PUSH string "Price has not been Updated Since the Past Hour" ; FAILWITH } ;
+                     DUP ;
+                     CDR ;
+                     CONTRACT %OracleLiquidate (pair (pair address nat) (pair nat (pair nat nat))) ;
+                     IF_NONE { PUSH string "Liquidate Call to Vault Failed" ; FAILWITH } {} ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     DIG 4 ;
+                     DUP ;
+                     GET 7 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 6 ;
+                     GET 3 ;
+                     CDR ;
+                     PAIR ;
+                     DUP 6 ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     DUP 6 ;
+                     GET 3 ;
+                     CAR ;
+                     DIG 5 ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     CONS } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 8 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 6 ;
+                     MEM ;
+                     IF {}
+                        { PUSH string " Sender's validator is not a Registered vault factory contract" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     GET 3 ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 3 ;
+                     GET 7 ;
+                     DIG 2 ;
+                     DUP ;
+                     GET 5 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 4 ;
+                     CAR ;
+                     CDR ;
+                     ADD ;
+                     ADD ;
+                     MUL ;
+                     PUSH nat 1000000000000 ;
+                     DUP 4 ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     DUP 4 ;
+                     CAR ;
+                     CAR ;
+                     MUL ;
+                     MUL ;
+                     COMPARE ;
+                     GE ;
+                     IF {}
+                        { PUSH string " Vault is undercollateralized, unable to mint stable coins" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     PUSH int 3600 ;
+                     ADD ;
+                     NOW ;
+                     COMPARE ;
+                     LE ;
+                     IF {}
+                        { PUSH string "Price has not been Updated Since the Past Hour" ; FAILWITH } ;
+                     DUP ;
+                     GET 6 ;
+                     CONTRACT %mint (pair nat (pair address address)) ;
+                     IF_NONE
+                       { PUSH string "Vault Factory contract mint call failed" ; FAILWITH }
+                       {} ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     SENDER ;
+                     DIG 4 ;
+                     DUP ;
+                     GET 3 ;
+                     SWAP ;
+                     CAR ;
+                     CDR ;
+                     PAIR 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 8 ;
+                         SENDER ;
+                         MEM ;
+                         IF {}
+                            { PUSH string " Sender is not a Registered vault factory contract" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         PUSH int 3600 ;
+                         ADD ;
+                         NOW ;
+                         COMPARE ;
+                         LE ;
+                         IF {}
+                            { PUSH string "Price has not been Updated Since the Past Hour" ; FAILWITH } ;
+                         NIL operation ;
+                         DUP 3 ;
+                         GET 5 ;
+                         CONTRACT %OracleExerciseSecurity (pair address nat) ;
+                         IF_NONE
+                           { PUSH string " call to exercised security on PUT contract failed" ;
+                             FAILWITH }
+                           {} ;
+                         PUSH mutez 0 ;
+                         DUP 5 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         DIG 4 ;
+                         PAIR ;
+                         TRANSFER_TOKENS ;
+                         CONS }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 8 ;
+                         SENDER ;
+                         MEM ;
+                         IF {}
+                            { PUSH string " Sender is not a Registered vault factory contract" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         GET 3 ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 3 ;
+                         GET 7 ;
+                         DUP 3 ;
+                         GET 3 ;
+                         ADD ;
+                         MUL ;
+                         PUSH nat 1000000000000 ;
+                         DUP 4 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         DUP 4 ;
+                         GET 6 ;
+                         MUL ;
+                         MUL ;
+                         COMPARE ;
+                         GE ;
+                         IF {} { PUSH string " Vault is undercollateralized" ; FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         GET 3 ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 3 ;
+                         GET 7 ;
+                         DUP 3 ;
+                         GET 3 ;
+                         ADD ;
+                         MUL ;
+                         PUSH nat 1000000000000000000 ;
+                         DUP 4 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         DUP 4 ;
+                         CAR ;
+                         GET 3 ;
+                         MUL ;
+                         MUL ;
+                         COMPARE ;
+                         GE ;
+                         IF {}
+                            { PUSH string " Order Size of PUT Options is insufficient" ; FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         PUSH int 3600 ;
+                         ADD ;
+                         NOW ;
+                         COMPARE ;
+                         LE ;
+                         IF {}
+                            { PUSH string "Price has not been Updated Since the Past Hour" ; FAILWITH } ;
+                         NIL operation ;
+                         DUP 3 ;
+                         GET 5 ;
+                         CONTRACT %OraclePurchaseSecurity
+                           (pair (pair nat nat) (pair address (pair nat address))) ;
+                         IF_NONE
+                           { PUSH string "Call to purchased PUT Option contract failed" ; FAILWITH }
+                           {} ;
+                         PUSH mutez 0 ;
+                         DUP 4 ;
+                         CAR ;
+                         GET 4 ;
+                         DUP 6 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         DUP 5 ;
+                         GET 5 ;
+                         PAIR ;
+                         DIG 4 ;
+                         DUP ;
+                         CAR ;
+                         GET 3 ;
+                         SWAP ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         TRANSFER_TOKENS ;
+                         CONS } } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET 4 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "Only Governance Contract will ADD or REMOVE vault factory Contract " ;
+                          FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     PUSH nat 1 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { SWAP ; DUP ; GET 8 ; PUSH bool True ; DIG 3 ; CDR ; UPDATE ; UPDATE 8 }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          GET 8 ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          MEM ;
+                          IF {}
+                             { PUSH string "Address is not present in factory contract list" ; FAILWITH } ;
+                          SWAP ;
+                          DUP ;
+                          GET 8 ;
+                          PUSH bool False ;
+                          DIG 3 ;
+                          CDR ;
+                          UPDATE ;
+                          UPDATE 8 } }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     PUSH int 3600 ;
+                     ADD ;
+                     NOW ;
+                     COMPARE ;
+                     LE ;
+                     IF {}
+                        { PUSH string "Price has not been Updated Since the Past Hour" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     GET 3 ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 3 ;
+                     GET 7 ;
+                     DUP 3 ;
+                     CDR ;
+                     ADD ;
+                     MUL ;
+                     PUSH nat 1000000000000 ;
+                     DUP 4 ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     DIG 3 ;
+                     CAR ;
+                     MUL ;
+                     MUL ;
+                     COMPARE ;
+                     GE ;
+                     IF {} { PUSH string "Vault is undercollateralized" ; FAILWITH } } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET 4 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "Only Governance Contract will update Contributor" ; FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     PUSH nat 1 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { SWAP ;
+                          UNPAIR ;
+                          UNPAIR ;
+                          SWAP ;
+                          UNPAIR ;
+                          PUSH bool True ;
+                          DIG 5 ;
+                          CDR ;
+                          UPDATE ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          PAIR }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CAR ;
+                          GET 3 ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          MEM ;
+                          IF {} { PUSH string "Address is not present as contributor" ; FAILWITH } ;
+                          SWAP ;
+                          UNPAIR ;
+                          UNPAIR ;
+                          SWAP ;
+                          UNPAIR ;
+                          PUSH bool False ;
+                          DIG 5 ;
+                          CDR ;
+                          UPDATE ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          PAIR } }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         GET 4 ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "Only Governance Contract will Change Securities Contract" ;
+                              FAILWITH } ;
+                         UPDATE 5 }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         GET 3 ;
+                         SENDER ;
+                         MEM ;
+                         IF {}
+                            { PUSH string "User Doesn't have permission to Update Price" ; FAILWITH } ;
+                         SWAP ;
+                         UNPAIR ;
+                         CDR ;
+                         DIG 2 ;
+                         NOW ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR } } } ;
+             NIL operation } ;
+         PAIR } }

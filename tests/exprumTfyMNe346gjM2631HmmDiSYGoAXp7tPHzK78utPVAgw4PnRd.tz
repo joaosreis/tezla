@@ -1,0 +1,16 @@
+{ storage unit ;
+  parameter unit ;
+  code { PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         PUSH address "tz1M9CMEtsXm3QxA7FmMU2Qh7xzsuGXVbcDr" ;
+         DROP 11 ;
+         UNIT ;
+         NIL operation ;
+         PAIR } }

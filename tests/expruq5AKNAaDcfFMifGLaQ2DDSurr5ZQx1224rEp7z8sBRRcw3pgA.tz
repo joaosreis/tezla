@@ -1,0 +1,249 @@
+{ parameter
+    (or (unit %cancel_xtzusd)
+        (or (unit %request_xtzusd)
+            (pair %set_xtzusd
+               (ticket %request
+                  (pair (pair (pair (nat %amount) (nat %client_request_id))
+                              (pair (bytes %job_id) (address %oracle)))
+                        (pair (pair (option %parameters (or (bytes %bytes) (or (int %int) (string %string))))
+                                    (string %tag))
+                              (pair (address %target) (timestamp %timeout)))))
+               (ticket %result
+                  (pair (pair (address %client) (nat %client_request_id))
+                        (pair (or %result (bytes %bytes) (or (int %int) (string %string))) (string %tag))))))) ;
+  storage
+    (pair (pair (address %admin) (pair (nat %next_request_id) (address %oracle)))
+          (pair (pair (address %token) (option %waiting_request_id nat))
+                (pair (option %xtzusd int) (bytes %xtzusd_job_id)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "RequesterNotAdmin" ; FAILWITH } ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CONTRACT %cancel_request nat ;
+             { IF_NONE { PUSH int 214 ; FAILWITH } {} } ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DUP 4 ;
+             CDR ;
+             CAR ;
+             CDR ;
+             { IF_NONE { PUSH string "ClientWaitingRequestIdUnknown" ; FAILWITH } {} } ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             CAR ;
+             NONE nat ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP }
+           { IF_LEFT
+               { DROP ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "RequesterNotAdmin" ; FAILWITH } ;
+                 PUSH nat 1 ;
+                 NOW ;
+                 PUSH int 300 ;
+                 ADD ;
+                 SELF %set_xtzusd ;
+                 ADDRESS ;
+                 PAIR %target %timeout ;
+                 PUSH (pair (option %parameters (or (bytes %bytes) (or (int %int) (string %string))))
+                            (string %tag))
+                      (Pair None "OracleRequest") ;
+                 PAIR ;
+                 DIG 2 ;
+                 DUP ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 4 ;
+                 GET 6 ;
+                 PAIR %job_id %oracle ;
+                 DUP 4 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 PUSH nat 2 ;
+                 PAIR %amount %client_request_id ;
+                 PAIR ;
+                 PAIR ;
+                 TICKET ;
+                 NIL operation ;
+                 DUP 3 ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 CONTRACT %proxy
+                   (ticket
+                      (pair (pair (pair (nat %amount) (nat %client_request_id))
+                                  (pair (bytes %job_id) (address %oracle)))
+                            (pair (pair (option %parameters (or (bytes %bytes) (or (int %int) (string %string))))
+                                        (string %tag))
+                                  (pair (address %target) (timestamp %timeout))))) ;
+                 { IF_NONE { PUSH int 200 ; FAILWITH } {} } ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 CAR ;
+                 DIG 4 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 SOME ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 PUSH nat 1 ;
+                 ADD ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "ReceiverNotOracle" ; FAILWITH } ;
+                 UNPAIR ;
+                 READ_TICKET ;
+                 SWAP ;
+                 DROP ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 2 ;
+                 READ_TICKET ;
+                 SWAP ;
+                 DROP ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 SELF_ADDRESS ;
+                 DUP 5 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "ReceiverBadRequester" ; FAILWITH } ;
+                 DUP 5 ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 { IF_NONE
+                     { PUSH bool False }
+                     { DROP ;
+                       DUP 3 ;
+                       CAR ;
+                       CAR ;
+                       CDR ;
+                       DUP 6 ;
+                       CDR ;
+                       CAR ;
+                       CDR ;
+                       { IF_NONE { PUSH int 223 ; FAILWITH } {} } ;
+                       COMPARE ;
+                       EQ } } ;
+                 IF {} { PUSH string "ReceivedBadRequestId" ; FAILWITH } ;
+                 DIG 4 ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 CAR ;
+                 NONE nat ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 CDR ;
+                 DUP 4 ;
+                 GET 3 ;
+                 IF_LEFT
+                   { PUSH int 28 ; FAILWITH }
+                   { IF_LEFT {} { PUSH int 28 ; FAILWITH } } ;
+                 SOME ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 DUG 4 ;
+                 PUSH string "OracleRequest" ;
+                 DUP 4 ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketExpectedTag:OracleRequest" ; FAILWITH } ;
+                 DUP ;
+                 GET 4 ;
+                 PUSH string "OracleResult" ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketExpectedTag:OracleResult" ; FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 DIG 4 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketClientNotMatch" ; FAILWITH } ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 DIG 2 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketOracleNotMatch" ; FAILWITH } ;
+                 CAR ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketClientRequestIdNotMatch" ; FAILWITH } ;
+                 NIL operation } } ;
+         PAIR } }

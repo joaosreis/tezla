@@ -1,0 +1,17 @@
+{ parameter unit ;
+  storage unit ;
+  code { DROP ;
+         PUSH string "a" ;
+         PUSH nat 0 ;
+         SWAP ;
+         TICKET @a ;
+         PUSH string "a" ;
+         PUSH nat 9 ;
+         SWAP ;
+         TICKET @b ;
+         PAIR ;
+         JOIN_TICKETS ;
+         DROP ;
+         UNIT ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,5 @@
+{ parameter (or (unit %buy) (unit %newPrice)) ;
+  storage
+    (pair (pair (nat %nft_id) (mutez %nft_price))
+          (pair (address %owner_addr) (timestamp %tran_date))) ;
+  code { UNPAIR ; IF_LEFT { DROP } { DROP } ; NIL operation ; PAIR } }

@@ -1,0 +1,12 @@
+{ storage unit ;
+  parameter unit ;
+  code { CDR ;
+         NIL operation ;
+         PUSH address "KT1KS3ocDAdXxNxYtg72VMnapAi8uB6gVRxq" ;
+         CONTRACT %modifyVotingPeriod int ;
+         IF_NONE { PUSH int 9 ; FAILWITH } {} ;
+         PUSH mutez 0 ;
+         PUSH int 24 ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

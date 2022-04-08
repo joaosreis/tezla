@@ -1,0 +1,3 @@
+{ storage bytes ;
+  parameter unit ;
+  code { UNPAIR ; DROP ; PUSH bytes 0x01 ; SWAP ; DROP ; NIL operation ; PAIR } }

@@ -1,0 +1,681 @@
+{ parameter
+    (or (or (list %aggregated_endorsement
+               (pair (nat %proposalId)
+                     (list %signatures (pair (signature %signature) (address %signerAddress)))))
+            (pair %aggregated_proposal
+               (or %actions
+                  (pair %external (bytes %actions) (address %target))
+                  (list %internal
+                     (or (nat %changeQuorum)
+                         (or %changeSigners
+                            (list %added (pair (address %address) (key %publicKey)))
+                            (set %removed address)))))
+               (pair (nat %proposalId)
+                     (list %signatures (pair (signature %signature) (address %signerAddress))))))
+        (or (nat %cancel_proposal)
+            (or (list %endorsement nat)
+                (or %proposal
+                   (pair %external (bytes %actions) (address %target))
+                   (list %internal
+                      (or (nat %changeQuorum)
+                          (or %changeSigners
+                             (list %added (pair (address %address) (key %publicKey)))
+                             (set %removed address)))))))) ;
+  storage
+    (pair (set %activeProposals nat)
+          (pair (nat %lastProposalId)
+                (pair (big_map %metadata string bytes)
+                      (pair (big_map %proposals
+                               nat
+                               (pair (or %actions
+                                        (pair %external (bytes %actions) (address %target))
+                                        (list %internal
+                                           (or (nat %changeQuorum)
+                                               (or %changeSigners
+                                                  (list %added (pair (address %address) (key %publicKey)))
+                                                  (set %removed address)))))
+                                     (pair (set %endorsements address) (pair (address %initiator) (timestamp %startedAt)))))
+                            (pair (nat %quorum)
+                                  (map %signers address (pair (option %lastProposalId nat) (key %publicKey)))))))) ;
+  code { CAST (pair (or (or (list (pair nat (list (pair signature address))))
+                            (pair (or (pair bytes address) (list (or nat (or (list (pair address key)) (set address)))))
+                                  (pair nat (list (pair signature address)))))
+                        (or nat
+                            (or (list nat)
+                                (or (pair bytes address) (list (or nat (or (list (pair address key)) (set address))))))))
+                    (pair (set nat)
+                          (pair nat
+                                (pair (big_map string bytes)
+                                      (pair (big_map
+                                               nat
+                                               (pair (or (pair bytes address) (list (or nat (or (list (pair address key)) (set address)))))
+                                                     (pair (set address) (pair address timestamp))))
+                                            (pair nat (map address (pair (option nat) key)))))))) ;
+         LAMBDA
+           (pair (pair (or (pair bytes address) (list (or nat (or (list (pair address key)) (set address))))) nat)
+                 (pair (set nat)
+                       (pair nat
+                             (pair (big_map string bytes)
+                                   (pair (big_map
+                                            nat
+                                            (pair (or (pair bytes address) (list (or nat (or (list (pair address key)) (set address)))))
+                                                  (pair (set address) (pair address timestamp))))
+                                         (pair nat (map address (pair (option nat) key))))))))
+           (pair (list operation)
+                 (pair unit
+                       (pair (set nat)
+                             (pair nat
+                                   (pair (big_map string bytes)
+                                         (pair (big_map
+                                                  nat
+                                                  (pair (or (pair bytes address) (list (or nat (or (list (pair address key)) (set address)))))
+                                                        (pair (set address) (pair address timestamp))))
+                                               (pair nat (map address (pair (option nat) key)))))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             IF_LEFT
+               { DIG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CONTRACT bytes ;
+                 { IF_NONE { PUSH string "MULTISIG_InvalidTarget" ; FAILWITH } {} } ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 CAR ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 SWAP }
+               { DUP ;
+                 ITER { DUP ;
+                        IF_LEFT
+                          { DIG 3 ; SWAP ; UPDATE 9 ; DUG 2 }
+                          { DUP ;
+                            IF_LEFT
+                              { DUP ;
+                                ITER { DIG 5 ;
+                                       DUP ;
+                                       GET 10 ;
+                                       DUP 3 ;
+                                       CDR ;
+                                       NONE nat ;
+                                       PAIR ;
+                                       SOME ;
+                                       DIG 3 ;
+                                       CAR ;
+                                       UPDATE ;
+                                       UPDATE 10 ;
+                                       DUG 4 } ;
+                                DROP 2 }
+                              { DUP ;
+                                ITER { DUP 6 ;
+                                       GET 10 ;
+                                       SWAP ;
+                                       DUP ;
+                                       DUG 2 ;
+                                       MEM ;
+                                       IF { DUP 6 ;
+                                            GET 10 ;
+                                            SWAP ;
+                                            DUP ;
+                                            DUG 2 ;
+                                            GET ;
+                                            { IF_NONE { PUSH int 309 ; FAILWITH } {} } ;
+                                            CAR ;
+                                            DUP ;
+                                            { IF_NONE
+                                                { DROP }
+                                                { DROP ;
+                                                  DIG 6 ;
+                                                  DUP ;
+                                                  CAR ;
+                                                  PUSH bool False ;
+                                                  DIG 3 ;
+                                                  { IF_NONE { PUSH int 312 ; FAILWITH } {} } ;
+                                                  UPDATE ;
+                                                  UPDATE 1 ;
+                                                  DUG 5 } } ;
+                                            DIG 5 ;
+                                            DUP ;
+                                            GET 10 ;
+                                            NONE (pair (option nat) key) ;
+                                            DIG 3 ;
+                                            UPDATE ;
+                                            UPDATE 10 ;
+                                            DUG 4 }
+                                          { DROP } } ;
+                                DROP 2 } } ;
+                        DUP 3 ;
+                        GET 10 ;
+                        SIZE ;
+                        DUP 4 ;
+                        GET 9 ;
+                        COMPARE ;
+                        LE ;
+                        IF {} { PUSH string "MULTISIG_MoreQuorumThanSigners" ; FAILWITH } ;
+                        DUP 3 ;
+                        CAR ;
+                        ITER { DIG 3 ; DUP ; CAR ; PUSH bool False ; DIG 3 ; UPDATE ; UPDATE 1 ; DUG 2 } ;
+                        DROP } ;
+                 DROP } ;
+             DUP ;
+             CAR ;
+             PUSH bool False ;
+             DIG 4 ;
+             CAR ;
+             CDR ;
+             UPDATE ;
+             UPDATE 1 ;
+             UNIT ;
+             DIG 2 ;
+             PAIR 3 } ;
+         SWAP ;
+         LAMBDA
+           (pair (pair nat address)
+                 (pair (set nat)
+                       (pair nat
+                             (pair (big_map string bytes)
+                                   (pair (big_map
+                                            nat
+                                            (pair (or (pair bytes address) (list (or nat (or (list (pair address key)) (set address)))))
+                                                  (pair (set address) (pair address timestamp))))
+                                         (pair nat (map address (pair (option nat) key))))))))
+           (pair (list operation)
+                 (pair unit
+                       (pair (set nat)
+                             (pair nat
+                                   (pair (big_map string bytes)
+                                         (pair (big_map
+                                                  nat
+                                                  (pair (or (pair bytes address) (list (or nat (or (list (pair address key)) (set address)))))
+                                                        (pair (set address) (pair address timestamp))))
+                                               (pair nat (map address (pair (option nat) key)))))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             CAR ;
+             DUP 4 ;
+             CAR ;
+             CAR ;
+             MEM ;
+             IF {} { PUSH string "MULTISIG_ProposalUnknown" ; FAILWITH } ;
+             DUP ;
+             GET 7 ;
+             DUP ;
+             DUP 5 ;
+             CAR ;
+             CAR ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             { IF_NONE { PUSH int 278 ; FAILWITH } {} } ;
+             DUP ;
+             GET 3 ;
+             PUSH bool True ;
+             DIG 7 ;
+             CAR ;
+             CDR ;
+             UPDATE ;
+             UPDATE 3 ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             UPDATE 7 ;
+             UNIT ;
+             DIG 2 ;
+             PAIR 3 } ;
+         SWAP ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DUP ;
+                 NIL operation ;
+                 SWAP ;
+                 ITER { DUP ;
+                        CDR ;
+                        ITER { DUP 5 ;
+                               GET 10 ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CDR ;
+                               MEM ;
+                               IF {} { PUSH string "MULTISIG_SignerUnknown" ; FAILWITH } ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CAR ;
+                               SELF_ADDRESS ;
+                               PAIR ;
+                               PACK ;
+                               SWAP ;
+                               DUP ;
+                               DUG 2 ;
+                               CAR ;
+                               DUP 7 ;
+                               GET 10 ;
+                               DUP 4 ;
+                               CDR ;
+                               GET ;
+                               { IF_NONE { PUSH int 242 ; FAILWITH } {} } ;
+                               CDR ;
+                               CHECK_SIGNATURE ;
+                               IF {} { PUSH string "MULTISIG_Badsig" ; FAILWITH } ;
+                               DUP 6 ;
+                               DIG 5 ;
+                               DUP 3 ;
+                               CDR ;
+                               DUP 5 ;
+                               CAR ;
+                               PAIR ;
+                               PAIR ;
+                               EXEC ;
+                               DUP ;
+                               GET 4 ;
+                               DUG 5 ;
+                               DUP ;
+                               CAR ;
+                               ITER { DIG 4 ; SWAP ; CONS ; DUG 3 } ;
+                               DROP 2 } ;
+                        DUP 4 ;
+                        GET 7 ;
+                        SWAP ;
+                        DUP ;
+                        DUG 2 ;
+                        CAR ;
+                        GET ;
+                        { IF_NONE { PUSH int 253 ; FAILWITH } {} } ;
+                        DUP 5 ;
+                        GET 9 ;
+                        SWAP ;
+                        DUP ;
+                        DUG 2 ;
+                        GET 3 ;
+                        SIZE ;
+                        COMPARE ;
+                        GE ;
+                        IF { DUP 7 ;
+                             DIG 5 ;
+                             DUP 4 ;
+                             CAR ;
+                             DUP 4 ;
+                             CAR ;
+                             PAIR ;
+                             PAIR ;
+                             EXEC ;
+                             DUP ;
+                             GET 4 ;
+                             DUG 5 ;
+                             DUP ;
+                             CAR ;
+                             ITER { DIG 4 ; SWAP ; CONS ; DUG 3 } ;
+                             DROP 3 }
+                           { DROP 2 } } ;
+                 SWAP ;
+                 DROP ;
+                 DIG 2 ;
+                 DROP ;
+                 DIG 2 ;
+                 DROP }
+               { SWAP ;
+                 DUP ;
+                 GET 3 ;
+                 PUSH nat 1 ;
+                 ADD ;
+                 UPDATE 3 ;
+                 SWAP ;
+                 DUP ;
+                 GET 3 ;
+                 DUP 3 ;
+                 GET 3 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "MULTISIG_InvalidProposalId" ; FAILWITH } ;
+                 NOW ;
+                 SENDER ;
+                 EMPTY_SET address ;
+                 DUP 4 ;
+                 CAR ;
+                 PAIR 4 ;
+                 NONE nat ;
+                 DUP 4 ;
+                 GET 10 ;
+                 SENDER ;
+                 GET ;
+                 { IF_NONE { PUSH int 188 ; FAILWITH } {} } ;
+                 CAR ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DUP 3 ;
+                      DUP ;
+                      CAR ;
+                      PUSH bool False ;
+                      DIG 5 ;
+                      GET 10 ;
+                      SENDER ;
+                      GET ;
+                      { IF_NONE { PUSH int 188 ; FAILWITH } {} } ;
+                      CAR ;
+                      { IF_NONE { PUSH int 190 ; FAILWITH } {} } ;
+                      UPDATE ;
+                      UPDATE 1 ;
+                      DUG 2 }
+                    {} ;
+                 DIG 2 ;
+                 DUP ;
+                 GET 10 ;
+                 DUP ;
+                 SENDER ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 191 ; FAILWITH } {} } ;
+                 DUP 6 ;
+                 GET 3 ;
+                 SOME ;
+                 UPDATE 1 ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 10 ;
+                 DUP ;
+                 CAR ;
+                 PUSH bool True ;
+                 DUP 5 ;
+                 GET 3 ;
+                 UPDATE ;
+                 UPDATE 1 ;
+                 DUP ;
+                 GET 7 ;
+                 DUP 3 ;
+                 SOME ;
+                 DUP 5 ;
+                 GET 3 ;
+                 UPDATE ;
+                 UPDATE 7 ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 SELF_ADDRESS ;
+                 DUP 4 ;
+                 CAR ;
+                 PAIR 3 ;
+                 PACK ;
+                 DUP 3 ;
+                 GET 4 ;
+                 ITER { DUP 5 ;
+                        GET 10 ;
+                        SWAP ;
+                        DUP ;
+                        DUG 2 ;
+                        CDR ;
+                        MEM ;
+                        IF {} { PUSH string "MULTISIG_SignerUnknown" ; FAILWITH } ;
+                        SWAP ;
+                        DUP ;
+                        DUG 2 ;
+                        SWAP ;
+                        DUP ;
+                        DUG 2 ;
+                        CAR ;
+                        DUP 7 ;
+                        GET 10 ;
+                        DUP 4 ;
+                        CDR ;
+                        GET ;
+                        { IF_NONE { PUSH int 211 ; FAILWITH } {} } ;
+                        CDR ;
+                        CHECK_SIGNATURE ;
+                        IF {} { PUSH string "MULTISIG_Badsig" ; FAILWITH } ;
+                        DIG 2 ;
+                        DUP ;
+                        GET 3 ;
+                        PUSH bool True ;
+                        DIG 3 ;
+                        CDR ;
+                        UPDATE ;
+                        UPDATE 3 ;
+                        SWAP } ;
+                 DROP ;
+                 DUP 3 ;
+                 GET 9 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 SIZE ;
+                 COMPARE ;
+                 GE ;
+                 IF { DIG 3 ;
+                      DROP ;
+                      SWAP ;
+                      GET 3 ;
+                      SWAP ;
+                      CAR ;
+                      PAIR ;
+                      PAIR ;
+                      EXEC ;
+                      DUP ;
+                      GET 4 ;
+                      SWAP ;
+                      CAR ;
+                      NIL operation ;
+                      SWAP ;
+                      ITER { CONS } }
+                    { DROP 2 ; SWAP ; DROP ; SWAP ; DROP ; NIL operation } } }
+           { IF_LEFT
+               { DIG 2 ;
+                 DROP ;
+                 DIG 2 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 10 ;
+                 SENDER ;
+                 MEM ;
+                 IF {} { PUSH string "MULTISIG_SignerUnknown" ; FAILWITH } ;
+                 SENDER ;
+                 DUP 3 ;
+                 GET 7 ;
+                 DUP 3 ;
+                 GET ;
+                 { IF_NONE { PUSH int 267 ; FAILWITH } {} } ;
+                 GET 5 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "MULTISIG_NotInitiator" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 CAR ;
+                 PUSH bool False ;
+                 DIG 3 ;
+                 UPDATE ;
+                 UPDATE 1 ;
+                 NIL operation }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 10 ;
+                     SENDER ;
+                     MEM ;
+                     IF {} { PUSH string "MULTISIG_SignerUnknown" ; FAILWITH } ;
+                     DUP ;
+                     NIL operation ;
+                     SWAP ;
+                     ITER { DUP 5 ;
+                            DIG 4 ;
+                            SENDER ;
+                            DUP 4 ;
+                            PAIR ;
+                            PAIR ;
+                            EXEC ;
+                            DUP ;
+                            GET 4 ;
+                            DUG 4 ;
+                            DUP ;
+                            CAR ;
+                            ITER { DIG 3 ; SWAP ; CONS ; DUG 2 } ;
+                            DIG 4 ;
+                            DUP ;
+                            GET 9 ;
+                            SWAP ;
+                            DUP ;
+                            DUG 6 ;
+                            GET 7 ;
+                            DUP 4 ;
+                            GET ;
+                            { IF_NONE { PUSH int 159 ; FAILWITH } {} } ;
+                            GET 3 ;
+                            SIZE ;
+                            COMPARE ;
+                            GE ;
+                            IF { DUP 7 ;
+                                 DUP 6 ;
+                                 DUP 4 ;
+                                 DIG 7 ;
+                                 GET 7 ;
+                                 DUP 6 ;
+                                 GET ;
+                                 { IF_NONE { PUSH int 159 ; FAILWITH } {} } ;
+                                 CAR ;
+                                 PAIR ;
+                                 PAIR ;
+                                 EXEC ;
+                                 DUP ;
+                                 GET 4 ;
+                                 DUG 5 ;
+                                 DUP ;
+                                 CAR ;
+                                 ITER { DIG 4 ; SWAP ; CONS ; DUG 3 } ;
+                                 DROP 3 }
+                               { DROP 2 } } ;
+                     SWAP ;
+                     DROP ;
+                     DIG 2 ;
+                     DROP ;
+                     DIG 2 ;
+                     DROP }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 10 ;
+                     SENDER ;
+                     MEM ;
+                     IF {} { PUSH string "MULTISIG_SignerUnknown" ; FAILWITH } ;
+                     NONE nat ;
+                     DUP 3 ;
+                     GET 10 ;
+                     SENDER ;
+                     GET ;
+                     { IF_NONE { PUSH int 114 ; FAILWITH } {} } ;
+                     CAR ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          DUP ;
+                          CAR ;
+                          PUSH bool False ;
+                          DIG 4 ;
+                          GET 10 ;
+                          SENDER ;
+                          GET ;
+                          { IF_NONE { PUSH int 114 ; FAILWITH } {} } ;
+                          CAR ;
+                          { IF_NONE { PUSH int 116 ; FAILWITH } {} } ;
+                          UPDATE ;
+                          UPDATE 1 ;
+                          SWAP }
+                        {} ;
+                     SWAP ;
+                     DUP ;
+                     GET 3 ;
+                     PUSH nat 1 ;
+                     ADD ;
+                     UPDATE 3 ;
+                     DUP ;
+                     DUG 2 ;
+                     DUP ;
+                     CAR ;
+                     PUSH bool True ;
+                     DIG 4 ;
+                     GET 3 ;
+                     UPDATE ;
+                     UPDATE 1 ;
+                     DUP ;
+                     DUG 2 ;
+                     DUP ;
+                     GET 7 ;
+                     NOW ;
+                     SENDER ;
+                     EMPTY_SET address ;
+                     PUSH bool True ;
+                     SENDER ;
+                     UPDATE ;
+                     DUP 6 ;
+                     PAIR 4 ;
+                     SOME ;
+                     DIG 4 ;
+                     GET 3 ;
+                     UPDATE ;
+                     UPDATE 7 ;
+                     DUP ;
+                     DUG 2 ;
+                     DUP ;
+                     GET 10 ;
+                     DUP ;
+                     SENDER ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     { IF_NONE { PUSH int 130 ; FAILWITH } {} } ;
+                     DIG 5 ;
+                     GET 3 ;
+                     SOME ;
+                     UPDATE 1 ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 10 ;
+                     SWAP ;
+                     PUSH nat 2 ;
+                     DUP 3 ;
+                     GET 9 ;
+                     COMPARE ;
+                     LT ;
+                     IF { DIG 2 ;
+                          DROP ;
+                          DUG 2 ;
+                          DUP ;
+                          GET 3 ;
+                          DIG 3 ;
+                          PAIR ;
+                          PAIR ;
+                          EXEC ;
+                          DUP ;
+                          GET 4 ;
+                          SWAP ;
+                          CAR ;
+                          NIL operation ;
+                          SWAP ;
+                          ITER { CONS } }
+                        { DROP ; SWAP ; DROP ; SWAP ; DROP ; NIL operation } } } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

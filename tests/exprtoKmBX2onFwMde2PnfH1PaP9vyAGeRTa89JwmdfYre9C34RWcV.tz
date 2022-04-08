@@ -1,0 +1,197 @@
+{ storage
+    (pair (pair (nat %USDPrice) (set %keysset address))
+          (pair (address %owner) (pair (address %securities) (set %validator address)))) ;
+  parameter
+    (or (or (address %SecuritiesExercise)
+            (or (pair %SecuritiesPurchase (address %address) (nat %duration))
+                (pair %ValidatorOperation (nat %Operation) (address %address))))
+        (or (pair %addDataContributor (nat %Operation) (address %contributor))
+            (or (address %changeSecurities) (nat %feedData)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { NIL operation ;
+                 DUP 3 ;
+                 GET 5 ;
+                 CONTRACT %OracleExerciseSecurity (pair (address %owner) (nat %price)) ;
+                 IF_NONE
+                   { PUSH string " call to exercised security on PUT contract failed" ;
+                     FAILWITH }
+                   {} ;
+                 PUSH mutez 0 ;
+                 DUP 5 ;
+                 CAR ;
+                 CAR ;
+                 DIG 4 ;
+                 PAIR %owner %price ;
+                 TRANSFER_TOKENS ;
+                 CONS }
+               { IF_LEFT
+                   { NIL operation ;
+                     DUP 3 ;
+                     GET 5 ;
+                     CONTRACT %OraclePurchaseSecurity
+                       (pair (address %address) (pair (nat %duration) (nat %price))) ;
+                     IF_NONE
+                       { PUSH string "Call to purchased PUT Option contract failed" ; FAILWITH }
+                       {} ;
+                     PUSH mutez 0 ;
+                     DUP 5 ;
+                     CAR ;
+                     CAR ;
+                     DUP 5 ;
+                     CDR ;
+                     PAIR %duration %price ;
+                     DIG 4 ;
+                     CAR ;
+                     PAIR %address ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "Only Governance Contract will ADD or REMOVE vault factory Contract " ;
+                          FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     PUSH nat 1 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { SWAP ;
+                          UNPAIR ;
+                          SWAP ;
+                          UNPAIR ;
+                          SWAP ;
+                          UNPAIR ;
+                          SWAP ;
+                          PUSH bool True ;
+                          DIG 5 ;
+                          CDR ;
+                          UPDATE ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          GET 6 ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          MEM ;
+                          IF {}
+                             { PUSH string "Address is not present in factory contract list" ; FAILWITH } ;
+                          SWAP ;
+                          UNPAIR ;
+                          SWAP ;
+                          UNPAIR ;
+                          SWAP ;
+                          UNPAIR ;
+                          SWAP ;
+                          PUSH bool False ;
+                          DIG 5 ;
+                          CDR ;
+                          UPDATE ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR } ;
+                     NIL operation } } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Only Admin will update Contributor" ; FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 PUSH nat 1 ;
+                 COMPARE ;
+                 EQ ;
+                 IF { SWAP ;
+                      UNPAIR ;
+                      UNPAIR ;
+                      SWAP ;
+                      PUSH bool True ;
+                      DIG 4 ;
+                      CDR ;
+                      UPDATE ;
+                      SWAP ;
+                      PAIR ;
+                      PAIR }
+                    { SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CAR ;
+                      CDR ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CDR ;
+                      MEM ;
+                      IF {} { PUSH string "Address is not present as contributor" ; FAILWITH } ;
+                      SWAP ;
+                      UNPAIR ;
+                      UNPAIR ;
+                      SWAP ;
+                      PUSH bool False ;
+                      DIG 4 ;
+                      CDR ;
+                      UPDATE ;
+                      SWAP ;
+                      PAIR ;
+                      PAIR } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "Only Governance Contract will Change Securities Contract" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DIG 3 ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     MEM ;
+                     IF {}
+                        { PUSH string "User Doesn't have permission to Update Price" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     CDR ;
+                     DIG 2 ;
+                     PAIR ;
+                     PAIR } } ;
+             NIL operation } ;
+         PAIR } }

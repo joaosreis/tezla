@@ -1,0 +1,165 @@
+{ parameter unit ;
+  storage address ;
+  code { DROP ;
+         NIL operation ;
+         PUSH (pair (pair (pair (pair (map string bytes)
+                                      (lambda
+                                         (pair (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                     (pair (pair timestamp nat) (list (pair address nat))))
+                                               (pair (pair (pair (pair address (map string bytes))
+                                                                 (pair (big_map (pair address nat) nat) (big_map string bytes)))
+                                                           (pair (pair (or unit (or address address)) (big_map (pair address address) unit))
+                                                                 (pair address nat)))
+                                                     (pair (pair (pair (set (pair timestamp bytes))
+                                                                       (big_map
+                                                                          bytes
+                                                                          (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                                                (pair (pair timestamp nat) (list (pair address nat))))))
+                                                                 (pair nat address))
+                                                           nat)))
+                                         (pair (list operation)
+                                               (pair (pair (pair (pair address (map string bytes))
+                                                                 (pair (big_map (pair address nat) nat) (big_map string bytes)))
+                                                           (pair (pair (or unit (or address address)) (big_map (pair address address) unit))
+                                                                 (pair address nat)))
+                                                     (pair (pair (pair (set (pair timestamp bytes))
+                                                                       (big_map
+                                                                          bytes
+                                                                          (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                                                (pair (pair timestamp nat) (list (pair address nat))))))
+                                                                 (pair nat address))
+                                                           nat)))))
+                                (pair nat nat))
+                          (pair (pair nat nat) (pair nat nat)))
+                    (pair (lambda
+                             (pair (pair nat (map string bytes))
+                                   (pair (pair (pair (pair address (map string bytes))
+                                                     (pair (big_map (pair address nat) nat) (big_map string bytes)))
+                                               (pair (pair (or unit (or address address)) (big_map (pair address address) unit))
+                                                     (pair address nat)))
+                                         (pair (pair (pair (set (pair timestamp bytes))
+                                                           (big_map
+                                                              bytes
+                                                              (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                                    (pair (pair timestamp nat) (list (pair address nat))))))
+                                                     (pair nat address))
+                                               nat)))
+                             bool)
+                          (lambda
+                             (pair (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                         (pair (pair timestamp nat) (list (pair address nat))))
+                                   (pair (pair (pair (pair address (map string bytes))
+                                                     (pair (big_map (pair address nat) nat) (big_map string bytes)))
+                                               (pair (pair (or unit (or address address)) (big_map (pair address address) unit))
+                                                     (pair address nat)))
+                                         (pair (pair (pair (set (pair timestamp bytes))
+                                                           (big_map
+                                                              bytes
+                                                              (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                                    (pair (pair timestamp nat) (list (pair address nat))))))
+                                                     (pair nat address))
+                                               nat)))
+                             nat)))
+              (Pair (Pair (Pair (Pair {}
+                                      { { DUP ; CAR ; DIP { CDR } } ; DROP ; NIL operation ; PAIR })
+                                (Pair 500 1000))
+                          (Pair (Pair 1000 2592000) (Pair 1 1)))
+                    (Pair { DROP ; PUSH bool True } { DROP ; PUSH nat 0 })) ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter
+               (or (or (pair %callCustom string bytes)
+                       (or (or (or (or (unit %accept_ownership)
+                                       (pair %burn (address %from_) (pair (nat %token_id) (nat %amount))))
+                                   (or (or %call_FA2
+                                          (or (pair %balance_of
+                                                 (list %requests (pair (address %owner) (nat %token_id)))
+                                                 (contract %callback
+                                                    (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                                              (list %transfer
+                                                 (pair (address %from_)
+                                                       (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))
+                                          (list %update_operators
+                                             (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                                                 (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))))
+                                       (unit %confirm_migration)))
+                               (or (or (bytes %drop_proposal) (nat %flush))
+                                   (or (pair %getVotePermitCounter (unit %param) (contract %callback nat))
+                                       (address %migrate))))
+                           (or (or (or (pair %mint (address %to_) (pair (nat %token_id) (nat %amount)))
+                                       (pair %propose (nat %frozen_token) (map %proposal_metadata string bytes)))
+                                   (or (nat %set_quorum_threshold) (nat %set_voting_period)))
+                               (or (address %transfer_ownership)
+                                   (list %vote
+                                      (pair (pair %argument (bytes %proposal_key) (pair (bool %vote_type) (nat %vote_amount)))
+                                            (option %permit (pair (key %key) (signature %signature)))))))))
+                   (pair %transfer_contract_tokens
+                      (address %contract_address)
+                      (list %params
+                         (pair (address %from_)
+                               (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))) ;
+             storage
+               (pair (pair (pair (pair (map string bytes)
+                                       (lambda
+                                          (pair (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                      (pair (pair timestamp nat) (list (pair address nat))))
+                                                (pair (pair (pair (pair address (map string bytes))
+                                                                  (pair (big_map (pair address nat) nat) (big_map string bytes)))
+                                                            (pair (pair (or unit (or address address)) (big_map (pair address address) unit))
+                                                                  (pair address nat)))
+                                                      (pair (pair (pair (set (pair timestamp bytes))
+                                                                        (big_map
+                                                                           bytes
+                                                                           (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                                                 (pair (pair timestamp nat) (list (pair address nat))))))
+                                                                  (pair nat address))
+                                                            nat)))
+                                          (pair (list operation)
+                                                (pair (pair (pair (pair address (map string bytes))
+                                                                  (pair (big_map (pair address nat) nat) (big_map string bytes)))
+                                                            (pair (pair (or unit (or address address)) (big_map (pair address address) unit))
+                                                                  (pair address nat)))
+                                                      (pair (pair (pair (set (pair timestamp bytes))
+                                                                        (big_map
+                                                                           bytes
+                                                                           (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                                                 (pair (pair timestamp nat) (list (pair address nat))))))
+                                                                  (pair nat address))
+                                                            nat)))))
+                                 (pair nat nat))
+                           (pair (pair nat nat) (pair nat nat)))
+                     (pair (lambda
+                              (pair (pair nat (map string bytes))
+                                    (pair (pair (pair (pair address (map string bytes))
+                                                      (pair (big_map (pair address nat) nat) (big_map string bytes)))
+                                                (pair (pair (or unit (or address address)) (big_map (pair address address) unit))
+                                                      (pair address nat)))
+                                          (pair (pair (pair (set (pair timestamp bytes))
+                                                            (big_map
+                                                               bytes
+                                                               (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                                     (pair (pair timestamp nat) (list (pair address nat))))))
+                                                      (pair nat address))
+                                                nat)))
+                              bool)
+                           (lambda
+                              (pair (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                          (pair (pair timestamp nat) (list (pair address nat))))
+                                    (pair (pair (pair (pair address (map string bytes))
+                                                      (pair (big_map (pair address nat) nat) (big_map string bytes)))
+                                                (pair (pair (or unit (or address address)) (big_map (pair address address) unit))
+                                                      (pair address nat)))
+                                          (pair (pair (pair (set (pair timestamp bytes))
+                                                            (big_map
+                                                               bytes
+                                                               (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                                                     (pair (pair timestamp nat) (list (pair address nat))))))
+                                                      (pair nat address))
+                                                nat)))
+                              nat))) ;
+             code { PUSH string "FA2_INSUFFICIENT_BALANCE" ; FAILWITH } } ;
+         SWAP ;
+         DIP { CONS } ;
+         SWAP ;
+         PAIR } }

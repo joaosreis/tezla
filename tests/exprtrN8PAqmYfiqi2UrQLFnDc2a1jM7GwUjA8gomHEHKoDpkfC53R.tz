@@ -1,7 +1,0 @@
-{ parameter (lambda (set nat) (set nat)) ;
-  storage (set nat) ;
-  code { { { DUP ; CAR ; DIP { CDR } } } ;
-         SWAP ;
-         EXEC ;
-         NIL operation ;
-         PAIR } }

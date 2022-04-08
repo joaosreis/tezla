@@ -1,0 +1,3 @@
+{ parameter bytes ;
+  storage bytes ;
+  code { UNPAIR ; SWAP ; DROP ; NIL operation ; PAIR } }

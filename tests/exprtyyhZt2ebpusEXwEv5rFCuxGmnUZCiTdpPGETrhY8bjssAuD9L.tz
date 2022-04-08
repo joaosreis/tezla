@@ -1,0 +1,441 @@
+{ storage
+    (pair (pair (pair (big_map %allowed address (map address nat)) (big_map %balances address nat))
+                (pair (int %decimals) (bool %locked)))
+          (pair (pair (string %name) (option %newOwner address))
+                (pair (address %owner) (pair (string %symbol) (int %totalSupply))))) ;
+  parameter
+    (or (or (or (unit %acceptOwnership) (pair %approve (address %spender) (nat %tokens)))
+            (or (unit %lock) (string %setName)))
+        (or (or (string %setSymbol) (pair %transfer (address %destination) (nat %tokens)))
+            (or (pair %transferFrom (address %_from) (pair (address %_to) (nat %tokens)))
+                (or (address %transferOwnerShip) (unit %unlock))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DROP ;
+                     DUP ;
+                     GET 5 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: self.data.owner == sp.sender" ; FAILWITH } ;
+                     DUP ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     IF_NONE
+                       { PUSH string "WrongCondition: self.data.newOwner.is_some()" ; FAILWITH }
+                       { DROP } ;
+                     DUP ;
+                     GET 5 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     IF_NONE { PUSH string "Unexpected_error" ; FAILWITH } {} ;
+                     COMPARE ;
+                     NEQ ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: self.data.newOwner.open_some(message = 'Unexpected_error') != self.data.owner" ;
+                          FAILWITH } ;
+                     DUP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DIG 3 ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     IF_NONE { PUSH string "Unexpected_error" ; FAILWITH } {} ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     CAR ;
+                     NONE address ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     DUP ;
+                     SENDER ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 127 ; FAILWITH } {} ;
+                     DUP 7 ;
+                     CDR ;
+                     SOME ;
+                     DIG 7 ;
+                     CAR ;
+                     UPDATE ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR } }
+               { IF_LEFT
+                   { DROP ;
+                     DUP ;
+                     GET 5 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.owner" ; FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     PUSH bool False ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "WrongCondition: self.data.locked == False" ; FAILWITH } ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     PUSH bool True ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.owner" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     IF { PUSH string "WrongCondition: ~ self.data.locked" ; FAILWITH } {} ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     CDR ;
+                     DIG 3 ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.owner" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     IF { PUSH string "WrongCondition: ~ self.data.locked" ; FAILWITH } {} ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DIG 4 ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     MEM ;
+                     IF {}
+                        { SWAP ;
+                          UNPAIR ;
+                          UNPAIR ;
+                          UNPAIR ;
+                          SWAP ;
+                          PUSH (option nat) (Some 0) ;
+                          DUP 6 ;
+                          CAR ;
+                          UPDATE ;
+                          SWAP ;
+                          PAIR ;
+                          PAIR ;
+                          PAIR ;
+                          SWAP } ;
+                     SENDER ;
+                     DUP 3 ;
+                     GET 5 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { PUSH bool True } { SWAP ; DUP ; DUG 2 ; CAR ; CDR ; CDR ; NOT } ;
+                     IF { DUP ;
+                          CDR ;
+                          DUP 3 ;
+                          CAR ;
+                          CAR ;
+                          CDR ;
+                          SENDER ;
+                          GET ;
+                          IF_NONE { PUSH int 118 ; FAILWITH } {} ;
+                          COMPARE ;
+                          GE }
+                        { PUSH bool False } ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: ((self.data.owner == sp.sender) | (~ self.data.locked)) & (self.data.balances[sp.sender] >= params.tokens)" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP 5 ;
+                     CDR ;
+                     DIG 6 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     GET ;
+                     IF_NONE { PUSH int 122 ; FAILWITH } {} ;
+                     SUB ;
+                     ISNAT ;
+                     IF_NONE { PUSH int 122 ; FAILWITH } {} ;
+                     SOME ;
+                     SENDER ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUP 6 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 123 ; FAILWITH } {} ;
+                     DIG 6 ;
+                     CDR ;
+                     ADD ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR } }
+               { IF_LEFT
+                   { SENDER ;
+                     DUP 3 ;
+                     GET 5 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { PUSH bool True }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CAR ;
+                          CDR ;
+                          CDR ;
+                          IF { PUSH bool False }
+                             { DUP ;
+                               CAR ;
+                               SENDER ;
+                               COMPARE ;
+                               EQ ;
+                               IF { PUSH bool True }
+                                  { DUP ;
+                                    GET 4 ;
+                                    DUP 3 ;
+                                    CAR ;
+                                    CAR ;
+                                    CAR ;
+                                    DUP 3 ;
+                                    CAR ;
+                                    GET ;
+                                    IF_NONE { PUSH int 133 ; FAILWITH } {} ;
+                                    SENDER ;
+                                    GET ;
+                                    IF_NONE { PUSH int 133 ; FAILWITH } {} ;
+                                    COMPARE ;
+                                    GE } } } ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: (self.data.owner == sp.sender) | ((~ self.data.locked) & ((params._from == sp.sender) | (self.data.allowed[params._from][sp.sender] >= params.tokens)))" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP 5 ;
+                     GET 4 ;
+                     DIG 6 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     DUP 7 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 138 ; FAILWITH } {} ;
+                     SUB ;
+                     ISNAT ;
+                     IF_NONE { PUSH int 138 ; FAILWITH } {} ;
+                     SOME ;
+                     DUP 6 ;
+                     CAR ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     DUP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     DUP ;
+                     DUP 6 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 140 ; FAILWITH } {} ;
+                     DUP 7 ;
+                     GET 4 ;
+                     DIG 8 ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     DUP 9 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 140 ; FAILWITH } {} ;
+                     SENDER ;
+                     GET ;
+                     IF_NONE { PUSH int 140 ; FAILWITH } {} ;
+                     SUB ;
+                     ISNAT ;
+                     IF_NONE { PUSH int 140 ; FAILWITH } {} ;
+                     SOME ;
+                     SENDER ;
+                     UPDATE ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUP 6 ;
+                     GET 3 ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 142 ; FAILWITH } {} ;
+                     DIG 6 ;
+                     GET 4 ;
+                     ADD ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR }
+                   { IF_LEFT
+                       { SWAP ;
+                         UNPAIR ;
+                         SWAP ;
+                         UNPAIR ;
+                         CAR ;
+                         DIG 3 ;
+                         SOME ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR }
+                       { DROP ;
+                         DUP ;
+                         GET 5 ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.sender == self.data.owner" ; FAILWITH } ;
+                         DUP ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         PUSH bool True ;
+                         COMPARE ;
+                         EQ ;
+                         IF {} { PUSH string "WrongCondition: self.data.locked == True" ; FAILWITH } ;
+                         UNPAIR ;
+                         UNPAIR ;
+                         SWAP ;
+                         CAR ;
+                         PUSH bool False ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR } } } } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,10 @@
+{ storage int ;
+  parameter (unit %khali) ;
+  code { CDR ;
+         DUP ;
+         PUSH int 0 ;
+         COMPARE ;
+         LT ;
+         IF {} { PUSH string "WrongCondition: self.data.value > 0" ; FAILWITH } ;
+         NIL operation ;
+         PAIR } }

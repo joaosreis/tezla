@@ -1,0 +1,3 @@
+{ storage int ;
+  parameter bls12_381_fr ;
+  code { CDR ; NIL operation ; PAIR } }

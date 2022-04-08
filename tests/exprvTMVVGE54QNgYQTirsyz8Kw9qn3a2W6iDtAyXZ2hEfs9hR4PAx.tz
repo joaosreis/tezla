@@ -1,0 +1,11 @@
+{ parameter (contract address) ;
+  storage nat ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         SWAP ;
+         NIL operation ;
+         DIG 2 ;
+         PUSH mutez 0 ;
+         SELF_ADDRESS ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

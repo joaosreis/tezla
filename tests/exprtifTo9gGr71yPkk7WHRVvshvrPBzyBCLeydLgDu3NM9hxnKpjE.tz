@@ -1,0 +1,54 @@
+{ parameter (sapling_transaction 8) ;
+  storage
+    (pair (big_map %secrets nat (sapling_transaction 8))
+          (pair (nat %current_id) (sapling_state %state 8))) ;
+  code { PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         EQ ;
+         IF {} { PUSH string "failed assertion" ; FAILWITH } ;
+         UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         SAPLING_EMPTY_STATE 8 ;
+         DIG 4 ;
+         DUP ;
+         DUG 5 ;
+         SAPLING_VERIFY_UPDATE ;
+         IF_NONE { PUSH string "failed" ; FAILWITH } {} ;
+         UNPAIR ;
+         SWAP ;
+         DROP ;
+         PUSH int 1000 ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         COMPARE ;
+         GT ;
+         PUSH int 0 ;
+         DIG 2 ;
+         COMPARE ;
+         LT ;
+         AND ;
+         IF { DIG 3 ; DROP ; PUSH string "failed" ; FAILWITH }
+            { DIG 2 ;
+              DUP ;
+              DUG 3 ;
+              DIG 4 ;
+              SOME ;
+              DIG 2 ;
+              DUP ;
+              DUG 3 ;
+              GET_AND_UPDATE ;
+              DROP 2 } ;
+         SWAP ;
+         PUSH nat 1 ;
+         DIG 2 ;
+         ADD ;
+         PAIR ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

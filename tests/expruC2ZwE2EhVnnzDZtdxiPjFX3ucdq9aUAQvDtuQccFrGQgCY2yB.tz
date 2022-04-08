@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (list unit) ;
+  code { DUP ; CAR ; DIP { CDR } ; CONS ; NIL operation ; PAIR } }

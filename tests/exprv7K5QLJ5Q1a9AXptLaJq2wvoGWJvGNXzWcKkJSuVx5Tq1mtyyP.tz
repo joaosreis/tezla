@@ -1,0 +1,108 @@
+{ parameter
+    (or (or (option %oven_delegate key_hash) (unit %default))
+        (or (or %oven_edit_depositor (pair %allow_account bool address) (bool %allow_any))
+            (pair %oven_withdraw mutez (contract unit)))) ;
+  storage
+    (pair (pair (address %admin) (or %depositors (unit %any) (set %whitelist address)))
+          (pair %handle (nat %id) (address %owner))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP 2 ; PUSH nat 1002 ; FAILWITH }
+                    { SWAP ; NIL operation ; DIG 2 ; SET_DELEGATE ; CONS ; PAIR } }
+               { DROP ;
+                 DUP ;
+                 CAR ;
+                 CDR ;
+                 IF_LEFT { DROP ; PUSH bool True } { SENDER ; MEM } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 OR ;
+                 IF { DUP ;
+                      CAR ;
+                      CAR ;
+                      CONTRACT %register_deposit
+                        (pair (pair %handle (nat %id) (address %owner)) (mutez %amount)) ;
+                      IF_NONE { PUSH nat 1003 ; FAILWITH } {} ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      NIL operation ;
+                      DIG 2 ;
+                      PUSH mutez 0 ;
+                      AMOUNT ;
+                      DIG 5 ;
+                      CDR ;
+                      PAIR ;
+                      TRANSFER_TOKENS ;
+                      CONS ;
+                      PAIR }
+                    { DROP ; PUSH nat 1004 ; FAILWITH } } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP 2 ; PUSH nat 1006 ; FAILWITH }
+                    { IF_LEFT
+                        { UNPAIR ;
+                          DUP 3 ;
+                          CAR ;
+                          CDR ;
+                          IF_LEFT
+                            { DROP 3 ; PUSH nat 1005 ; FAILWITH }
+                            { SWAP ;
+                              IF { SWAP ; PUSH bool True ; SWAP ; UPDATE }
+                                 { SWAP ; PUSH bool False ; SWAP ; UPDATE } ;
+                              RIGHT unit } }
+                        { IF { PUSH unit Unit ; LEFT (set address) }
+                             { EMPTY_SET address ; RIGHT unit } } ;
+                      SWAP ;
+                      DUP ;
+                      DUG 2 ;
+                      CDR ;
+                      SWAP ;
+                      DIG 2 ;
+                      CAR ;
+                      CAR ;
+                      PAIR ;
+                      PAIR ;
+                      NIL operation ;
+                      PAIR } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP 2 ; PUSH nat 1001 ; FAILWITH }
+                    { SWAP ;
+                      NIL operation ;
+                      DUP 3 ;
+                      CDR ;
+                      DIG 3 ;
+                      CAR ;
+                      UNIT ;
+                      TRANSFER_TOKENS ;
+                      CONS ;
+                      PAIR } } } } }

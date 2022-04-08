@@ -1,0 +1,16 @@
+{ storage string ;
+  parameter (pair (string %note) (address %reciever)) ;
+  code { CAR ;
+         DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         CONTRACT unit ;
+         IF_NONE { PUSH int 11 ; FAILWITH } {} ;
+         NIL operation ;
+         SWAP ;
+         AMOUNT ;
+         UNIT ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

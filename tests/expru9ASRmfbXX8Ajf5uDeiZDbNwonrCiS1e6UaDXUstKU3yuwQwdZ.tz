@@ -1,0 +1,29 @@
+{ parameter
+    (or (ticket %burn unit)
+        (pair %mint (contract %destination (ticket unit)) (nat %amount))) ;
+  storage address ;
+  code { AMOUNT ;
+         PUSH mutez 0 ;
+         { { COMPARE ; EQ } ; IF {} { { UNIT ; FAILWITH } } } ;
+         UNPAIR ;
+         IF_LEFT
+           { READ_TICKET ;
+             CAR ;
+             SELF_ADDRESS ;
+             { { COMPARE ; EQ } ; IF {} { { UNIT ; FAILWITH } } } ;
+             DROP ;
+             NIL operation }
+           { DUP @manager 2 ;
+             SENDER ;
+             { { COMPARE ; EQ } ; IF {} { { UNIT ; FAILWITH } } } ;
+             UNPAIR ;
+             SWAP ;
+             UNIT ;
+             TICKET ;
+             PUSH mutez 0 ;
+             SWAP ;
+             TRANSFER_TOKENS ;
+             NIL operation ;
+             SWAP ;
+             CONS } ;
+         PAIR } }

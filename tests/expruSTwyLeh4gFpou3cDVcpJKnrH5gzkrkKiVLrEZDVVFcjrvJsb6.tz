@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (pair bool (set address)) ;
+  code { CDR ; NIL operation ; PAIR } }

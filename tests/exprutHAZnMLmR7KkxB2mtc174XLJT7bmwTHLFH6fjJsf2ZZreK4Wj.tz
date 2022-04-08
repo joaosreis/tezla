@@ -1,0 +1,30 @@
+{ parameter
+    (or (contract %getPrice nat) (or %update (nat %store) (timestamp %timestamp))) ;
+  storage (pair (pair nat timestamp) address) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             NIL operation ;
+             DIG 2 ;
+             PUSH mutez 0 ;
+             DIG 4 ;
+             CAR ;
+             CAR ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             PAIR }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "Not allowed" ; FAILWITH } {} ;
+             IF_LEFT
+               { SWAP ; DUP ; DUG 2 ; CDR ; DIG 2 ; CAR ; CDR ; DIG 2 ; PAIR ; PAIR }
+               { SWAP ; DUP ; DUG 2 ; CDR ; SWAP ; DIG 2 ; CAR ; CAR ; PAIR ; PAIR } ;
+             NIL operation ;
+             PAIR } } }

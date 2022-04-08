@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage unit ;
+  code { PUSH mutez 0 ; PUSH mutez 1 ; SUB ; PUSH string "bye" ; FAILWITH } }

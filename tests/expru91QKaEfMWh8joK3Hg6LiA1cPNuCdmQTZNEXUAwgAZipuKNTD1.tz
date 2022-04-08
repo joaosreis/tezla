@@ -1,0 +1,26 @@
+{ parameter (timestamp %d) ;
+  storage int ;
+  code { UNPAIR ;
+         PUSH int 86400 ;
+         PUSH int 604800 ;
+         PUSH int 345600 ;
+         PUSH timestamp 0 ;
+         DIG 4 ;
+         DUP ;
+         DUG 5 ;
+         SUB ;
+         ADD ;
+         EDIV ;
+         IF_NONE
+           { PUSH string "DivByZero" ; FAILWITH }
+           { DUP ; CDR ; SWAP ; DROP 1 } ;
+         INT ;
+         EDIV ;
+         IF_NONE
+           { PUSH string "DivByZero" ; FAILWITH }
+           { DUP ; CAR ; SWAP ; DROP 1 } ;
+         DIP 1 { DIG 1 ; DROP 1 } ;
+         DUG 1 ;
+         DROP 1 ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,21 @@
+{ storage nat ;
+  parameter (timestamp %d) ;
+  code { UNPAIR ;
+         PUSH int 86400 ;
+         PUSH int 604800 ;
+         EDIV ;
+         IF_NONE { PUSH string "DivByZero" ; FAILWITH } { DUP ; CAR ; SWAP ; DROP } ;
+         PUSH int 259200 ;
+         PUSH timestamp 0 ;
+         DIG 3 ;
+         DUP ;
+         DUG 4 ;
+         SUB ;
+         ADD ;
+         EDIV ;
+         IF_NONE { PUSH string "DivByZero" ; FAILWITH } { DUP ; CDR ; SWAP ; DROP } ;
+         DIP { DIG 1 ; DROP } ;
+         DUG 1 ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

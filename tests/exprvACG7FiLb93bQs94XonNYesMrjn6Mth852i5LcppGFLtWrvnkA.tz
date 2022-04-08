@@ -1,0 +1,8 @@
+{ storage (map nat nat) ;
+  parameter (or (pair %add (nat %key) (nat %value)) (nat %remove)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DUP ; DUG 2 ; CDR ; SOME ; DIG 2 ; CAR ; UPDATE }
+           { SWAP ; NONE nat ; DIG 2 ; UPDATE } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,33 @@
+{ parameter bytes ;
+  storage bytes ;
+  code { CAR ;
+         LAMBDA
+           bytes
+           bytes
+           { DUP ;
+             BLAKE2B ;
+             SIZE ;
+             PUSH nat 32 ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: sp.len(sp.blake2b(lparams_0)) == 32" ;
+                  FAILWITH } ;
+             DUP ;
+             BLAKE2B ;
+             PUSH bytes 0x050a00000020 ;
+             CONCAT ;
+             UNPACK bls12_381_fr ;
+             { IF_NONE
+                 { BLAKE2B ; PUSH bytes 0x050a00000020 ; CONCAT }
+                 { DROP ;
+                   BLAKE2B ;
+                   PUSH bytes 0x050a00000020 ;
+                   CONCAT ;
+                   UNPACK bls12_381_fr ;
+                   { IF_NONE { PUSH int 18 ; FAILWITH } {} } ;
+                   PACK } } } ;
+         SWAP ;
+         EXEC ;
+         NIL operation ;
+         PAIR } }

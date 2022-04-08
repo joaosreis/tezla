@@ -1,0 +1,1979 @@
+{ parameter
+    (or (or (or (or (pair %approve (address %spender) (nat %value))
+                    (pair %burn (address %address) (pair (nat %amount) (string %partition))))
+                (or (list %burnMultiple (pair (address %address) (pair (nat %amount) (string %partition))))
+                    (pair %getAllowance (pair (address %owner) (address %spender)) (contract nat))))
+            (or (or (pair %getBalance address (contract nat))
+                    (pair %getTotalSupply unit (contract nat)))
+                (or (address %get_administrator)
+                    (or (pair %mint (address %address) (pair (nat %amount) (string %partition)))
+                        (list %mintMultiple (pair (address %address) (pair (nat %amount) (string %partition))))))))
+        (or (or (or (address %set_administrator) (pair %set_metdata (string %k) (bytes %v)))
+                (or (bool %set_pause) (set %set_unlocked_partitions string)))
+            (or (or (pair %transfer (address %from) (pair (address %to) (nat %value)))
+                    (list %transferMultiple
+                       (pair (pair (string %f_partition) (address %from_))
+                             (pair (string %t_partition) (pair (address %to_) (nat %value))))))
+                (or (list %update_burners
+                       (or (list %add_burners address) (list %remove_burners address)))
+                    (or (list %update_controllers
+                           (or (list %add_controllers address) (list %remove_controllers address)))
+                        (list %update_minters
+                           (or (list %add_minters address) (list %remove_minters address)))))))) ;
+  storage
+    (pair (pair (pair (address %administrator) (pair (set %burners address) (bool %controllable)))
+                (pair (set %controllers address)
+                      (pair (big_map %ledger
+                               (pair address string)
+                               (pair (map %approvals address nat) (nat %balance)))
+                            (big_map %metadata string bytes))))
+          (pair (pair (set %minters address) (pair (bool %operable) (map %partitions string nat)))
+                (pair (pair (bool %paused) (nat %total_supply))
+                      (pair (option %transferlist_address address) (set %unlocked_partitions string))))) ;
+  code { LAMBDA
+           (pair (pair %in_param (address %address) (pair (nat %amount) (string %partition)))
+                 (pair %in_storage
+                    (pair (pair (address %administrator) (pair (set %burners address) (bool %controllable)))
+                          (pair (set %controllers address)
+                                (pair (big_map %ledger
+                                         (pair address string)
+                                         (pair (map %approvals address nat) (nat %balance)))
+                                      (big_map %metadata string bytes))))
+                    (pair (pair (set %minters address) (pair (bool %operable) (map %partitions string nat)))
+                          (pair (pair (bool %paused) (nat %total_supply))
+                                (pair (option %transferlist_address address) (set %unlocked_partitions string))))))
+           (pair (list %operations operation)
+                 (pair (unit %result)
+                       (pair %storage
+                          (pair (pair (address %administrator) (pair (set %burners address) (bool %controllable)))
+                                (pair (set %controllers address)
+                                      (pair (big_map %ledger
+                                               (pair address string)
+                                               (pair (map %approvals address nat) (nat %balance)))
+                                            (big_map %metadata string bytes))))
+                          (pair (pair (set %minters address) (pair (bool %operable) (map %partitions string nat)))
+                                (pair (pair (bool %paused) (nat %total_supply))
+                                      (pair (option %transferlist_address address) (set %unlocked_partitions string)))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             CAR ;
+             CDR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             DIG 4 ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 6 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             GET ;
+             IF_NONE { PUSH int 146 ; FAILWITH } {} ;
+             CDR ;
+             COMPARE ;
+             GE ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: self.data.ledger[(lparams_0.in_param.address, lparams_0.in_param.partition)].balance >= lparams_0.in_param.amount" ;
+                  FAILWITH } ;
+             DUP ;
+             CDR ;
+             CAR ;
+             CDR ;
+             CDR ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CAR ;
+             CDR ;
+             CDR ;
+             MEM ;
+             IF { DUP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { DIP 7 { DUP } ; DIG 8 } ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  DIG 6 ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  { DIP 8 { DUP } ; DIG 9 } ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  GET ;
+                  IF_NONE { PUSH int 248 ; FAILWITH } {} ;
+                  SUB ;
+                  ISNAT ;
+                  IF_NONE { PUSH int 248 ; FAILWITH } {} ;
+                  SOME ;
+                  { DIP 7 { DUP } ; DIG 8 } ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  DUP ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  PUSH nat 0 ;
+                  SWAP ;
+                  { DIP 4 { DUP } ; DIG 5 } ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  GET ;
+                  IF_NONE { PUSH int 249 ; FAILWITH } {} ;
+                  COMPARE ;
+                  LE ;
+                  IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       NONE nat ;
+                       { DIP 7 { DUP } ; DIG 8 } ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       UPDATE ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR }
+                     {} }
+                {} ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             DIG 3 ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             MEM ;
+             IF { DUP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  DUP ;
+                  DIG 8 ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 10 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  IF_NONE { PUSH int 230 ; FAILWITH } {} ;
+                  CAR ;
+                  { DIP 9 { DUP } ; DIG 10 } ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  DIG 8 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  DIG 10 ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 12 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  GET ;
+                  IF_NONE { PUSH int 230 ; FAILWITH } {} ;
+                  CDR ;
+                  SUB ;
+                  ISNAT ;
+                  IF_NONE { PUSH int 230 ; FAILWITH } {} ;
+                  SWAP ;
+                  PAIR ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  PUSH nat 0 ;
+                  SWAP ;
+                  DIG 4 ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 6 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  GET ;
+                  IF_NONE { PUSH int 231 ; FAILWITH } {} ;
+                  CDR ;
+                  COMPARE ;
+                  LE ;
+                  IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       NONE (pair (map %approvals address nat) (nat %balance)) ;
+                       DIG 7 ;
+                       DUP ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       SWAP ;
+                       DUP ;
+                       DUG 9 ;
+                       CAR ;
+                       CAR ;
+                       PAIR ;
+                       UPDATE ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       PAIR }
+                     {} }
+                {} ;
+             DUP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             CAR ;
+             DIG 6 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             DIG 5 ;
+             CDR ;
+             CDR ;
+             CAR ;
+             CDR ;
+             SUB ;
+             ISNAT ;
+             IF_NONE { PUSH int 151 ; FAILWITH } {} ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             UNIT ;
+             PAIR %result %storage ;
+             SWAP ;
+             PAIR %operations } ;
+         SWAP ;
+         LAMBDA
+           (pair (pair %in_param (address %address) (pair (nat %amount) (string %partition)))
+                 (pair %in_storage
+                    (pair (pair (address %administrator) (pair (set %burners address) (bool %controllable)))
+                          (pair (set %controllers address)
+                                (pair (big_map %ledger
+                                         (pair address string)
+                                         (pair (map %approvals address nat) (nat %balance)))
+                                      (big_map %metadata string bytes))))
+                    (pair (pair (set %minters address) (pair (bool %operable) (map %partitions string nat)))
+                          (pair (pair (bool %paused) (nat %total_supply))
+                                (pair (option %transferlist_address address) (set %unlocked_partitions string))))))
+           (pair (list %operations operation)
+                 (pair (unit %result)
+                       (pair %storage
+                          (pair (pair (address %administrator) (pair (set %burners address) (bool %controllable)))
+                                (pair (set %controllers address)
+                                      (pair (big_map %ledger
+                                               (pair address string)
+                                               (pair (map %approvals address nat) (nat %balance)))
+                                            (big_map %metadata string bytes))))
+                          (pair (pair (set %minters address) (pair (bool %operable) (map %partitions string nat)))
+                                (pair (pair (bool %paused) (nat %total_supply))
+                                      (pair (option %transferlist_address address) (set %unlocked_partitions string)))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             CDR ;
+             CAR ;
+             CDR ;
+             CDR ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CAR ;
+             CDR ;
+             CDR ;
+             MEM ;
+             IF {}
+                { { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  PUSH (option nat) (Some 0) ;
+                  { DIP 7 { DUP } ; DIG 8 } ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR } ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             DIG 3 ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             MEM ;
+             IF {}
+                { { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  PUSH (option (pair (map %approvals address nat) (nat %balance))) (Some (Pair {} 0)) ;
+                  DIG 7 ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 9 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             DUP ;
+             { DIP 7 { DUP } ; DIG 8 } ;
+             CAR ;
+             CDR ;
+             CDR ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 88 ; FAILWITH } {} ;
+             { DIP 8 { DUP } ; DIG 9 } ;
+             CAR ;
+             CDR ;
+             CAR ;
+             ADD ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             DUP ;
+             DIG 7 ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 9 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 90 ; FAILWITH } {} ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { DIP 9 { DUP } ; DIG 10 } ;
+             CAR ;
+             CDR ;
+             CAR ;
+             ADD ;
+             SWAP ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             DIG 6 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             ADD ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             UNIT ;
+             PAIR %result %storage ;
+             SWAP ;
+             PAIR %operations } ;
+         SWAP ;
+         LAMBDA
+           (pair (pair %in_param
+                    (pair (string %f_partition) (address %from_))
+                    (pair (string %t_partition) (pair (address %to_) (nat %value))))
+                 (pair %in_storage
+                    (pair (pair (address %administrator) (pair (set %burners address) (bool %controllable)))
+                          (pair (set %controllers address)
+                                (pair (big_map %ledger
+                                         (pair address string)
+                                         (pair (map %approvals address nat) (nat %balance)))
+                                      (big_map %metadata string bytes))))
+                    (pair (pair (set %minters address) (pair (bool %operable) (map %partitions string nat)))
+                          (pair (pair (bool %paused) (nat %total_supply))
+                                (pair (option %transferlist_address address) (set %unlocked_partitions string))))))
+           (pair (list %operations operation)
+                 (pair (unit %result)
+                       (pair %storage
+                          (pair (pair (address %administrator) (pair (set %burners address) (bool %controllable)))
+                                (pair (set %controllers address)
+                                      (pair (big_map %ledger
+                                               (pair address string)
+                                               (pair (map %approvals address nat) (nat %balance)))
+                                            (big_map %metadata string bytes))))
+                          (pair (pair (set %minters address) (pair (bool %operable) (map %partitions string nat)))
+                                (pair (pair (bool %paused) (nat %total_supply))
+                                      (pair (option %transferlist_address address) (set %unlocked_partitions string)))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             CDR ;
+             CDR ;
+             CAR ;
+             CAR ;
+             IF { DUP ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  SENDER ;
+                  COMPARE ;
+                  EQ ;
+                  IF { PUSH bool True } { DUP ; CAR ; CDR ; CAR ; SENDER ; MEM } ;
+                  IF {}
+                     { PUSH string
+                            "WrongCondition: (sp.sender == self.data.administrator) | (self.data.controllers.contains(sp.sender))" ;
+                       FAILWITH } }
+                { DUP ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  SENDER ;
+                  COMPARE ;
+                  EQ ;
+                  IF { PUSH bool True } { DUP ; CAR ; CDR ; CAR ; SENDER ; MEM } ;
+                  IF { PUSH bool True }
+                     { SENDER ;
+                       { DIP 3 { DUP } ; DIG 4 } ;
+                       CAR ;
+                       CAR ;
+                       CDR ;
+                       COMPARE ;
+                       EQ ;
+                       IF { PUSH bool True }
+                          { { DIP 2 { DUP } ; DIG 3 } ;
+                            CAR ;
+                            CDR ;
+                            CDR ;
+                            CDR ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            CAR ;
+                            CDR ;
+                            CDR ;
+                            CAR ;
+                            DIG 4 ;
+                            DUP ;
+                            CAR ;
+                            CAR ;
+                            CAR ;
+                            SWAP ;
+                            DUP ;
+                            DUG 6 ;
+                            CAR ;
+                            CAR ;
+                            CDR ;
+                            PAIR ;
+                            GET ;
+                            IF_NONE { PUSH int 321 ; FAILWITH } {} ;
+                            CAR ;
+                            SENDER ;
+                            GET ;
+                            IF_NONE { PUSH int 321 ; FAILWITH } {} ;
+                            COMPARE ;
+                            GE } } ;
+                  IF {}
+                     { PUSH string
+                            "WrongCondition: ((sp.sender == self.data.administrator) | (self.data.controllers.contains(sp.sender))) | ((lparams_2.in_param.from_ == sp.sender) | (self.data.ledger[(lparams_2.in_param.from_, lparams_2.in_param.f_partition)].approvals[sp.sender] >= lparams_2.in_param.value))" ;
+                       FAILWITH } } ;
+             DIG 2 ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 4 ;
+             CAR ;
+             CAR ;
+             CAR ;
+             COMPARE ;
+             NEQ ;
+             IF { DUP ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  SENDER ;
+                  COMPARE ;
+                  EQ ;
+                  IF { PUSH bool True } { DUP ; CAR ; CDR ; CAR ; SENDER ; MEM } ;
+                  IF {}
+                     { PUSH string
+                            "WrongCondition: (sp.sender == self.data.administrator) | (self.data.controllers.contains(sp.sender))" ;
+                       FAILWITH } }
+                {} ;
+             DUP ;
+             CAR ;
+             CAR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF { PUSH bool False } { DUP ; CAR ; CDR ; CAR ; SENDER ; MEM ; NOT } ;
+             IF { DUP ;
+                  GET 8 ;
+                  { DIP 3 { DUP } ; DIG 4 } ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  MEM ;
+                  IF {}
+                     { PUSH string
+                            "WrongCondition: self.data.unlocked_partitions.contains(lparams_2.in_param.f_partition)" ;
+                       FAILWITH } }
+                {} ;
+             DUP ;
+             CAR ;
+             CAR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF { PUSH bool False } { DUP ; CAR ; CDR ; CAR ; SENDER ; MEM ; NOT } ;
+             IF { DUP ;
+                  GET 7 ;
+                  IF_NONE
+                    {}
+                    { DROP ;
+                      DUP ;
+                      DUG 2 ;
+                      GET 7 ;
+                      IF_NONE { PUSH int 266 ; FAILWITH } {} ;
+                      CONTRACT %assertTransfer (pair (address %from_) (address %to_)) ;
+                      IF_NONE { PUSH int 264 ; FAILWITH } {} ;
+                      PUSH mutez 0 ;
+                      DIG 4 ;
+                      DUP ;
+                      CAR ;
+                      CDR ;
+                      CDR ;
+                      CAR ;
+                      SWAP ;
+                      DUP ;
+                      DUG 6 ;
+                      CAR ;
+                      CAR ;
+                      CDR ;
+                      PAIR %from_ %to_ ;
+                      TRANSFER_TOKENS ;
+                      CONS ;
+                      SWAP } }
+                {} ;
+             DUP ;
+             CDR ;
+             CAR ;
+             CDR ;
+             CDR ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CAR ;
+             CDR ;
+             CAR ;
+             MEM ;
+             IF {}
+                { { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  PUSH (option nat) (Some 0) ;
+                  { DIP 7 { DUP } ; DIG 8 } ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR } ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             DIG 3 ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             MEM ;
+             IF {}
+                { { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  PUSH (option (pair (map %approvals address nat) (nat %balance))) (Some (Pair {} 0)) ;
+                  DIG 7 ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 9 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR } ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             DIG 4 ;
+             DUP ;
+             CAR ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 6 ;
+             CAR ;
+             CAR ;
+             CDR ;
+             PAIR ;
+             GET ;
+             IF_NONE { PUSH int 459 ; FAILWITH } {} ;
+             CDR ;
+             COMPARE ;
+             GE ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: self.data.ledger[(lparams_2.in_param.from_, lparams_2.in_param.f_partition)].balance >= lparams_2.in_param.value" ;
+                  FAILWITH } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             DUP ;
+             DIG 7 ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 9 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 461 ; FAILWITH } {} ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { DIP 9 { DUP } ; DIG 10 } ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             ADD ;
+             SWAP ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             DIG 3 ;
+             DUP ;
+             CAR ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             CAR ;
+             CAR ;
+             CDR ;
+             PAIR ;
+             MEM ;
+             IF { DUP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  DUP ;
+                  DIG 8 ;
+                  DUP ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 10 ;
+                  CAR ;
+                  CAR ;
+                  CDR ;
+                  PAIR ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  IF_NONE { PUSH int 230 ; FAILWITH } {} ;
+                  CAR ;
+                  { DIP 9 { DUP } ; DIG 10 } ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CDR ;
+                  DIG 8 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  DIG 10 ;
+                  DUP ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 12 ;
+                  CAR ;
+                  CAR ;
+                  CDR ;
+                  PAIR ;
+                  GET ;
+                  IF_NONE { PUSH int 230 ; FAILWITH } {} ;
+                  CDR ;
+                  SUB ;
+                  ISNAT ;
+                  IF_NONE { PUSH int 230 ; FAILWITH } {} ;
+                  SWAP ;
+                  PAIR ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  PUSH nat 0 ;
+                  SWAP ;
+                  DIG 4 ;
+                  DUP ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 6 ;
+                  CAR ;
+                  CAR ;
+                  CDR ;
+                  PAIR ;
+                  GET ;
+                  IF_NONE { PUSH int 231 ; FAILWITH } {} ;
+                  CDR ;
+                  COMPARE ;
+                  LE ;
+                  IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       NONE (pair (map %approvals address nat) (nat %balance)) ;
+                       DIG 7 ;
+                       DUP ;
+                       CAR ;
+                       CAR ;
+                       CAR ;
+                       SWAP ;
+                       DUP ;
+                       DUG 9 ;
+                       CAR ;
+                       CAR ;
+                       CDR ;
+                       PAIR ;
+                       UPDATE ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       PAIR }
+                     {} }
+                {} ;
+             DIG 2 ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 4 ;
+             CAR ;
+             CAR ;
+             CAR ;
+             COMPARE ;
+             NEQ ;
+             IF { DUP ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  { DIP 3 { DUP } ; DIG 4 } ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  MEM ;
+                  IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       DUP ;
+                       { DIP 7 { DUP } ; DIG 8 } ;
+                       CAR ;
+                       CDR ;
+                       CAR ;
+                       DUP ;
+                       DUG 2 ;
+                       GET ;
+                       IF_NONE { PUSH int 237 ; FAILWITH } {} ;
+                       { DIP 8 { DUP } ; DIG 9 } ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       CDR ;
+                       ADD ;
+                       SOME ;
+                       SWAP ;
+                       UPDATE ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR }
+                     { { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { DIP 6 { DUP } ; DIG 7 } ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       CDR ;
+                       SOME ;
+                       { DIP 7 { DUP } ; DIG 8 } ;
+                       CAR ;
+                       CDR ;
+                       CAR ;
+                       UPDATE ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR } ;
+                  DUP ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  { DIP 3 { DUP } ; DIG 4 } ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  MEM ;
+                  IF { DUP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { DIP 7 { DUP } ; DIG 8 } ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       CDR ;
+                       DIG 6 ;
+                       CDR ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       { DIP 8 { DUP } ; DIG 9 } ;
+                       CAR ;
+                       CAR ;
+                       CAR ;
+                       GET ;
+                       IF_NONE { PUSH int 242 ; FAILWITH } {} ;
+                       SUB ;
+                       ISNAT ;
+                       IF_NONE { PUSH int 242 ; FAILWITH } {} ;
+                       SOME ;
+                       { DIP 7 { DUP } ; DIG 8 } ;
+                       CAR ;
+                       CAR ;
+                       CAR ;
+                       UPDATE ;
+                       SWAP ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       DUP ;
+                       CDR ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       PUSH nat 0 ;
+                       SWAP ;
+                       { DIP 4 { DUP } ; DIG 5 } ;
+                       CAR ;
+                       CAR ;
+                       CAR ;
+                       GET ;
+                       IF_NONE { PUSH int 243 ; FAILWITH } {} ;
+                       COMPARE ;
+                       LE ;
+                       IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                            SWAP ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            SWAP ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            SWAP ;
+                            NONE nat ;
+                            { DIP 7 { DUP } ; DIG 8 } ;
+                            CAR ;
+                            CAR ;
+                            CAR ;
+                            UPDATE ;
+                            SWAP ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR }
+                          {} }
+                     {} }
+                {} ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             DIG 3 ;
+             DUP ;
+             CAR ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             CAR ;
+             CAR ;
+             CDR ;
+             PAIR ;
+             MEM ;
+             IF { DUP ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  DIG 3 ;
+                  DUP ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 5 ;
+                  CAR ;
+                  CAR ;
+                  CDR ;
+                  PAIR ;
+                  GET ;
+                  IF_NONE { PUSH int 224 ; FAILWITH } {} ;
+                  CAR ;
+                  SENDER ;
+                  MEM ;
+                  IF { { DIP 2 { DUP } ; DIG 3 } ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       CDR ;
+                       SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       CAR ;
+                       DIG 4 ;
+                       DUP ;
+                       CAR ;
+                       CAR ;
+                       CAR ;
+                       SWAP ;
+                       DUP ;
+                       DUG 6 ;
+                       CAR ;
+                       CAR ;
+                       CDR ;
+                       PAIR ;
+                       GET ;
+                       IF_NONE { PUSH int 225 ; FAILWITH } {} ;
+                       CAR ;
+                       SENDER ;
+                       GET ;
+                       IF_NONE { PUSH int 225 ; FAILWITH } {} ;
+                       COMPARE ;
+                       GT ;
+                       IF { DUP ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            SWAP ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            SWAP ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            DUP ;
+                            DIG 8 ;
+                            DUP ;
+                            CAR ;
+                            CAR ;
+                            CAR ;
+                            SWAP ;
+                            DUP ;
+                            DUG 10 ;
+                            CAR ;
+                            CAR ;
+                            CDR ;
+                            PAIR ;
+                            DUP ;
+                            DUG 2 ;
+                            GET ;
+                            IF_NONE { PUSH int 226 ; FAILWITH } {} ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            { DIP 10 { DUP } ; DIG 11 } ;
+                            CAR ;
+                            CDR ;
+                            CDR ;
+                            CDR ;
+                            DIG 9 ;
+                            CAR ;
+                            CDR ;
+                            CDR ;
+                            CAR ;
+                            DIG 11 ;
+                            DUP ;
+                            CAR ;
+                            CAR ;
+                            CAR ;
+                            SWAP ;
+                            CAR ;
+                            CAR ;
+                            CDR ;
+                            PAIR ;
+                            GET ;
+                            IF_NONE { PUSH int 226 ; FAILWITH } {} ;
+                            CAR ;
+                            SENDER ;
+                            GET ;
+                            IF_NONE { PUSH int 226 ; FAILWITH } {} ;
+                            SUB ;
+                            ISNAT ;
+                            IF_NONE { PUSH int 226 ; FAILWITH } {} ;
+                            SOME ;
+                            SENDER ;
+                            UPDATE ;
+                            PAIR ;
+                            SOME ;
+                            SWAP ;
+                            UPDATE ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR ;
+                            PAIR }
+                          { DIG 2 ; DROP } }
+                     { DIG 2 ; DROP } }
+                { DIG 2 ; DROP } ;
+             UNIT ;
+             PAIR %result %storage ;
+             SWAP ;
+             PAIR %operations } ;
+         SWAP ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { IF_LEFT
+                       { DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         IF { PUSH string "WrongCondition: ~ self.data.paused" ; FAILWITH } {} ;
+                         PUSH nat 0 ;
+                         { DIP 2 { DUP } ; DIG 3 } ;
+                         GET 8 ;
+                         SIZE ;
+                         COMPARE ;
+                         GT ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.len(self.data.unlocked_partitions) > 0" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         DUP ;
+                         PUSH string "unlocked" ;
+                         SENDER ;
+                         PAIR ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE { PUSH int 514 ; FAILWITH } {} ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         { DIP 8 { DUP } ; DIG 9 } ;
+                         CDR ;
+                         SOME ;
+                         DIG 9 ;
+                         CAR ;
+                         UPDATE ;
+                         PAIR ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         NIL operation }
+                       { DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF { PUSH bool True }
+                            { SWAP ; DUP ; DUG 2 ; CAR ; CAR ; CDR ; CAR ; SENDER ; MEM } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: (sp.sender == self.data.administrator) | (self.data.burners.contains(sp.sender))" ;
+                              FAILWITH } ;
+                         PAIR %in_param %in_storage ;
+                         EXEC ;
+                         DUP ;
+                         GET 4 ;
+                         SWAP ;
+                         CAR ;
+                         NIL operation ;
+                         SWAP ;
+                         ITER { CONS } } }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF { PUSH bool True }
+                            { SWAP ; DUP ; DUG 2 ; CAR ; CAR ; CDR ; CAR ; SENDER ; MEM } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: (sp.sender == self.data.administrator) | (self.data.burners.contains(sp.sender))" ;
+                              FAILWITH } ;
+                         DUP ;
+                         NIL operation ;
+                         SWAP ;
+                         ITER { { DIP 6 { DUP } ; DIG 7 } ;
+                                DIG 4 ;
+                                { DIP 2 { DUP } ; DIG 3 } ;
+                                PAIR %in_param %in_storage ;
+                                EXEC ;
+                                DUP ;
+                                GET 4 ;
+                                DUG 4 ;
+                                DUP ;
+                                CAR ;
+                                ITER { DIG 3 ; SWAP ; CONS ; DUG 2 } ;
+                                DROP 2 } ;
+                         SWAP ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP }
+                       { DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         IF {} { PUSH string "WrongCondition: self.data.operable" ; FAILWITH } ;
+                         PUSH nat 0 ;
+                         { DIP 2 { DUP } ; DIG 3 } ;
+                         GET 8 ;
+                         SIZE ;
+                         COMPARE ;
+                         GT ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.len(self.data.unlocked_partitions) > 0" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         PUSH string "unlocked" ;
+                         { DIP 2 { DUP } ; DIG 3 } ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         GET ;
+                         IF_NONE { PUSH int 539 ; FAILWITH } {} ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         GET ;
+                         IF_NONE { PUSH int 539 ; FAILWITH } {} ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CDR ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS } } }
+               { IF_LEFT
+                   { DIG 3 ;
+                     DROP ;
+                     DIG 3 ;
+                     DROP ;
+                     IF_LEFT
+                       { PUSH nat 0 ;
+                         PUSH nat 0 ;
+                         { DIP 3 { DUP } ; DIG 4 } ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         SIZE ;
+                         COMPARE ;
+                         GT ;
+                         IF { { DIP 2 { DUP } ; DIG 3 } ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              ITER { CAR ;
+                                     { DIP 3 { DUP } ; DIG 4 } ;
+                                     CAR ;
+                                     CDR ;
+                                     CDR ;
+                                     CAR ;
+                                     SWAP ;
+                                     { DIP 3 { DUP } ; DIG 4 } ;
+                                     CAR ;
+                                     PAIR ;
+                                     GET ;
+                                     IF_NONE { PUSH int 525 ; FAILWITH } {} ;
+                                     CDR ;
+                                     ADD } ;
+                              DIG 3 ;
+                              DROP }
+                            { DIG 3 ; DROP } ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CDR ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS }
+                       { DIG 2 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CDR ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS } }
+                   { IF_LEFT
+                       { DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         CONTRACT address ;
+                         IF_NONE { PUSH int 34 ; FAILWITH } {} ;
+                         NIL operation ;
+                         SWAP ;
+                         PUSH mutez 0 ;
+                         { DIP 3 { DUP } ; DIG 4 } ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         TRANSFER_TOKENS ;
+                         CONS }
+                       { IF_LEFT
+                           { DIG 2 ;
+                             DROP ;
+                             DIG 3 ;
+                             DROP ;
+                             SWAP ;
+                             DUP ;
+                             DUG 2 ;
+                             CAR ;
+                             CAR ;
+                             CAR ;
+                             SENDER ;
+                             COMPARE ;
+                             EQ ;
+                             IF { PUSH bool True }
+                                { SWAP ; DUP ; DUG 2 ; CDR ; CAR ; CAR ; SENDER ; MEM } ;
+                             IF {}
+                                { PUSH string
+                                       "WrongCondition: (sp.sender == self.data.administrator) | (self.data.minters.contains(sp.sender))" ;
+                                  FAILWITH } ;
+                             PAIR %in_param %in_storage ;
+                             EXEC ;
+                             DUP ;
+                             GET 4 ;
+                             SWAP ;
+                             CAR ;
+                             NIL operation ;
+                             SWAP ;
+                             ITER { CONS } }
+                           { SWAP ;
+                             DUP ;
+                             DUG 2 ;
+                             CAR ;
+                             CAR ;
+                             CAR ;
+                             SENDER ;
+                             COMPARE ;
+                             EQ ;
+                             IF { PUSH bool True }
+                                { SWAP ; DUP ; DUG 2 ; CDR ; CAR ; CAR ; SENDER ; MEM } ;
+                             IF {}
+                                { PUSH string
+                                       "WrongCondition: (sp.sender == self.data.administrator) | (self.data.minters.contains(sp.sender))" ;
+                                  FAILWITH } ;
+                             DUP ;
+                             NIL operation ;
+                             SWAP ;
+                             ITER { { DIP 5 { DUP } ; DIG 6 } ;
+                                    DIG 4 ;
+                                    { DIP 2 { DUP } ; DIG 3 } ;
+                                    PAIR %in_param %in_storage ;
+                                    EXEC ;
+                                    DUP ;
+                                    GET 4 ;
+                                    DUG 4 ;
+                                    DUP ;
+                                    CAR ;
+                                    ITER { DIG 3 ; SWAP ; CONS ; DUG 2 } ;
+                                    DROP 2 } ;
+                             SWAP ;
+                             DROP ;
+                             DIG 2 ;
+                             DROP ;
+                             DIG 2 ;
+                             DROP ;
+                             DIG 2 ;
+                             DROP } } } } }
+           { DIG 3 ;
+             DROP ;
+             DIG 3 ;
+             DROP ;
+             IF_LEFT
+               { DIG 2 ;
+                 DROP ;
+                 IF_LEFT
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         CDR ;
+                         DIG 3 ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { DIP 5 { DUP } ; DIG 6 } ;
+                         CDR ;
+                         SOME ;
+                         DIG 6 ;
+                         CAR ;
+                         UPDATE ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR } }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         CDR ;
+                         DIG 4 ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         CAR ;
+                         DIG 4 ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } } ;
+                 NIL operation }
+               { IF_LEFT
+                   { IF_LEFT
+                       { PUSH nat 0 ;
+                         { DIP 2 { DUP } ; DIG 3 } ;
+                         GET 8 ;
+                         SIZE ;
+                         COMPARE ;
+                         GT ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.len(self.data.unlocked_partitions) > 0" ;
+                              FAILWITH } ;
+                         DUP ;
+                         GET 4 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 4 ;
+                         GET 3 ;
+                         PAIR %to_ %value ;
+                         PUSH string "unlocked" ;
+                         PAIR %t_partition ;
+                         DIG 3 ;
+                         CAR ;
+                         PUSH string "unlocked" ;
+                         PAIR %f_partition %from_ ;
+                         PAIR ;
+                         PAIR %in_param %in_storage ;
+                         EXEC ;
+                         DUP ;
+                         GET 4 ;
+                         SWAP ;
+                         CAR ;
+                         NIL operation ;
+                         SWAP ;
+                         ITER { CONS } }
+                       { DUP ;
+                         NIL operation ;
+                         SWAP ;
+                         ITER { { DIP 4 { DUP } ; DIG 5 } ;
+                                DIG 4 ;
+                                { DIP 2 { DUP } ; DIG 3 } ;
+                                PAIR %in_param %in_storage ;
+                                EXEC ;
+                                DUP ;
+                                GET 4 ;
+                                DUG 4 ;
+                                DUP ;
+                                CAR ;
+                                ITER { DIG 3 ; SWAP ; CONS ; DUG 2 } ;
+                                DROP 2 } ;
+                         SWAP ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP } }
+                   { DIG 2 ;
+                     DROP ;
+                     IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                              FAILWITH } ;
+                         DUP ;
+                         ITER { DUP ;
+                                IF_LEFT
+                                  { DUP ;
+                                    ITER { DIG 4 ;
+                                           { { DUP ; CAR ; DIP { CDR } } } ;
+                                           { { DUP ; CAR ; DIP { CDR } } } ;
+                                           { { DUP ; CAR ; DIP { CDR } } } ;
+                                           SWAP ;
+                                           { { DUP ; CAR ; DIP { CDR } } } ;
+                                           PUSH bool True ;
+                                           DIG 6 ;
+                                           UPDATE ;
+                                           PAIR ;
+                                           SWAP ;
+                                           PAIR ;
+                                           PAIR ;
+                                           PAIR ;
+                                           DUG 3 } ;
+                                    DROP 2 }
+                                  { DUP ;
+                                    ITER { DIG 4 ;
+                                           { { DUP ; CAR ; DIP { CDR } } } ;
+                                           { { DUP ; CAR ; DIP { CDR } } } ;
+                                           { { DUP ; CAR ; DIP { CDR } } } ;
+                                           SWAP ;
+                                           { { DUP ; CAR ; DIP { CDR } } } ;
+                                           PUSH bool False ;
+                                           DIG 6 ;
+                                           UPDATE ;
+                                           PAIR ;
+                                           SWAP ;
+                                           PAIR ;
+                                           PAIR ;
+                                           PAIR ;
+                                           DUG 3 } ;
+                                    DROP 2 } } ;
+                         DROP }
+                       { IF_LEFT
+                           { SWAP ;
+                             DUP ;
+                             DUG 2 ;
+                             CAR ;
+                             CAR ;
+                             CAR ;
+                             SENDER ;
+                             COMPARE ;
+                             EQ ;
+                             IF {}
+                                { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                                  FAILWITH } ;
+                             SWAP ;
+                             DUP ;
+                             DUG 2 ;
+                             CAR ;
+                             CAR ;
+                             CDR ;
+                             CDR ;
+                             IF { DUP ;
+                                  ITER { DUP ;
+                                         IF_LEFT
+                                           { DUP ;
+                                             ITER { DIG 4 ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    SWAP ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    PUSH bool True ;
+                                                    DIG 5 ;
+                                                    UPDATE ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    DUG 3 } ;
+                                             DROP 2 }
+                                           { DUP ;
+                                             ITER { DIG 4 ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    SWAP ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    PUSH bool False ;
+                                                    DIG 5 ;
+                                                    UPDATE ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    DUG 3 } ;
+                                             DROP 2 } } ;
+                                  DROP }
+                                { PUSH string "ST1.2_CONTROLLERS_UNSUPPORTED" ; FAILWITH } }
+                           { SWAP ;
+                             DUP ;
+                             DUG 2 ;
+                             CAR ;
+                             CAR ;
+                             CAR ;
+                             SENDER ;
+                             COMPARE ;
+                             EQ ;
+                             IF {}
+                                { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                                  FAILWITH } ;
+                             DUP ;
+                             ITER { DUP ;
+                                    IF_LEFT
+                                      { DUP ;
+                                        ITER { DIG 4 ;
+                                               { { DUP ; CAR ; DIP { CDR } } } ;
+                                               SWAP ;
+                                               { { DUP ; CAR ; DIP { CDR } } } ;
+                                               { { DUP ; CAR ; DIP { CDR } } } ;
+                                               PUSH bool True ;
+                                               DIG 5 ;
+                                               UPDATE ;
+                                               PAIR ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               DUG 3 } ;
+                                        DROP 2 }
+                                      { DUP ;
+                                        ITER { DIG 4 ;
+                                               { { DUP ; CAR ; DIP { CDR } } } ;
+                                               SWAP ;
+                                               { { DUP ; CAR ; DIP { CDR } } } ;
+                                               { { DUP ; CAR ; DIP { CDR } } } ;
+                                               PUSH bool False ;
+                                               DIG 5 ;
+                                               UPDATE ;
+                                               PAIR ;
+                                               PAIR ;
+                                               SWAP ;
+                                               PAIR ;
+                                               DUG 3 } ;
+                                        DROP 2 } } ;
+                             DROP } } ;
+                     NIL operation } } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

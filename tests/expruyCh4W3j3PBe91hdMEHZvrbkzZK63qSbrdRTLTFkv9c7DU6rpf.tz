@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (map (or nat (pair (pair nat bool) string)) nat) ;
+  code { CDR ; NIL operation ; PAIR } }

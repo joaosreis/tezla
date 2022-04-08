@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage mutez ;
+  code { DROP ; PUSH mutez 1 ; PUSH mutez 0 ; SUB ; NIL operation ; PAIR } }

@@ -1,0 +1,13 @@
+{ storage (list key_hash) ;
+  parameter key_hash ;
+  code { UNPAIR ;
+         DUP ;
+         SOME ;
+         SET_DELEGATE ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         DUG 2 ;
+         CONS ;
+         SWAP ;
+         PAIR } }

@@ -1,0 +1,12 @@
+{ storage unit ;
+  parameter (unit %default) ;
+  code { CDR ;
+         NIL operation ;
+         SENDER ;
+         CONTRACT unit ;
+         IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+         AMOUNT ;
+         UNIT ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

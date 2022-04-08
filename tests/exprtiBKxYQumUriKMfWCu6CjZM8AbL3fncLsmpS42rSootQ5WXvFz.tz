@@ -1,0 +1,139 @@
+{ parameter
+    (or (or (nat %add_allowed_activity) (address %change_admin))
+        (or (nat %suspend_allowed_activity)
+            (list %update_activity_balance (list (pair nat nat))))) ;
+  storage
+    (pair (pair (map %activity_balance nat nat) (address %admin))
+          (map %allowed_activities nat bool)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         NEQ ;
+         IF { PUSH string "This contract does not accept tezi deposits" ; FAILWITH }
+            {} ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         CDR ;
+         SENDER ;
+         COMPARE ;
+         NEQ ;
+         IF { PUSH string "CALLER_NOT_ADMIN" ; FAILWITH } {} ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 PUSH bool True ;
+                 DIG 2 ;
+                 SWAP ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 NIL operation ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 SWAP ;
+                 DIG 2 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 NIL operation ;
+                 PAIR } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE
+                   { DROP ; PUSH string "ACTIVITY_DOES_NO_EXIST" ; FAILWITH }
+                   { DROP ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     PUSH bool False ;
+                     DIG 2 ;
+                     SWAP ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SWAP ;
+                     CAR ;
+                     PAIR } ;
+                 NIL operation ;
+                 PAIR }
+               { ITER { ITER { SWAP ;
+                               DUP ;
+                               CDR ;
+                               { DIP 2 { DUP } ; DIG 3 } ;
+                               CAR ;
+                               GET ;
+                               IF_NONE
+                                 { PUSH string "ACTIVITY_DOES_NOT_EXIST" ; FAILWITH }
+                                 { IF {} { PUSH string "ACTIVITY_SUSPENDED" ; FAILWITH } } ;
+                               DUP ;
+                               CAR ;
+                               CAR ;
+                               { DIP 2 { DUP } ; DIG 3 } ;
+                               CAR ;
+                               GET ;
+                               IF_NONE
+                                 { DUP ;
+                                   CDR ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   CDR ;
+                                   DIG 2 ;
+                                   CAR ;
+                                   CAR ;
+                                   { DIP 3 { DUP } ; DIG 4 } ;
+                                   CDR ;
+                                   DIG 4 ;
+                                   CAR ;
+                                   SWAP ;
+                                   SOME ;
+                                   SWAP ;
+                                   UPDATE ;
+                                   PAIR ;
+                                   PAIR }
+                                 { SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CDR ;
+                                   { DIP 2 { DUP } ; DIG 3 } ;
+                                   CAR ;
+                                   CDR ;
+                                   DIG 3 ;
+                                   CAR ;
+                                   CAR ;
+                                   { DIP 4 { DUP } ; DIG 5 } ;
+                                   CDR ;
+                                   DIG 4 ;
+                                   ADD ;
+                                   DIG 4 ;
+                                   CAR ;
+                                   SWAP ;
+                                   SOME ;
+                                   SWAP ;
+                                   UPDATE ;
+                                   PAIR ;
+                                   PAIR } } } ;
+                 NIL operation ;
+                 PAIR } } } }

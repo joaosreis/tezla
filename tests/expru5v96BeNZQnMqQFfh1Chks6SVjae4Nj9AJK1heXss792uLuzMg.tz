@@ -1,0 +1,262 @@
+{ parameter
+    (or (or (pair %cancel_request (address %client) (nat %client_request_id))
+            (ticket %create_request
+               (pair (pair (pair (nat %amount) (nat %client_request_id))
+                           (pair (bytes %job_id) (address %oracle)))
+                     (pair (pair (option %parameters (or (bytes %bytes) (or (int %int) (string %string))))
+                                 (string %tag))
+                           (pair (address %target) (timestamp %timeout))))))
+        (or (pair %fulfill_request
+               (nat %request_id)
+               (or %result (bytes %bytes) (or (int %int) (string %string))))
+            (pair %setup
+               (pair (bool %active) (address %admin))
+               (pair (address %escrow) (pair (nat %min_amount) (int %min_timeout_minutes)))))) ;
+  storage
+    (pair (pair (nat %next_id)
+                (big_map %requests
+                   nat
+                   (ticket
+                      (pair (pair (pair (nat %amount) (nat %client_request_id))
+                                  (pair (bytes %job_id) (address %oracle)))
+                            (pair (pair (option %parameters (or (bytes %bytes) (or (int %int) (string %string))))
+                                        (string %tag))
+                                  (pair (address %target) (timestamp %timeout)))))))
+          (pair (big_map %reverse_requests (pair (address %client) (nat %client_request_id)) nat)
+                (pair %setup
+                   (pair (bool %active) (address %admin))
+                   (pair (address %escrow) (pair (nat %min_amount) (int %min_timeout_minutes)))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 DUP ;
+                 GET 3 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF { PUSH bool True } { DUP ; CAR ; CDR ; SENDER ; COMPARE ; EQ } ;
+                 IF {} { PUSH string "OracleNotEscrow" ; FAILWITH } ;
+                 SWAP ;
+                 NONE nat ;
+                 DIG 5 ;
+                 GET_AND_UPDATE ;
+                 DUG 2 ;
+                 PAIR %reverse_requests %setup ;
+                 DIG 2 ;
+                 NONE (ticket
+                         (pair (pair (pair (nat %amount) (nat %client_request_id))
+                                     (pair (bytes %job_id) (address %oracle)))
+                               (pair (pair (option %parameters (or (bytes %bytes) (or (int %int) (string %string))))
+                                           (string %tag))
+                                     (pair (address %target) (timestamp %timeout))))) ;
+                 DIG 3 ;
+                 { IF_NONE { PUSH string "OracleRequestUnknown" ; FAILWITH } {} } ;
+                 UPDATE ;
+                 DIG 2 ;
+                 PAIR %next_id %requests ;
+                 PAIR }
+               { SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 DUP ;
+                 GET 3 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "OracleNotEscrow" ; FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 IF {} { PUSH string "OracleInactive" ; FAILWITH } ;
+                 DIG 4 ;
+                 READ_TICKET ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 4 ;
+                 DIG 5 ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 DUP 7 ;
+                 GET 5 ;
+                 COMPARE ;
+                 LE ;
+                 IF {} { PUSH string "OracleAmountBelowMin" ; FAILWITH } ;
+                 DUP 3 ;
+                 GET 6 ;
+                 NOW ;
+                 PUSH int 60 ;
+                 DUP 9 ;
+                 GET 6 ;
+                 MUL ;
+                 ADD ;
+                 COMPARE ;
+                 LE ;
+                 IF {} { PUSH string "OracleTimeoutBelowMinTimeout" ; FAILWITH } ;
+                 DIG 2 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 DIG 3 ;
+                 PAIR %client %client_request_id ;
+                 DUP 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 MEM ;
+                 IF { PUSH string "OracleRequestKeyAlreadyKnown" ; FAILWITH } {} ;
+                 DIG 2 ;
+                 DUP 6 ;
+                 SOME ;
+                 DIG 2 ;
+                 UPDATE ;
+                 SWAP ;
+                 DIG 2 ;
+                 SOME ;
+                 DUP 5 ;
+                 UPDATE ;
+                 DUG 2 ;
+                 PAIR %reverse_requests %setup ;
+                 SWAP ;
+                 PUSH nat 1 ;
+                 DIG 3 ;
+                 ADD ;
+                 PAIR %next_id %requests ;
+                 PAIR } ;
+             NIL operation }
+           { IF_LEFT
+               { SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "OracleNotAdmin" ; FAILWITH } ;
+                 DIG 2 ;
+                 NONE (ticket
+                         (pair (pair (pair (nat %amount) (nat %client_request_id))
+                                     (pair (bytes %job_id) (address %oracle)))
+                               (pair (pair (option %parameters (or (bytes %bytes) (or (int %int) (string %string))))
+                                           (string %tag))
+                                     (pair (address %target) (timestamp %timeout))))) ;
+                 DUP 6 ;
+                 CAR ;
+                 GET_AND_UPDATE ;
+                 { IF_NONE { PUSH string "OracleRequestUnknown" ; FAILWITH } {} } ;
+                 READ_TICKET ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 PUSH nat 1 ;
+                 PUSH string "OracleResult" ;
+                 DIG 9 ;
+                 CDR ;
+                 PAIR %result %tag ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 DUP 5 ;
+                 PAIR %client %client_request_id ;
+                 PAIR ;
+                 TICKET ;
+                 NIL operation ;
+                 DUP 8 ;
+                 GET 3 ;
+                 CONTRACT %fulfill_request
+                   (pair (ticket %request
+                            (pair (pair (pair (nat %amount) (nat %client_request_id))
+                                        (pair (bytes %job_id) (address %oracle)))
+                                  (pair (pair (option %parameters (or (bytes %bytes) (or (int %int) (string %string))))
+                                              (string %tag))
+                                        (pair (address %target) (timestamp %timeout)))))
+                         (ticket %result
+                            (pair (pair (address %client) (nat %client_request_id))
+                                  (pair (or %result (bytes %bytes) (or (int %int) (string %string))) (string %tag))))) ;
+                 { IF_NONE { PUSH int 173 ; FAILWITH } {} } ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 DIG 6 ;
+                 PAIR %request %result ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIG 4 ;
+                 NONE nat ;
+                 DIG 3 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 DIG 4 ;
+                 PAIR %client %client_request_id ;
+                 UPDATE ;
+                 DUG 2 ;
+                 DIG 3 ;
+                 DIG 3 ;
+                 PAIR %reverse_requests %setup ;
+                 DIG 2 ;
+                 DIG 3 ;
+                 PAIR %next_id %requests ;
+                 PAIR ;
+                 SWAP }
+               { SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "OracleNotAdmin" ; FAILWITH } ;
+                 DIG 3 ;
+                 DUP ;
+                 GET 6 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 5 ;
+                 GET 5 ;
+                 PAIR %min_amount %min_timeout_minutes ;
+                 DUP 5 ;
+                 GET 3 ;
+                 PAIR %escrow ;
+                 DIG 4 ;
+                 DUP ;
+                 CAR ;
+                 CDR ;
+                 SWAP ;
+                 CAR ;
+                 CAR ;
+                 PAIR %active %admin ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR %reverse_requests %setup ;
+                 SWAP ;
+                 DIG 2 ;
+                 PAIR %next_id %requests ;
+                 PAIR ;
+                 NIL operation } } ;
+         PAIR } }

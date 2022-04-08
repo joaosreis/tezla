@@ -1,0 +1,72 @@
+{ storage
+    (pair (address %admin)
+          (pair (option %latestRoundData
+                   (pair (pair (nat %answer) (nat %answeredInRound))
+                         (pair (nat %roundId) (pair (timestamp %startedAt) (timestamp %updatedAt)))))
+                (address %proxy))) ;
+  parameter
+    (or (unit %getLatestRoundData)
+        (or (pair %setLatestRoundData
+               (pair (nat %answer) (nat %answeredInRound))
+               (pair (nat %roundId) (pair (timestamp %startedAt) (timestamp %updatedAt))))
+            (pair %setup (address %admin) (address %proxy)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ;
+             DUP ;
+             GET 4 ;
+             CONTRACT %latestRoundData address ;
+             IF_NONE { PUSH string "Viewer proxy not found" ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             SELF %setLatestRoundData ;
+             ADDRESS ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 4 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.sender == self.data.proxy" ; FAILWITH } ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 CDR ;
+                 DIG 2 ;
+                 SOME ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+                 SWAP ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 PAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 2 ;
+                 CDR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } ;
+             NIL operation } ;
+         PAIR } }

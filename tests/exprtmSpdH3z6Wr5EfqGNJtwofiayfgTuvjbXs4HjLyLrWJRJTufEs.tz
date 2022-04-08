@@ -1,0 +1,3 @@
+{ parameter (or (address %disburse) (unit %donate)) ;
+  storage (pair (map %donors address mutez) (address %owner)) ;
+  code { CDR ; NIL operation ; PAIR } }

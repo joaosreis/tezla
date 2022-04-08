@@ -1,0 +1,64 @@
+{ storage
+    (pair (map %participants address int)
+          (pair (list %requiredProofs string) (address %tezid))) ;
+  parameter
+    (or (pair %register
+           (address %address)
+           (map %proofs string (pair (timestamp %register_date) (bool %verified))))
+        (unit %signup)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "Only TezID can register" ; FAILWITH } {} ;
+             NIL string ;
+             DUP 3 ;
+             GET 3 ;
+             ITER { DUP 3 ;
+                    CDR ;
+                    SWAP ;
+                    DUP ;
+                    DUG 2 ;
+                    MEM ;
+                    IF { DUP 3 ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE { PUSH int 252 ; FAILWITH } {} ;
+                         CDR ;
+                         IF { CONS } { DROP } }
+                       { DROP } } ;
+             SIZE ;
+             DUP 3 ;
+             GET 3 ;
+             SIZE ;
+             COMPARE ;
+             EQ ;
+             IF { SWAP ; UNPAIR ; PUSH (option int) (Some 1) ; DIG 3 ; CAR ; UPDATE ; PAIR }
+                { DROP } ;
+             NIL operation }
+           { DROP ;
+             DUP ;
+             GET 4 ;
+             CONTRACT %getProofs
+               (pair (address %address)
+                     (pair (address %callback_address) (string %callback_entrypoint))) ;
+             IF_NONE { PUSH int 259 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             PUSH string "register" ;
+             SELF_ADDRESS ;
+             PAIR %callback_address %callback_entrypoint ;
+             SENDER ;
+             PAIR %address ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

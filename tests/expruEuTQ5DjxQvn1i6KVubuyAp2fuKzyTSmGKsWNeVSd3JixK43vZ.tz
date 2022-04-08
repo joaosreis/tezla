@@ -1,0 +1,13 @@
+{ storage (option bls12_381_g2) ;
+  parameter (or (pair %mul bls12_381_g2 bls12_381_fr) (bls12_381_fr %toInt)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; DROP ; UNPAIR ; MUL ; SOME }
+           { INT ;
+             PUSH int
+                  42464891526387597118296418373234097444996300047457149716884383324723207029826 ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "Failed to cast field element Fr to Int" ; FAILWITH } } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,25 @@
+{ storage
+    (pair (pair (address %admin) (address %contract))
+          (pair (address %reserve_address)
+                (pair (big_map %rewards address (pair (nat %balance) (timestamp %date)))
+                      (big_map %stakings address (pair (nat %balance) (timestamp %date)))))) ;
+  parameter (or (nat %getRewards) (address %updateContract)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { NIL operation ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CONTRACT (pair (address %from_) (pair (address %to_) (nat %value))) ;
+             IF_NONE { PUSH int 37 ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             SENDER ;
+             PAIR %to_ %value ;
+             DUP 5 ;
+             GET 3 ;
+             PAIR %from_ ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SWAP ; UNPAIR ; CAR ; DIG 2 ; SWAP ; PAIR ; PAIR ; NIL operation } ;
+         PAIR } }

@@ -1,0 +1,52 @@
+{ parameter unit ;
+  storage address ;
+  code { DROP ;
+         NIL operation ;
+         PUSH nat 11 ;
+         PUSH (pair nat address) (Pair 2 "tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af") ;
+         EMPTY_BIG_MAP
+           bytes
+           (pair (pair (pair nat (map string bytes)) (pair address nat))
+                 (pair (pair timestamp nat) (list (pair address nat)))) ;
+         EMPTY_SET (pair timestamp bytes) ;
+         PAIR ;
+         PAIR ;
+         PAIR ;
+         PUSH (pair address nat) (Pair "tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" 0) ;
+         EMPTY_BIG_MAP (pair address address) unit ;
+         PUSH (or unit (or address address)) (Left Unit) ;
+         PAIR ;
+         PAIR ;
+         EMPTY_BIG_MAP string bytes ;
+         EMPTY_BIG_MAP (pair address nat) nat ;
+         PAIR ;
+         PUSH (pair address (map string bytes))
+              (Pair "tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" {}) ;
+         PAIR ;
+         PAIR ;
+         PAIR ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter unit ;
+             storage
+               (pair (pair (pair (pair (address %admin) (map %extra string bytes))
+                                 (pair (big_map %ledger (pair address nat) nat) (big_map %metadata string bytes)))
+                           (pair (pair (or %migration_status
+                                          (unit %not_in_migration)
+                                          (or (address %migratingTo) (address %migratedTo)))
+                                       (big_map %operators (pair (address %owner) (address %operator)) unit))
+                                 (pair (address %pending_owner) (nat %permits_counter))))
+                     (pair (pair (pair (set %proposal_key_list_sort_by_date (pair timestamp bytes))
+                                       (big_map %proposals
+                                          bytes
+                                          (pair (pair (pair (nat %downvotes) (map %metadata string bytes))
+                                                      (pair (address %proposer) (nat %proposer_frozen_token)))
+                                                (pair (pair (timestamp %start_date) (nat %upvotes)) (list %voters (pair address nat))))))
+                                 (pair (nat %quorum_threshold) (address %token_address)))
+                           (nat %voting_period))) ;
+             code { PUSH string "FA2_INSUFFICIENT_BALANCE" ; FAILWITH } } ;
+         SWAP ;
+         DIP { CONS } ;
+         SWAP ;
+         PAIR } }

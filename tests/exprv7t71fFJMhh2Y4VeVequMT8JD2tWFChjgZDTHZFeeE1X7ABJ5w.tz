@@ -1,0 +1,10 @@
+{ parameter (pair key (pair signature bytes)) ;
+  storage unit ;
+  code { CAR ;
+         UNPAIR ;
+         DIP { UNPAIR } ;
+         CHECK_SIGNATURE ;
+         IF {} { PUSH string "Invalid signature" ; FAILWITH } ;
+         UNIT ;
+         NIL operation ;
+         PAIR } }

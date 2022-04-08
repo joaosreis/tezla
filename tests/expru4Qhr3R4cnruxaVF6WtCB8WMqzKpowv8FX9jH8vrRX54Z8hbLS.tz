@@ -1,0 +1,51 @@
+{ parameter (pair (bls12_381_fr %a) (int %e)) ;
+  storage bls12_381_fr ;
+  code { CAR ;
+         LAMBDA
+           (pair bls12_381_fr int)
+           bls12_381_fr
+           { DUP ;
+             UNPAIR ;
+             DUP ;
+             INT ;
+             PUSH bls12_381_fr 0x01 ;
+             DUP 4 ;
+             DUP ;
+             PUSH int 0 ;
+             COMPARE ;
+             LT ;
+             LOOP { PUSH nat 1 ;
+                    PUSH nat 2 ;
+                    DUP 3 ;
+                    EDIV ;
+                    { IF_NONE { PUSH int 17 ; FAILWITH } {} } ;
+                    CDR ;
+                    COMPARE ;
+                    EQ ;
+                    IF { DUP 3 ; DIG 2 ; MUL ; SWAP } {} ;
+                    DIG 2 ;
+                    DUP ;
+                    MUL ;
+                    DUG 2 ;
+                    PUSH nat 2 ;
+                    SWAP ;
+                    EDIV ;
+                    { IF_NONE { PUSH int 17 ; FAILWITH } {} } ;
+                    CAR ;
+                    DUP ;
+                    PUSH int 0 ;
+                    COMPARE ;
+                    LT } ;
+             DROP ;
+             SWAP ;
+             DROP ;
+             SWAP ;
+             DROP ;
+             SWAP ;
+             DROP ;
+             SWAP ;
+             DROP } ;
+         SWAP ;
+         EXEC ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,98 @@
+{ parameter
+    (or (or (contract %prophecyHook bytes) (bytes %setProphecy))
+        (pair %setupContract (set %owners address) (set %contracts address))) ;
+  storage (pair (pair (set %contracts address) (set %owners address)) (bytes %prophecy)) ;
+  code { NIL operation ;
+         LAMBDA
+           (pair bool string)
+           unit
+           { UNPAIR ; IF { FAILWITH } { DROP ; UNIT } } ;
+         DIG 2 ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DIG 3 ;
+                 DROP ;
+                 PUSH string "TZC_NOT_AUTHORIZED_CONTRACT" ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 MEM ;
+                 NOT ;
+                 PAIR ;
+                 DUP 4 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH string "TZC_ORACLE_EMPTY" ;
+                 PUSH bytes 0x0000 ;
+                 DUP 4 ;
+                 CDR ;
+                 COMPARE ;
+                 EQ ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 PUSH mutez 0 ;
+                 DUP 3 ;
+                 CDR ;
+                 TRANSFER_TOKENS ;
+                 PUSH bytes 0x0000 ;
+                 DIG 2 ;
+                 CAR ;
+                 PAIR ;
+                 NIL operation ;
+                 DIG 2 ;
+                 CONS ;
+                 PAIR }
+               { PUSH string "TZC_NOT_OWNER" ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 SOURCE ;
+                 MEM ;
+                 NOT ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } }
+           { PUSH string "TZC_NOT_OWNER" ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             SOURCE ;
+             MEM ;
+             NOT ;
+             PAIR ;
+             DIG 3 ;
+             SWAP ;
+             EXEC ;
+             DROP ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             DIG 3 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             CDR ;
+             DIG 2 ;
+             CDR ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             PAIR } } }

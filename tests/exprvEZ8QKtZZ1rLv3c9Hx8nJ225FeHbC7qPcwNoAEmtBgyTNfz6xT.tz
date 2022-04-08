@@ -1,0 +1,16 @@
+{ storage (pair (nat %fk) (big_map %userRecords string nat)) ;
+  parameter (pair (string %user) (nat %value)) ;
+  code { UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         SWAP ;
+         DUP 3 ;
+         CDR ;
+         SOME ;
+         DIG 3 ;
+         CAR ;
+         UPDATE ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

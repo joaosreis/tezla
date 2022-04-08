@@ -1,0 +1,57 @@
+{ parameter (or (bytes %load_lambda) (unit %run_lambda)) ;
+  storage
+    (pair (address %owner)
+          (or (address %originated)
+              (pair %running
+                 bytes
+                 (pair (pair (pair (big_map (pair address nat) nat) (big_map string bytes))
+                             (big_map (pair address address) unit))
+                       (big_map
+                          bytes
+                          (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                (pair (pair timestamp nat) (list (pair address nat))))))))) ;
+  code { DUP ;
+         CAR ;
+         DIP { CDR } ;
+         DIP { DUP ;
+               CAR ;
+               DIP { CDR } ;
+               SWAP ;
+               IF_LEFT
+                 { FAILWITH }
+                 { SWAP ;
+                   DUP ;
+                   SENDER ;
+                   COMPARE ;
+                   EQ ;
+                   IF { SWAP ; DUP ; CAR ; DIP { CDR } }
+                      { PUSH string "sender is not originator owner" ; FAILWITH } } } ;
+         IF_LEFT
+           { CONCAT ; PAIR ; RIGHT address ; NIL operation }
+           { DROP ;
+             UNPACK
+               (lambda
+                  (pair (pair (pair (big_map (pair address nat) nat) (big_map string bytes))
+                              (big_map (pair address address) unit))
+                        (big_map
+                           bytes
+                           (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                 (pair (pair timestamp nat) (list (pair address nat))))))
+                  (pair address (list operation))) ;
+             IF_NONE
+               { PUSH string "failed to unpack lambda" ; FAILWITH }
+               { SWAP ;
+                 EXEC ;
+                 DUP ;
+                 CAR ;
+                 DIP { CDR } ;
+                 LEFT (pair bytes
+                            (pair (pair (pair (big_map (pair address nat) nat) (big_map string bytes))
+                                        (big_map (pair address address) unit))
+                                  (big_map
+                                     bytes
+                                     (pair (pair (pair nat (map string bytes)) (pair address nat))
+                                           (pair (pair timestamp nat) (list (pair address nat))))))) ;
+                 SWAP } } ;
+         DIP { SWAP ; PAIR } ;
+         PAIR } }

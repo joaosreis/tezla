@@ -1,0 +1,20 @@
+{ parameter (or int (or nat (or int (or nat int)))) ;
+  storage
+    (pair string
+          (big_map nat (lambda (pair (or int (or nat (or int (or nat int)))) string) string))) ;
+  code { UNPAIR 3 ;
+         DUP ;
+         IF_LEFT
+           { DROP ; DUP 3 ; PUSH nat 0 }
+           { IF_LEFT
+               { DROP ; DUP 3 ; PUSH nat 1 }
+               { IF_LEFT
+                   { DROP ; DUP 3 ; PUSH nat 2 }
+                   { IF_LEFT { DROP ; DUP 3 ; PUSH nat 3 } { DROP ; DUP 3 ; PUSH nat 4 } } } } ;
+         GET ;
+         { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+         DUG 2 ;
+         PAIR ;
+         EXEC ;
+         NIL operation ;
+         PAIR 3 } }

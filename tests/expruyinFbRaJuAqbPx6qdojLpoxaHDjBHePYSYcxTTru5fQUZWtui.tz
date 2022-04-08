@@ -1,0 +1,94 @@
+{ parameter
+    (or (unit %default)
+        (pair %main
+           (pair :payload
+              nat
+              (or :action
+                 (lambda %operation unit (list operation))
+                 (pair %changeKeys nat (list key))))
+           (list (option signature)))) ;
+  storage (pair nat (pair nat (list key))) ;
+  code { CAST (pair (or unit
+                        (pair (pair nat (or (lambda unit (list operation)) (pair nat (list key))))
+                              (list (option signature))))
+                    (pair nat (pair nat (list key)))) ;
+         DUP ;
+         CAR ;
+         DIP { CDR } ;
+         IF_LEFT
+           { DROP ; NIL operation ; PAIR }
+           { PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             EQ ;
+             IF {} { UNIT ; PUSH string "NonZeroTransfer" ; PAIR ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DIP { SWAP ;
+                   DUP ;
+                   CAR @counter ;
+                   DIP { CDR } ;
+                   DUP ;
+                   SELF_ADDRESS ;
+                   CHAIN_ID ;
+                   PAIR ;
+                   PAIR ;
+                   PACK ;
+                   DIP { DUP ; CAR ; DIP { CDR ; SWAP } } ;
+                   SWAP } ;
+             DUP ;
+             CAR @stored_counter ;
+             DIP { CDR ; SWAP } ;
+             COMPARE ;
+             EQ ;
+             IF {} { UNIT ; PUSH string "CounterDoesntMatch" ; PAIR ; FAILWITH } ;
+             DIP { SWAP } ;
+             DUP ;
+             CAR @threshold ;
+             DIP { CDR @keys ;
+                   PUSH @valid nat 0 ;
+                   SWAP ;
+                   ITER { DIP { SWAP } ;
+                          SWAP ;
+                          IF_CONS
+                            { IF_NONE
+                                { SWAP ; DROP }
+                                { SWAP ;
+                                  DIP { SWAP ;
+                                        DIP 2 { DIP { DUP } ; SWAP } ;
+                                        DUP 3 ;
+                                        DIP { CHECK_SIGNATURE } ;
+                                        SWAP ;
+                                        IF { DROP }
+                                           { DROP ; UNIT ; PUSH string "InvalidSignature" ; PAIR ; FAILWITH } ;
+                                        PUSH nat 1 ;
+                                        ADD @valid } } }
+                            { UNIT ; PUSH string "FewerSignaturesThanKeys" ; PAIR ; FAILWITH } ;
+                          SWAP } } ;
+             COMPARE ;
+             LE ;
+             IF {} { UNIT ; PUSH string "InsufficientSignatures" ; PAIR ; FAILWITH } ;
+             IF_CONS
+               { UNIT ; PUSH string "UncheckedSignaturesLeft" ; PAIR ; FAILWITH }
+               {} ;
+             DROP ;
+             DIP { DUP ; CAR ; DIP { CDR } ; PUSH nat 1 ; ADD @new_counter ; PAIR } ;
+             IF_LEFT
+               { UNIT ; EXEC }
+               { DUP ;
+                 DUP ;
+                 CAR ;
+                 INT ;
+                 EQ ;
+                 IF { UNIT ; PUSH string "ZeroThresholdUpdate" ; PAIR ; FAILWITH } {} ;
+                 DUP ;
+                 CAR ;
+                 DIP { CDR ; SIZE } ;
+                 COMPARE ;
+                 GT ;
+                 IF { UNIT ; PUSH string "ThresholdLargerThanKeysSize" ; PAIR ; FAILWITH } {} ;
+                 DIP { CAR } ;
+                 SWAP ;
+                 PAIR ;
+                 NIL operation } ;
+             PAIR } } }

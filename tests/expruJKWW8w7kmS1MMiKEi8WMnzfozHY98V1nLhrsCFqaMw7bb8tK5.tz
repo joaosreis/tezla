@@ -1,0 +1,265 @@
+{ storage
+    (pair (pair (address %admin) (pair (timestamp %genesis) (big_map %metadata string bytes)))
+          (pair (pair (bool %minting_allowed) (address %spot_address))
+                (pair (big_map %swaps
+                         nat
+                         (pair (address %issuer) (pair (nat %spot_id) (mutez %xtz_per_spot))))
+                      (address %tuDAO_address)))) ;
+  parameter
+    (or (or (bool %allow_minting) (or (nat %cancel_swap) (mutez %management_rewards)))
+        (or (or (pair %mint_SPOT
+                   (address %address)
+                   (pair (nat %token_id) (map %token_info string bytes)))
+                (nat %occupy))
+            (or (key_hash %set_baker) (pair %swap (nat %spot_id) (mutez %xtz_per_spot))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 CDR ;
+                 DIG 3 ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 NIL operation }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 22 ; FAILWITH } {} ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.swaps[params].issuer" ;
+                          FAILWITH } ;
+                     NIL operation ;
+                     DUP 3 ;
+                     GET 3 ;
+                     CDR ;
+                     CONTRACT %transfer
+                       (list (pair (address %from_) (list %txs (pair (address %to_) (nat %token_id))))) ;
+                     IF_NONE { PUSH int 71 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     NIL (pair (address %from_) (list %txs (pair (address %to_) (nat %token_id)))) ;
+                     NIL (pair (address %to_) (nat %token_id)) ;
+                     DUP 7 ;
+                     GET 5 ;
+                     DUP 7 ;
+                     GET ;
+                     IF_NONE { PUSH int 23 ; FAILWITH } {} ;
+                     GET 3 ;
+                     SENDER ;
+                     PAIR %to_ %token_id ;
+                     CONS ;
+                     SELF_ADDRESS ;
+                     PAIR %from_ %txs ;
+                     CONS ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DIG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     NONE (pair (address %issuer) (pair (nat %spot_id) (mutez %xtz_per_spot))) ;
+                     DIG 6 ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+                     NIL operation ;
+                     DUP 3 ;
+                     CAR ;
+                     CAR ;
+                     CONTRACT unit ;
+                     IF_NONE { PUSH int 42 ; FAILWITH } {} ;
+                     DIG 2 ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     CONS } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { NIL operation ;
+                     DUP 3 ;
+                     GET 3 ;
+                     CDR ;
+                     CONTRACT %mint
+                       (pair (address %address) (pair (nat %token_id) (map %token_info string bytes))) ;
+                     IF_NONE { PUSH int 52 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     DUP ;
+                     GET 4 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 5 ;
+                     GET 3 ;
+                     PAIR %token_id %token_info ;
+                     DIG 4 ;
+                     CAR ;
+                     PAIR %address ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 28 ; FAILWITH } {} ;
+                     GET 4 ;
+                     AMOUNT ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.amount == self.data.swaps[params].xtz_per_spot" ;
+                          FAILWITH } ;
+                     NIL operation ;
+                     DUP 3 ;
+                     GET 3 ;
+                     CDR ;
+                     CONTRACT %transfer
+                       (list (pair (address %from_) (list %txs (pair (address %to_) (nat %token_id))))) ;
+                     IF_NONE { PUSH int 71 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     NIL (pair (address %from_) (list %txs (pair (address %to_) (nat %token_id)))) ;
+                     NIL (pair (address %to_) (nat %token_id)) ;
+                     DUP 6 ;
+                     SENDER ;
+                     PAIR %to_ %token_id ;
+                     CONS ;
+                     SELF_ADDRESS ;
+                     PAIR %from_ %txs ;
+                     CONS ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DUP 3 ;
+                     GET 5 ;
+                     DUP 3 ;
+                     GET ;
+                     IF_NONE { PUSH int 30 ; FAILWITH } {} ;
+                     CAR ;
+                     CONTRACT unit ;
+                     IF_NONE { PUSH int 30 ; FAILWITH } {} ;
+                     AMOUNT ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DIG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     NONE (pair (address %issuer) (pair (nat %spot_id) (mutez %xtz_per_spot))) ;
+                     DIG 6 ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+                     SOME ;
+                     SET_DELEGATE ;
+                     NIL operation ;
+                     SWAP ;
+                     CONS }
+                   { NIL operation ;
+                     DUP 3 ;
+                     GET 3 ;
+                     CDR ;
+                     CONTRACT %transfer
+                       (list (pair (address %from_) (list %txs (pair (address %to_) (nat %token_id))))) ;
+                     IF_NONE { PUSH int 71 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     NIL (pair (address %from_) (list %txs (pair (address %to_) (nat %token_id)))) ;
+                     NIL (pair (address %to_) (nat %token_id)) ;
+                     DUP 6 ;
+                     CAR ;
+                     SELF_ADDRESS ;
+                     PAIR %to_ %token_id ;
+                     CONS ;
+                     SENDER ;
+                     PAIR %from_ %txs ;
+                     CONS ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DIG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     DIG 5 ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 7 ;
+                     CAR ;
+                     PAIR %spot_id %xtz_per_spot ;
+                     SENDER ;
+                     PAIR %issuer ;
+                     SOME ;
+                     DIG 6 ;
+                     CAR ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP } } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

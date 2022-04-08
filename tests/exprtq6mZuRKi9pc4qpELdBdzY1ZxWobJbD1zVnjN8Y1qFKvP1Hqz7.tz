@@ -1,0 +1,5 @@
+{ parameter
+    (list (pair (pair (nat %amount) (map %metadata string bytes))
+                (pair (string %partition) (pair (address %to) (nat %token_id))))) ;
+  storage unit ;
+  code { CDR ; NIL operation ; PAIR } }

@@ -1,0 +1,27 @@
+{ storage unit ;
+  parameter (or (nat %stake) (nat %unstake)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { NIL operation ;
+             PUSH address "KT1TQyxEEdFx7xnEJH3PWjE3ehfjH493xuRA" ;
+             CONTRACT %transfer (pair address (pair address nat)) ;
+             IF_NONE { PUSH int 12 ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             SELF_ADDRESS ;
+             SENDER ;
+             PAIR 3 ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { NIL operation ;
+             PUSH address "KT1TQyxEEdFx7xnEJH3PWjE3ehfjH493xuRA" ;
+             CONTRACT %transfer (pair address (pair address nat)) ;
+             IF_NONE { PUSH int 19 ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             SENDER ;
+             SELF_ADDRESS ;
+             PAIR 3 ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

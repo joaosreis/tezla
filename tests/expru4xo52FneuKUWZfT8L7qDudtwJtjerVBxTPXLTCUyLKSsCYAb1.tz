@@ -1,0 +1,298 @@
+{ storage
+    (pair (pair (pair (address %administrator)
+                      (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                (pair (pair (big_map %metadata string bytes)
+                            (big_map %operators
+                               (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                               unit))
+                      (pair (bool %paused)
+                            (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply))))))
+          (pair (pair (big_map
+                         nat
+                         (lambda
+                            (pair (pair (pair (list %requests (pair (address %owner) (nat %token_id)))
+                                              (contract %callback
+                                                 (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                                        (pair (pair (address %administrator)
+                                                    (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                              (pair (pair (big_map %metadata string bytes)
+                                                          (big_map %operators
+                                                             (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                             unit))
+                                                    (pair (bool %paused)
+                                                          (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))
+                                  address)
+                            (pair (list operation)
+                                  (pair (pair (address %administrator)
+                                              (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                        (pair (pair (big_map %metadata string bytes)
+                                                    (big_map %operators
+                                                       (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                       unit))
+                                              (pair (bool %paused)
+                                                    (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))))
+                      (pair (big_map
+                               nat
+                               (lambda
+                                  (pair (pair (pair (pair (address %address) (nat %amount))
+                                                    (pair (map %metadata string bytes) (nat %token_id)))
+                                              (pair (pair (address %administrator)
+                                                          (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                                    (pair (pair (big_map %metadata string bytes)
+                                                                (big_map %operators
+                                                                   (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                                   unit))
+                                                          (pair (bool %paused)
+                                                                (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))
+                                        address)
+                                  (pair (list operation)
+                                        (pair (pair (address %administrator)
+                                                    (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                              (pair (pair (big_map %metadata string bytes)
+                                                          (big_map %operators
+                                                             (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                             unit))
+                                                    (pair (bool %paused)
+                                                          (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))))
+                            (big_map
+                               nat
+                               (lambda
+                                  (pair (pair address
+                                              (pair (pair (address %administrator)
+                                                          (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                                    (pair (pair (big_map %metadata string bytes)
+                                                                (big_map %operators
+                                                                   (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                                   unit))
+                                                          (pair (bool %paused)
+                                                                (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))
+                                        address)
+                                  (pair (list operation)
+                                        (pair (pair (address %administrator)
+                                                    (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                              (pair (pair (big_map %metadata string bytes)
+                                                          (big_map %operators
+                                                             (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                             unit))
+                                                    (pair (bool %paused)
+                                                          (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))))))
+                (pair (pair (big_map
+                               nat
+                               (lambda
+                                  (pair (pair (pair (string %k) (bytes %v))
+                                              (pair (pair (address %administrator)
+                                                          (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                                    (pair (pair (big_map %metadata string bytes)
+                                                                (big_map %operators
+                                                                   (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                                   unit))
+                                                          (pair (bool %paused)
+                                                                (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))
+                                        address)
+                                  (pair (list operation)
+                                        (pair (pair (address %administrator)
+                                                    (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                              (pair (pair (big_map %metadata string bytes)
+                                                          (big_map %operators
+                                                             (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                             unit))
+                                                    (pair (bool %paused)
+                                                          (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))))
+                            (big_map
+                               nat
+                               (lambda
+                                  (pair (pair bool
+                                              (pair (pair (address %administrator)
+                                                          (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                                    (pair (pair (big_map %metadata string bytes)
+                                                                (big_map %operators
+                                                                   (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                                   unit))
+                                                          (pair (bool %paused)
+                                                                (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))
+                                        address)
+                                  (pair (list operation)
+                                        (pair (pair (address %administrator)
+                                                    (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                              (pair (pair (big_map %metadata string bytes)
+                                                          (big_map %operators
+                                                             (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                             unit))
+                                                    (pair (bool %paused)
+                                                          (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply))))))))))
+                      (pair (big_map
+                               nat
+                               (lambda
+                                  (pair (pair (list (pair (address %from_)
+                                                          (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+                                              (pair (pair (address %administrator)
+                                                          (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                                    (pair (pair (big_map %metadata string bytes)
+                                                                (big_map %operators
+                                                                   (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                                   unit))
+                                                          (pair (bool %paused)
+                                                                (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))
+                                        address)
+                                  (pair (list operation)
+                                        (pair (pair (address %administrator)
+                                                    (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                              (pair (pair (big_map %metadata string bytes)
+                                                          (big_map %operators
+                                                             (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                             unit))
+                                                    (pair (bool %paused)
+                                                          (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))))
+                            (big_map
+                               nat
+                               (lambda
+                                  (pair (pair (list (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                                                        (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))))
+                                              (pair (pair (address %administrator)
+                                                          (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                                    (pair (pair (big_map %metadata string bytes)
+                                                                (big_map %operators
+                                                                   (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                                   unit))
+                                                          (pair (bool %paused)
+                                                                (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply)))))))
+                                        address)
+                                  (pair (list operation)
+                                        (pair (pair (address %administrator)
+                                                    (pair (nat %all_tokens) (big_map %ledger (pair address nat) nat)))
+                                              (pair (pair (big_map %metadata string bytes)
+                                                          (big_map %operators
+                                                             (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                                             unit))
+                                                    (pair (bool %paused)
+                                                          (big_map %tokens nat (pair (map %metadata_map string bytes) (nat %total_supply))))))))))))) ;
+  parameter
+    (or (or (pair %balance_of
+               (list %requests (pair (address %owner) (nat %token_id)))
+               (contract %callback
+                  (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+            (or (pair %mint
+                   (pair (address %address) (nat %amount))
+                   (pair (map %metadata string bytes) (nat %token_id)))
+                (address %set_administrator)))
+        (or (or (pair %set_metdata (string %k) (bytes %v)) (bool %set_pause))
+            (or (list %transfer
+                   (pair (address %from_)
+                         (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+                (list %update_operators
+                   (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                       (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))))))) ;
+  code { UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         DIG 2 ;
+         IF_LEFT
+           { IF_LEFT
+               { PAIR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 PUSH nat 0 ;
+                 GET ;
+                 IF_NONE { PUSH int -1 ; FAILWITH } {} ;
+                 SWAP ;
+                 SELF_ADDRESS ;
+                 SWAP ;
+                 PAIR ;
+                 EXEC }
+               { IF_LEFT
+                   { PAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET 3 ;
+                     PUSH nat 0 ;
+                     GET ;
+                     IF_NONE { PUSH int -1 ; FAILWITH } {} ;
+                     SWAP ;
+                     SELF_ADDRESS ;
+                     SWAP ;
+                     PAIR ;
+                     EXEC }
+                   { PAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET 4 ;
+                     PUSH nat 0 ;
+                     GET ;
+                     IF_NONE { PUSH int -1 ; FAILWITH } {} ;
+                     SWAP ;
+                     SELF_ADDRESS ;
+                     SWAP ;
+                     PAIR ;
+                     EXEC } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { PAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CAR ;
+                     PUSH nat 0 ;
+                     GET ;
+                     IF_NONE { PUSH int -1 ; FAILWITH } {} ;
+                     SWAP ;
+                     SELF_ADDRESS ;
+                     SWAP ;
+                     PAIR ;
+                     EXEC }
+                   { PAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CDR ;
+                     PUSH nat 0 ;
+                     GET ;
+                     IF_NONE { PUSH int -1 ; FAILWITH } {} ;
+                     SWAP ;
+                     SELF_ADDRESS ;
+                     SWAP ;
+                     PAIR ;
+                     EXEC } }
+               { IF_LEFT
+                   { PAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     PUSH nat 0 ;
+                     GET ;
+                     IF_NONE { PUSH int -1 ; FAILWITH } {} ;
+                     SWAP ;
+                     SELF_ADDRESS ;
+                     SWAP ;
+                     PAIR ;
+                     EXEC }
+                   { PAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 6 ;
+                     PUSH nat 0 ;
+                     GET ;
+                     IF_NONE { PUSH int -1 ; FAILWITH } {} ;
+                     SWAP ;
+                     SELF_ADDRESS ;
+                     SWAP ;
+                     PAIR ;
+                     EXEC } } } ;
+         UNPAIR ;
+         DUG 2 ;
+         PAIR ;
+         SWAP ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

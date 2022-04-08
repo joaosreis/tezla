@@ -1,0 +1,15 @@
+{ storage nat ;
+  parameter (unit %ep) ;
+  code { DROP ;
+         PUSH int 1 ;
+         ISNAT ;
+         IF_NONE { PUSH int 9 ; FAILWITH } {} ;
+         PUSH nat 1 ;
+         PUSH int 1 ;
+         ISNAT ;
+         IF_NONE { PUSH int 9 ; FAILWITH } {} ;
+         MUL ;
+         EDIV ;
+         IF_NONE { PUSH int 9 ; FAILWITH } { CAR } ;
+         NIL operation ;
+         PAIR } }

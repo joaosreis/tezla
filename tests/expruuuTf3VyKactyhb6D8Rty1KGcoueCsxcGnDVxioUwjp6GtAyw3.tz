@@ -1,0 +1,24 @@
+{ parameter (ticket int) ;
+  storage bool ;
+  code { CAR ;
+         READ_TICKET ;
+         SWAP ;
+         DIP { UNPAIR ; DIP { UNPAIR } } ;
+         PUSH address 0x010abc05572c0dd304b7864e73b500d5bec4705ed400 ;
+         SWAP ;
+         DROP ;
+         COMPARE ;
+         EQ ;
+         IF {} { PUSH string "WRONG_TICKETER" ; FAILWITH } ;
+         SWAP ;
+         DIP { PUSH nat 1 } ;
+         COMPARE ;
+         EQ ;
+         IF {} { PUSH string "NOT_SINGLE_TICKET_TOKEN" ; FAILWITH } ;
+         PUSH int 12345 ;
+         COMPARE ;
+         EQ ;
+         IF {} { PUSH string "Bad code" ; FAILWITH } ;
+         PUSH bool True ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,45 @@
+{ storage (option bytes) ;
+  parameter
+    (or (address %t)
+        (pair %verify (map %m address nat) (pair (bytes %request) (address %sender)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; DROP ; PACK ; SHA256 ; SOME ; NIL operation }
+           { DUP ;
+             GET 3 ;
+             UNPACK address ;
+             IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: params.sender == sp.unpack(params.request, sp.TRecord(address = sp.TAddress).layout(\"address\")).open_some().address" ;
+                  FAILWITH } ;
+             DUP ;
+             CAR ;
+             PUSH address "KT1Tezooo1zzSmartPyzzSTATiCzzzyfC8eF" ;
+             MEM ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: params.m.contains(sp.address('KT1Tezooo1zzSmartPyzzSTATiCzzzyfC8eF'))" ;
+                  FAILWITH } ;
+             DUP ;
+             GET 3 ;
+             UNPACK address ;
+             IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+             CONTRACT %t address ;
+             IF_NONE { PUSH int 14 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             GET 3 ;
+             UNPACK address ;
+             IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

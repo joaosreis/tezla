@@ -1,0 +1,26 @@
+{ parameter unit ;
+  storage bytes ;
+  code { DROP ;
+         EMPTY_MAP string bytes ;
+         NOW ;
+         PACK ;
+         SOME ;
+         PUSH string "ts" ;
+         UPDATE ;
+         PUSH string "Legendary" ;
+         PACK ;
+         SOME ;
+         PUSH string "rarity" ;
+         UPDATE ;
+         PUSH bytes 0x0055 ;
+         SOME ;
+         PUSH string "data" ;
+         UPDATE ;
+         PUSH string "tezos-storage:123456" ;
+         PACK ;
+         SOME ;
+         PUSH string "artefactUri" ;
+         UPDATE ;
+         PACK ;
+         NIL operation ;
+         PAIR } }

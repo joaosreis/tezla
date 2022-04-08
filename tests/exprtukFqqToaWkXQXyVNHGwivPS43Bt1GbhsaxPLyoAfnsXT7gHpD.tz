@@ -1,0 +1,8 @@
+{ storage (pair (bytes %b1) (bytes %b2)) ;
+  parameter
+    (or (pair %entry_point_1 (nat %g) (pair (nat %x) (pair (nat %y) (nat %z))))
+        (pair %entry_point_2 (nat %x) (nat %y) (nat %z) (nat %g))) ;
+  code { UNPAIR ;
+         IF_LEFT { PACK ; UPDATE 1 } { PACK ; UPDATE 2 } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,89 @@
+{ parameter (or (pair %reassign address (option (list nat))) (unit %transfer)) ;
+  storage
+    (big_map
+       address
+       (pair (map %allowances (pair address nat) unit) (map %balances nat nat))) ;
+  code { LAMBDA
+           (pair address (big_map address (pair (map (pair address nat) unit) (map nat nat))))
+           (pair (map (pair address nat) unit) (map nat nat))
+           { DROP ; EMPTY_MAP nat nat ; EMPTY_MAP (pair address nat) unit ; PAIR } ;
+         LAMBDA
+           (big_map address (pair (map (pair address nat) unit) (map nat nat)))
+           nat
+           { DROP ; PUSH nat 1 } ;
+         DIG 2 ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         NEQ ;
+         IF { PUSH string "This contract does not accept tezi deposits" ; FAILWITH }
+            {} ;
+         IF_LEFT
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             IF_NONE
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 PAIR ;
+                 { DIP 4 { DUP } ; DIG 5 } ;
+                 SWAP ;
+                 EXEC ;
+                 DIG 2 ;
+                 SWAP ;
+                 CDR ;
+                 ITER { CAR ;
+                        SWAP ;
+                        DUP ;
+                        { DIP 3 { DUP } ; DIG 4 } ;
+                        PAIR ;
+                        { DIP 5 { DUP } ; DIG 6 } ;
+                        SWAP ;
+                        EXEC ;
+                        SWAP ;
+                        DUP ;
+                        DUG 2 ;
+                        { DIP 5 { DUP } ; DIG 6 } ;
+                        SWAP ;
+                        EXEC ;
+                        DROP ;
+                        DUP ;
+                        DUG 2 ;
+                        CDR ;
+                        PUSH nat 0 ;
+                        DIG 4 ;
+                        SWAP ;
+                        SOME ;
+                        SWAP ;
+                        UPDATE ;
+                        DIG 2 ;
+                        CAR ;
+                        PAIR ;
+                        { DIP 2 { DUP } ; DIG 3 } ;
+                        SWAP ;
+                        SOME ;
+                        SWAP ;
+                        UPDATE } ;
+                 SWAP ;
+                 DROP ;
+                 SWAP ;
+                 DROP ;
+                 SWAP ;
+                 DROP }
+               { DROP 2 ; SWAP ; DROP ; SWAP ; DROP } ;
+             NIL operation ;
+             PAIR }
+           { DROP ;
+             DIG 2 ;
+             DROP ;
+             DUP ;
+             DIG 2 ;
+             SWAP ;
+             EXEC ;
+             DROP ;
+             NIL operation ;
+             PAIR } } }

@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (big_map nat nat) ;
+  code { CDR ; NIL operation ; PAIR } }

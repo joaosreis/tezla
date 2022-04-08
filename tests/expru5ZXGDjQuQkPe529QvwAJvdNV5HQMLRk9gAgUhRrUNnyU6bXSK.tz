@@ -1,0 +1,141 @@
+{ storage
+    (pair (nat %nonce) (pair (list %operator_public_keys key) (nat %signers_threshold))) ;
+  parameter
+    (or (pair %execute
+           (lambda %execution_payload unit (list operation))
+           (map %signatures key_hash signature))
+        (pair %update_signatory
+           (nat %signers_threshold)
+           (pair (list %operator_public_keys key) (map %signatures key_hash signature)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { PUSH nat 0 ;
+             DUP 3 ;
+             GET 3 ;
+             ITER { DUP 3 ;
+                    CDR ;
+                    SWAP ;
+                    DUP ;
+                    DUG 2 ;
+                    HASH_KEY ;
+                    MEM ;
+                    IF { DUP 3 ;
+                         CAR ;
+                         PUSH nat 1 ;
+                         DUP 6 ;
+                         CAR ;
+                         ADD ;
+                         PAIR %nonce %execution_payload ;
+                         SELF_ADDRESS ;
+                         PAIR %self_address ;
+                         CHAIN_ID ;
+                         PAIR %chain_id ;
+                         PACK ;
+                         DUP 4 ;
+                         CDR ;
+                         DUP 3 ;
+                         HASH_KEY ;
+                         GET ;
+                         IF_NONE { PUSH int 80 ; FAILWITH } {} ;
+                         DIG 2 ;
+                         CHECK_SIGNATURE }
+                       { DROP ; PUSH bool False } ;
+                    IF { PUSH nat 1 ; ADD } {} } ;
+             DUP 3 ;
+             GET 4 ;
+             SWAP ;
+             COMPARE ;
+             GE ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: valid_signatures_counter.value >= self.data.signers_threshold" ;
+                  FAILWITH } ;
+             SWAP ;
+             UNPAIR ;
+             PUSH nat 1 ;
+             ADD ;
+             PAIR ;
+             SWAP ;
+             CAR ;
+             NIL operation ;
+             SWAP ;
+             UNIT ;
+             EXEC ;
+             NIL operation ;
+             SWAP ;
+             ITER { CONS } ;
+             ITER { CONS } }
+           { PUSH nat 0 ;
+             DUP 3 ;
+             GET 3 ;
+             ITER { DUP 3 ;
+                    GET 4 ;
+                    SWAP ;
+                    DUP ;
+                    DUG 2 ;
+                    HASH_KEY ;
+                    MEM ;
+                    IF { DIG 2 ;
+                         DUP ;
+                         GET 3 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 4 ;
+                         CAR ;
+                         PAIR %signers_threshold %operator_public_keys ;
+                         PUSH nat 1 ;
+                         DUP 6 ;
+                         CAR ;
+                         ADD ;
+                         PAIR %nonce ;
+                         SELF_ADDRESS ;
+                         PAIR %self_address ;
+                         CHAIN_ID ;
+                         PAIR %chain_id ;
+                         PACK ;
+                         DUP 4 ;
+                         GET 4 ;
+                         DUP 3 ;
+                         HASH_KEY ;
+                         GET ;
+                         IF_NONE { PUSH int 94 ; FAILWITH } {} ;
+                         DIG 2 ;
+                         CHECK_SIGNATURE }
+                       { DROP ; PUSH bool False } ;
+                    IF { PUSH nat 1 ; ADD } {} } ;
+             DUP 3 ;
+             GET 4 ;
+             SWAP ;
+             COMPARE ;
+             GE ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: valid_signatures_counter.value >= self.data.signers_threshold" ;
+                  FAILWITH } ;
+             SWAP ;
+             UNPAIR ;
+             PUSH nat 1 ;
+             ADD ;
+             PAIR ;
+             UNPAIR ;
+             SWAP ;
+             CAR ;
+             DUP 3 ;
+             CAR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             UNPAIR ;
+             SWAP ;
+             CDR ;
+             DIG 2 ;
+             GET 3 ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             NIL operation } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

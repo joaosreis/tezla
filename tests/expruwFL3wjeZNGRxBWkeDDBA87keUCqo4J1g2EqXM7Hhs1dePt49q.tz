@@ -1,0 +1,19 @@
+{ storage int ;
+  parameter
+    (or (int %recieveResponse)
+        (pair %sendDataToTargetContract (int %num) (address %targetContract))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; DROP ; NIL operation }
+           { DUP ;
+             CDR ;
+             CONTRACT %addTwoAndReturn int ;
+             IF_NONE { PUSH int 8 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             CAR ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

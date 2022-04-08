@@ -1,0 +1,22 @@
+{ storage nat ;
+  parameter (or (or (nat %add) (nat %divide)) (or (nat %multiply) (nat %subtract))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { ADD }
+               { DUP ;
+                 PUSH nat 0 ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {} { PUSH string "WrongCondition: params != 0" ; FAILWITH } ;
+                 SWAP ;
+                 EDIV ;
+                 IF_NONE { PUSH int 23 ; FAILWITH } { CAR } } }
+           { IF_LEFT
+               { MUL }
+               { SWAP ;
+                 SUB ;
+                 ISNAT ;
+                 IF_NONE { PUSH string "sp.TNat must be non negative !" ; FAILWITH } {} } } ;
+         NIL operation ;
+         PAIR } }

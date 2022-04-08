@@ -1,0 +1,65 @@
+{ parameter
+    (or (pair %concatenating
+           (pair (string %testAction) (string %testDate))
+           (pair (string %testMessage) (string %testStatus)))
+        (pair %set_child_record
+           (pair (string %_message) (string %action))
+           (pair (string %date) (string %status)))) ;
+  storage
+    (pair (pair (string %_message) (string %action)) (pair (string %date) (string %status))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             UNPAIR ;
+             CAR ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             UPDATE 4 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             UPDATE 3 ;
+             UNPAIR ;
+             CDR ;
+             DIG 2 ;
+             GET 3 ;
+             PAIR ;
+             PAIR }
+           { SWAP ;
+             UNPAIR ;
+             CAR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             UPDATE 4 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             UPDATE 3 ;
+             UNPAIR ;
+             CDR ;
+             DIG 2 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR } ;
+         NIL operation ;
+         PAIR } }

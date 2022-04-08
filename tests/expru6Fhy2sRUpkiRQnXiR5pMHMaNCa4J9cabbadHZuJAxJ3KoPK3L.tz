@@ -1,0 +1,10 @@
+{ parameter unit ;
+  storage
+    (pair (pair (pair (pair (map %mapa address nat) (map %mapb int nat))
+                      (pair (map %mapc nat nat) (map %mapd string nat)))
+                (pair (pair (map %mape bytes nat) (map %mapf mutez nat))
+                      (pair (map %mapg timestamp nat) (map %maph chain_id nat))))
+          (pair (pair (map %mapi key nat) (map %mapj (option nat) nat))
+                (pair (map %mapk (or (nat %myNat) (string %myString)) nat)
+                      (big_map %mapl signature nat)))) ;
+  code { DUP ; CDR ; NIL operation ; PAIR ; DIP { DROP } } }

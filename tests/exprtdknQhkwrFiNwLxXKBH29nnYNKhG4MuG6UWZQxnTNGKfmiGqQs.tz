@@ -1,0 +1,20 @@
+{ storage (pair (address %admin) (nat %value)) ;
+  parameter unit ;
+  code { UNPAIR ;
+         DIP { UNPAIR ; SWAP } ;
+         DROP ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         SENDER ;
+         COMPARE ;
+         EQ ;
+         NOT ;
+         IF { PUSH string "InvalidCaller" ; FAILWITH } {} ;
+         PUSH nat 3 ;
+         SWAP ;
+         DROP ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

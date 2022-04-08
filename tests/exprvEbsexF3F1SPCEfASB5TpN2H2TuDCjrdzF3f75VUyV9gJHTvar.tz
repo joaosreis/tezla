@@ -1,0 +1,301 @@
+{ parameter
+    (or (or (or (pair %propose
+                   (nat %escrowAmount)
+                   (pair %proposal
+                      (string %title)
+                      (pair (string %descriptionLink)
+                            (pair (string %descriptionHash) (lambda %proposalLambda unit (list operation))))))
+                (pair %rescueFA12
+                   (address %tokenContractAddress)
+                   (pair (nat %amount) (address %destination))))
+            (or (pair %rescueFA2
+                   (address %tokenContractAddress)
+                   (pair (nat %tokenId) (pair (nat %amount) (address %destination))))
+                (address %rescueXTZ)))
+        (or (or (address %rotateOwner) (address %setDaoContractAddress))
+            (or (nat %vote) (nat %withdraw)))) ;
+  storage
+    (pair (pair (nat %amountPerBlock)
+                (pair (nat %amountWithdrawn) (address %daoContractAddress)))
+          (pair (pair (address %governorAddress) (address %owner))
+                (pair (nat %startBlock) (address %tokenContractAddress)))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CDR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Not owner" ; FAILWITH } ;
+                     NIL operation ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     GET 6 ;
+                     CONTRACT %approve (pair (address %spender) (nat %value)) ;
+                     { IF_NONE { PUSH int 232 ; FAILWITH } {} } ;
+                     PUSH mutez 0 ;
+                     PUSH nat 0 ;
+                     { DIP 5 { DUP } ; DIG 6 } ;
+                     CAR ;
+                     GET 4 ;
+                     PAIR %spender %value ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     GET 6 ;
+                     CONTRACT %approve (pair (address %spender) (nat %value)) ;
+                     { IF_NONE { PUSH int 232 ; FAILWITH } {} } ;
+                     PUSH mutez 0 ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     CAR ;
+                     { DIP 5 { DUP } ; DIG 6 } ;
+                     CAR ;
+                     GET 4 ;
+                     PAIR %spender %value ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     GET 4 ;
+                     CONTRACT %propose
+                       (pair (string %title)
+                             (pair (string %descriptionLink)
+                                   (pair (string %descriptionHash) (lambda %proposalLambda unit (list operation))))) ;
+                     { IF_NONE { PUSH int 251 ; FAILWITH } {} } ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     CDR ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CDR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Not owner" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 6 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     COMPARE ;
+                     NEQ ;
+                     IF {} { PUSH string "USE_WITHDRAW_INSTEAD" ; FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+                     { IF_NONE { PUSH int 123 ; FAILWITH } {} } ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     DUP ;
+                     GET 3 ;
+                     SWAP ;
+                     GET 4 ;
+                     PAIR %to %value ;
+                     SELF_ADDRESS ;
+                     PAIR %from ;
+                     TRANSFER_TOKENS ;
+                     CONS } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CDR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Not owner" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 6 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     COMPARE ;
+                     NEQ ;
+                     IF {} { PUSH string "USE_WITHDRAW_INSTEAD" ; FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     CONTRACT %transfer
+                       (list (pair (address %from_)
+                                   (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+                     { IF_NONE { PUSH int 153 ; FAILWITH } {} } ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     NIL (pair (address %from_)
+                               (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))) ;
+                     NIL (pair (address %to_) (pair (nat %token_id) (nat %amount))) ;
+                     DIG 5 ;
+                     DUP ;
+                     GET 5 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 7 ;
+                     GET 3 ;
+                     PAIR %token_id %amount ;
+                     DIG 6 ;
+                     GET 6 ;
+                     PAIR %to_ ;
+                     CONS ;
+                     SELF_ADDRESS ;
+                     PAIR %from_ %txs ;
+                     CONS ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CDR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_OWNER" ; FAILWITH } ;
+                     CONTRACT unit ;
+                     { IF_NONE { PUSH int 105 ; FAILWITH } {} } ;
+                     NIL operation ;
+                     SWAP ;
+                     BALANCE ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     CONS } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_GOVERNOR" ; FAILWITH } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     CAR ;
+                     DIG 3 ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_GOVERNOR" ; FAILWITH } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     CAR ;
+                     DIG 3 ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR } ;
+                 NIL operation }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CDR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_GOVERNOR" ; FAILWITH } ;
+                     NIL operation ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     GET 4 ;
+                     CONTRACT %vote nat ;
+                     { IF_NONE { PUSH int 268 ; FAILWITH } {} } ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     CDR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_OWNER" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     CAR ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 3 ;
+                     GET 5 ;
+                     LEVEL ;
+                     SUB ;
+                     ISNAT ;
+                     { IF_NONE { PUSH int 71 ; FAILWITH } {} } ;
+                     MUL ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     CAR ;
+                     GET 3 ;
+                     ADD ;
+                     COMPARE ;
+                     LE ;
+                     IF {} { PUSH string "NOT_VESTED" ; FAILWITH } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     { DIP 4 { DUP } ; DIG 5 } ;
+                     ADD ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     NIL operation ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     GET 6 ;
+                     CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+                     { IF_NONE { PUSH int 80 ; FAILWITH } {} } ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     SENDER ;
+                     PAIR %to %value ;
+                     SELF_ADDRESS ;
+                     PAIR %from ;
+                     TRANSFER_TOKENS ;
+                     CONS } } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

@@ -1,0 +1,15 @@
+{ storage int ;
+  parameter (or (int %decrement) (or (unit %default) (int %increment))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; SUB }
+           { IF_LEFT
+               { DROP ;
+                 PUSH mutez 0 ;
+                 AMOUNT ;
+                 COMPARE ;
+                 GT ;
+                 IF {} { PUSH string "WrongCondition: sp.amount > sp.tez(0)" ; FAILWITH } }
+               { ADD } } ;
+         NIL operation ;
+         PAIR } }

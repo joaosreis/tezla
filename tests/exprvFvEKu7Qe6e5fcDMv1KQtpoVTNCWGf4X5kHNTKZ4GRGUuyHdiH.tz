@@ -1,0 +1,3 @@
+{ parameter (pair int int) ;
+  storage int ;
+  code { CAR ; UNPAIR ; ADD ; NIL operation ; PAIR } }

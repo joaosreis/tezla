@@ -1,0 +1,39 @@
+{ parameter
+    (or (or (mutez %burrowSendSliceToChecker) (pair %burrowSendTezTo mutez address))
+        (or (option %burrowSetDelegate key_hash) (unit %burrowStoreTez))) ;
+  storage (pair (pair %burrow_id address nat) (address %checker_address)) ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         SENDER ;
+         COMPARE ;
+         NEQ ;
+         IF { DROP 2 ; PUSH string "B1" ; FAILWITH }
+            { IF_LEFT
+                { IF_LEFT
+                    { SENDER ;
+                      CONTRACT %receive_slice_from_burrow (pair address nat) ;
+                      IF_NONE
+                        { DROP ; PUSH string "B3" ; FAILWITH }
+                        { SWAP ; DUP 3 ; CAR ; TRANSFER_TOKENS } ;
+                      SWAP ;
+                      NIL operation ;
+                      DIG 2 ;
+                      CONS ;
+                      PAIR }
+                    { UNPAIR ;
+                      SWAP ;
+                      CONTRACT unit ;
+                      IF_NONE
+                        { DROP ; PUSH string "B2" ; FAILWITH }
+                        { SWAP ; PUSH unit Unit ; TRANSFER_TOKENS } ;
+                      SWAP ;
+                      NIL operation ;
+                      DIG 2 ;
+                      CONS ;
+                      PAIR } }
+                { IF_LEFT
+                    { SWAP ; NIL operation ; DIG 2 ; SET_DELEGATE ; CONS ; PAIR }
+                    { DROP ; NIL operation ; PAIR } } } } }

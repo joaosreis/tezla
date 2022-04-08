@@ -1,0 +1,18 @@
+{ parameter (pair address (option (list nat))) ;
+  storage (pair (address %addr) (list %tokenIdList nat)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         NEQ ;
+         IF { PUSH string "This contract does not accept tezi deposits" ; FAILWITH }
+            {} ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         DIG 2 ;
+         CDR ;
+         SWAP ;
+         PAIR ;
+         SWAP ;
+         IF_NONE {} { SWAP ; CAR ; PAIR } ;
+         NIL operation ;
+         PAIR } }

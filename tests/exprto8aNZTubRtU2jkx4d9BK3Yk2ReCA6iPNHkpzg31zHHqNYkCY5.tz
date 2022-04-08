@@ -1,0 +1,175 @@
+{ storage
+    (pair (address %admin)
+          (big_map %identities
+             address
+             (map string
+                  (pair (map %meta string string) (pair (timestamp %register_date) (bool %verified)))))) ;
+  parameter
+    (or (or (pair %delProof (address %address) (string %prooftype))
+            (or (pair %getProofs (address %address) (address %callback_address))
+                (address %removeIdentity)))
+        (or (or (pair %send (mutez %amount) (address %receiverAddress)) (address %setAdmin))
+            (or (option %setBaker key_hash)
+                (pair %setProof
+                   (address %address)
+                   (pair (pair %proof
+                            (map %meta string string)
+                            (pair (timestamp %register_date) (bool %verified)))
+                         (string %prooftype)))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "Only admin can delProof" ; FAILWITH } {} ;
+                 SWAP ;
+                 DUP ;
+                 CDR ;
+                 DUP ;
+                 DUP 4 ;
+                 CAR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 76 ; FAILWITH } {} ;
+                 NONE (pair (map string string) (pair timestamp bool)) ;
+                 DIG 5 ;
+                 CDR ;
+                 UPDATE ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 2 ;
+                 NIL operation }
+               { IF_LEFT
+                   { DUP ;
+                     CDR ;
+                     CONTRACT (pair address (map string (pair (map string string) (pair timestamp bool)))) ;
+                     IF_NONE { PUSH int 86 ; FAILWITH } {} ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     DUP 5 ;
+                     CDR ;
+                     DUP 5 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 87 ; FAILWITH } {} ;
+                     DIG 4 ;
+                     CAR ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "Only admin can removeIdentity" ; FAILWITH } {} ;
+                     SWAP ;
+                     DUP ;
+                     CDR ;
+                     NONE (map string (pair (map string string) (pair timestamp bool))) ;
+                     DIG 3 ;
+                     UPDATE ;
+                     UPDATE 2 ;
+                     NIL operation } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "Only admin can send" ; FAILWITH } {} ;
+                     DUP ;
+                     CDR ;
+                     CONTRACT unit ;
+                     IF_NONE { PUSH int 62 ; FAILWITH } {} ;
+                     NIL operation ;
+                     SWAP ;
+                     DIG 2 ;
+                     CAR ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "Only admin can setAdmin" ; FAILWITH } {} ;
+                     UPDATE 1 ;
+                     NIL operation } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "Only admin can setBaker" ; FAILWITH } {} ;
+                     SET_DELEGATE ;
+                     NIL operation ;
+                     SWAP ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "Only admin can setProof" ; FAILWITH } {} ;
+                     PUSH bool False ;
+                     DUP 3 ;
+                     CDR ;
+                     DUP 3 ;
+                     CAR ;
+                     MEM ;
+                     COMPARE ;
+                     EQ ;
+                     IF { SWAP ;
+                          DUP ;
+                          CDR ;
+                          PUSH (option (map string (pair (map string string) (pair timestamp bool)))) (Some {}) ;
+                          DUP 4 ;
+                          CAR ;
+                          UPDATE ;
+                          UPDATE 2 ;
+                          SWAP }
+                        {} ;
+                     SWAP ;
+                     DUP ;
+                     CDR ;
+                     DUP ;
+                     DUP 4 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 70 ; FAILWITH } {} ;
+                     DUP 5 ;
+                     GET 3 ;
+                     SOME ;
+                     DIG 5 ;
+                     GET 4 ;
+                     UPDATE ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 2 ;
+                     NIL operation } } } ;
+         PAIR } }

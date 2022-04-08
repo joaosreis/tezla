@@ -1,0 +1,3045 @@
+{ parameter
+    (or (or (or (or (address %addAdmin) (address %banUser))
+                (or (nat %blackjackDrawCard) (nat %blackjackOpen)))
+            (or (or (unit %closeLoto) (unit %createLoto))
+                (or (nat %injectFund) (nat %injectFundAsUser))))
+        (or (or (or (pair %joinCaster nat nat) (pair %joinLoto nat nat))
+                (or (nat %register) (nat %retrieveFund)))
+            (or (or (nat %retrieveFundAsUser) (address %rmAdmin)) (address %unbanUser)))) ;
+  storage
+    (pair (pair (pair (pair (set %admins address) (set %bans address))
+                      (pair (pair %blackjacks
+                               (pair (map %games
+                                        nat
+                                        (pair (pair (pair (nat %bet_value) (list %cards nat))
+                                                    (pair (nat %cards_value) (address %player)))
+                                              (pair (nat %pool_id) (bool %state))))
+                                     (nat %next_id))
+                               (nat %target_cards_value))
+                            (pair %casters
+                               (pair (pair (nat %bet_value) (nat %join_limit))
+                                     (pair (pair %opened_game
+                                              (pair (pair (nat %final_value) (nat %nb_players))
+                                                    (pair (list %players_addr address) (map %players_val address nat)))
+                                              (pair (pair (nat %pool_id) (bool %state)) (nat %total_balance)))
+                                           (nat %val_max)))
+                               (nat %val_min))))
+                (pair (pair (nat %contract_balance) (address %contract_owner))
+                      (pair (big_map %game_users address nat) (map %games_pools nat nat))))
+          (pair (pair %lotos
+                   (pair (pair (nat %bet_max) (nat %bet_min))
+                         (pair (nat %nb_games)
+                               (pair %opened_game
+                                  (pair (pair (nat %final_value) (nat %nb_players))
+                                        (pair (list %players_addr address) (map %players_bet address nat)))
+                                  (pair (pair (map %players_val address nat) (nat %pool_id))
+                                        (pair (bool %state) (nat %total_balance))))))
+                   (pair (nat %val_max) (nat %val_min)))
+                (nat %next_pool_id))) ;
+  code { LAMBDA
+           (pair address
+                 (pair (pair (pair (pair (set address) (set address))
+                                   (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                               nat)
+                                         (pair (pair (pair nat nat)
+                                                     (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                           nat))
+                                               nat)))
+                             (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                       (pair (pair (pair (pair nat nat)
+                                         (pair nat
+                                               (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                     (pair (pair (map address nat) nat) (pair bool nat)))))
+                                   (pair nat nat))
+                             nat)))
+           unit
+           { UNPAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             COMPARE ;
+             EQ ;
+             NOT ;
+             IF { SWAP ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  SWAP ;
+                  MEM ;
+                  NOT ;
+                  IF { PUSH string "Forbidden: User is not a registered admin." ; FAILWITH }
+                     { PUSH unit Unit } }
+                { DROP 2 ; PUSH unit Unit } ;
+             DROP ;
+             UNIT } ;
+         LAMBDA
+           (pair address
+                 (pair (pair (pair (pair (set address) (set address))
+                                   (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                               nat)
+                                         (pair (pair (pair nat nat)
+                                                     (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                           nat))
+                                               nat)))
+                             (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                       (pair (pair (pair (pair nat nat)
+                                         (pair nat
+                                               (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                     (pair (pair (map address nat) nat) (pair bool nat)))))
+                                   (pair nat nat))
+                             nat)))
+           unit
+           { UNPAIR ;
+             SWAP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             SWAP ;
+             MEM ;
+             NOT ;
+             IF { PUSH string "Warning: User is not registered." ; FAILWITH } {} ;
+             UNIT } ;
+         LAMBDA
+           (pair address
+                 (pair (pair (pair (pair (set address) (set address))
+                                   (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                               nat)
+                                         (pair (pair (pair nat nat)
+                                                     (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                           nat))
+                                               nat)))
+                             (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                       (pair (pair (pair (pair nat nat)
+                                         (pair nat
+                                               (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                     (pair (pair (map address nat) nat) (pair bool nat)))))
+                                   (pair nat nat))
+                             nat)))
+           unit
+           { UNPAIR ;
+             SWAP ;
+             CAR ;
+             CAR ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             MEM ;
+             IF { PUSH string "Forbidden: User is banned." ; FAILWITH } {} ;
+             UNIT } ;
+         LAMBDA
+           (pair address
+                 (pair (pair (pair (pair (set address) (set address))
+                                   (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                               nat)
+                                         (pair (pair (pair nat nat)
+                                                     (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                           nat))
+                                               nat)))
+                             (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                       (pair (pair (pair (pair nat nat)
+                                         (pair nat
+                                               (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                     (pair (pair (map address nat) nat) (pair bool nat)))))
+                                   (pair nat nat))
+                             nat)))
+           nat
+           { UNPAIR ;
+             SWAP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             SWAP ;
+             GET ;
+             IF_NONE { PUSH nat 0 } {} } ;
+         LAMBDA
+           (pair nat
+                 (pair (pair (pair (pair (set address) (set address))
+                                   (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                               nat)
+                                         (pair (pair (pair nat nat)
+                                                     (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                           nat))
+                                               nat)))
+                             (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                       (pair (pair (pair (pair nat nat)
+                                         (pair nat
+                                               (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                     (pair (pair (map address nat) nat) (pair bool nat)))))
+                                   (pair nat nat))
+                             nat)))
+           nat
+           { UNPAIR ;
+             SWAP ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             SWAP ;
+             GET ;
+             IF_NONE
+               { PUSH string "Error: The targeted pool balance value couldn't be retrieved." ;
+                 FAILWITH }
+               {} } ;
+         LAMBDA
+           (pair (pair nat nat)
+                 (pair (pair (pair (pair (set address) (set address))
+                                   (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                               nat)
+                                         (pair (pair (pair nat nat)
+                                                     (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                           nat))
+                                               nat)))
+                             (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                       (pair (pair (pair (pair nat nat)
+                                         (pair nat
+                                               (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                     (pair (pair (map address nat) nat) (pair bool nat)))))
+                                   (pair nat nat))
+                             nat)))
+           (pair (pair (pair (pair (set address) (set address))
+                             (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                         nat)
+                                   (pair (pair (pair nat nat)
+                                               (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                     nat))
+                                         nat)))
+                       (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                 (pair (pair (pair (pair nat nat)
+                                   (pair nat
+                                         (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                               (pair (pair (map address nat) nat) (pair bool nat)))))
+                             (pair nat nat))
+                       nat))
+           { UNPAIR ;
+             UNPAIR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             CAR ;
+             DUP 3 ;
+             COMPARE ;
+             GT ;
+             IF { PUSH string "Error: Insufficient funds in the contract's balance." ;
+                  FAILWITH }
+                {} ;
+             DUP 3 ;
+             CDR ;
+             DUP 4 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             DUP 5 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             CDR ;
+             DUP 5 ;
+             DUP 7 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             CAR ;
+             SUB ;
+             ABS ;
+             PAIR ;
+             PAIR ;
+             DIG 4 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR ;
+             DUP ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             DIG 4 ;
+             DIG 4 ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             DIG 2 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR } ;
+         DUP 3 ;
+         DUP 3 ;
+         PAIR ;
+         LAMBDA
+           (pair (pair (lambda
+                          (pair nat
+                                (pair (pair (pair (pair (set address) (set address))
+                                                  (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                                              nat)
+                                                        (pair (pair (pair nat nat)
+                                                                    (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                                          nat))
+                                                              nat)))
+                                            (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                                      (pair (pair (pair (pair nat nat)
+                                                        (pair nat
+                                                              (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                                    (pair (pair (map address nat) nat) (pair bool nat)))))
+                                                  (pair nat nat))
+                                            nat)))
+                          nat)
+                       (lambda
+                          (pair address
+                                (pair (pair (pair (pair (set address) (set address))
+                                                  (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                                              nat)
+                                                        (pair (pair (pair nat nat)
+                                                                    (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                                          nat))
+                                                              nat)))
+                                            (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                                      (pair (pair (pair (pair nat nat)
+                                                        (pair nat
+                                                              (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                                    (pair (pair (map address nat) nat) (pair bool nat)))))
+                                                  (pair nat nat))
+                                            nat)))
+                          nat))
+                 (pair (pair nat nat)
+                       (pair (pair (pair (pair (set address) (set address))
+                                         (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                                     nat)
+                                               (pair (pair (pair nat nat)
+                                                           (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                                 nat))
+                                                     nat)))
+                                   (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                             (pair (pair (pair (pair nat nat)
+                                               (pair nat
+                                                     (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                           (pair (pair (map address nat) nat) (pair bool nat)))))
+                                         (pair nat nat))
+                                   nat))))
+           (pair (pair (pair (pair (set address) (set address))
+                             (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                         nat)
+                                   (pair (pair (pair nat nat)
+                                               (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                     nat))
+                                         nat)))
+                       (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                 (pair (pair (pair (pair nat nat)
+                                   (pair nat
+                                         (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                               (pair (pair (map address nat) nat) (pair bool nat)))))
+                             (pair nat nat))
+                       nat))
+           { UNPAIR ;
+             UNPAIR ;
+             DIG 2 ;
+             UNPAIR ;
+             UNPAIR ;
+             DUP 3 ;
+             SOURCE ;
+             PAIR ;
+             DIG 5 ;
+             SWAP ;
+             EXEC ;
+             DUP ;
+             DUP 3 ;
+             COMPARE ;
+             GT ;
+             IF { PUSH string "Error: You don't have sufficient funds." ; FAILWITH } {} ;
+             DUP 4 ;
+             CDR ;
+             DUP 5 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             DUP 6 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             DUP 5 ;
+             DIG 4 ;
+             SUB ;
+             ABS ;
+             SOME ;
+             SOURCE ;
+             UPDATE ;
+             PAIR ;
+             DUP 5 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             DIG 4 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR ;
+             DUP ;
+             DUP 4 ;
+             PAIR ;
+             DIG 4 ;
+             SWAP ;
+             EXEC ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CDR ;
+             DIG 4 ;
+             DIG 3 ;
+             ADD ;
+             DIG 4 ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             DIG 2 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR } ;
+         SWAP ;
+         APPLY ;
+         DUP 4 ;
+         DIG 3 ;
+         PAIR ;
+         LAMBDA
+           (pair (pair (lambda
+                          (pair nat
+                                (pair (pair (pair (pair (set address) (set address))
+                                                  (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                                              nat)
+                                                        (pair (pair (pair nat nat)
+                                                                    (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                                          nat))
+                                                              nat)))
+                                            (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                                      (pair (pair (pair (pair nat nat)
+                                                        (pair nat
+                                                              (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                                    (pair (pair (map address nat) nat) (pair bool nat)))))
+                                                  (pair nat nat))
+                                            nat)))
+                          nat)
+                       (lambda
+                          (pair address
+                                (pair (pair (pair (pair (set address) (set address))
+                                                  (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                                              nat)
+                                                        (pair (pair (pair nat nat)
+                                                                    (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                                          nat))
+                                                              nat)))
+                                            (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                                      (pair (pair (pair (pair nat nat)
+                                                        (pair nat
+                                                              (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                                    (pair (pair (map address nat) nat) (pair bool nat)))))
+                                                  (pair nat nat))
+                                            nat)))
+                          nat))
+                 (pair (pair (pair nat nat) (pair bool address))
+                       (pair (pair (pair (pair (set address) (set address))
+                                         (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                                     nat)
+                                               (pair (pair (pair nat nat)
+                                                           (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                                 nat))
+                                                     nat)))
+                                   (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                             (pair (pair (pair (pair nat nat)
+                                               (pair nat
+                                                     (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                                           (pair (pair (map address nat) nat) (pair bool nat)))))
+                                         (pair nat nat))
+                                   nat))))
+           (pair (pair (pair (pair (set address) (set address))
+                             (pair (pair (pair (map nat (pair (pair (pair nat (list nat)) (pair nat address)) (pair nat bool))) nat)
+                                         nat)
+                                   (pair (pair (pair nat nat)
+                                               (pair (pair (pair (pair nat nat) (pair (list address) (map address nat))) (pair (pair nat bool) nat))
+                                                     nat))
+                                         nat)))
+                       (pair (pair nat address) (pair (big_map address nat) (map nat nat))))
+                 (pair (pair (pair (pair nat nat)
+                                   (pair nat
+                                         (pair (pair (pair nat nat) (pair (list address) (map address nat)))
+                                               (pair (pair (map address nat) nat) (pair bool nat)))))
+                             (pair nat nat))
+                       nat))
+           { UNPAIR ;
+             UNPAIR ;
+             DIG 2 ;
+             UNPAIR ;
+             UNPAIR ;
+             UNPAIR ;
+             DIG 2 ;
+             UNPAIR ;
+             DUP 5 ;
+             DUP 4 ;
+             PAIR ;
+             DIG 6 ;
+             SWAP ;
+             EXEC ;
+             PUSH bool True ;
+             DIG 2 ;
+             COMPARE ;
+             EQ ;
+             IF { SWAP ;
+                  DIG 3 ;
+                  DIG 5 ;
+                  DROP 3 ;
+                  DUP 3 ;
+                  CDR ;
+                  DUP 4 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CDR ;
+                  PUSH nat 0 ;
+                  DIG 4 ;
+                  SWAP ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  DUP 4 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  DUP 4 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  DIG 3 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  PAIR ;
+                  DUP ;
+                  CDR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  DUP 3 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  DIG 4 ;
+                  DUP 5 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  CAR ;
+                  ADD ;
+                  PAIR ;
+                  PAIR ;
+                  DIG 2 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  PAIR }
+                { DUP ;
+                  DUP 5 ;
+                  COMPARE ;
+                  GT ;
+                  IF { PUSH string
+                            "Unexpected: The targeted pool has insufficient funds to reward the user." ;
+                       FAILWITH }
+                     {} ;
+                  DUP 5 ;
+                  DUP 3 ;
+                  PAIR ;
+                  DIG 6 ;
+                  SWAP ;
+                  EXEC ;
+                  DUP 6 ;
+                  CDR ;
+                  DUP 7 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CDR ;
+                  DUP 8 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  DUP 8 ;
+                  DIG 4 ;
+                  ADD ;
+                  DIG 5 ;
+                  SWAP ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  PAIR ;
+                  DUP 6 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  DIG 5 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  PAIR ;
+                  DUP ;
+                  CDR ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CDR ;
+                  DIG 5 ;
+                  DIG 4 ;
+                  SUB ;
+                  ABS ;
+                  DIG 4 ;
+                  SWAP ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  DUP 3 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  DUP 3 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  DIG 2 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  PAIR } } ;
+         SWAP ;
+         APPLY ;
+         LAMBDA
+           (pair nat nat)
+           nat
+           { UNPAIR ;
+             PUSH nat 2 ;
+             DUP 3 ;
+             ADD ;
+             PUSH nat 2 ;
+             DUP 4 ;
+             MUL ;
+             DUP 3 ;
+             ADD ;
+             MUL ;
+             EDIV ;
+             IF_NONE { PUSH string "MOD by 0" ; FAILWITH } {} ;
+             CDR ;
+             ADD } ;
+         DIG 8 ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DIG 6 ;
+                 DROP ;
+                 IF_LEFT
+                   { DIG 2 ;
+                     DIG 3 ;
+                     DIG 4 ;
+                     DIG 5 ;
+                     DIG 6 ;
+                     DIG 7 ;
+                     DROP 6 ;
+                     IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         MEM ;
+                         NOT ;
+                         IF { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CDR ;
+                              DUP 3 ;
+                              CAR ;
+                              CDR ;
+                              DUP 4 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              DUP 5 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              DIG 5 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              DIG 5 ;
+                              PUSH bool True ;
+                              SWAP ;
+                              UPDATE ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR }
+                            { DROP ; PUSH string "Warning: This user is already an admin." ; FAILWITH } ;
+                         NIL operation ;
+                         PAIR }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         MEM ;
+                         NOT ;
+                         IF { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CDR ;
+                              DUP 3 ;
+                              CAR ;
+                              CDR ;
+                              DUP 4 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              DUP 5 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              DIG 4 ;
+                              PUSH bool True ;
+                              SWAP ;
+                              UPDATE ;
+                              DIG 4 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR }
+                            { DROP ; PUSH string "Warning: This user is already banned." ; FAILWITH } ;
+                         NIL operation ;
+                         PAIR } }
+                   { DIG 8 ;
+                     DROP ;
+                     IF_LEFT
+                       { DIG 4 ;
+                         DIG 5 ;
+                         DROP 2 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 6 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 5 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE
+                           { PUSH string "Error: Retrieving this game's datas caused an error." ;
+                             FAILWITH }
+                           {} ;
+                         DUP ;
+                         CDR ;
+                         CAR ;
+                         SOURCE ;
+                         DUP 3 ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         COMPARE ;
+                         EQ ;
+                         IF { PUSH bool False ;
+                              SWAP ;
+                              CDR ;
+                              CDR ;
+                              COMPARE ;
+                              EQ ;
+                              IF { PUSH string "Forbidden: This game ended and is now closed." ; FAILWITH }
+                                 {} }
+                            { DROP ;
+                              PUSH string "Forbidden: You are not a player of this game." ;
+                              FAILWITH } ;
+                         PUSH nat 1 ;
+                         PUSH nat 13 ;
+                         PAIR ;
+                         DIG 5 ;
+                         SWAP ;
+                         EXEC ;
+                         DUP 3 ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CDR ;
+                         DUP 5 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         DUP 4 ;
+                         CONS ;
+                         DIG 5 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         ADD ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP 3 ;
+                         PAIR ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PUSH nat 3 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         MUL ;
+                         PUSH nat 21 ;
+                         DUP 4 ;
+                         COMPARE ;
+                         EQ ;
+                         IF { DIG 2 ;
+                              DROP ;
+                              DIG 4 ;
+                              SOURCE ;
+                              PUSH bool False ;
+                              PAIR ;
+                              DIG 2 ;
+                              DIG 4 ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 3 ;
+                              SWAP ;
+                              EXEC ;
+                              PUSH bool False ;
+                              DUP 3 ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              PAIR ;
+                              SWAP ;
+                              PAIR }
+                            { PUSH nat 21 ;
+                              DIG 3 ;
+                              COMPARE ;
+                              GT ;
+                              IF { DIG 4 ;
+                                   SOURCE ;
+                                   PUSH bool True ;
+                                   PAIR ;
+                                   DIG 2 ;
+                                   DIG 4 ;
+                                   PAIR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DIG 3 ;
+                                   SWAP ;
+                                   EXEC ;
+                                   PUSH bool False ;
+                                   DUP 3 ;
+                                   CDR ;
+                                   CAR ;
+                                   PAIR ;
+                                   DIG 2 ;
+                                   CAR ;
+                                   PAIR ;
+                                   SWAP ;
+                                   PAIR }
+                                 { DIG 2 ; DIG 5 ; DROP 3 ; DIG 2 ; PAIR } } ;
+                         DUP ;
+                         CAR ;
+                         DUP ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         DUP 3 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         UNPAIR ;
+                         CDR ;
+                         DUP 6 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         DIG 7 ;
+                         CDR ;
+                         DIG 8 ;
+                         SWAP ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         NIL operation ;
+                         PAIR }
+                       { DIG 3 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 7 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 6 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         PUSH nat 1 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         COMPARE ;
+                         LT ;
+                         IF { PUSH string "Error: The bet value must be at least 1." ; FAILWITH } {} ;
+                         PUSH nat 1 ;
+                         PUSH nat 13 ;
+                         PAIR ;
+                         DIG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         DUP 3 ;
+                         CDR ;
+                         CDR ;
+                         PUSH nat 2 ;
+                         DUP 4 ;
+                         MUL ;
+                         DIG 4 ;
+                         SWAP ;
+                         DUP 3 ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 5 ;
+                         SWAP ;
+                         EXEC ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         DUP 5 ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 4 ;
+                         SWAP ;
+                         EXEC ;
+                         PUSH bool True ;
+                         DIG 2 ;
+                         PAIR ;
+                         SOURCE ;
+                         DUP 4 ;
+                         PAIR ;
+                         NIL nat ;
+                         DIG 4 ;
+                         CONS ;
+                         DIG 4 ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         DUP 3 ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CDR ;
+                         DUP 5 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP 6 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         UNPAIR ;
+                         CDR ;
+                         DUP 8 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         DIG 7 ;
+                         DUP 8 ;
+                         SWAP ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 4 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         DUP 3 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         DUP ;
+                         CDR ;
+                         PUSH nat 1 ;
+                         DIG 7 ;
+                         ADD ;
+                         DIG 2 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         NIL operation ;
+                         PAIR } } }
+               { DIG 4 ;
+                 DROP ;
+                 IF_LEFT
+                   { DIG 5 ;
+                     DIG 6 ;
+                     DIG 7 ;
+                     DROP 3 ;
+                     IF_LEFT
+                       { DIG 4 ;
+                         DROP 2 ;
+                         DUP ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 4 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         DUP ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         PUSH bool False ;
+                         DUP 3 ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         COMPARE ;
+                         EQ ;
+                         IF { PUSH string "Forbidden: You can't close a game if the game is already closed." ;
+                              FAILWITH }
+                            {} ;
+                         DUP 3 ;
+                         CDR ;
+                         CDR ;
+                         DUP 4 ;
+                         CDR ;
+                         CAR ;
+                         DUP ;
+                         CDR ;
+                         DUP 6 ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP ;
+                         CDR ;
+                         CDR ;
+                         CDR ;
+                         PUSH bool False ;
+                         PAIR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         SWAP ;
+                         CAR ;
+                         PAIR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 2 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 3 ;
+                         CAR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 4 ;
+                         SWAP ;
+                         EXEC ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CDR ;
+                         DUP 3 ;
+                         CDR ;
+                         CAR ;
+                         DUP ;
+                         CDR ;
+                         DUP 5 ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         DIG 2 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         DUP 7 ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 2 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 2 ;
+                         CAR ;
+                         PAIR ;
+                         NIL address ;
+                         PUSH nat 0 ;
+                         PAIR ;
+                         DUP 5 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         ITER { SWAP ;
+                                PAIR ;
+                                DUP ;
+                                CAR ;
+                                CDR ;
+                                SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                CAR ;
+                                CAR ;
+                                DIG 2 ;
+                                CDR ;
+                                DUP 7 ;
+                                CDR ;
+                                CAR ;
+                                CAR ;
+                                SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                GET ;
+                                IF_NONE
+                                  { PUSH string "Error: Retrieving the value chosen by a user caused an error." ;
+                                    FAILWITH }
+                                  {} ;
+                                DUP 6 ;
+                                SWAP ;
+                                COMPARE ;
+                                EQ ;
+                                IF { PUSH nat 1 ; DIG 2 ; ADD ; DUG 2 ; CONS ; SWAP ; PAIR }
+                                   { DROP ; PAIR } } ;
+                         DIG 2 ;
+                         DROP ;
+                         DUP ;
+                         CAR ;
+                         PUSH nat 0 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         COMPARE ;
+                         GT ;
+                         IF { DUP ;
+                              DUP 6 ;
+                              CDR ;
+                              CDR ;
+                              CDR ;
+                              EDIV ;
+                              IF_NONE { PUSH string "MOD by 0" ; FAILWITH } {} ;
+                              CDR ;
+                              DIG 5 ;
+                              CDR ;
+                              CDR ;
+                              CDR ;
+                              SUB ;
+                              ABS ;
+                              EDIV ;
+                              IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                              CAR ;
+                              DUG 2 ;
+                              CDR ;
+                              ITER { PUSH bool False ;
+                                     PAIR ;
+                                     DUP 3 ;
+                                     DUP 5 ;
+                                     PAIR ;
+                                     PAIR ;
+                                     PAIR ;
+                                     DUP 4 ;
+                                     SWAP ;
+                                     EXEC } ;
+                              SWAP ;
+                              DIG 2 ;
+                              DIG 3 ;
+                              DROP 3 }
+                            { DROP 2 ;
+                              SOURCE ;
+                              PUSH bool True ;
+                              PAIR ;
+                              DIG 3 ;
+                              CDR ;
+                              CDR ;
+                              CDR ;
+                              DIG 3 ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              EXEC } ;
+                         NIL operation ;
+                         PAIR }
+                       { DIG 2 ;
+                         DIG 3 ;
+                         DROP 3 ;
+                         DUP ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         EMPTY_MAP address nat ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CDR ;
+                         DIG 2 ;
+                         PUSH nat 0 ;
+                         DUP 3 ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         PUSH nat 0 ;
+                         PUSH bool True ;
+                         PAIR ;
+                         DIG 2 ;
+                         DUP 4 ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 2 ;
+                         NIL address ;
+                         PAIR ;
+                         PUSH nat 0 ;
+                         PUSH nat 0 ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PUSH nat 0 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         COMPARE ;
+                         EQ ;
+                         IF { DUP 3 ;
+                              CDR ;
+                              CDR ;
+                              DUP 4 ;
+                              CDR ;
+                              CAR ;
+                              DUP ;
+                              CDR ;
+                              DIG 4 ;
+                              DUP 3 ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              PAIR ;
+                              DUP ;
+                              CDR ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CDR ;
+                              CAR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              PUSH nat 1 ;
+                              DIG 6 ;
+                              ADD ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              SWAP ;
+                              CAR ;
+                              PAIR }
+                            { PUSH bool True ;
+                              DUP 4 ;
+                              CDR ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              COMPARE ;
+                              EQ ;
+                              IF { DROP 2 ;
+                                   PUSH string
+                                        "Forbidden: You can't create a new game if the last one isn't closed." ;
+                                   FAILWITH }
+                                 { DUP 3 ;
+                                   CDR ;
+                                   CDR ;
+                                   DUP 4 ;
+                                   CDR ;
+                                   CAR ;
+                                   DUP ;
+                                   CDR ;
+                                   DIG 4 ;
+                                   DUP 3 ;
+                                   CAR ;
+                                   CDR ;
+                                   CAR ;
+                                   PAIR ;
+                                   DIG 2 ;
+                                   CAR ;
+                                   CAR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DIG 2 ;
+                                   CAR ;
+                                   PAIR ;
+                                   DUP ;
+                                   CDR ;
+                                   CDR ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CDR ;
+                                   CAR ;
+                                   DUP ;
+                                   CDR ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   PUSH nat 1 ;
+                                   DIG 6 ;
+                                   ADD ;
+                                   PAIR ;
+                                   DIG 2 ;
+                                   CAR ;
+                                   CAR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   SWAP ;
+                                   CAR ;
+                                   PAIR } } ;
+                         NIL operation ;
+                         PAIR } }
+                   { DIG 2 ;
+                     DIG 3 ;
+                     DIG 4 ;
+                     DROP 3 ;
+                     IF_LEFT
+                       { DIG 2 ;
+                         DIG 3 ;
+                         DIG 4 ;
+                         DROP 3 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         PUSH mutez 1 ;
+                         AMOUNT ;
+                         EDIV ;
+                         IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "Error: Real amount of tezos sent doesn't match your declaration." ;
+                              FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         DIG 3 ;
+                         DUP 5 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         ADD ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 2 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         NIL operation ;
+                         PAIR }
+                       { DIG 5 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 5 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 4 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         PUSH mutez 1 ;
+                         AMOUNT ;
+                         EDIV ;
+                         IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "Error: Real amount of tezos sent doesn't match your declaration." ;
+                              FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         DIG 3 ;
+                         DUP 5 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 6 ;
+                         SWAP ;
+                         EXEC ;
+                         ADD ;
+                         SOME ;
+                         SOURCE ;
+                         UPDATE ;
+                         PAIR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 2 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         NIL operation ;
+                         PAIR } } } }
+           { IF_LEFT
+               { DIG 6 ;
+                 DROP ;
+                 IF_LEFT
+                   { DIG 8 ;
+                     DROP ;
+                     IF_LEFT
+                       { UNPAIR ;
+                         DUP 3 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 9 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         DUP 3 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 8 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         DUP 3 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         SOURCE ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         PUSH nat 0 ;
+                         SWAP ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DIG 2 ;
+                         GET ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         COMPARE ;
+                         GT ;
+                         IF { PUSH string "Forbidden: You already joined this game." ; FAILWITH } {} ;
+                         DUP 3 ;
+                         DUP 3 ;
+                         DUP 6 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP ;
+                         CDR ;
+                         DUP 4 ;
+                         COMPARE ;
+                         LT ;
+                         IF { DROP 3 ; PUSH string "Forbidden: The chosen value is to small." ; FAILWITH }
+                            { DUP ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DIG 3 ;
+                              COMPARE ;
+                              GT ;
+                              IF { DROP 2 ; PUSH string "Forbidden: The chosen value is to big." ; FAILWITH }
+                                 { CAR ;
+                                   CAR ;
+                                   CAR ;
+                                   SWAP ;
+                                   COMPARE ;
+                                   EQ ;
+                                   IF {}
+                                      { PUSH string "Forbidden: The amount of the bet is wrong." ; FAILWITH } } } ;
+                         PUSH bool False ;
+                         SWAP ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         COMPARE ;
+                         EQ ;
+                         IF { DIG 3 ;
+                              DIG 4 ;
+                              DROP 2 ;
+                              EMPTY_MAP address nat ;
+                              DIG 2 ;
+                              SOME ;
+                              SOURCE ;
+                              UPDATE ;
+                              NIL address ;
+                              SOURCE ;
+                              CONS ;
+                              DUP 4 ;
+                              CDR ;
+                              CDR ;
+                              DIG 4 ;
+                              PUSH nat 0 ;
+                              DUP 3 ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 6 ;
+                              SWAP ;
+                              EXEC ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              DUP 6 ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 5 ;
+                              SWAP ;
+                              EXEC ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              DUP 3 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DIG 9 ;
+                              PUSH bool True ;
+                              DIG 8 ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 8 ;
+                              DIG 8 ;
+                              PAIR ;
+                              PUSH nat 1 ;
+                              PUSH nat 0 ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              DUP 4 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              DIG 3 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR }
+                            { DIG 6 ;
+                              DROP ;
+                              DUP 3 ;
+                              CDR ;
+                              DUP 4 ;
+                              CAR ;
+                              CDR ;
+                              DUP 5 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP 8 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              PUSH nat 1 ;
+                              DUP 12 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              ADD ;
+                              DIG 3 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              DUP 6 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              DIG 5 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              DUP 3 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP 6 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              DUP ;
+                              CDR ;
+                              DUP 8 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DIG 10 ;
+                              SOME ;
+                              SOURCE ;
+                              UPDATE ;
+                              DUP 3 ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              DUP 4 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              DIG 3 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              DUP ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              CAR ;
+                              DUP ;
+                              DUG 2 ;
+                              DUP 4 ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 5 ;
+                              SWAP ;
+                              EXEC ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              DUP 3 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP 6 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP 9 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              SOURCE ;
+                              CONS ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              DUP 4 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              DIG 3 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              DUP 3 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP ;
+                              CDR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              DUP 6 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              DIG 8 ;
+                              DUP 8 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              ADD ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              SWAP ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              DIG 2 ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              DUP 4 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              DIG 3 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              PUSH nat 10 ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              CDR ;
+                              CAR ;
+                              CDR ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              COMPARE ;
+                              LT ;
+                              IF { SWAP ; DIG 2 ; DIG 3 ; DROP 3 }
+                                 { DUP ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   CDR ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   PAIR ;
+                                   DIG 3 ;
+                                   SWAP ;
+                                   EXEC ;
+                                   NIL address ;
+                                   PUSH nat 0 ;
+                                   PAIR ;
+                                   DUP 3 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   CAR ;
+                                   CDR ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CAR ;
+                                   ITER { SWAP ;
+                                          PAIR ;
+                                          DUP ;
+                                          CAR ;
+                                          CDR ;
+                                          SWAP ;
+                                          DUP ;
+                                          DUG 2 ;
+                                          CAR ;
+                                          CAR ;
+                                          DIG 2 ;
+                                          CDR ;
+                                          DUP 5 ;
+                                          CAR ;
+                                          CAR ;
+                                          CDR ;
+                                          CDR ;
+                                          CAR ;
+                                          CDR ;
+                                          CAR ;
+                                          CAR ;
+                                          CDR ;
+                                          CDR ;
+                                          SWAP ;
+                                          DUP ;
+                                          DUG 2 ;
+                                          GET ;
+                                          IF_NONE
+                                            { PUSH string "Error: Retrieving the value chosen by a user caused an error." ;
+                                              FAILWITH }
+                                            {} ;
+                                          DUP 5 ;
+                                          SWAP ;
+                                          COMPARE ;
+                                          EQ ;
+                                          IF { PUSH nat 1 ; DIG 2 ; ADD ; DUG 2 ; CONS ; SWAP ; PAIR }
+                                             { DROP ; PAIR } } ;
+                                   DUP ;
+                                   CAR ;
+                                   DUP 4 ;
+                                   CDR ;
+                                   DUP 5 ;
+                                   CAR ;
+                                   CDR ;
+                                   DUP 6 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   DUP ;
+                                   CDR ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   DUP 9 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   CAR ;
+                                   CDR ;
+                                   CAR ;
+                                   DUP ;
+                                   CDR ;
+                                   CDR ;
+                                   PUSH bool False ;
+                                   DUP 3 ;
+                                   CDR ;
+                                   CAR ;
+                                   CAR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   SWAP ;
+                                   CAR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DIG 2 ;
+                                   CAR ;
+                                   CAR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DUP 7 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CAR ;
+                                   PAIR ;
+                                   DIG 6 ;
+                                   CAR ;
+                                   CAR ;
+                                   CAR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DUP ;
+                                   CDR ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   CDR ;
+                                   DUP 3 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   DUP ;
+                                   CDR ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   DUP 6 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CDR ;
+                                   CAR ;
+                                   CDR ;
+                                   CAR ;
+                                   DUP ;
+                                   CDR ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CAR ;
+                                   CDR ;
+                                   DIG 2 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   DIG 11 ;
+                                   PAIR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DIG 2 ;
+                                   CAR ;
+                                   CAR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   DUP 4 ;
+                                   CAR ;
+                                   CAR ;
+                                   CDR ;
+                                   CAR ;
+                                   PAIR ;
+                                   DIG 3 ;
+                                   CAR ;
+                                   CAR ;
+                                   CAR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   PAIR ;
+                                   PUSH nat 0 ;
+                                   DUP 3 ;
+                                   COMPARE ;
+                                   GT ;
+                                   IF { SWAP ;
+                                        DUP ;
+                                        DUG 2 ;
+                                        SWAP ;
+                                        DUP ;
+                                        DUG 2 ;
+                                        CAR ;
+                                        CAR ;
+                                        CDR ;
+                                        CDR ;
+                                        CAR ;
+                                        CDR ;
+                                        CAR ;
+                                        CDR ;
+                                        CDR ;
+                                        EDIV ;
+                                        IF_NONE { PUSH string "MOD by 0" ; FAILWITH } {} ;
+                                        CDR ;
+                                        SWAP ;
+                                        DUP ;
+                                        DUG 2 ;
+                                        CAR ;
+                                        CAR ;
+                                        CDR ;
+                                        CDR ;
+                                        CAR ;
+                                        CDR ;
+                                        CAR ;
+                                        CDR ;
+                                        CDR ;
+                                        SUB ;
+                                        ABS ;
+                                        DIG 2 ;
+                                        SWAP ;
+                                        EDIV ;
+                                        IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                                        CAR ;
+                                        SWAP ;
+                                        DIG 2 ;
+                                        CDR ;
+                                        ITER { PUSH bool False ;
+                                               PAIR ;
+                                               DUP 3 ;
+                                               DUP 5 ;
+                                               PAIR ;
+                                               PAIR ;
+                                               PAIR ;
+                                               DUP 4 ;
+                                               SWAP ;
+                                               EXEC } ;
+                                        SWAP ;
+                                        DIG 2 ;
+                                        DIG 3 ;
+                                        DROP 3 }
+                                      { SWAP ;
+                                        DIG 2 ;
+                                        DROP 2 ;
+                                        DUP ;
+                                        SOURCE ;
+                                        PUSH bool True ;
+                                        PAIR ;
+                                        DIG 2 ;
+                                        CAR ;
+                                        CAR ;
+                                        CDR ;
+                                        CDR ;
+                                        CAR ;
+                                        CDR ;
+                                        CAR ;
+                                        CDR ;
+                                        CDR ;
+                                        DIG 3 ;
+                                        PAIR ;
+                                        PAIR ;
+                                        PAIR ;
+                                        EXEC } } } ;
+                         NIL operation ;
+                         PAIR }
+                       { DIG 2 ;
+                         DIG 3 ;
+                         DIG 5 ;
+                         DROP 3 ;
+                         UNPAIR ;
+                         DUP 3 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 6 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         DUP 3 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 5 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         DUP 3 ;
+                         CDR ;
+                         CAR ;
+                         DUP ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         PUSH bool False ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         COMPARE ;
+                         EQ ;
+                         IF { PUSH string "Forbidden: The Loto is closed for the moment." ; FAILWITH }
+                            {} ;
+                         DUP 4 ;
+                         DUP 4 ;
+                         DIG 3 ;
+                         DUP ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         DUP 3 ;
+                         COMPARE ;
+                         LT ;
+                         IF { DROP 3 ;
+                              PUSH string "Forbidden: The amount of your bet is to small." ;
+                              FAILWITH }
+                            { DUP ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              DIG 2 ;
+                              COMPARE ;
+                              GT ;
+                              IF { DROP 2 ;
+                                   PUSH string "Forbidden: The amount of your bet is to big." ;
+                                   FAILWITH }
+                                 { DUP ;
+                                   CDR ;
+                                   CDR ;
+                                   DUP 3 ;
+                                   COMPARE ;
+                                   LT ;
+                                   IF { DROP 2 ; PUSH string "Forbidden: The chosen value is to small." ; FAILWITH }
+                                      { CDR ;
+                                        CAR ;
+                                        SWAP ;
+                                        COMPARE ;
+                                        GT ;
+                                        IF { PUSH string "Forbidden: The chosen value is to big." ; FAILWITH } {} } } } ;
+                         SOURCE ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         PUSH nat 0 ;
+                         SWAP ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DIG 2 ;
+                         GET ;
+                         IF_NONE { PUSH nat 0 } {} ;
+                         COMPARE ;
+                         GT ;
+                         IF { PUSH string "Forbidden: You already joined this game." ; FAILWITH } {} ;
+                         DIG 3 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         DUP 4 ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 4 ;
+                         SWAP ;
+                         EXEC ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         SOURCE ;
+                         CONS ;
+                         PAIR ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP 5 ;
+                         SOME ;
+                         SOURCE ;
+                         UPDATE ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 2 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         DUP 3 ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         DIG 6 ;
+                         SOME ;
+                         SOURCE ;
+                         UPDATE ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         CAR ;
+                         PAIR ;
+                         DUP ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         PUSH nat 1 ;
+                         DUP 4 ;
+                         CAR ;
+                         CAR ;
+                         CDR ;
+                         ADD ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 2 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CDR ;
+                         CDR ;
+                         ADD ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         SWAP ;
+                         CAR ;
+                         PAIR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CDR ;
+                         DUP 3 ;
+                         CDR ;
+                         CAR ;
+                         DUP ;
+                         CDR ;
+                         DIG 3 ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 2 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         CAR ;
+                         PAIR ;
+                         NIL operation ;
+                         PAIR } }
+                   { DIG 2 ;
+                     DIG 3 ;
+                     DIG 4 ;
+                     DIG 5 ;
+                     DIG 6 ;
+                     DIG 7 ;
+                     DROP 6 ;
+                     IF_LEFT
+                       { DIG 2 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         SOURCE ;
+                         MEM ;
+                         IF { PUSH string "Warning: You are already registered as a user." ; FAILWITH }
+                            {} ;
+                         PUSH mutez 1 ;
+                         AMOUNT ;
+                         EDIV ;
+                         IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "Error: Real amount of tezos sent doesn't match your declaration." ;
+                              FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         DIG 3 ;
+                         SOME ;
+                         SOURCE ;
+                         UPDATE ;
+                         PAIR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 2 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         NIL operation ;
+                         PAIR }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         DUP ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         COMPARE ;
+                         GE ;
+                         IF {} { PUSH string "Warning: Insufficient contract balance." ; FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         DUP 4 ;
+                         DUP 6 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         SUB ;
+                         ABS ;
+                         PAIR ;
+                         PAIR ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PUSH mutez 1 ;
+                         DIG 2 ;
+                         MUL ;
+                         SOURCE ;
+                         CONTRACT unit ;
+                         IF_NONE { PUSH string "bad address for get_contract" ; FAILWITH } {} ;
+                         SWAP ;
+                         UNIT ;
+                         TRANSFER_TOKENS ;
+                         SWAP ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CONS ;
+                         PAIR } } }
+               { DIG 2 ;
+                 DIG 3 ;
+                 DIG 4 ;
+                 DIG 5 ;
+                 DIG 7 ;
+                 DROP 5 ;
+                 IF_LEFT
+                   { IF_LEFT
+                       { DIG 4 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 4 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         COMPARE ;
+                         LT ;
+                         IF { PUSH string "Error: Insufficient fund." ; FAILWITH } {} ;
+                         DUP 3 ;
+                         CDR ;
+                         DUP 4 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CDR ;
+                         DUP 5 ;
+                         CAR ;
+                         CDR ;
+                         CDR ;
+                         CAR ;
+                         DUP 5 ;
+                         DIG 4 ;
+                         SUB ;
+                         ABS ;
+                         SOME ;
+                         SOURCE ;
+                         UPDATE ;
+                         PAIR ;
+                         DUP 4 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         PAIR ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         PUSH mutez 1 ;
+                         DIG 2 ;
+                         MUL ;
+                         SOURCE ;
+                         CONTRACT unit ;
+                         IF_NONE { PUSH string "bad address for get_contract" ; FAILWITH } {} ;
+                         SWAP ;
+                         UNIT ;
+                         TRANSFER_TOKENS ;
+                         SWAP ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CONS ;
+                         PAIR }
+                       { DIG 2 ;
+                         DIG 3 ;
+                         DROP 2 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         SOURCE ;
+                         PAIR ;
+                         DIG 3 ;
+                         SWAP ;
+                         EXEC ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         MEM ;
+                         IF { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CDR ;
+                              DUP 3 ;
+                              CAR ;
+                              CDR ;
+                              DUP 4 ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              DUP 5 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              CDR ;
+                              DIG 5 ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              CAR ;
+                              DIG 5 ;
+                              PUSH bool False ;
+                              SWAP ;
+                              UPDATE ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR ;
+                              PAIR }
+                            { DROP ; PUSH string "Warning: This user is not an admin." ; FAILWITH } ;
+                         NIL operation ;
+                         PAIR } }
+                   { DIG 2 ;
+                     DIG 3 ;
+                     DROP 2 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     SOURCE ;
+                     PAIR ;
+                     DIG 3 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     MEM ;
+                     IF { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          DUP 3 ;
+                          CAR ;
+                          CDR ;
+                          DUP 4 ;
+                          CAR ;
+                          CAR ;
+                          CDR ;
+                          DUP 5 ;
+                          CAR ;
+                          CAR ;
+                          CAR ;
+                          CDR ;
+                          DIG 4 ;
+                          PUSH bool False ;
+                          SWAP ;
+                          UPDATE ;
+                          DIG 4 ;
+                          CAR ;
+                          CAR ;
+                          CAR ;
+                          CAR ;
+                          PAIR ;
+                          PAIR ;
+                          PAIR ;
+                          PAIR }
+                        { DROP ; PUSH string "Warning: This user has not been banned." ; FAILWITH } ;
+                     NIL operation ;
+                     PAIR } } } } }

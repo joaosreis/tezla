@@ -1,0 +1,28 @@
+{ storage (pair (address %admin) (nat %value)) ;
+  parameter (nat %v) ;
+  code { UNPAIR ;
+         DIP { UNPAIR ; SWAP } ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         SENDER ;
+         COMPARE ;
+         EQ ;
+         NOT ;
+         IF { PUSH string "InvalidCaller" ; FAILWITH } {} ;
+         PUSH nat 5 ;
+         DIG 1 ;
+         DUP ;
+         DUG 2 ;
+         COMPARE ;
+         GT ;
+         NOT ;
+         IF { PUSH string "InvalidCondition: r2" ; FAILWITH } {} ;
+         DUP ;
+         DIP { DIG 1 ; DROP } ;
+         DUG 1 ;
+         DROP ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

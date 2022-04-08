@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage mutez ;
+  code { UNPAIR ; DROP 1 ; BALANCE ; SWAP ; DROP 1 ; NIL operation ; PAIR } }

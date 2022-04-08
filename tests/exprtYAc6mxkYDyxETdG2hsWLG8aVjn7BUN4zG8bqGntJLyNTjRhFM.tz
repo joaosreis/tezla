@@ -1,0 +1,13 @@
+{ parameter mutez ;
+  storage unit ;
+  code { UNPAIR ;
+         SENDER ;
+         CONTRACT unit ;
+         { IF_NONE { UNIT ; FAILWITH } {} } ;
+         SWAP ;
+         UNIT ;
+         TRANSFER_TOKENS ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         PAIR } }

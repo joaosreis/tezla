@@ -1,0 +1,104 @@
+{ parameter
+    (or (or (pair %balance_of
+               (list %requests (pair (address %owner) (nat %token_id)))
+               (contract %callback
+                  (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+            (or (pair %mint
+                   (address %address)
+                   (pair (nat %amount) (pair (map %metadata string bytes) (nat %token_id))))
+                (address %set_administrator)))
+        (or (or (pair %set_metadata (string %k) (bytes %v)) (bool %set_pause))
+            (or (list %transfer
+                   (pair (address %from_)
+                         (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+                (list %update_operators
+                   (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                       (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))))))) ;
+  storage
+    (pair (pair (address %administrator)
+                (pair (nat %all_tokens)
+                      (pair (big_map %ledger (pair address nat) nat)
+                            (pair (big_map %metadata string bytes)
+                                  (pair (big_map %operators
+                                           (pair (address %owner) (pair (address %operator) (nat %token_id)))
+                                           unit)
+                                        (pair (bool %paused)
+                                              (pair (big_map %token_metadata nat (pair nat (map string bytes)))
+                                                    (big_map %total_supply nat nat))))))))
+          (big_map
+             nat
+             (lambda
+                (pair (or (or (pair (list (pair address nat)) (contract (list (pair (pair address nat) nat))))
+                              (or (pair address (pair nat (pair (map string bytes) nat))) address))
+                          (or (or (pair string bytes) bool)
+                              (or (list (pair address (list (pair address (pair nat nat)))))
+                                  (list (or (pair address (pair address nat)) (pair address (pair address nat)))))))
+                      (pair address
+                            (pair nat
+                                  (pair (big_map (pair address nat) nat)
+                                        (pair (big_map string bytes)
+                                              (pair (big_map (pair address (pair address nat)) unit)
+                                                    (pair bool (pair (big_map nat (pair nat (map string bytes))) (big_map nat nat)))))))))
+                (pair (list operation)
+                      (pair address
+                            (pair nat
+                                  (pair (big_map (pair address nat) nat)
+                                        (pair (big_map string bytes)
+                                              (pair (big_map (pair address (pair address nat)) unit)
+                                                    (pair bool (pair (big_map nat (pair nat (map string bytes))) (big_map nat nat)))))))))))) ;
+  code { CAST (pair (or (or (pair (list (pair address nat)) (contract (list (pair (pair address nat) nat))))
+                            (or (pair address (pair nat (pair (map string bytes) nat))) address))
+                        (or (or (pair string bytes) bool)
+                            (or (list (pair address (list (pair address (pair nat nat)))))
+                                (list (or (pair address (pair address nat)) (pair address (pair address nat)))))))
+                    (pair (pair address
+                                (pair nat
+                                      (pair (big_map (pair address nat) nat)
+                                            (pair (big_map string bytes)
+                                                  (pair (big_map (pair address (pair address nat)) unit)
+                                                        (pair bool (pair (big_map nat (pair nat (map string bytes))) (big_map nat nat))))))))
+                          (big_map
+                             nat
+                             (lambda
+                                (pair (or (or (pair (list (pair address nat)) (contract (list (pair (pair address nat) nat))))
+                                              (or (pair address (pair nat (pair (map string bytes) nat))) address))
+                                          (or (or (pair string bytes) bool)
+                                              (or (list (pair address (list (pair address (pair nat nat)))))
+                                                  (list (or (pair address (pair address nat)) (pair address (pair address nat)))))))
+                                      (pair address
+                                            (pair nat
+                                                  (pair (big_map (pair address nat) nat)
+                                                        (pair (big_map string bytes)
+                                                              (pair (big_map (pair address (pair address nat)) unit)
+                                                                    (pair bool (pair (big_map nat (pair nat (map string bytes))) (big_map nat nat)))))))))
+                                (pair (list operation)
+                                      (pair address
+                                            (pair nat
+                                                  (pair (big_map (pair address nat) nat)
+                                                        (pair (big_map string bytes)
+                                                              (pair (big_map (pair address (pair address nat)) unit)
+                                                                    (pair bool (pair (big_map nat (pair nat (map string bytes))) (big_map nat nat))))))))))))) ;
+         UNPAIR 3 ;
+         DUP ;
+         IF_LEFT
+           { IF_LEFT
+               { DROP ; PUSH nat 0 }
+               { IF_LEFT { DROP ; PUSH nat 1 } { DROP ; PUSH nat 2 } } }
+           { IF_LEFT
+               { IF_LEFT { DROP ; PUSH nat 3 } { DROP ; PUSH nat 4 } }
+               { IF_LEFT { DROP ; PUSH nat 5 } { DROP ; PUSH nat 6 } } } ;
+         DUP 4 ;
+         SWAP ;
+         GET ;
+         { IF_NONE { PUSH int -1 ; FAILWITH } {} } ;
+         DUG 2 ;
+         PAIR ;
+         EXEC ;
+         UNPAIR ;
+         DUG 2 ;
+         PAIR ;
+         SWAP ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

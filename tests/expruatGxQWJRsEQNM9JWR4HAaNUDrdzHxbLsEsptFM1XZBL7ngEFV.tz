@@ -1,0 +1,12 @@
+{ storage (map int int) ;
+  parameter (pair (int %key) (int %value)) ;
+  code { UNPAIR ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         SOME ;
+         DIG 2 ;
+         CAR ;
+         UPDATE ;
+         NIL operation ;
+         PAIR } }

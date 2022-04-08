@@ -1,0 +1,147 @@
+{ parameter
+    (or (or (unit %default)
+            (or (pair %rescueFA12
+                   (address %tokenContractAddress)
+                   (pair (nat %amount) (address %destination)))
+                (pair %rescueFA2
+                   (address %tokenContractAddress)
+                   (pair (nat %tokenId) (pair (nat %amount) (address %destination))))))
+        (or (or (address %rescueXTZ) (pair %send (nat %numberOfTokens) (address %destination)))
+            (or (option %setDelegate key_hash) (address %setGovernorAddress)))) ;
+  storage
+    (pair (address %governorAddress)
+          (pair (big_map %metadata string bytes) (address %tokenContractAddress))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { DROP ; NIL operation }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_GOVERNOR" ; FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+                     { IF_NONE { PUSH int 93 ; FAILWITH } {} } ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     DUP ;
+                     GET 3 ;
+                     SWAP ;
+                     GET 4 ;
+                     PAIR %to %value ;
+                     SELF_ADDRESS ;
+                     PAIR %from ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_GOVERNOR" ; FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     CONTRACT %transfer
+                       (list (pair (address %from_)
+                                   (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+                     { IF_NONE { PUSH int 119 ; FAILWITH } {} } ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     NIL (pair (address %from_)
+                               (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))) ;
+                     NIL (pair (address %to_) (pair (nat %token_id) (nat %amount))) ;
+                     DIG 5 ;
+                     DUP ;
+                     GET 5 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 7 ;
+                     GET 3 ;
+                     PAIR %token_id %amount ;
+                     DIG 6 ;
+                     GET 6 ;
+                     PAIR %to_ ;
+                     CONS ;
+                     SELF_ADDRESS ;
+                     PAIR %from_ %txs ;
+                     CONS ;
+                     TRANSFER_TOKENS ;
+                     CONS } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_GOVERNOR" ; FAILWITH } ;
+                     CONTRACT unit ;
+                     { IF_NONE { PUSH int 78 ; FAILWITH } {} } ;
+                     NIL operation ;
+                     SWAP ;
+                     BALANCE ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_GOVERNOR" ; FAILWITH } ;
+                     NIL operation ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     GET 4 ;
+                     CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+                     { IF_NONE { PUSH int 63 ; FAILWITH } {} } ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     PAIR %to %value ;
+                     SELF_ADDRESS ;
+                     PAIR %from ;
+                     TRANSFER_TOKENS ;
+                     CONS } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_GOVERNOR" ; FAILWITH } ;
+                     SET_DELEGATE ;
+                     NIL operation ;
+                     SWAP ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_GOVERNOR" ; FAILWITH } ;
+                     SWAP ;
+                     CDR ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation } } } ;
+         PAIR } }

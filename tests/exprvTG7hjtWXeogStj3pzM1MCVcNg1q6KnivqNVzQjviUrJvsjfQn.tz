@@ -1,0 +1,9 @@
+{ parameter (contract (lambda unit address)) ;
+  storage unit ;
+  code { CAR ;
+         BALANCE ;
+         LAMBDA unit address { DROP ; SELF_ADDRESS } ;
+         TRANSFER_TOKENS ;
+         DIP { UNIT ; NIL operation } ;
+         CONS ;
+         PAIR } }

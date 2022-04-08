@@ -1,0 +1,419 @@
+{ storage
+    (pair (pair (address %admin) (set %operators address))
+          (pair (big_map %sales
+                   nat
+                   (pair (pair (address %author) (pair (nat %cut) (address %nft_address)))
+                         (pair (nat %nft_id) (pair (address %owner) (nat %price)))))
+                (address %user_manager))) ;
+  parameter
+    (or (or (nat %cancel_sale)
+            (or (pair %create_sale
+                   (pair (address %author) (pair (nat %cut) (address %nft_address)))
+                   (pair (nat %nft_id) (pair (address %owner) (nat %price))))
+                (pair %purchase
+                   (pair (nat %nft_id) (address %owner))
+                   (pair (bytes %payment_data) (string %payment_method)))))
+        (or (address %set_administrator)
+            (or (list %update_operator (pair (address %operator) (bool %valid)))
+                (address %update_user_manager)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 1190 ; FAILWITH } {} ;
+                 GET 5 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF { PUSH bool True } { SWAP ; DUP ; DUG 2 ; CAR ; CDR ; SENDER ; MEM } ;
+                 IF {}
+                    { PUSH string
+                           "WrongCondition: (sp.sender == self.data.sales[params.nft_id].owner) | (self.data.operators.contains(sp.sender))" ;
+                      FAILWITH } ;
+                 NIL operation ;
+                 DUP 3 ;
+                 GET 3 ;
+                 DUP 3 ;
+                 GET ;
+                 IF_NONE { PUSH int 1190 ; FAILWITH } {} ;
+                 CAR ;
+                 GET 4 ;
+                 CONTRACT %transfer
+                   (list (pair (address %from_)
+                               (list %txs (pair (nat %amount) (pair (address %to_) (nat %token_id)))))) ;
+                 IF_NONE { PUSH int 1193 ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 NIL (pair (address %from_)
+                           (list %txs (pair (nat %amount) (pair (address %to_) (nat %token_id))))) ;
+                 NIL (pair (nat %amount) (pair (address %to_) (nat %token_id))) ;
+                 DUP 6 ;
+                 DUP 8 ;
+                 GET 3 ;
+                 DUP 8 ;
+                 GET ;
+                 IF_NONE { PUSH int 1190 ; FAILWITH } {} ;
+                 GET 5 ;
+                 PAIR %to_ %token_id ;
+                 PUSH nat 1 ;
+                 PAIR %amount ;
+                 CONS ;
+                 SELF_ADDRESS ;
+                 PAIR %from_ %txs ;
+                 CONS ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 NONE (pair (pair (address %author) (pair (nat %cut) (address %nft_address)))
+                            (pair (nat %nft_id) (pair (address %owner) (nat %price)))) ;
+                 DIG 5 ;
+                 UPDATE ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     MEM ;
+                     IF {}
+                        { PUSH string "WrongCondition: self.data.operators.contains(sp.sender)" ;
+                          FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     GET 4 ;
+                     CONTRACT %transfer
+                       (list (pair (address %from_)
+                                   (list %txs (pair (nat %amount) (pair (address %to_) (nat %token_id)))))) ;
+                     IF_NONE { PUSH int 1174 ; FAILWITH } {} ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     NIL (pair (address %from_)
+                               (list %txs (pair (nat %amount) (pair (address %to_) (nat %token_id))))) ;
+                     NIL (pair (nat %amount) (pair (address %to_) (nat %token_id))) ;
+                     DUP 6 ;
+                     GET 3 ;
+                     SELF_ADDRESS ;
+                     PAIR %to_ %token_id ;
+                     PUSH nat 1 ;
+                     PAIR %amount ;
+                     CONS ;
+                     DUP 6 ;
+                     GET 5 ;
+                     PAIR %from_ %txs ;
+                     CONS ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DIG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     DIG 4 ;
+                     DUP ;
+                     GET 6 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 6 ;
+                     GET 5 ;
+                     PAIR %owner %price ;
+                     DUP 6 ;
+                     GET 3 ;
+                     PAIR %nft_id ;
+                     DIG 5 ;
+                     DUP ;
+                     CAR ;
+                     GET 4 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 7 ;
+                     CAR ;
+                     GET 3 ;
+                     PAIR %cut %nft_address ;
+                     DUP 7 ;
+                     CAR ;
+                     CAR ;
+                     PAIR %author ;
+                     PAIR ;
+                     SOME ;
+                     DIG 5 ;
+                     GET 3 ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     MEM ;
+                     IF {}
+                        { PUSH string "WrongCondition: self.data.operators.contains(sp.sender)" ;
+                          FAILWITH } ;
+                     NIL operation ;
+                     DUP 3 ;
+                     GET 4 ;
+                     CONTRACT %pay
+                       (pair (pair (address %account) (nat %amount)) (pair (bytes %data) (string %method))) ;
+                     IF_NONE { PUSH int 1205 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     DUP ;
+                     GET 4 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 5 ;
+                     GET 3 ;
+                     PAIR %data %method ;
+                     DUP 6 ;
+                     GET 3 ;
+                     DUP 6 ;
+                     CAR ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 1203 ; FAILWITH } {} ;
+                     GET 6 ;
+                     DUP 6 ;
+                     CAR ;
+                     CDR ;
+                     PAIR %account %amount ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DUP 3 ;
+                     GET 3 ;
+                     DUP 3 ;
+                     CAR ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 1203 ; FAILWITH } {} ;
+                     CAR ;
+                     GET 4 ;
+                     CONTRACT %transfer
+                       (list (pair (address %from_)
+                                   (list %txs (pair (nat %amount) (pair (address %to_) (nat %token_id)))))) ;
+                     IF_NONE { PUSH int 1208 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     NIL (pair (address %from_)
+                               (list %txs (pair (nat %amount) (pair (address %to_) (nat %token_id))))) ;
+                     NIL (pair (nat %amount) (pair (address %to_) (nat %token_id))) ;
+                     DIG 5 ;
+                     DUP ;
+                     CAR ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 7 ;
+                     CAR ;
+                     CDR ;
+                     PAIR %to_ %token_id ;
+                     PUSH nat 1 ;
+                     PAIR %amount ;
+                     CONS ;
+                     SELF_ADDRESS ;
+                     PAIR %from_ %txs ;
+                     CONS ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DUP 3 ;
+                     GET 4 ;
+                     CONTRACT %update_balance
+                       (pair (address %account) (pair (nat %amount) (bool %increase))) ;
+                     IF_NONE { PUSH int 1214 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     PUSH bool True ;
+                     PUSH nat 100 ;
+                     DUP 7 ;
+                     GET 3 ;
+                     DUP 7 ;
+                     CAR ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 1203 ; FAILWITH } {} ;
+                     CAR ;
+                     GET 3 ;
+                     DUP 8 ;
+                     GET 3 ;
+                     DUP 8 ;
+                     CAR ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 1203 ; FAILWITH } {} ;
+                     GET 6 ;
+                     MUL ;
+                     EDIV ;
+                     IF_NONE { PUSH int 1213 ; FAILWITH } { CAR } ;
+                     PAIR %amount %increase ;
+                     DUP 6 ;
+                     GET 3 ;
+                     DUP 6 ;
+                     CAR ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 1203 ; FAILWITH } {} ;
+                     CAR ;
+                     CAR ;
+                     PAIR %account ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DUP 3 ;
+                     GET 4 ;
+                     CONTRACT %update_balance
+                       (pair (address %account) (pair (nat %amount) (bool %increase))) ;
+                     IF_NONE { PUSH int 1217 ; FAILWITH } {} ;
+                     PUSH mutez 0 ;
+                     PUSH bool True ;
+                     PUSH nat 100 ;
+                     DUP 7 ;
+                     GET 3 ;
+                     DUP 7 ;
+                     CAR ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 1203 ; FAILWITH } {} ;
+                     CAR ;
+                     GET 3 ;
+                     DUP 8 ;
+                     GET 3 ;
+                     DUP 8 ;
+                     CAR ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 1203 ; FAILWITH } {} ;
+                     GET 6 ;
+                     MUL ;
+                     EDIV ;
+                     IF_NONE { PUSH int 1213 ; FAILWITH } { CAR } ;
+                     DUP 7 ;
+                     GET 3 ;
+                     DUP 7 ;
+                     CAR ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 1203 ; FAILWITH } {} ;
+                     GET 6 ;
+                     SUB ;
+                     ISNAT ;
+                     IF_NONE { PUSH int 1218 ; FAILWITH } {} ;
+                     PAIR %amount %increase ;
+                     DUP 6 ;
+                     GET 3 ;
+                     DUP 6 ;
+                     CAR ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 1203 ; FAILWITH } {} ;
+                     GET 5 ;
+                     PAIR %account ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DIG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     NONE (pair (pair (address %author) (pair (nat %cut) (address %nft_address)))
+                                (pair (nat %nft_id) (pair (address %owner) (nat %price)))) ;
+                     DIG 5 ;
+                     CAR ;
+                     CAR ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP } } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+                 SWAP ;
+                 UNPAIR ;
+                 CDR ;
+                 DIG 2 ;
+                 PAIR ;
+                 PAIR }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+                     DUP ;
+                     ITER { DUP ;
+                            CDR ;
+                            IF { DIG 2 ;
+                                 UNPAIR ;
+                                 UNPAIR ;
+                                 SWAP ;
+                                 PUSH bool True ;
+                                 DIG 4 ;
+                                 CAR ;
+                                 UPDATE ;
+                                 SWAP ;
+                                 PAIR ;
+                                 PAIR ;
+                                 SWAP }
+                               { DIG 2 ;
+                                 UNPAIR ;
+                                 UNPAIR ;
+                                 SWAP ;
+                                 PUSH bool False ;
+                                 DIG 4 ;
+                                 CAR ;
+                                 UPDATE ;
+                                 SWAP ;
+                                 PAIR ;
+                                 PAIR ;
+                                 SWAP } } ;
+                     DROP }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 2 ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } } ;
+             NIL operation } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

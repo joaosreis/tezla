@@ -1,0 +1,112 @@
+{ storage (pair (nat %value) (nat %_state)) ;
+  parameter
+    (or (unit %inc_value) (or (unit %init) (or (unit %complete) (unit %interrupt)))) ;
+  code { NIL operation ;
+         DIG 1 ;
+         UNPAIR ;
+         DIP { UNPAIR ; SWAP } ;
+         IF_LEFT
+           { DROP ;
+             PUSH nat 1 ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             ADD ;
+             DIP { DIG 1 ; DROP } ;
+             DUG 1 ;
+             SWAP ;
+             PAIR ;
+             DIG 1 ;
+             PAIR }
+           { IF_LEFT
+               { DROP ;
+                 DUP ;
+                 DUP ;
+                 PUSH nat 0 ;
+                 COMPARE ;
+                 EQ ;
+                 IF { PUSH mutez 3000000 ;
+                      AMOUNT ;
+                      COMPARE ;
+                      GT ;
+                      IF { PUSH nat 1 ; DIP { DIG 1 ; DROP } ; DUG 1 } {} }
+                    { PUSH string "InvalidState" ; FAILWITH } ;
+                 DROP ;
+                 SWAP ;
+                 PAIR ;
+                 DIG 1 ;
+                 PAIR }
+               { IF_LEFT
+                   { DROP ;
+                     DUP ;
+                     DUP ;
+                     PUSH nat 1 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { PUSH nat 1 ;
+                          DIG 3 ;
+                          DUP ;
+                          DUG 4 ;
+                          COMPARE ;
+                          GT ;
+                          IF { DIG 3 ;
+                               DUP ;
+                               DUG 4 ;
+                               SENDER ;
+                               CONTRACT unit ;
+                               IF_NONE { PUSH string "BadContract" ; FAILWITH } {} ;
+                               BALANCE ;
+                               UNIT ;
+                               TRANSFER_TOKENS ;
+                               CONS ;
+                               DIP { DIG 3 ; DROP } ;
+                               DUG 3 ;
+                               PUSH nat 3 ;
+                               DIP { DIG 1 ; DROP } ;
+                               DUG 1 }
+                             {} }
+                        { PUSH string "InvalidState" ; FAILWITH } ;
+                     DROP ;
+                     SWAP ;
+                     PAIR ;
+                     DIG 1 ;
+                     PAIR }
+                   { DROP ;
+                     DUP ;
+                     DUP ;
+                     PUSH nat 1 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { DIG 3 ;
+                          DUP ;
+                          DUG 4 ;
+                          SENDER ;
+                          CONTRACT unit ;
+                          IF_NONE { PUSH string "BadContract" ; FAILWITH } {} ;
+                          BALANCE ;
+                          PUSH nat 2 ;
+                          PUSH int 1 ;
+                          PAIR ;
+                          PAIR ;
+                          UNPAIR ;
+                          UNPAIR ;
+                          ABS ;
+                          DIG 2 ;
+                          MUL ;
+                          EDIV ;
+                          IF_NONE { PUSH string "DivByZero" ; FAILWITH } {} ;
+                          CAR ;
+                          UNIT ;
+                          TRANSFER_TOKENS ;
+                          CONS ;
+                          DIP { DIG 3 ; DROP } ;
+                          DUG 3 ;
+                          PUSH nat 2 ;
+                          DIP { DIG 1 ; DROP } ;
+                          DUG 1 }
+                        { PUSH string "InvalidState" ; FAILWITH } ;
+                     DROP ;
+                     SWAP ;
+                     PAIR ;
+                     DIG 1 ;
+                     PAIR } } } } }

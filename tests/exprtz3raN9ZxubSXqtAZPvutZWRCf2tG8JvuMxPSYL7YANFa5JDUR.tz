@@ -1,0 +1,83 @@
+{ storage
+    (pair (map (bytes :hash) (pair mutez (pair (pair address timestamp) (pair address timestamp))))
+          (map (bytes :hash) (bytes :code))) ;
+  parameter
+    (or (pair %create (bytes :hash) (pair (pair address timestamp) (pair address timestamp)))
+        (or (bytes :code %wisdrow) (bytes :hash %cancel))) ;
+  code { NIL operation ;
+         SWAP ;
+         UNPAIR ;
+         IF_LEFT
+           { UNPAIR ;
+             DIP 2 { UNPAIR } ;
+             DUP 3 ;
+             DUP 2 ;
+             GET ;
+             { IF_NONE {} { { UNIT ; FAILWITH } } } ;
+             DIP { AMOUNT ; PAIR ; SOME } ;
+             UPDATE ;
+             PAIR }
+           { IF_LEFT
+               { DIP { UNPAIR ; SWAP } ;
+                 DUP ;
+                 PACK ;
+                 SHA256 ;
+                 DUP ;
+                 DIP { DIP { SOME } ; UPDATE ; SWAP } ;
+                 DUP 2 ;
+                 DUP 2 ;
+                 DIP 2
+                     { DUP ;
+                       DIP { GET } ;
+                       SWAP ;
+                       { IF_NONE { FAILWITH } { SWAP ; DROP } } ;
+                       { UNPAIR ; DIP { UNPAIR } ; DIP { UNPAIR } } ;
+                       DIP { SENDER ;
+                             { { COMPARE ; EQ } ; IF {} { { UNIT ; FAILWITH } } } ;
+                             NOW ;
+                             { { COMPARE ; GT } ; IF {} { { UNIT ; FAILWITH } } } ;
+                             DROP } } ;
+                 NONE (pair mutez (pair (pair address timestamp) (pair address timestamp))) ;
+                 SWAP ;
+                 UPDATE ;
+                 DIP { DIP { SENDER ;
+                             CONTRACT unit ;
+                             { IF_NONE { { UNIT ; FAILWITH } } {} } } ;
+                       UNIT ;
+                       TRANSFER_TOKENS ;
+                       SWAP ;
+                       DIP { CONS } } ;
+                 PAIR }
+               { DUP 2 ;
+                 DUP 2 ;
+                 DIP 2
+                     { DUP ;
+                       DIP { DIP { DUP ; CAR } ; GET } ;
+                       SWAP ;
+                       { IF_NONE
+                           { DIP { CDR } ;
+                             GET ;
+                             { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+                             FAILWITH }
+                           { SWAP ; DROP } } ;
+                       { UNPAIR ; DIP { UNPAIR } ; DIP 2 { UNPAIR } } ;
+                       DIP { DROP ;
+                             SENDER ;
+                             { { COMPARE ; EQ } ; IF {} { { UNIT ; FAILWITH } } } ;
+                             NOW ;
+                             { { COMPARE ; GT } ; IF {} { { UNIT ; FAILWITH } } } } ;
+                       SWAP ;
+                       DROP } ;
+                 DIP { UNPAIR } ;
+                 NONE (pair mutez (pair (pair address timestamp) (pair address timestamp))) ;
+                 SWAP ;
+                 UPDATE ;
+                 PAIR ;
+                 DIP { DIP { SENDER ;
+                             CONTRACT unit ;
+                             { IF_NONE { { UNIT ; FAILWITH } } {} } } ;
+                       UNIT ;
+                       TRANSFER_TOKENS ;
+                       CONS } } } ;
+         SWAP ;
+         PAIR } }

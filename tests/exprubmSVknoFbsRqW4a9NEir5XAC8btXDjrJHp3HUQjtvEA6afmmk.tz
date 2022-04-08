@@ -1,0 +1,144 @@
+{ storage
+    (map string
+         (pair (pair (pair (int %age) (string %gender)) (pair (string %hospital) (string %name)))
+               (pair (pair (int %number) (bool %v1)) (pair (int %v1Date) (pair (bool %v2) (int %v2Date)))))) ;
+  parameter
+    (or (pair %addCause
+           (pair (int %age) (string %email))
+           (pair (string %gender) (pair (string %name) (int %number))))
+        (or (pair %markV1 (int %date) (pair (string %email) (string %hospital)))
+            (pair %markV2 (int %date) (string %email)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             PUSH (pair int (pair bool int)) (Pair 0 (Pair False 0)) ;
+             PUSH bool False ;
+             DUP 4 ;
+             GET 6 ;
+             PAIR ;
+             PAIR ;
+             DUP 3 ;
+             GET 5 ;
+             PUSH string "" ;
+             PAIR ;
+             DIG 3 ;
+             DUP ;
+             GET 3 ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR ;
+             PAIR ;
+             SOME ;
+             DIG 2 ;
+             CAR ;
+             CDR ;
+             UPDATE }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.usersMap.contains(params.email)" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUP 3 ;
+                 GET 3 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 26 ; FAILWITH } {} ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 CAR ;
+                 PUSH bool True ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 DUP ;
+                 DUP 3 ;
+                 GET 3 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 27 ; FAILWITH } {} ;
+                 DUP 4 ;
+                 CAR ;
+                 UPDATE 5 ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 DUP ;
+                 DUP 3 ;
+                 GET 3 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 28 ; FAILWITH } {} ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 CDR ;
+                 DIG 5 ;
+                 GET 4 ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.usersMap.contains(params.email)" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUP 3 ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 34 ; FAILWITH } {} ;
+                 PUSH bool True ;
+                 UPDATE 7 ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 DUP ;
+                 DUP 3 ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 35 ; FAILWITH } {} ;
+                 DIG 3 ;
+                 CAR ;
+                 UPDATE 8 ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE } } ;
+         NIL operation ;
+         PAIR } }

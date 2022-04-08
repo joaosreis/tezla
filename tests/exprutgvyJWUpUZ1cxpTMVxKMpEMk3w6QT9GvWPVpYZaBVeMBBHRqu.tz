@@ -1,0 +1,44 @@
+{ parameter
+    (or (pair %send (nat %numberOfTokens) (address %destination))
+        (address %setAdministrator)) ;
+  storage
+    (pair (address %administratorAddress)
+          (pair (big_map %metadata string bytes) (address %tokenContractAddress))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "NOT_ADMIN" ; FAILWITH } ;
+             NIL operation ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             GET 4 ;
+             CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+             { IF_NONE { PUSH int 64 ; FAILWITH } {} } ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             PAIR %to %value ;
+             SELF_ADDRESS ;
+             PAIR %from ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "NOT_ADMIN" ; FAILWITH } ;
+             SWAP ;
+             CDR ;
+             SWAP ;
+             PAIR ;
+             NIL operation } ;
+         PAIR } }

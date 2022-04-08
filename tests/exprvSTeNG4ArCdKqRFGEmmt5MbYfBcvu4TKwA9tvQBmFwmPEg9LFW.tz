@@ -1,0 +1,3 @@
+{ parameter (list (pair (nat %amount) (pair (string %partition) (address %to)))) ;
+  storage unit ;
+  code { CDR ; NIL operation ; PAIR } }

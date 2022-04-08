@@ -1,9 +1,0 @@
-{ parameter
-    (pair (pair (pair (nat %decimals) (map %extras string string))
-                (pair (string %name) (string %symbol)))
-          (nat %token_id)) ;
-  storage
-    (pair (pair (pair (nat %decimals) (map %extras string string))
-                (pair (string %name) (string %symbol)))
-          (nat %token_id)) ;
-  code { DUP ; CAR ; NIL operation ; PAIR ; DIP { DROP } } }

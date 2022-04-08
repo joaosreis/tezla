@@ -1,0 +1,3 @@
+{ parameter (or (nat %bar) (unit %foo)) ;
+  storage unit ;
+  code { DROP ; PUSH unit Unit ; NIL operation ; PAIR } }

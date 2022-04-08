@@ -1,3 +1,0 @@
-{ storage (pair (address %owner) (string %track)) ;
-  parameter unit ;
-  code { CDR ; NIL operation ; PAIR } }

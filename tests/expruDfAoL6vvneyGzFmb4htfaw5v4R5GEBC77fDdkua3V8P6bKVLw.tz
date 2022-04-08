@@ -1,0 +1,16 @@
+{ storage (big_map address timestamp) ;
+  parameter nat ;
+  code { UNPAIR ;
+         NIL operation ;
+         PUSH address "KT1L7adXFKRXsQhXeYw5LNvW5V392bwV5zTZ" ;
+         CONTRACT %transfer (pair (address %from_) (pair (address %to_) (nat %value))) ;
+         IF_NONE { PUSH int 15 ; FAILWITH } {} ;
+         PUSH mutez 0 ;
+         DIG 3 ;
+         SENDER ;
+         PAIR %to_ %value ;
+         PUSH address "tz1MtzUvoywewbY8axwHqSoeVo91w4XhPZV8" ;
+         PAIR %from_ ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

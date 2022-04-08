@@ -1,0 +1,82 @@
+{ parameter (or (address %buy) (mutez %withdraw)) ;
+  storage
+    (pair (pair (address %fa2address) (mutez %initaltacoz))
+          (pair (address %lastorder) (address %owner))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { PUSH mutez 1000000 ;
+             AMOUNT ;
+             DUP 4 ;
+             CAR ;
+             CDR ;
+             SUB ;
+             COMPARE ;
+             LT ;
+             IF { DROP 2 ; PUSH string "All Tacoz sold." ; FAILWITH }
+                { PUSH mutez 1000000 ;
+                  AMOUNT ;
+                  EDIV ;
+                  IF_NONE { PUSH string "DIV by 0" ; FAILWITH } { DROP } ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CAR ;
+                  CAR ;
+                  CONTRACT %transfer
+                    (list (pair (address %from_)
+                                (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+                  IF_NONE { PUSH string "Contract not found :/ ." ; FAILWITH } {} ;
+                  NIL (pair address (pair nat nat)) ;
+                  PUSH nat 1 ;
+                  PUSH nat 0 ;
+                  PAIR ;
+                  SENDER ;
+                  PAIR ;
+                  CONS ;
+                  SELF_ADDRESS ;
+                  PAIR ;
+                  NIL operation ;
+                  DIG 2 ;
+                  PUSH mutez 0 ;
+                  NIL (pair address (list (pair address (pair nat nat)))) ;
+                  DIG 4 ;
+                  CONS ;
+                  TRANSFER_TOKENS ;
+                  CONS ;
+                  DUP 3 ;
+                  CDR ;
+                  AMOUNT ;
+                  DUP 5 ;
+                  CAR ;
+                  CDR ;
+                  SUB ;
+                  DIG 4 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  PAIR ;
+                  DUP ;
+                  CDR ;
+                  CDR ;
+                  DIG 3 ;
+                  PAIR ;
+                  SWAP ;
+                  CAR ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CDR ;
+             CONTRACT unit ;
+             IF_NONE { PUSH string "Contract not found." ; FAILWITH } {} ;
+             SWAP ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             SWAP ;
+             NIL operation ;
+             DIG 2 ;
+             CONS ;
+             PAIR } } }

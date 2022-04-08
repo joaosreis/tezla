@@ -1,0 +1,264 @@
+{ storage
+    (pair (map %goldInvestors
+             string
+             (pair (pair (string %amount) (string %email)) (pair (string %mode) (string %name))))
+          (map %projects
+             string
+             (pair (pair (string %amount) (string %cycleDuration))
+                   (pair (string %description)
+                         (pair (list %investors
+                                  (pair (pair (string %amount) (timestamp %date)) (pair (string %email) (string %mode))))
+                               (string %name)))))) ;
+  parameter
+    (or (or (or (pair %addAGoldInvestor
+                   (pair (string %amount) (string %email))
+                   (pair (string %id) (pair (string %mode) (string %name))))
+                (pair %addProject
+                   (pair (string %amount) (pair (string %cycleDuration) (string %description)))
+                   (pair (string %id)
+                         (pair (list %investors
+                                  (pair (pair (string %amount) (timestamp %date)) (pair (string %email) (string %mode))))
+                               (string %name)))))
+            (or (string %deleteGoldInvestor) (string %deleteProject)))
+        (or (or (pair %getGoldInvestors unit (contract string))
+                (pair %getProjects unit (contract string)))
+            (or (pair %invest
+                   (pair (string %amount) (string %investorEmail))
+                   (pair (string %mode) (string %projectId)))
+                (or (pair %updateGoldInvestor (string %amount) (pair (string %id) (string %mode)))
+                    (pair %updateProject (string %amount) (string %projetId)))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DUP ;
+                     GET 3 ;
+                     PUSH string "" ;
+                     COMPARE ;
+                     NEQ ;
+                     IF {} { PUSH string "WrongCondition: params.id != ''" ; FAILWITH } ;
+                     DUP ;
+                     GET 6 ;
+                     PUSH string "" ;
+                     COMPARE ;
+                     NEQ ;
+                     IF {} { PUSH string "WrongCondition: params.name != ''" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     DIG 2 ;
+                     DUP ;
+                     GET 6 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 4 ;
+                     GET 5 ;
+                     PAIR %mode %name ;
+                     DIG 3 ;
+                     DUP ;
+                     CAR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 5 ;
+                     CAR ;
+                     CAR ;
+                     PAIR %amount %email ;
+                     PAIR ;
+                     SOME ;
+                     DIG 3 ;
+                     GET 3 ;
+                     UPDATE ;
+                     PAIR }
+                   { SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     DIG 2 ;
+                     DUP ;
+                     GET 6 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 4 ;
+                     GET 5 ;
+                     PAIR %investors %name ;
+                     DUP 4 ;
+                     CAR ;
+                     GET 4 ;
+                     PAIR %description ;
+                     DIG 3 ;
+                     DUP ;
+                     CAR ;
+                     GET 3 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 5 ;
+                     CAR ;
+                     CAR ;
+                     PAIR %amount %cycleDuration ;
+                     PAIR ;
+                     SOME ;
+                     DIG 3 ;
+                     GET 3 ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR } }
+               { IF_LEFT
+                   { DUP ;
+                     PUSH string "" ;
+                     COMPARE ;
+                     NEQ ;
+                     IF {} { PUSH string "WrongCondition: params.id != ''" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     NONE (pair (pair (string %amount) (string %email)) (pair (string %mode) (string %name))) ;
+                     DIG 3 ;
+                     UPDATE ;
+                     PAIR }
+                   { DUP ;
+                     PUSH string "" ;
+                     COMPARE ;
+                     NEQ ;
+                     IF {} { PUSH string "WrongCondition: params.projetId != ''" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     NONE (pair (pair (string %amount) (string %cycleDuration))
+                                (pair (string %description)
+                                      (pair (list %investors
+                                               (pair (pair (string %amount) (timestamp %date)) (pair (string %email) (string %mode))))
+                                            (string %name)))) ;
+                     DIG 3 ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR } } }
+           { IF_LEFT
+               { IF_LEFT { DROP } { DROP } }
+               { IF_LEFT
+                   { DUP ;
+                     GET 4 ;
+                     PUSH string "" ;
+                     COMPARE ;
+                     NEQ ;
+                     IF {} { PUSH string "WrongCondition: params.projectId != ''" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUP 4 ;
+                     GET 4 ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 55 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DIG 7 ;
+                     CDR ;
+                     DUP 8 ;
+                     GET 4 ;
+                     GET ;
+                     IF_NONE { PUSH int 55 ; FAILWITH } {} ;
+                     GET 5 ;
+                     DIG 7 ;
+                     DUP ;
+                     GET 3 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 9 ;
+                     CAR ;
+                     CDR ;
+                     PAIR %email %mode ;
+                     PUSH timestamp "2021-04-27T09:56:03Z" ;
+                     DIG 9 ;
+                     CAR ;
+                     CAR ;
+                     PAIR %amount %date ;
+                     PAIR ;
+                     CONS ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR }
+                   { IF_LEFT
+                       { DUP ;
+                         GET 3 ;
+                         PUSH string "" ;
+                         COMPARE ;
+                         NEQ ;
+                         IF {} { PUSH string "WrongCondition: params.id != ''" ; FAILWITH } ;
+                         SWAP ;
+                         UNPAIR ;
+                         DUP ;
+                         DUP 4 ;
+                         GET 3 ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE { PUSH int 100 ; FAILWITH } {} ;
+                         UNPAIR ;
+                         CDR ;
+                         DUP 6 ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         DUP ;
+                         DUP 4 ;
+                         GET 3 ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE { PUSH int 101 ; FAILWITH } {} ;
+                         UNPAIR ;
+                         SWAP ;
+                         CDR ;
+                         DIG 5 ;
+                         GET 4 ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         PAIR }
+                       { DUP ;
+                         CDR ;
+                         PUSH string "" ;
+                         COMPARE ;
+                         NEQ ;
+                         IF {} { PUSH string "WrongCondition: params.projetId != ''" ; FAILWITH } ;
+                         SWAP ;
+                         UNPAIR ;
+                         SWAP ;
+                         DUP ;
+                         DUP 4 ;
+                         CDR ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE { PUSH int 36 ; FAILWITH } {} ;
+                         UNPAIR ;
+                         CDR ;
+                         DIG 5 ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         SWAP ;
+                         PAIR } } } } ;
+         NIL operation ;
+         PAIR } }

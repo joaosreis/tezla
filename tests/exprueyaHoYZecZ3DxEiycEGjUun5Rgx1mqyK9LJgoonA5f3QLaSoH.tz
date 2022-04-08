@@ -1,0 +1,148 @@
+{ parameter
+    (or (or %administrator_action
+           (or (address %set_administrator) (bool %set_pause))
+           (lambda %set_service_factory_function
+              (pair (pair (bytes %metadata)
+                          (pair (pair %allowed_tokens (bool %tez) (set %assets address))
+                                (nat %allowed_operation_type)))
+                    nat)
+              (pair operation address)))
+        (pair %create_service
+           (bytes %metadata)
+           (pair (pair %allowed_tokens (bool %tez) (set %assets address))
+                 (nat %allowed_operation_type)))) ;
+  storage
+    (pair (pair (pair (address %administrator) (bool %paused))
+                (pair (lambda %service_factory_function
+                         (pair (pair (bytes %metadata)
+                                     (pair (pair %allowed_tokens (bool %tez) (set %assets address))
+                                           (nat %allowed_operation_type)))
+                               nat)
+                         (pair operation address))
+                      (nat %service_factory_function_version)))
+          (big_map %services address (set address))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SENDER ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             CAR ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "Only administrator can do this" ; FAILWITH } {} ;
+             IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     DUP 3 ;
+                     CAR ;
+                     CDR ;
+                     DIG 3 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     DIG 3 ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     DUP 3 ;
+                     CAR ;
+                     CDR ;
+                     DIG 2 ;
+                     DIG 3 ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     NIL operation ;
+                     PAIR } }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 DIG 2 ;
+                 PAIR ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 DUP ;
+                 CDR ;
+                 PUSH nat 1 ;
+                 DIG 3 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 ADD ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 PAIR ;
+                 DIG 2 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 NIL operation ;
+                 PAIR } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             CDR ;
+             IF { PUSH string "Contract is paused" ; FAILWITH } {} ;
+             SENDER ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             DIG 2 ;
+             PAIR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             SWAP ;
+             EXEC ;
+             UNPAIR ;
+             DUP 4 ;
+             CDR ;
+             DUP 5 ;
+             CDR ;
+             DUP 5 ;
+             GET ;
+             IF_NONE { EMPTY_SET address } {} ;
+             DIG 3 ;
+             PUSH bool True ;
+             SWAP ;
+             UPDATE ;
+             DIG 3 ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             DIG 2 ;
+             CAR ;
+             PAIR ;
+             NIL operation ;
+             DIG 2 ;
+             CONS ;
+             PAIR } } }

@@ -1,0 +1,14 @@
+{ parameter (pair address mutez) ;
+  storage (map address mutez) ;
+  code { UNPAIR ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         DIG 2 ;
+         CAR ;
+         SWAP ;
+         SOME ;
+         SWAP ;
+         UPDATE ;
+         NIL operation ;
+         PAIR } }

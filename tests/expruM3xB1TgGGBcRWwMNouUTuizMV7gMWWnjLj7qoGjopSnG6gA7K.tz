@@ -1,0 +1,6 @@
+{ parameter
+    (list %mintMultiple
+       (pair (pair (nat %amount) (map %metadata string bytes))
+             (pair (address %to) (nat %token_id)))) ;
+  storage unit ;
+  code { CDR ; NIL operation ; PAIR } }

@@ -1,0 +1,8 @@
+{ storage (pair (map %metadata string string) (int %x)) ;
+  parameter (or (string %change_metadata) (unit %incr)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; UNPAIR ; DIG 2 ; SOME ; PUSH string "" ; UPDATE ; PAIR }
+           { DROP ; UNPAIR ; SWAP ; PUSH int 1 ; ADD ; SWAP ; PAIR } ;
+         NIL operation ;
+         PAIR } }

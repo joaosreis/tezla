@@ -1,0 +1,37 @@
+{ storage bytes ;
+  parameter int ;
+  code { UNPAIR ;
+         PUSH bytes 0x ;
+         DUP 3 ;
+         SIZE ;
+         PUSH nat 0 ;
+         DUP ;
+         DUP 3 ;
+         COMPARE ;
+         GT ;
+         LOOP { DUP ;
+                PUSH nat 1 ;
+                COMPARE ;
+                EQ ;
+                IF { PUSH bytes 0x01 ; DIG 3 ; CONCAT ; DUG 2 }
+                   { DUP 5 ;
+                     PUSH nat 1 ;
+                     DUP 3 ;
+                     SLICE ;
+                     IF_NONE { PUSH int 17 ; FAILWITH } {} ;
+                     DIG 3 ;
+                     CONCAT ;
+                     DUG 2 } ;
+                PUSH nat 1 ;
+                ADD ;
+                DUP ;
+                DUP 3 ;
+                COMPARE ;
+                GT } ;
+         DROP 2 ;
+         SWAP ;
+         DROP ;
+         SWAP ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

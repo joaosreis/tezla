@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (set key) ;
+  code { CDR ; NIL operation ; PAIR } }

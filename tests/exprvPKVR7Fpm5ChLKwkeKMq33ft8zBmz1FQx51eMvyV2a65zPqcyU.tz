@@ -1,0 +1,3 @@
+{ parameter address ;
+  storage (list address) ;
+  code { UNPAIR ; CONS ; NIL operation ; PAIR } }

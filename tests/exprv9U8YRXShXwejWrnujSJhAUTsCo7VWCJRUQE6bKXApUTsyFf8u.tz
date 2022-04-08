@@ -1,0 +1,4 @@
+{ parameter unit ;
+  storage
+    (map (or (or (or address bytes) (or int nat)) (or (or (pair nat int) string) mutez)) nat) ;
+  code { CDR ; NIL operation ; PAIR } }

@@ -1,0 +1,21 @@
+{ storage (pair (nat %storedValue) (int %unusedVal)) ;
+  parameter (or (nat %divide) (or (unit %double) (nat %replace))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DUP ;
+             PUSH nat 5 ;
+             COMPARE ;
+             LT ;
+             IF {} { PUSH string "Divisor must be greater than 5" ; FAILWITH } ;
+             SWAP ;
+             UNPAIR ;
+             DIG 2 ;
+             SWAP ;
+             EDIV ;
+             IF_NONE { PUSH int 20 ; FAILWITH } { CAR } ;
+             PAIR }
+           { IF_LEFT
+               { DROP ; UNPAIR ; PUSH nat 2 ; MUL ; PAIR }
+               { SWAP ; CDR ; SWAP ; PAIR } } ;
+         NIL operation ;
+         PAIR } }

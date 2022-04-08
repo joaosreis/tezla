@@ -1,0 +1,57 @@
+{ parameter (or (unit %ask) (pair %respond string nat)) ;
+  storage (pair (bool %waiting) (pair (string %response) (nat %counter))) ;
+  code { DUP ;
+         CAR ;
+         DIP { CDR } ;
+         IF_LEFT
+           { DROP ;
+             DUP ;
+             CAR ;
+             DIP { CDR } ;
+             IF { PUSH string "waiting" ; FAILWITH }
+                { SENDER ;
+                  PUSH address "tz1d9FjxhkxMjH34pBawHqj6w9UTYFhbcDuL" ;
+                  COMPARE ;
+                  EQ ;
+                  IF { PUSH address "KT1XjMMkAE4TSm1agdwXJ5xh3n4PgxRZoeCg" ;
+                       CONTRACT %ask (pair (contract (pair string nat)) string) ;
+                       IF_NONE
+                         { PUSH string "oracle not found" ; FAILWITH }
+                         { SWAP ;
+                           DIP { PUSH string "my_query" ;
+                                 SELF %respond ;
+                                 PAIR ;
+                                 PUSH mutez 1 ;
+                                 SWAP ;
+                                 TRANSFER_TOKENS } ;
+                           PUSH bool True ;
+                           PAIR ;
+                           SWAP ;
+                           NIL operation ;
+                           SWAP ;
+                           CONS } }
+                     { PUSH string "not owner" ; FAILWITH } } }
+           { SWAP ;
+             DUP ;
+             CAR ;
+             DIP { CDR } ;
+             IF { SENDER ;
+                  PUSH address "tz1d9FjxhkxMjH34pBawHqj6w9UTYFhbcDuL" ;
+                  COMPARE ;
+                  EQ ;
+                  IF { DUP ;
+                       CAR ;
+                       DIP { CDR ;
+                             SWAP ;
+                             CDR ;
+                             DUP ;
+                             COMPARE ;
+                             EQ ;
+                             IF { PUSH nat 1 ; ADD } { PUSH string "unexpected counter" ; FAILWITH } } ;
+                       PAIR ;
+                       PUSH bool False ;
+                       PAIR ;
+                       NIL operation }
+                     { PUSH string "not responder" ; FAILWITH } }
+                { PUSH string "not waiting" ; FAILWITH } } ;
+         PAIR } }

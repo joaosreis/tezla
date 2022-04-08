@@ -1,0 +1,11 @@
+{ parameter (contract unit) ;
+  storage unit ;
+  code { CAR ;
+         PUSH mutez 0 ;
+         UNIT ;
+         TRANSFER_TOKENS ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         DIP { UNIT } ;
+         PAIR } }

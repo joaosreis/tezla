@@ -1,3 +1,0 @@
-{ storage (option nat) ;
-  parameter nat ;
-  code { CAR ; SOME ; NIL operation ; PAIR } }

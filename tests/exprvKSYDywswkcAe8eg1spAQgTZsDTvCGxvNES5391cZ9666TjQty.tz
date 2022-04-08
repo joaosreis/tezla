@@ -1,0 +1,206 @@
+{ parameter
+    (or (or (or (or %receive
+                   (or (nat %getAllowanceResponse) (nat %getBalanceResponse))
+                   (or (pair %getSwapResponse
+                          (pair (pair (bool %confirmed) (nat %fee))
+                                (pair (address %from) (timestamp %releaseTime)))
+                          (pair (address %to) (nat %value)))
+                       (nat %getTotalSupplyResponse)))
+                (pair %requestAllowance
+                   (address %at)
+                   (pair %request (address %owner) (address %spender))))
+            (or (pair %requestBalance (address %at) (address %request))
+                (pair %requestSwap
+                   (address %at)
+                   (pair %request (bytes %secretHash) (address %swapInitiator)))))
+        (address %requestTotalSupply)) ;
+  storage
+    (pair (pair (pair (nat %allowance) (nat %balance))
+                (pair (pair %swap
+                         (pair (pair (bool %confirmed) (nat %fee))
+                               (pair (address %from) (timestamp %releaseTime)))
+                         (pair (address %to) (nat %value)))
+                      (nat %totalSupply)))
+          (unit %u)) ;
+  code { PUSH string "NoContractFound" ;
+         NIL operation ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CDR ;
+         DIG 3 ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DIG 3 ;
+                     DROP ;
+                     IF_LEFT
+                       { IF_LEFT
+                           { DIP { DUP ; CDR ; SWAP ; CAR ; DUP ; CDR ; SWAP ; CAR ; CDR } ;
+                             PAIR ;
+                             PAIR ;
+                             PAIR ;
+                             SWAP ;
+                             PAIR }
+                           { DIP { DUP ; CDR ; SWAP ; CAR ; DUP ; CDR ; SWAP ; CAR ; CAR } ;
+                             SWAP ;
+                             PAIR ;
+                             PAIR ;
+                             PAIR ;
+                             SWAP ;
+                             PAIR } }
+                       { IF_LEFT
+                           { DIP { DUP ; CDR ; SWAP ; CAR ; DUP ; CAR ; SWAP ; CDR ; CDR } ;
+                             PAIR ;
+                             SWAP ;
+                             PAIR ;
+                             PAIR ;
+                             SWAP ;
+                             PAIR }
+                           { DIP { DUP ; CDR ; SWAP ; CAR ; DUP ; CAR ; SWAP ; CDR ; CAR } ;
+                             SWAP ;
+                             PAIR ;
+                             SWAP ;
+                             PAIR ;
+                             PAIR ;
+                             SWAP ;
+                             PAIR } } }
+                   { DIG 2 ;
+                     DROP ;
+                     PAIR ;
+                     DUP ;
+                     CAR ;
+                     DUP ;
+                     CAR ;
+                     CONTRACT %getAllowance
+                       (pair (pair (address %owner) (address %spender)) (contract %callback nat)) ;
+                     IF_NONE { DIG 2 ; DUP ; DUG 3 ; FAILWITH } {} ;
+                     SELF ;
+                     ADDRESS ;
+                     CONTRACT %getAllowanceResponse nat ;
+                     IF_NONE { DIG 3 ; FAILWITH } { DIG 4 ; DROP } ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CDR ;
+                     CDR ;
+                     DIG 3 ;
+                     CDR ;
+                     CAR ;
+                     DIG 2 ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     DIG 2 ;
+                     DUP ;
+                     DUG 3 ;
+                     CAR ;
+                     CAR ;
+                     DIG 3 ;
+                     DUP ;
+                     DUG 4 ;
+                     CDR ;
+                     DIG 4 ;
+                     CAR ;
+                     CDR ;
+                     PAIR ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     SWAP ;
+                     CDR ;
+                     NIL operation ;
+                     DIG 2 ;
+                     CONS ;
+                     PAIR } }
+               { DIG 2 ;
+                 DROP ;
+                 IF_LEFT
+                   { PAIR ;
+                     DUP ;
+                     CAR ;
+                     DUP ;
+                     CAR ;
+                     CONTRACT %getBalance (pair (address %owner) (contract %callback nat)) ;
+                     IF_NONE { DIG 2 ; DUP ; DUG 3 ; FAILWITH } {} ;
+                     SELF ;
+                     ADDRESS ;
+                     CONTRACT %getBalanceResponse nat ;
+                     IF_NONE { DIG 3 ; FAILWITH } { DIG 4 ; DROP } ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     DIG 2 ;
+                     DIG 3 ;
+                     CDR ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     SWAP ;
+                     CDR ;
+                     NIL operation ;
+                     DIG 2 ;
+                     CONS ;
+                     PAIR }
+                   { PAIR ;
+                     DUP ;
+                     CAR ;
+                     DUP ;
+                     CAR ;
+                     CONTRACT %getSwap
+                       (pair (bytes %secretHash)
+                             (pair (address %swapInitiator)
+                                   (contract %callback
+                                      (pair (pair (pair (bool %confirmed) (nat %fee))
+                                                  (pair (address %from) (timestamp %releaseTime)))
+                                            (pair (address %to) (nat %value)))))) ;
+                     IF_NONE { DIG 2 ; DUP ; DUG 3 ; FAILWITH } {} ;
+                     SELF ;
+                     ADDRESS ;
+                     CONTRACT %getSwapResponse
+                       (pair (pair (pair (bool %confirmed) (nat %fee))
+                                   (pair (address %from) (timestamp %releaseTime)))
+                             (pair (address %to) (nat %value))) ;
+                     IF_NONE { DIG 3 ; FAILWITH } { DIG 4 ; DROP } ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     DIG 2 ;
+                     DIG 3 ;
+                     DUP ;
+                     DUG 4 ;
+                     CDR ;
+                     CDR ;
+                     PAIR ;
+                     DIG 3 ;
+                     CDR ;
+                     CAR ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     SWAP ;
+                     CDR ;
+                     NIL operation ;
+                     DIG 2 ;
+                     CONS ;
+                     PAIR } } }
+           { DIG 2 ;
+             DROP ;
+             PAIR ;
+             DUP ;
+             CAR ;
+             CONTRACT %getTotalSupply (pair (unit %u) (contract %callback nat)) ;
+             IF_NONE { SWAP ; DUP ; DUG 2 ; FAILWITH } {} ;
+             SELF ;
+             ADDRESS ;
+             CONTRACT %getTotalSupplyResponse nat ;
+             IF_NONE { DIG 2 ; FAILWITH } { DIG 3 ; DROP } ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DIG 2 ;
+             PUSH unit Unit ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             SWAP ;
+             CDR ;
+             NIL operation ;
+             DIG 2 ;
+             CONS ;
+             PAIR } } }

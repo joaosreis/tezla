@@ -1,0 +1,32 @@
+{ parameter (or int (or nat mutez)) ;
+  storage (big_map nat bytes) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DUP 2 ;
+             PUSH nat 0 ;
+             GET ;
+             { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+             UNPACK (lambda int unit) ;
+             { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+             SWAP ;
+             EXEC }
+           { IF_LEFT
+               { DUP 2 ;
+                 PUSH nat 1 ;
+                 GET ;
+                 { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                 UNPACK (lambda nat unit) ;
+                 { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                 SWAP ;
+                 EXEC }
+               { DUP 2 ;
+                 PUSH nat 2 ;
+                 GET ;
+                 { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                 UNPACK (lambda mutez unit) ;
+                 { IF_NONE { PUSH string ":(" ; FAILWITH } {} } ;
+                 SWAP ;
+                 EXEC } } ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

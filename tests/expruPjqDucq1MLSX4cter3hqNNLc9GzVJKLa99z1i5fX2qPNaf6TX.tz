@@ -1,0 +1,12 @@
+{ storage unit ;
+  parameter (pair :owner address (contract nat)) ;
+  code { UNPAIR ;
+         PUSH nat 1 ;
+         NIL operation ;
+         DIG 2 ;
+         CDR ;
+         PUSH mutez 0 ;
+         DIG 3 ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

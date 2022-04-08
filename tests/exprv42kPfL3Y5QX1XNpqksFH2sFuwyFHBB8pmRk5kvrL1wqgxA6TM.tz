@@ -1,0 +1,3 @@
+{ storage mutez ;
+  parameter (or (unit %abc) (unit %default)) ;
+  code { UNPAIR ; IF_LEFT { DROP } { DROP } ; NIL operation ; PAIR } }

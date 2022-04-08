@@ -1,0 +1,155 @@
+{ parameter (or (unit %deposit) (option %withdraw mutez)) ;
+  storage
+    (pair (address %admin)
+          (big_map %ledger address (pair (map %assets address nat) (mutez %tez_amount)))) ;
+  code { PUSH string "Invalid amount" ;
+         PUSH string "Invalid address" ;
+         PUSH string "Empty balance" ;
+         PAIR ;
+         PAIR ;
+         SWAP ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { DROP ;
+             SWAP ;
+             DROP ;
+             DUP ;
+             CDR ;
+             PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             LE ;
+             IF { PUSH string "Invalid amount" ; FAILWITH } {} ;
+             DUP ;
+             SENDER ;
+             PAIR ;
+             LAMBDA
+               (pair address (big_map address (pair (map address nat) mutez)))
+               (option (pair (map address nat) mutez))
+               { { { DUP ; CAR ; DIP { CDR } } } ; GET } ;
+             DUP ;
+             LAMBDA
+               (pair (lambda
+                        (pair address (big_map address (pair (map address nat) mutez)))
+                        (option (pair (map address nat) mutez)))
+                     (pair address (big_map address (pair (map address nat) mutez))))
+               (pair (map address nat) mutez)
+               { { { DUP ; CAR ; DIP { CDR } } } ;
+                 SWAP ;
+                 EXEC ;
+                 IF_NONE { PUSH mutez 0 ; EMPTY_MAP address nat ; PAIR } {} } ;
+             SWAP ;
+             APPLY ;
+             SWAP ;
+             PAIR ;
+             CDR ;
+             SWAP ;
+             EXEC ;
+             AMOUNT ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             ADD ;
+             DIG 2 ;
+             SWAP ;
+             DIG 2 ;
+             CAR ;
+             PAIR ;
+             SOME ;
+             SENDER ;
+             UPDATE ;
+             NIL operation ;
+             SWAP ;
+             DIG 2 ;
+             CAR ;
+             PAIR ;
+             SWAP ;
+             PAIR }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             DUG 2 ;
+             SENDER ;
+             PAIR ;
+             LAMBDA
+               (pair address (big_map address (pair (map address nat) mutez)))
+               (option (pair (map address nat) mutez))
+               { { { DUP ; CAR ; DIP { CDR } } } ; GET } ;
+             DUP ;
+             LAMBDA
+               (pair (lambda
+                        (pair address (big_map address (pair (map address nat) mutez)))
+                        (option (pair (map address nat) mutez)))
+                     (pair address (big_map address (pair (map address nat) mutez))))
+               (pair (map address nat) mutez)
+               { { { DUP ; CAR ; DIP { CDR } } } ;
+                 SWAP ;
+                 EXEC ;
+                 IF_NONE { PUSH mutez 0 ; EMPTY_MAP address nat ; PAIR } {} } ;
+             SWAP ;
+             APPLY ;
+             SWAP ;
+             PAIR ;
+             CAR ;
+             SWAP ;
+             EXEC ;
+             IF_NONE { { DIP 3 { DUP } ; DIG 4 } ; CAR ; CAR ; FAILWITH } {} ;
+             SENDER ;
+             CONTRACT unit ;
+             IF_NONE { { DIP 4 { DUP } ; DIG 5 } ; CAR ; CDR ; FAILWITH } {} ;
+             DIG 2 ;
+             IF_NONE
+               { DIG 4 ; DROP ; SWAP ; DUP ; DUG 2 ; CDR }
+               { PUSH mutez 0 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 COMPARE ;
+                 EQ ;
+                 { DIP 3 { DUP } ; DIG 4 } ;
+                 CDR ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 COMPARE ;
+                 GT ;
+                 OR ;
+                 IF { DIG 5 ; CDR ; FAILWITH } { DIG 5 ; DROP } } ;
+             PUSH nat 0 ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CAR ;
+             SIZE ;
+             COMPARE ;
+             EQ ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CDR ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             COMPARE ;
+             EQ ;
+             AND ;
+             IF { DIG 2 ; DROP ; DIG 2 ; NONE (pair (map address nat) mutez) ; SENDER ; UPDATE }
+                { DUP ;
+                  { DIP 3 { DUP } ; DIG 4 } ;
+                  CDR ;
+                  SUB ;
+                  DIG 4 ;
+                  SWAP ;
+                  DIG 4 ;
+                  CAR ;
+                  PAIR ;
+                  SOME ;
+                  SENDER ;
+                  UPDATE } ;
+             NIL operation ;
+             DIG 3 ;
+             DIG 3 ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             SWAP ;
+             DIG 2 ;
+             CAR ;
+             PAIR ;
+             SWAP ;
+             PAIR } } }

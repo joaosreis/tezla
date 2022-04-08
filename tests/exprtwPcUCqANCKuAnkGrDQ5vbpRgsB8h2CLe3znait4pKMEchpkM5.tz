@@ -1,0 +1,20 @@
+{ parameter (or (nat %callback) (unit %other)) ;
+  storage unit ;
+  code { CAR ;
+         IF_LEFT
+           { DROP ; NIL operation }
+           { DROP ;
+             PUSH address "KT1BJLuYdwcJ6wub8KdCZkoVs9rV7Bn27xVD" ;
+             CONTRACT (pair unit (contract nat)) ;
+             { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+             PUSH mutez 0 ;
+             SELF %callback ;
+             UNIT ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             NIL operation ;
+             SWAP ;
+             CONS } ;
+         UNIT ;
+         SWAP ;
+         PAIR } }

@@ -1,0 +1,30 @@
+{ storage unit ;
+  parameter (pair (map %m address string) (pair (bytes %request) (address %sender))) ;
+  code { UNPAIR ;
+         DUP ;
+         GET 3 ;
+         UNPACK address ;
+         IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         GET 4 ;
+         COMPARE ;
+         EQ ;
+         IF {}
+            { PUSH string
+                   "WrongCondition: params.sender == sp.unpack(params.request, sp.TRecord(address = sp.TAddress).layout(\"address\")).open_some().address" ;
+              FAILWITH } ;
+         DUP ;
+         CAR ;
+         SWAP ;
+         GET 3 ;
+         UNPACK address ;
+         IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+         MEM ;
+         IF {}
+            { PUSH string
+                   "WrongCondition: params.m.contains(sp.unpack(params.request, sp.TRecord(address = sp.TAddress).layout(\"address\")).open_some().address)" ;
+              FAILWITH } ;
+         NIL operation ;
+         PAIR } }

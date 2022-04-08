@@ -1,0 +1,55 @@
+{ storage
+    (pair (pair %wrapped (address %target) (address %delegateAdmin))
+          (pair (nat %vested)
+                (pair %schedule (timestamp %epoch) (pair (nat %secondsPerTick) (nat %tokensPerTick))))) ;
+  parameter (or (option %setDelegate key_hash) (nat %vest)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DIP { CAR ;
+                   CDR ;
+                   SENDER ;
+                   COMPARE ;
+                   EQ ;
+                   IF { DIP { NIL operation } ; SET_DELEGATE ; CONS } { FAILWITH } } ;
+             SWAP ;
+             PAIR }
+           { PAIR ;
+             DUP ;
+             DIP { CDR ; UNPAIR ; SWAP ; DUP ; CDR ; SWAP ; UNPAIR ; SWAP } ;
+             CAR ;
+             DUP ;
+             DIP { DIP { DIP { DUP } ;
+                         DUP ;
+                         CAR ;
+                         NOW ;
+                         SUB ;
+                         DIP { GET 3 } ;
+                         EDIV ;
+                         IF_NONE { FAILWITH } { CAR } ;
+                         SUB ;
+                         ISNAT } ;
+                   SWAP ;
+                   IF_NONE
+                     { FAILWITH }
+                     { DIP { DUP } ; SWAP ; COMPARE ; LE ; IF { ADD } { FAILWITH } } ;
+                   DIP { DUP } ;
+                   SWAP ;
+                   DIP { PAIR ; SWAP ; DUP } ;
+                   GET 4 } ;
+             MUL ;
+             SWAP ;
+             CAR ;
+             CONTRACT unit ;
+             IF_NONE
+               { FAILWITH }
+               { SWAP ;
+                 PUSH mutez 1 ;
+                 MUL ;
+                 UNIT ;
+                 TRANSFER_TOKENS ;
+                 DIP { NIL operation } ;
+                 CONS } ;
+             DIP { PAIR } ;
+             PAIR } } }

@@ -1,0 +1,20 @@
+{ parameter (or (int %participate) (int %setUpGame)) ;
+  storage (pair (int %bet) (map %players address int)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             SENDER ;
+             GET ;
+             IF_NONE
+               { SWAP ; SOME ; SENDER ; UPDATE }
+               { DROP ; SWAP ; DROP ; PUSH string "You are already registered" ; FAILWITH } ;
+             SWAP ;
+             CAR ;
+             PAIR ;
+             NIL operation ;
+             PAIR }
+           { SWAP ; DROP ; EMPTY_MAP address int ; SWAP ; PAIR ; NIL operation ; PAIR } } }

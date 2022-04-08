@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (chain_id :storage) ;
+  code { DROP ; CHAIN_ID ; NIL operation ; PAIR } }

@@ -1,0 +1,26 @@
+{ storage nat ;
+  parameter
+    (or (pair %fetchPriceFromHarbinger
+           (string %asset)
+           (pair (address %harbingerContractAddress) (address %targetAddress)))
+        (pair %getResponse string (pair timestamp nat))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DUP ;
+             GET 3 ;
+             CONTRACT %get (pair string (contract (pair string (pair timestamp nat)))) ;
+             IF_NONE { PUSH int 11 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DUP 4 ;
+             GET 4 ;
+             CONTRACT %getResponse (pair string (pair timestamp nat)) ;
+             IF_NONE { PUSH int 13 ; FAILWITH } {} ;
+             DIG 4 ;
+             CAR ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SWAP ; DROP ; GET 4 ; NIL operation } ;
+         PAIR } }

@@ -1,0 +1,23 @@
+{ storage (pair (address %admin) (address %tokenAddress)) ;
+  parameter (unit %buy) ;
+  code { CDR ;
+         DUP ;
+         CDR ;
+         CONTRACT %transfer (pair address (pair address nat)) ;
+         IF_NONE { PUSH int 12 ; FAILWITH } {} ;
+         NIL operation ;
+         SWAP ;
+         PUSH mutez 0 ;
+         PUSH nat 2 ;
+         PUSH mutez 1 ;
+         AMOUNT ;
+         EDIV ;
+         IF_NONE { UNIT ; FAILWITH } {} ;
+         CAR ;
+         MUL ;
+         SENDER ;
+         SELF_ADDRESS ;
+         PAIR 3 ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

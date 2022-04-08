@@ -1,0 +1,49 @@
+{ storage (map string int) ;
+  parameter (or (string %addChoice) (string %vote)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             MEM ;
+             IF { PUSH bool False } { PUSH mutez 50000000 ; AMOUNT ; COMPARE ; GE } ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: (~ (self.data.votes_record.contains(params.viennoiserie))) & (sp.amount >= sp.tez(50))" ;
+                  FAILWITH } ;
+             SWAP ;
+             PUSH (option int) (Some 1) ;
+             DIG 2 ;
+             UPDATE }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             MEM ;
+             IF { PUSH mutez 1000000 ; AMOUNT ; COMPARE ; GE } { PUSH bool False } ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: (self.data.votes_record.contains(params.viennoiserie)) & (sp.amount >= sp.tez(1))" ;
+                  FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DIG 2 ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 11 ; FAILWITH } {} ;
+             PUSH int 1 ;
+             ADD ;
+             SOME ;
+             SWAP ;
+             UPDATE } ;
+         NIL operation ;
+         PAIR } }

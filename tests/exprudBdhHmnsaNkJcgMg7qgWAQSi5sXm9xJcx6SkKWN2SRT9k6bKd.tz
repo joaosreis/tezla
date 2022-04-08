@@ -1,0 +1,3 @@
+{ parameter bytes ;
+  storage bytes ;
+  code { DUP ; CAR ; SWAP ; CDR ; CONCAT ; NIL operation ; PAIR } }

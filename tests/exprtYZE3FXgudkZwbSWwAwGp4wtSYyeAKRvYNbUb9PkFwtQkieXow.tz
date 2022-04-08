@@ -1,0 +1,118 @@
+{ storage
+    (pair (pair (address %counterparty) (timestamp %epoch))
+          (pair (bytes %hashedSecret) (pair (mutez %notional) (address %owner)))) ;
+  parameter (or (unit %allSigned) (or (unit %cancelSwap) (bytes %knownSecret))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ;
+             DUP ;
+             GET 5 ;
+             PUSH mutez 0 ;
+             COMPARE ;
+             NEQ ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.notional != sp.tez(0)" ; FAILWITH } ;
+             DUP ;
+             GET 6 ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.owner == sp.sender" ; FAILWITH } ;
+             DUP ;
+             CAR ;
+             CAR ;
+             CONTRACT unit ;
+             IF_NONE { PUSH int 23 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             DUP 3 ;
+             GET 5 ;
+             UNIT ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             SWAP ;
+             PUSH mutez 0 ;
+             UPDATE 5 ;
+             SWAP }
+           { IF_LEFT
+               { DROP ;
+                 DUP ;
+                 GET 5 ;
+                 PUSH mutez 0 ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.notional != sp.tez(0)" ; FAILWITH } ;
+                 DUP ;
+                 GET 6 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.owner == sp.sender" ; FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 CDR ;
+                 NOW ;
+                 COMPARE ;
+                 GT ;
+                 IF {} { PUSH string "WrongCondition: self.data.epoch < sp.now" ; FAILWITH } ;
+                 DUP ;
+                 GET 6 ;
+                 CONTRACT unit ;
+                 IF_NONE { PUSH int 30 ; FAILWITH } {} ;
+                 NIL operation ;
+                 SWAP ;
+                 DUP 3 ;
+                 GET 5 ;
+                 UNIT ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 SWAP ;
+                 PUSH mutez 0 ;
+                 UPDATE 5 ;
+                 SWAP }
+               { PUSH mutez 0 ;
+                 DUP 3 ;
+                 GET 5 ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.notional != sp.tez(0)" ; FAILWITH } ;
+                 SENDER ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.counterparty == sp.sender" ;
+                      FAILWITH } ;
+                 BLAKE2B ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.hashedSecret == sp.blake2b(params.secret)" ;
+                      FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 CONTRACT unit ;
+                 IF_NONE { PUSH int 37 ; FAILWITH } {} ;
+                 NIL operation ;
+                 SWAP ;
+                 DUP 3 ;
+                 GET 5 ;
+                 UNIT ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 SWAP ;
+                 PUSH mutez 0 ;
+                 UPDATE 5 ;
+                 SWAP } } ;
+         PAIR } }

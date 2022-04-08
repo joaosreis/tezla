@@ -1,0 +1,382 @@
+{ storage
+    (map nat
+         (pair (pair (nat %approverCount) (pair (map %approvers address bool) (string %description)))
+               (pair (int %minimumAmount)
+                     (pair (string %name)
+                           (map %requests
+                              nat
+                              (pair (pair (nat %approvecount) (pair (map %approvers address bool) (bool %complete)))
+                                    (pair (string %description) (pair (address %recipent) (mutez %value))))))))) ;
+  parameter
+    (or (or (pair %approve (nat %Rindex) (nat %index))
+            (pair %createCampaign
+               (string %description)
+               (pair (int %minimumAmount) (string %name))))
+        (or (pair %createRequest
+               (pair (string %description) (nat %index))
+               (pair (address %recipent) (mutez %value)))
+            (or (pair %donate (int %amount) (nat %index))
+                (pair %finalizeRequest (nat %Rindex) (nat %index))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 GET ;
+                 IF_NONE { PUSH int 49 ; FAILWITH } {} ;
+                 CAR ;
+                 GET 3 ;
+                 SENDER ;
+                 MEM ;
+                 IF {}
+                    { PUSH string
+                           "WrongCondition: self.data.camps[params.index].approvers.contains(sp.sender)" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 GET ;
+                 IF_NONE { PUSH int 50 ; FAILWITH } {} ;
+                 GET 6 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 GET ;
+                 IF_NONE { PUSH int 50 ; FAILWITH } {} ;
+                 CAR ;
+                 GET 3 ;
+                 SENDER ;
+                 GET ;
+                 IF_NONE { PUSH int 50 ; FAILWITH } {} ;
+                 IF { PUSH string
+                           "WrongCondition: ~ self.data.camps[params.index].requests[params.Rindex].approvers[sp.sender]" ;
+                      FAILWITH }
+                    {} ;
+                 SWAP ;
+                 DUP ;
+                 DUP 3 ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 51 ; FAILWITH } {} ;
+                 DUP ;
+                 GET 6 ;
+                 DUP ;
+                 DUP 6 ;
+                 CAR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 51 ; FAILWITH } {} ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 PUSH (option bool) (Some True) ;
+                 SENDER ;
+                 UPDATE ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 6 ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 DUP ;
+                 DUP 3 ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 52 ; FAILWITH } {} ;
+                 DUP ;
+                 GET 6 ;
+                 DUP ;
+                 DIG 5 ;
+                 CAR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 52 ; FAILWITH } {} ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 PUSH nat 1 ;
+                 ADD ;
+                 PAIR ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 6 ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 EMPTY_MAP
+                   nat
+                   (pair (pair nat (pair (map address bool) bool)) (pair string (pair address mutez))) ;
+                 DUP 3 ;
+                 GET 4 ;
+                 PAIR ;
+                 DUP 3 ;
+                 GET 3 ;
+                 PAIR ;
+                 DIG 2 ;
+                 CAR ;
+                 EMPTY_MAP address bool ;
+                 PAIR ;
+                 PUSH nat 0 ;
+                 PAIR ;
+                 PAIR ;
+                 SOME ;
+                 DIG 2 ;
+                 SIZE ;
+                 UPDATE } ;
+             NIL operation }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DUP ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 42 ; FAILWITH } {} ;
+                 DUP ;
+                 GET 6 ;
+                 DIG 4 ;
+                 DUP ;
+                 GET 4 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 6 ;
+                 GET 3 ;
+                 PAIR ;
+                 DUP 6 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PUSH (pair nat (pair (map address bool) bool)) (Pair 0 (Pair {} False)) ;
+                 PAIR ;
+                 SOME ;
+                 DIG 6 ;
+                 DIG 6 ;
+                 CAR ;
+                 CDR ;
+                 GET ;
+                 IF_NONE { PUSH int 42 ; FAILWITH } {} ;
+                 GET 6 ;
+                 SIZE ;
+                 UPDATE ;
+                 UPDATE 6 ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 NIL operation }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     SIZE ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     COMPARE ;
+                     LT ;
+                     IF {}
+                        { PUSH string "WrongCondition: params.index < sp.len(self.data.camps)" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     GET ;
+                     IF_NONE { PUSH int 28 ; FAILWITH } {} ;
+                     GET 3 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     COMPARE ;
+                     GE ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: params.amount >= self.data.camps[params.index].minimumAmount" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUP 3 ;
+                     CDR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 29 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     PUSH nat 1 ;
+                     ADD ;
+                     PAIR ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     DUP ;
+                     DIG 2 ;
+                     CDR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 30 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     PUSH (option bool) (Some True) ;
+                     SENDER ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     NIL operation }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     GET ;
+                     IF_NONE { PUSH int 59 ; FAILWITH } {} ;
+                     GET 6 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 59 ; FAILWITH } {} ;
+                     CAR ;
+                     GET 4 ;
+                     IF { PUSH string
+                               "WrongCondition: ~ self.data.camps[params.index].requests[params.Rindex].complete" ;
+                          FAILWITH }
+                        {} ;
+                     PUSH nat 2 ;
+                     DUP 3 ;
+                     DUP 3 ;
+                     CDR ;
+                     GET ;
+                     IF_NONE { PUSH int 60 ; FAILWITH } {} ;
+                     CAR ;
+                     CAR ;
+                     EDIV ;
+                     IF_NONE { PUSH int 60 ; FAILWITH } { CAR } ;
+                     DUP 3 ;
+                     DUP 3 ;
+                     CDR ;
+                     GET ;
+                     IF_NONE { PUSH int 60 ; FAILWITH } {} ;
+                     GET 6 ;
+                     DUP 3 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 60 ; FAILWITH } {} ;
+                     CAR ;
+                     CAR ;
+                     COMPARE ;
+                     GT ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: self.data.camps[params.index].requests[params.Rindex].approvecount > (self.data.camps[params.index].approverCount // 2)" ;
+                          FAILWITH } ;
+                     NIL operation ;
+                     DUP 3 ;
+                     DUP 3 ;
+                     CDR ;
+                     GET ;
+                     IF_NONE { PUSH int 63 ; FAILWITH } {} ;
+                     GET 6 ;
+                     DUP 3 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 63 ; FAILWITH } {} ;
+                     GET 5 ;
+                     CONTRACT unit ;
+                     IF_NONE { PUSH string "Request processed" ; FAILWITH } {} ;
+                     DUP 4 ;
+                     DUP 4 ;
+                     CDR ;
+                     GET ;
+                     IF_NONE { PUSH int 63 ; FAILWITH } {} ;
+                     GET 6 ;
+                     DUP 4 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 63 ; FAILWITH } {} ;
+                     GET 6 ;
+                     UNIT ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     DIG 2 ;
+                     DUP ;
+                     DUP 4 ;
+                     CDR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 64 ; FAILWITH } {} ;
+                     DUP ;
+                     GET 6 ;
+                     DUP ;
+                     DIG 6 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 64 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     PUSH bool True ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     UPDATE 6 ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SWAP } } } ;
+         PAIR } }

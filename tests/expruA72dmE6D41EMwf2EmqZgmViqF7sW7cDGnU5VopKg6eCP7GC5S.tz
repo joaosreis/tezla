@@ -1,0 +1,30 @@
+{ storage (pair (address %admin) (nat %price)) ;
+  parameter
+    (or (pair %get string (contract (pair string (pair timestamp nat)))) (nat %updatePrice)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { CDR ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DUP 4 ;
+             CDR ;
+             NOW ;
+             PAIR ;
+             PUSH string "XTZ-USD" ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "You are not an admin" ; FAILWITH } ;
+             SWAP ;
+             CAR ;
+             PAIR ;
+             NIL operation } ;
+         PAIR } }

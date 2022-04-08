@@ -1,0 +1,3 @@
+{ parameter never ;
+  storage (big_map string (pair int string)) ;
+  code { CAR ; NEVER } }

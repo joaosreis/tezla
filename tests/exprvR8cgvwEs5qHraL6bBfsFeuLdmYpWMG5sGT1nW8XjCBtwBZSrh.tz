@@ -1,0 +1,3 @@
+{ storage address ;
+  parameter (or (address %set_address) (unit %set_nat)) ;
+  code { UNPAIR ; IF_LEFT { SWAP ; DROP } { DROP } ; NIL operation ; PAIR } }

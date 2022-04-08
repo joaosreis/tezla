@@ -1,6 +1,6 @@
 (library
  (name adt)
  (public_name tezla.adt)
- (libraries core_kernel michelson)
+ (libraries core michelson-adt.common michelson-adt.edo michelson-parser.edo)
  (preprocess
   (pps ppx_deriving.ord ppx_deriving.make ppx_jane ppx_string)))

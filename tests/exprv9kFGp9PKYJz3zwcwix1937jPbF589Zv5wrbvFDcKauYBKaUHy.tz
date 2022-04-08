@@ -1,0 +1,49 @@
+{ storage
+    (pair (pair (int %coordinate_x) (pair (nat %coordinate_y) (bool %is_alive)))
+          (pair (string %name)
+                (pair (int %plasma_bullet_count) (map %record_alien_kills string nat)))) ;
+  parameter
+    (or (or (string %change_name) (int %move_horizontally))
+        (or (nat %move_vertically) (string %shoot_alien))) ;
+  code { CAST (pair (or (or string int) (or nat string))
+                    (pair (pair int (pair nat bool)) (pair string (pair int (map string nat))))) ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { UPDATE 3 }
+               { SWAP ; UNPAIR ; UNPAIR ; DIG 3 ; ADD ; PAIR ; PAIR } }
+           { IF_LEFT
+               { SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 DIG 4 ;
+                 ADD ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 GET 5 ;
+                 PUSH int 1 ;
+                 SWAP ;
+                 SUB ;
+                 UPDATE 5 ;
+                 DUP ;
+                 GET 6 ;
+                 DUP ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 43 ; FAILWITH } {} ;
+                 PUSH nat 1 ;
+                 ADD ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 6 } } ;
+         NIL operation ;
+         PAIR } }

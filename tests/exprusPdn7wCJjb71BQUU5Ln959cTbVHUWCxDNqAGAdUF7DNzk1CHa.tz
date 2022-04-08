@@ -1,0 +1,68 @@
+{ parameter
+    (or (ticket %receive unit)
+        (pair %send
+           (contract %destination (ticket unit))
+           (pair (nat %amount) (address %ticketer)))) ;
+  storage (pair (address %manager) (big_map %tickets address (ticket unit))) ;
+  code { AMOUNT ;
+         PUSH mutez 0 ;
+         { { COMPARE ; EQ } ; IF {} { { UNIT ; FAILWITH } } } ;
+         UNPAIR 3 ;
+         IF_LEFT
+           { READ_TICKET ;
+             CAR @ticketer ;
+             DUP ;
+             DIG 4 ;
+             NONE (ticket unit) ;
+             DIG 2 ;
+             GET_AND_UPDATE ;
+             { IF_NONE
+                 { DIG 2 }
+                 { DIG 3 ;
+                   PAIR ;
+                   JOIN_TICKETS ;
+                   { IF_NONE { { UNIT ; FAILWITH } } { RENAME } } } } ;
+             SOME ;
+             DIG 2 ;
+             GET_AND_UPDATE ;
+             { IF_NONE {} { { UNIT ; FAILWITH } } } ;
+             SWAP ;
+             PAIR ;
+             NIL operation }
+           { DUP @manager 2 ;
+             SENDER ;
+             { { COMPARE ; EQ } ; IF {} { { UNIT ; FAILWITH } } } ;
+             UNPAIR 3 ;
+             DIG 4 ;
+             NONE (ticket unit) ;
+             DUP @ticketer 5 ;
+             GET_AND_UPDATE ;
+             { IF_NONE { { UNIT ; FAILWITH } } { RENAME } } ;
+             READ_TICKET ;
+             GET @total_amount 4 ;
+             DUP @amount 5 ;
+             SWAP ;
+             SUB ;
+             ISNAT ;
+             { IF_NONE { { UNIT ; FAILWITH } } { RENAME @remaining_amount } } ;
+             DIG 4 ;
+             PAIR ;
+             SWAP ;
+             SPLIT_TICKET ;
+             { IF_NONE { { UNIT ; FAILWITH } } { RENAME } } ;
+             UNPAIR @to_send @to_keep ;
+             DUG 5 ;
+             SOME ;
+             DIG 3 ;
+             GET_AND_UPDATE ;
+             { IF_NONE {} { { UNIT ; FAILWITH } } } ;
+             DIG 2 ;
+             PAIR ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             TRANSFER_TOKENS ;
+             NIL operation ;
+             SWAP ;
+             CONS } ;
+         PAIR } }

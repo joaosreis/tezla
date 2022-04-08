@@ -1,0 +1,3 @@
+{ parameter address ;
+  storage (pair (option unit) (map address unit)) ;
+  code { UNPAIR ; DIP { CDR ; DUP } ; GET ; PAIR ; NIL operation ; PAIR } }

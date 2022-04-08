@@ -1,0 +1,44 @@
+{ parameter
+    (or (lambda %proxy_admin_update
+           (pair (pair (address %contract) (big_map %metadata string bytes)) (address %owner))
+           (pair (list operation)
+                 (pair (pair (address %contract) (big_map %metadata string bytes)) (address %owner))))
+        (pair %update_reverse_record
+           (address %address)
+           (pair (option %name bytes) (address %owner)))) ;
+  storage
+    (pair (pair (address %contract) (big_map %metadata string bytes)) (address %owner)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF { SWAP ; EXEC } { DROP 2 ; PUSH string "NOT_AUTHORIZED" ; FAILWITH } }
+           { SWAP ;
+             DUP ;
+             CAR ;
+             CAR ;
+             DIG 2 ;
+             PACK ;
+             PUSH string "UpdateReverseRecord" ;
+             DIG 2 ;
+             CONTRACT %execute
+               (pair (string %action_name) (pair (bytes %payload) (address %original_sender))) ;
+             IF_NONE
+               { DROP 2 ; PUSH string "INVALID_CONTRACT" ; FAILWITH }
+               { SENDER ;
+                 DIG 3 ;
+                 PAIR ;
+                 DIG 2 ;
+                 PAIR ;
+                 NIL operation ;
+                 DIG 2 ;
+                 AMOUNT ;
+                 DIG 3 ;
+                 TRANSFER_TOKENS ;
+                 CONS } ;
+             PAIR } } }

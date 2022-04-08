@@ -1,0 +1,27 @@
+{ storage
+    (pair (pair %accountParams
+             (pair (map %approvals address int) (pair (int %balance) (int %frozenBalance)))
+             (pair (mutez %reward) (pair (mutez %rewardDebt) (int %usedVotes))))
+          (pair (big_map %ledger address int) (map %votersChoose address key_hash))) ;
+  parameter (or (pair %ep (key_hash %candidate) (int %votes)) (unit %run)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ; NIL operation }
+           { DROP ;
+             NIL operation ;
+             SELF %ep ;
+             PUSH mutez 0 ;
+             DUP 4 ;
+             GET 3 ;
+             SENDER ;
+             GET ;
+             IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+             DUP 5 ;
+             GET 4 ;
+             SENDER ;
+             GET ;
+             IF_NONE { PUSH int 10 ; FAILWITH } {} ;
+             PAIR %candidate %votes ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

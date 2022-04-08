@@ -1,0 +1,3 @@
+{ storage (pair (big_map %hashmap nat (list int)) (big_map %metadata string bytes)) ;
+  parameter unit ;
+  code { CDR ; NIL operation ; PAIR } }

@@ -1,0 +1,9 @@
+{ parameter unit ;
+  storage string ;
+  code { UNPAIR ;
+         DROP 1 ;
+         PUSH string "Hello Tezos world!" ;
+         SWAP ;
+         DROP 1 ;
+         NIL operation ;
+         PAIR } }

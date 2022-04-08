@@ -1,0 +1,30 @@
+{ parameter (pair bool (sapling_transaction :left 8) (sapling_transaction :right 8)) ;
+  storage (pair (sapling_state :left 8) (sapling_state :right 8)) ;
+  code { UNPAIR ;
+         UNPAIR ;
+         DIP { UNPAIR } ;
+         DIP 3 { UNPAIR } ;
+         DIP 2 { SWAP } ;
+         IF { SAPLING_VERIFY_UPDATE ;
+              { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+              UNPAIR ;
+              DROP ;
+              DIP { DIP { DUP } ;
+                    SAPLING_VERIFY_UPDATE ;
+                    { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+                    UNPAIR ;
+                    DROP ;
+                    DROP } }
+            { DIP { DUP } ;
+              SAPLING_VERIFY_UPDATE ;
+              { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+              UNPAIR ;
+              DROP ;
+              DROP ;
+              DIP { SAPLING_VERIFY_UPDATE ;
+                    { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+                    UNPAIR ;
+                    DROP } } ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

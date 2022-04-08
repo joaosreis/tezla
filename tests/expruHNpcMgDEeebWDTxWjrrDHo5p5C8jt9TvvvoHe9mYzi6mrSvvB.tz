@@ -1,0 +1,16 @@
+{ parameter (ticket int) ;
+  storage unit ;
+  code { CAR ;
+         PUSH mutez 0 ;
+         SWAP ;
+         PUSH address "KT1Er56aufCnpsVdq7242cH9UxC6BszFkw3D" ;
+         CONTRACT (ticket int) ;
+         { IF_NONE { PUSH string "no contract (td)" ; FAILWITH } {} } ;
+         DUG 2 ;
+         TRANSFER_TOKENS ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         UNIT ;
+         SWAP ;
+         PAIR } }

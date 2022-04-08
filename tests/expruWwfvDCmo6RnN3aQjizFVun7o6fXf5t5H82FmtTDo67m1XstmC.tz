@@ -1,0 +1,1653 @@
+{ parameter
+    (or (or (or (or (pair %approve (address %spender) (nat %value))
+                    (pair %assertRole (address %account) (nat %role)))
+                (or (list %burn (pair (address %address) (nat %amount)))
+                    (pair %getAllowance (pair (address %owner) (address %spender)) (contract nat))))
+            (or (or (pair %getBalance address (contract nat))
+                    (pair %getTotalSupply unit (contract nat)))
+                (or (list %grantRole (pair (address %account) (nat %role)))
+                    (list %mint (pair (address %address) (nat %amount))))))
+        (or (or (or (unit %renounceControl) (unit %renounceIssuance))
+                (or (list %renounceRole (pair (address %account) (nat %role)))
+                    (list %revokeRole (pair (address %account) (nat %role)))))
+            (or (or (pair %set_metdata (string %k) (bytes %v)) (bool %set_paused))
+                (or (pair %transfer (address %from) (pair (address %to) (nat %value)))
+                    (or (list %transferMultiple (pair (address %from_) (pair (address %to_) (nat %value))))
+                        (list %update_operators
+                           (or (list %add_operators (pair (address %operator) (address %owner)))
+                               (list %remove_operators (pair (address %operator) (address %owner)))))))))) ;
+  storage
+    (pair (pair (pair (bool %controllable) (bool %issuable))
+                (pair (big_map %ledger
+                         address
+                         (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))))
+                      (big_map %metadata string bytes)))
+          (pair (pair (bool %operable) (bool %paused))
+                (pair (map %roles nat (pair (set %members address) (nat %role_admin)))
+                      (nat %total_supply)))) ;
+  code { LAMBDA
+           (pair (pair %in_param (address %address) (nat %amount))
+                 (pair %in_storage
+                    (pair (pair (bool %controllable) (bool %issuable))
+                          (pair (big_map %ledger
+                                   address
+                                   (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))))
+                                (big_map %metadata string bytes)))
+                    (pair (pair (bool %operable) (bool %paused))
+                          (pair (map %roles nat (pair (set %members address) (nat %role_admin)))
+                                (nat %total_supply)))))
+           (pair (list %operations operation)
+                 (pair (unit %result)
+                       (pair %storage
+                          (pair (pair (bool %controllable) (bool %issuable))
+                                (pair (big_map %ledger
+                                         address
+                                         (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))))
+                                      (big_map %metadata string bytes)))
+                          (pair (pair (bool %operable) (bool %paused))
+                                (pair (map %roles nat (pair (set %members address) (nat %role_admin)))
+                                      (nat %total_supply))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             { DIP 4 { DUP } ; DIG 5 } ;
+             CAR ;
+             CAR ;
+             GET ;
+             IF_NONE { PUSH int 132 ; FAILWITH } {} ;
+             GET 3 ;
+             COMPARE ;
+             GE ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: self.data.ledger[lparams_0.in_param.address].balance >= lparams_0.in_param.amount" ;
+                  FAILWITH } ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CAR ;
+             CAR ;
+             MEM ;
+             IF { DUP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  DUP ;
+                  { DIP 7 { DUP } ; DIG 8 } ;
+                  CAR ;
+                  CAR ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  IF_NONE { PUSH int 275 ; FAILWITH } {} ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  CDR ;
+                  { DIP 9 { DUP } ; DIG 10 } ;
+                  CAR ;
+                  CDR ;
+                  DIG 8 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  { DIP 10 { DUP } ; DIG 11 } ;
+                  CAR ;
+                  CAR ;
+                  GET ;
+                  IF_NONE { PUSH int 275 ; FAILWITH } {} ;
+                  GET 3 ;
+                  SUB ;
+                  ISNAT ;
+                  IF_NONE { PUSH int 275 ; FAILWITH } {} ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  PUSH nat 0 ;
+                  SWAP ;
+                  { DIP 4 { DUP } ; DIG 5 } ;
+                  CAR ;
+                  CAR ;
+                  GET ;
+                  IF_NONE { PUSH int 276 ; FAILWITH } {} ;
+                  GET 3 ;
+                  COMPARE ;
+                  LE ;
+                  IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       NONE (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))) ;
+                       { DIP 6 { DUP } ; DIG 7 } ;
+                       CAR ;
+                       CAR ;
+                       UPDATE ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       PAIR }
+                     {} }
+                {} ;
+             DUP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             CAR ;
+             DIG 5 ;
+             CAR ;
+             CDR ;
+             DIG 4 ;
+             GET 6 ;
+             SUB ;
+             ISNAT ;
+             IF_NONE { PUSH int 136 ; FAILWITH } {} ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             UNIT ;
+             PAIR %result %storage ;
+             SWAP ;
+             PAIR %operations } ;
+         SWAP ;
+         LAMBDA
+           (pair (pair %in_param (address %address) (nat %amount))
+                 (pair %in_storage
+                    (pair (pair (bool %controllable) (bool %issuable))
+                          (pair (big_map %ledger
+                                   address
+                                   (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))))
+                                (big_map %metadata string bytes)))
+                    (pair (pair (bool %operable) (bool %paused))
+                          (pair (map %roles nat (pair (set %members address) (nat %role_admin)))
+                                (nat %total_supply)))))
+           (pair (list %operations operation)
+                 (pair (unit %result)
+                       (pair %storage
+                          (pair (pair (bool %controllable) (bool %issuable))
+                                (pair (big_map %ledger
+                                         address
+                                         (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))))
+                                      (big_map %metadata string bytes)))
+                          (pair (pair (bool %operable) (bool %paused))
+                                (pair (map %roles nat (pair (set %members address) (nat %role_admin)))
+                                      (nat %total_supply))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             CAR ;
+             CAR ;
+             CDR ;
+             IF {} { PUSH string "WrongCondition: self.data.issuable" ; FAILWITH } ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CAR ;
+             CAR ;
+             MEM ;
+             IF {}
+                { { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  PUSH (option
+                          (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))))
+                       (Some (Pair {} (Pair 0 {}))) ;
+                  { DIP 6 { DUP } ; DIG 7 } ;
+                  CAR ;
+                  CAR ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             DUP ;
+             { DIP 6 { DUP } ; DIG 7 } ;
+             CAR ;
+             CAR ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 100 ; FAILWITH } {} ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             { DIP 9 { DUP } ; DIG 10 } ;
+             CAR ;
+             CDR ;
+             ADD ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             DIG 5 ;
+             CAR ;
+             CDR ;
+             ADD ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             UNIT ;
+             PAIR %result %storage ;
+             SWAP ;
+             PAIR %operations } ;
+         SWAP ;
+         LAMBDA
+           (pair (pair %in_param (address %from_) (pair (address %to_) (nat %value)))
+                 (pair %in_storage
+                    (pair (pair (bool %controllable) (bool %issuable))
+                          (pair (big_map %ledger
+                                   address
+                                   (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))))
+                                (big_map %metadata string bytes)))
+                    (pair (pair (bool %operable) (bool %paused))
+                          (pair (map %roles nat (pair (set %members address) (nat %role_admin)))
+                                (nat %total_supply)))))
+           (pair (list %operations operation)
+                 (pair (unit %result)
+                       (pair %storage
+                          (pair (pair (bool %controllable) (bool %issuable))
+                                (pair (big_map %ledger
+                                         address
+                                         (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))))
+                                      (big_map %metadata string bytes)))
+                          (pair (pair (bool %operable) (bool %paused))
+                                (pair (map %roles nat (pair (set %members address) (nat %role_admin)))
+                                      (nat %total_supply))))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             CDR ;
+             CAR ;
+             CDR ;
+             IF { DUP ;
+                  CAR ;
+                  CAR ;
+                  CAR ;
+                  IF { DUP ;
+                       GET 5 ;
+                       PUSH nat 1 ;
+                       MEM ;
+                       IF { DUP ;
+                            GET 5 ;
+                            PUSH nat 1 ;
+                            GET ;
+                            IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                            CAR ;
+                            SENDER ;
+                            MEM }
+                          { PUSH bool False } ;
+                       IF { PUSH bool True }
+                          { DUP ;
+                            GET 5 ;
+                            PUSH nat 0 ;
+                            MEM ;
+                            IF { DUP ;
+                                 GET 5 ;
+                                 PUSH nat 0 ;
+                                 GET ;
+                                 IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                 CAR ;
+                                 SENDER ;
+                                 MEM }
+                               { PUSH bool False } } }
+                     { PUSH bool False } ;
+                  IF {}
+                     { PUSH string
+                            "WrongCondition: self.data.controllable & (((self.data.roles.contains(1)) & (self.data.roles[1].members.contains(sp.sender))) | ((self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender))))" ;
+                       FAILWITH } }
+                { SENDER ;
+                  { DIP 3 { DUP } ; DIG 4 } ;
+                  CAR ;
+                  CAR ;
+                  COMPARE ;
+                  EQ ;
+                  IF { PUSH bool True }
+                     { DUP ;
+                       CAR ;
+                       CAR ;
+                       CAR ;
+                       IF { DUP ;
+                            GET 5 ;
+                            PUSH nat 1 ;
+                            MEM ;
+                            IF { DUP ;
+                                 GET 5 ;
+                                 PUSH nat 1 ;
+                                 GET ;
+                                 IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                 CAR ;
+                                 SENDER ;
+                                 MEM }
+                               { PUSH bool False } ;
+                            IF { PUSH bool True }
+                               { DUP ;
+                                 GET 5 ;
+                                 PUSH nat 0 ;
+                                 MEM ;
+                                 IF { DUP ;
+                                      GET 5 ;
+                                      PUSH nat 0 ;
+                                      GET ;
+                                      IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                      CAR ;
+                                      SENDER ;
+                                      MEM }
+                                    { PUSH bool False } } }
+                          { PUSH bool False } } ;
+                  IF { PUSH bool True }
+                     { DUP ;
+                       CDR ;
+                       CAR ;
+                       CAR ;
+                       IF { DUP ;
+                            CAR ;
+                            CDR ;
+                            CAR ;
+                            { DIP 3 { DUP } ; DIG 4 } ;
+                            CAR ;
+                            CAR ;
+                            MEM ;
+                            IF { DUP ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 { DIP 3 { DUP } ; DIG 4 } ;
+                                 CAR ;
+                                 CAR ;
+                                 GET ;
+                                 IF_NONE { PUSH int 170 ; FAILWITH } {} ;
+                                 GET 4 ;
+                                 SENDER ;
+                                 MEM }
+                               { PUSH bool False } ;
+                            IF { PUSH bool True }
+                               { DUP ;
+                                 CAR ;
+                                 CDR ;
+                                 CAR ;
+                                 { DIP 3 { DUP } ; DIG 4 } ;
+                                 CAR ;
+                                 CAR ;
+                                 MEM ;
+                                 IF { DUP ;
+                                      CAR ;
+                                      CDR ;
+                                      CAR ;
+                                      { DIP 3 { DUP } ; DIG 4 } ;
+                                      CAR ;
+                                      CAR ;
+                                      GET ;
+                                      IF_NONE { PUSH int 172 ; FAILWITH } {} ;
+                                      CAR ;
+                                      SENDER ;
+                                      MEM }
+                                    { PUSH bool False } ;
+                                 IF { { DIP 2 { DUP } ; DIG 3 } ;
+                                      CAR ;
+                                      CDR ;
+                                      CDR ;
+                                      SWAP ;
+                                      DUP ;
+                                      DUG 2 ;
+                                      CAR ;
+                                      CDR ;
+                                      CAR ;
+                                      { DIP 4 { DUP } ; DIG 5 } ;
+                                      CAR ;
+                                      CAR ;
+                                      GET ;
+                                      IF_NONE { PUSH int 173 ; FAILWITH } {} ;
+                                      CAR ;
+                                      SENDER ;
+                                      GET ;
+                                      IF_NONE { PUSH int 173 ; FAILWITH } {} ;
+                                      COMPARE ;
+                                      GE }
+                                    { PUSH bool False } } }
+                          { PUSH bool False } } ;
+                  IF {}
+                     { PUSH string
+                            "WrongCondition: ((lparams_2.in_param.from_ == sp.sender) | (self.data.controllable & (((self.data.roles.contains(1)) & (self.data.roles[1].members.contains(sp.sender))) | ((self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender)))))) | (self.data.operable & (((self.data.ledger.contains(lparams_2.in_param.from_)) & (self.data.ledger[lparams_2.in_param.from_].operators.contains(sp.sender))) | (((self.data.ledger.contains(lparams_2.in_param.from_)) & (self.data.ledger[lparams_2.in_param.from_].approvals.contains(sp.sender))) & (self.data.ledger[lparams_2.in_param.from_].approvals[sp.sender] >= lparams_2.in_param.value))))" ;
+                       FAILWITH } } ;
+             DUP ;
+             GET 5 ;
+             PUSH nat 5 ;
+             GET ;
+             IF_NONE { PUSH int 288 ; FAILWITH } {} ;
+             CAR ;
+             ITER { DIG 2 ;
+                    SWAP ;
+                    CONTRACT %assertTransfer
+                      (pair (address %from_) (pair (address %operator) (address %to_))) ;
+                    IF_NONE { PUSH int 289 ; FAILWITH } {} ;
+                    PUSH mutez 0 ;
+                    { DIP 4 { DUP } ; DIG 5 } ;
+                    CAR ;
+                    CDR ;
+                    CAR ;
+                    SENDER ;
+                    PAIR %operator %to_ ;
+                    { DIP 5 { DUP } ; DIG 6 } ;
+                    CAR ;
+                    CAR ;
+                    PAIR %from_ ;
+                    TRANSFER_TOKENS ;
+                    CONS ;
+                    SWAP } ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CAR ;
+             CDR ;
+             CAR ;
+             MEM ;
+             IF {}
+                { { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  PUSH (option
+                          (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))))
+                       (Some (Pair {} (Pair 0 {}))) ;
+                  { DIP 6 { DUP } ; DIG 7 } ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR } ;
+             { DIP 2 { DUP } ; DIG 3 } ;
+             CAR ;
+             CDR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             CAR ;
+             { DIP 4 { DUP } ; DIG 5 } ;
+             CAR ;
+             CAR ;
+             GET ;
+             IF_NONE { PUSH int 399 ; FAILWITH } {} ;
+             GET 3 ;
+             COMPARE ;
+             GE ;
+             IF {}
+                { PUSH string
+                       "WrongCondition: self.data.ledger[lparams_2.in_param.from_].balance >= lparams_2.in_param.value" ;
+                  FAILWITH } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             DUP ;
+             { DIP 6 { DUP } ; DIG 7 } ;
+             CAR ;
+             CDR ;
+             CAR ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 401 ; FAILWITH } {} ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             SWAP ;
+             { { DUP ; CAR ; DIP { CDR } } } ;
+             { DIP 9 { DUP } ; DIG 10 } ;
+             CAR ;
+             CDR ;
+             CDR ;
+             ADD ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             PAIR ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CAR ;
+             CAR ;
+             MEM ;
+             IF { DUP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  DUP ;
+                  { DIP 7 { DUP } ; DIG 8 } ;
+                  CAR ;
+                  CAR ;
+                  DUP ;
+                  DUG 2 ;
+                  GET ;
+                  IF_NONE { PUSH int 275 ; FAILWITH } {} ;
+                  { { DUP ; CAR ; DIP { CDR } } } ;
+                  SWAP ;
+                  CDR ;
+                  { DIP 9 { DUP } ; DIG 10 } ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  DIG 8 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  { DIP 10 { DUP } ; DIG 11 } ;
+                  CAR ;
+                  CAR ;
+                  GET ;
+                  IF_NONE { PUSH int 275 ; FAILWITH } {} ;
+                  GET 3 ;
+                  SUB ;
+                  ISNAT ;
+                  IF_NONE { PUSH int 275 ; FAILWITH } {} ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  PAIR ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR ;
+                  DUP ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  PUSH nat 0 ;
+                  SWAP ;
+                  { DIP 4 { DUP } ; DIG 5 } ;
+                  CAR ;
+                  CAR ;
+                  GET ;
+                  IF_NONE { PUSH int 276 ; FAILWITH } {} ;
+                  GET 3 ;
+                  COMPARE ;
+                  LE ;
+                  IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       SWAP ;
+                       { { DUP ; CAR ; DIP { CDR } } } ;
+                       NONE (pair (map %approvals address nat) (pair (nat %balance) (set %operators address))) ;
+                       { DIP 6 { DUP } ; DIG 7 } ;
+                       CAR ;
+                       CAR ;
+                       UPDATE ;
+                       PAIR ;
+                       SWAP ;
+                       PAIR ;
+                       PAIR }
+                     {} }
+                {} ;
+             DUP ;
+             CAR ;
+             CDR ;
+             CAR ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             CAR ;
+             CAR ;
+             MEM ;
+             IF { DUP ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  { DIP 3 { DUP } ; DIG 4 } ;
+                  CAR ;
+                  CAR ;
+                  GET ;
+                  IF_NONE { PUSH int 269 ; FAILWITH } {} ;
+                  CAR ;
+                  SENDER ;
+                  MEM ;
+                  IF { { DIP 2 { DUP } ; DIG 3 } ;
+                       CAR ;
+                       CDR ;
+                       CDR ;
+                       SWAP ;
+                       DUP ;
+                       DUG 2 ;
+                       CAR ;
+                       CDR ;
+                       CAR ;
+                       { DIP 4 { DUP } ; DIG 5 } ;
+                       CAR ;
+                       CAR ;
+                       GET ;
+                       IF_NONE { PUSH int 270 ; FAILWITH } {} ;
+                       CAR ;
+                       SENDER ;
+                       GET ;
+                       IF_NONE { PUSH int 270 ; FAILWITH } {} ;
+                       COMPARE ;
+                       GT ;
+                       IF { DUP ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            SWAP ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            DUP ;
+                            { DIP 7 { DUP } ; DIG 8 } ;
+                            CAR ;
+                            CAR ;
+                            DUP ;
+                            DUG 2 ;
+                            GET ;
+                            IF_NONE { PUSH int 271 ; FAILWITH } {} ;
+                            { { DUP ; CAR ; DIP { CDR } } } ;
+                            { DIP 9 { DUP } ; DIG 10 } ;
+                            CAR ;
+                            CDR ;
+                            CDR ;
+                            DIG 8 ;
+                            CAR ;
+                            CDR ;
+                            CAR ;
+                            DIG 10 ;
+                            CAR ;
+                            CAR ;
+                            GET ;
+                            IF_NONE { PUSH int 271 ; FAILWITH } {} ;
+                            CAR ;
+                            SENDER ;
+                            GET ;
+                            IF_NONE { PUSH int 271 ; FAILWITH } {} ;
+                            SUB ;
+                            ISNAT ;
+                            IF_NONE { PUSH int 271 ; FAILWITH } {} ;
+                            SOME ;
+                            SENDER ;
+                            UPDATE ;
+                            PAIR ;
+                            SOME ;
+                            SWAP ;
+                            UPDATE ;
+                            PAIR ;
+                            SWAP ;
+                            PAIR ;
+                            PAIR }
+                          { DIG 2 ; DROP } }
+                     { DIG 2 ; DROP } }
+                { DIG 2 ; DROP } ;
+             UNIT ;
+             PAIR %result %storage ;
+             SWAP ;
+             PAIR %operations } ;
+         SWAP ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DIG 2 ;
+                     DROP ;
+                     DIG 2 ;
+                     DROP ;
+                     DIG 2 ;
+                     DROP ;
+                     IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         CDR ;
+                         IF { PUSH string "WrongCondition: ~ self.data.paused" ; FAILWITH } {} ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         DUP ;
+                         SENDER ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE { PUSH int 449 ; FAILWITH } {} ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         { DIP 7 { DUP } ; DIG 8 } ;
+                         CDR ;
+                         SOME ;
+                         DIG 8 ;
+                         CAR ;
+                         UPDATE ;
+                         PAIR ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 5 ;
+                         PUSH nat 0 ;
+                         MEM ;
+                         IF { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 5 ;
+                              PUSH nat 0 ;
+                              GET ;
+                              IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                              CAR ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CAR ;
+                              MEM }
+                            { PUSH bool False } ;
+                         IF { DROP ; PUSH bool True }
+                            { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 5 ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CDR ;
+                              MEM ;
+                              IF { SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   GET 5 ;
+                                   SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   CDR ;
+                                   GET ;
+                                   IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                   CAR ;
+                                   SWAP ;
+                                   CAR ;
+                                   MEM }
+                                 { DROP ; PUSH bool False } } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: ((self.data.roles.contains(0)) & (self.data.roles[0].members.contains(params.account))) | ((self.data.roles.contains(params.role)) & (self.data.roles[params.role].members.contains(params.account)))" ;
+                              FAILWITH } } ;
+                     NIL operation }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 5 ;
+                         PUSH nat 3 ;
+                         MEM ;
+                         IF { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 5 ;
+                              PUSH nat 3 ;
+                              GET ;
+                              IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                              CAR ;
+                              SENDER ;
+                              MEM }
+                            { PUSH bool False } ;
+                         IF { PUSH bool True }
+                            { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 5 ;
+                              PUSH nat 0 ;
+                              MEM ;
+                              IF { SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   GET 5 ;
+                                   PUSH nat 0 ;
+                                   GET ;
+                                   IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                   CAR ;
+                                   SENDER ;
+                                   MEM }
+                                 { PUSH bool False } } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: ((self.data.roles.contains(3)) & (self.data.roles[3].members.contains(sp.sender))) | ((self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender)))" ;
+                              FAILWITH } ;
+                         DUP ;
+                         NIL operation ;
+                         SWAP ;
+                         ITER { { DIP 6 { DUP } ; DIG 7 } ;
+                                DIG 4 ;
+                                { DIP 2 { DUP } ; DIG 3 } ;
+                                PAIR %in_param %in_storage ;
+                                EXEC ;
+                                DUP ;
+                                GET 4 ;
+                                DUG 4 ;
+                                DUP ;
+                                CAR ;
+                                ITER { DIG 3 ; SWAP ; CONS ; DUG 2 } ;
+                                DROP 2 } ;
+                         SWAP ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP }
+                       { DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CDR ;
+                         CAR ;
+                         CAR ;
+                         IF {} { PUSH string "WrongCondition: self.data.operable" ; FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         GET ;
+                         IF_NONE { PUSH int 471 ; FAILWITH } {} ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         GET ;
+                         IF_NONE { PUSH int 471 ; FAILWITH } {} ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CDR ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS } } }
+               { IF_LEFT
+                   { DIG 3 ;
+                     DROP ;
+                     DIG 3 ;
+                     DROP ;
+                     IF_LEFT
+                       { DIG 2 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         GET ;
+                         IF_NONE { PUSH int 456 ; FAILWITH } {} ;
+                         GET 3 ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CDR ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS }
+                       { DIG 2 ;
+                         DROP ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 6 ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CDR ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS } }
+                   { IF_LEFT
+                       { DUP ;
+                         ITER { DIG 2 ;
+                                DUP ;
+                                GET 5 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 4 ;
+                                GET 5 ;
+                                { DIP 2 { DUP } ; DIG 3 } ;
+                                CDR ;
+                                GET ;
+                                IF_NONE { PUSH int 52 ; FAILWITH } {} ;
+                                CDR ;
+                                MEM ;
+                                IF { DIG 2 ;
+                                     DUP ;
+                                     GET 5 ;
+                                     SWAP ;
+                                     DUP ;
+                                     DUG 4 ;
+                                     GET 5 ;
+                                     { DIP 2 { DUP } ; DIG 3 } ;
+                                     CDR ;
+                                     GET ;
+                                     IF_NONE { PUSH int 52 ; FAILWITH } {} ;
+                                     CDR ;
+                                     GET ;
+                                     IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                     CAR ;
+                                     SENDER ;
+                                     MEM }
+                                   { PUSH bool False } ;
+                                IF {}
+                                   { PUSH string
+                                          "WrongCondition: (self.data.roles.contains(self.data.roles[p.role].role_admin)) & (self.data.roles[self.data.roles[p.role].role_admin].members.contains(sp.sender))" ;
+                                     FAILWITH } ;
+                                { DIP 2 { DUP } ; DIG 3 } ;
+                                GET 5 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                CDR ;
+                                MEM ;
+                                IF { { DIP 2 { DUP } ; DIG 3 } ;
+                                     GET 5 ;
+                                     SWAP ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     CDR ;
+                                     GET ;
+                                     IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                     CAR ;
+                                     SWAP ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     CAR ;
+                                     MEM }
+                                   { PUSH bool False } ;
+                                IF { DROP }
+                                   { DIG 2 ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     SWAP ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     SWAP ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     DUP ;
+                                     { DIP 5 { DUP } ; DIG 6 } ;
+                                     CDR ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     GET ;
+                                     IF_NONE { PUSH int 54 ; FAILWITH } {} ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     PUSH bool True ;
+                                     DIG 8 ;
+                                     CAR ;
+                                     UPDATE ;
+                                     PAIR ;
+                                     SOME ;
+                                     SWAP ;
+                                     UPDATE ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP } } ;
+                         DROP ;
+                         SWAP ;
+                         DROP ;
+                         SWAP ;
+                         DROP ;
+                         SWAP ;
+                         DROP ;
+                         NIL operation }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 5 ;
+                         PUSH nat 2 ;
+                         MEM ;
+                         IF { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 5 ;
+                              PUSH nat 2 ;
+                              GET ;
+                              IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                              CAR ;
+                              SENDER ;
+                              MEM }
+                            { PUSH bool False } ;
+                         IF { PUSH bool True }
+                            { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 5 ;
+                              PUSH nat 0 ;
+                              MEM ;
+                              IF { SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   GET 5 ;
+                                   PUSH nat 0 ;
+                                   GET ;
+                                   IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                   CAR ;
+                                   SENDER ;
+                                   MEM }
+                                 { PUSH bool False } } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: ((self.data.roles.contains(2)) & (self.data.roles[2].members.contains(sp.sender))) | ((self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender)))" ;
+                              FAILWITH } ;
+                         DUP ;
+                         NIL operation ;
+                         SWAP ;
+                         ITER { { DIP 5 { DUP } ; DIG 6 } ;
+                                DIG 4 ;
+                                { DIP 2 { DUP } ; DIG 3 } ;
+                                PAIR %in_param %in_storage ;
+                                EXEC ;
+                                DUP ;
+                                GET 4 ;
+                                DUG 4 ;
+                                DUP ;
+                                CAR ;
+                                ITER { DIG 3 ; SWAP ; CONS ; DUG 2 } ;
+                                DROP 2 } ;
+                         SWAP ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP ;
+                         DIG 2 ;
+                         DROP } } } }
+           { DIG 3 ;
+             DROP ;
+             DIG 3 ;
+             DROP ;
+             IF_LEFT
+               { DIG 2 ;
+                 DROP ;
+                 IF_LEFT
+                   { IF_LEFT
+                       { DROP ;
+                         DUP ;
+                         GET 5 ;
+                         PUSH nat 0 ;
+                         MEM ;
+                         IF { DUP ;
+                              GET 5 ;
+                              PUSH nat 0 ;
+                              GET ;
+                              IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                              CAR ;
+                              SENDER ;
+                              MEM }
+                            { PUSH bool False } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: (self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender))" ;
+                              FAILWITH } ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         CDR ;
+                         PUSH bool False ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR }
+                       { DROP ;
+                         DUP ;
+                         GET 5 ;
+                         PUSH nat 0 ;
+                         MEM ;
+                         IF { DUP ;
+                              GET 5 ;
+                              PUSH nat 0 ;
+                              GET ;
+                              IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                              CAR ;
+                              SENDER ;
+                              MEM }
+                            { PUSH bool False } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: (self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender))" ;
+                              FAILWITH } ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         CAR ;
+                         PUSH bool False ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         PAIR } }
+                   { IF_LEFT
+                       { DUP ;
+                         ITER { DUP ;
+                                CAR ;
+                                SENDER ;
+                                COMPARE ;
+                                EQ ;
+                                IF {} { PUSH string "WrongCondition: p.account == sp.sender" ; FAILWITH } ;
+                                { DIP 2 { DUP } ; DIG 3 } ;
+                                GET 5 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                CDR ;
+                                MEM ;
+                                IF { { DIP 2 { DUP } ; DIG 3 } ;
+                                     GET 5 ;
+                                     SWAP ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     CDR ;
+                                     GET ;
+                                     IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                     CAR ;
+                                     SWAP ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     CAR ;
+                                     MEM }
+                                   { PUSH bool False } ;
+                                IF { DIG 2 ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     SWAP ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     SWAP ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     DUP ;
+                                     { DIP 5 { DUP } ; DIG 6 } ;
+                                     CDR ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     GET ;
+                                     IF_NONE { PUSH int 68 ; FAILWITH } {} ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     PUSH bool False ;
+                                     DIG 8 ;
+                                     CAR ;
+                                     UPDATE ;
+                                     PAIR ;
+                                     SOME ;
+                                     SWAP ;
+                                     UPDATE ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP }
+                                   { DROP } } ;
+                         DROP }
+                       { DUP ;
+                         ITER { DIG 2 ;
+                                DUP ;
+                                GET 5 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 4 ;
+                                GET 5 ;
+                                { DIP 2 { DUP } ; DIG 3 } ;
+                                CDR ;
+                                GET ;
+                                IF_NONE { PUSH int 59 ; FAILWITH } {} ;
+                                CDR ;
+                                MEM ;
+                                IF { DIG 2 ;
+                                     DUP ;
+                                     GET 5 ;
+                                     SWAP ;
+                                     DUP ;
+                                     DUG 4 ;
+                                     GET 5 ;
+                                     { DIP 2 { DUP } ; DIG 3 } ;
+                                     CDR ;
+                                     GET ;
+                                     IF_NONE { PUSH int 59 ; FAILWITH } {} ;
+                                     CDR ;
+                                     GET ;
+                                     IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                     CAR ;
+                                     SENDER ;
+                                     MEM }
+                                   { PUSH bool False } ;
+                                IF {}
+                                   { PUSH string
+                                          "WrongCondition: (self.data.roles.contains(self.data.roles[p.role].role_admin)) & (self.data.roles[self.data.roles[p.role].role_admin].members.contains(sp.sender))" ;
+                                     FAILWITH } ;
+                                { DIP 2 { DUP } ; DIG 3 } ;
+                                GET 5 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                CDR ;
+                                MEM ;
+                                IF { { DIP 2 { DUP } ; DIG 3 } ;
+                                     GET 5 ;
+                                     SWAP ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     CDR ;
+                                     GET ;
+                                     IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                     CAR ;
+                                     SWAP ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     CAR ;
+                                     MEM }
+                                   { PUSH bool False } ;
+                                IF { DIG 2 ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     SWAP ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     SWAP ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     DUP ;
+                                     { DIP 5 { DUP } ; DIG 6 } ;
+                                     CDR ;
+                                     DUP ;
+                                     DUG 2 ;
+                                     GET ;
+                                     IF_NONE { PUSH int 61 ; FAILWITH } {} ;
+                                     { { DUP ; CAR ; DIP { CDR } } } ;
+                                     PUSH bool False ;
+                                     DIG 8 ;
+                                     CAR ;
+                                     UPDATE ;
+                                     PAIR ;
+                                     SOME ;
+                                     SWAP ;
+                                     UPDATE ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP ;
+                                     PAIR ;
+                                     SWAP }
+                                   { DROP } } ;
+                         DROP } } ;
+                 NIL operation }
+               { IF_LEFT
+                   { DIG 2 ;
+                     DROP ;
+                     IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 5 ;
+                         PUSH nat 0 ;
+                         MEM ;
+                         IF { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 5 ;
+                              PUSH nat 0 ;
+                              GET ;
+                              IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                              CAR ;
+                              SENDER ;
+                              MEM }
+                            { PUSH bool False } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: (self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender))" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { DIP 4 { DUP } ; DIG 5 } ;
+                         CDR ;
+                         SOME ;
+                         DIG 5 ;
+                         CAR ;
+                         UPDATE ;
+                         SWAP ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 5 ;
+                         PUSH nat 4 ;
+                         MEM ;
+                         IF { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 5 ;
+                              PUSH nat 4 ;
+                              GET ;
+                              IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                              CAR ;
+                              SENDER ;
+                              MEM }
+                            { PUSH bool False } ;
+                         IF { PUSH bool True }
+                            { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 5 ;
+                              PUSH nat 0 ;
+                              MEM ;
+                              IF { SWAP ;
+                                   DUP ;
+                                   DUG 2 ;
+                                   GET 5 ;
+                                   PUSH nat 0 ;
+                                   GET ;
+                                   IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                   CAR ;
+                                   SENDER ;
+                                   MEM }
+                                 { PUSH bool False } } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: ((self.data.roles.contains(4)) & (self.data.roles[4].members.contains(sp.sender))) | ((self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender)))" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         SWAP ;
+                         { { DUP ; CAR ; DIP { CDR } } } ;
+                         CAR ;
+                         DIG 3 ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } ;
+                     NIL operation }
+                   { IF_LEFT
+                       { DUP ;
+                         GET 4 ;
+                         SWAP ;
+                         DUP ;
+                         DUG 4 ;
+                         GET 3 ;
+                         PAIR %to_ %value ;
+                         DIG 3 ;
+                         CAR ;
+                         PAIR %from_ ;
+                         PAIR %in_param %in_storage ;
+                         EXEC ;
+                         DUP ;
+                         GET 4 ;
+                         SWAP ;
+                         CAR ;
+                         NIL operation ;
+                         SWAP ;
+                         ITER { CONS } }
+                       { IF_LEFT
+                           { DUP ;
+                             NIL operation ;
+                             SWAP ;
+                             ITER { { DIP 4 { DUP } ; DIG 5 } ;
+                                    DIG 4 ;
+                                    { DIP 2 { DUP } ; DIG 3 } ;
+                                    PAIR %in_param %in_storage ;
+                                    EXEC ;
+                                    DUP ;
+                                    GET 4 ;
+                                    DUG 4 ;
+                                    DUP ;
+                                    CAR ;
+                                    ITER { DIG 3 ; SWAP ; CONS ; DUG 2 } ;
+                                    DROP 2 } ;
+                             SWAP ;
+                             DROP ;
+                             DIG 2 ;
+                             DROP }
+                           { DIG 2 ;
+                             DROP ;
+                             SWAP ;
+                             DUP ;
+                             DUG 2 ;
+                             CDR ;
+                             CAR ;
+                             CAR ;
+                             IF { DUP ;
+                                  ITER { DUP ;
+                                         IF_LEFT
+                                           { DUP ;
+                                             ITER { DUP ;
+                                                    CDR ;
+                                                    SENDER ;
+                                                    COMPARE ;
+                                                    EQ ;
+                                                    IF { PUSH bool True }
+                                                       { { DIP 4 { DUP } ; DIG 5 } ;
+                                                         CAR ;
+                                                         CAR ;
+                                                         CAR ;
+                                                         IF { { DIP 4 { DUP } ; DIG 5 } ;
+                                                              GET 5 ;
+                                                              PUSH nat 1 ;
+                                                              MEM ;
+                                                              IF { { DIP 4 { DUP } ; DIG 5 } ;
+                                                                   GET 5 ;
+                                                                   PUSH nat 1 ;
+                                                                   GET ;
+                                                                   IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                                                   CAR ;
+                                                                   SENDER ;
+                                                                   MEM }
+                                                                 { PUSH bool False } ;
+                                                              IF { PUSH bool True }
+                                                                 { { DIP 4 { DUP } ; DIG 5 } ;
+                                                                   GET 5 ;
+                                                                   PUSH nat 0 ;
+                                                                   MEM ;
+                                                                   IF { { DIP 4 { DUP } ; DIG 5 } ;
+                                                                        GET 5 ;
+                                                                        PUSH nat 0 ;
+                                                                        GET ;
+                                                                        IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                                                        CAR ;
+                                                                        SENDER ;
+                                                                        MEM }
+                                                                      { PUSH bool False } } }
+                                                            { PUSH bool False } } ;
+                                                    IF {}
+                                                       { PUSH string
+                                                              "WrongCondition: (upd.owner == sp.sender) | (self.data.controllable & (((self.data.roles.contains(1)) & (self.data.roles[1].members.contains(sp.sender))) | ((self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender)))))" ;
+                                                         FAILWITH } ;
+                                                    DIG 4 ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    SWAP ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    DUP ;
+                                                    { DIP 5 { DUP } ; DIG 6 } ;
+                                                    CDR ;
+                                                    DUP ;
+                                                    DUG 2 ;
+                                                    GET ;
+                                                    IF_NONE { PUSH int 203 ; FAILWITH } {} ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    SWAP ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    SWAP ;
+                                                    PUSH bool True ;
+                                                    DIG 9 ;
+                                                    CAR ;
+                                                    UPDATE ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    SOME ;
+                                                    SWAP ;
+                                                    UPDATE ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    DUG 3 } ;
+                                             DROP 2 }
+                                           { DUP ;
+                                             ITER { DUP ;
+                                                    CDR ;
+                                                    SENDER ;
+                                                    COMPARE ;
+                                                    EQ ;
+                                                    IF { PUSH bool True }
+                                                       { { DIP 4 { DUP } ; DIG 5 } ;
+                                                         CAR ;
+                                                         CAR ;
+                                                         CAR ;
+                                                         IF { { DIP 4 { DUP } ; DIG 5 } ;
+                                                              GET 5 ;
+                                                              PUSH nat 1 ;
+                                                              MEM ;
+                                                              IF { { DIP 4 { DUP } ; DIG 5 } ;
+                                                                   GET 5 ;
+                                                                   PUSH nat 1 ;
+                                                                   GET ;
+                                                                   IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                                                   CAR ;
+                                                                   SENDER ;
+                                                                   MEM }
+                                                                 { PUSH bool False } ;
+                                                              IF { PUSH bool True }
+                                                                 { { DIP 4 { DUP } ; DIG 5 } ;
+                                                                   GET 5 ;
+                                                                   PUSH nat 0 ;
+                                                                   MEM ;
+                                                                   IF { { DIP 4 { DUP } ; DIG 5 } ;
+                                                                        GET 5 ;
+                                                                        PUSH nat 0 ;
+                                                                        GET ;
+                                                                        IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                                                                        CAR ;
+                                                                        SENDER ;
+                                                                        MEM }
+                                                                      { PUSH bool False } } }
+                                                            { PUSH bool False } } ;
+                                                    IF {}
+                                                       { PUSH string
+                                                              "WrongCondition: (upd.owner == sp.sender) | (self.data.controllable & (((self.data.roles.contains(1)) & (self.data.roles[1].members.contains(sp.sender))) | ((self.data.roles.contains(0)) & (self.data.roles[0].members.contains(sp.sender)))))" ;
+                                                         FAILWITH } ;
+                                                    DIG 4 ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    SWAP ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    DUP ;
+                                                    { DIP 5 { DUP } ; DIG 6 } ;
+                                                    CDR ;
+                                                    DUP ;
+                                                    DUG 2 ;
+                                                    GET ;
+                                                    IF_NONE { PUSH int 210 ; FAILWITH } {} ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    SWAP ;
+                                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                                    SWAP ;
+                                                    PUSH bool False ;
+                                                    DIG 9 ;
+                                                    CAR ;
+                                                    UPDATE ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    SOME ;
+                                                    SWAP ;
+                                                    UPDATE ;
+                                                    PAIR ;
+                                                    SWAP ;
+                                                    PAIR ;
+                                                    PAIR ;
+                                                    DUG 3 } ;
+                                             DROP 2 } } ;
+                                  DROP }
+                                { PUSH string "noop" ; FAILWITH } ;
+                             NIL operation } } } } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

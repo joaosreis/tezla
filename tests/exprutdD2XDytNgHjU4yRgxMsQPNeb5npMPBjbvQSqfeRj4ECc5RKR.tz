@@ -1,3 +1,0 @@
-{ parameter (contract string) ;
-  storage bytes ;
-  code { CAR ; PACK ; NIL operation ; PAIR } }

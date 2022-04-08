@@ -1,0 +1,158 @@
+{ storage
+    (pair (pair (address %creator) (nat %next_item_id))
+          (pair (nat %next_order_id)
+                (pair (big_map %orders
+                         nat
+                         (pair (address %buyer)
+                               (pair (nat %total_cost) (list %purchased_items (pair (nat %item) (nat %amount))))))
+                      (big_map %shop_items
+                         nat
+                         (pair (address %owner)
+                               (pair (nat %id)
+                                     (pair (string %name) (pair (string %description) (pair (nat %price) (nat %amount)))))))))) ;
+  parameter
+    (or (pair %buy_item (address %buyer) (map %items_to_purchase nat nat))
+        (pair %list_item
+           (address %owner)
+           (pair (nat %id)
+                 (pair (string %name) (pair (string %description) (pair (nat %price) (nat %amount))))))) ;
+  code { CAST (pair (or (pair address (map nat nat))
+                        (pair address (pair nat (pair string (pair string (pair nat nat))))))
+                    (pair (pair address nat)
+                          (pair nat
+                                (pair (big_map nat (pair address (pair nat (list (pair nat nat)))))
+                                      (big_map nat (pair address (pair nat (pair string (pair string (pair nat nat)))))))))) ;
+         UNPAIR ;
+         IF_LEFT
+           { NIL (pair nat nat) ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             ITER { DUP 4 ;
+                    GET 6 ;
+                    SWAP ;
+                    DUP ;
+                    DUG 2 ;
+                    CAR ;
+                    MEM ;
+                    IF {} { PUSH string "ITEM_DOESNT_EXIST" ; FAILWITH } ;
+                    DUP ;
+                    CDR ;
+                    DUP 5 ;
+                    GET 6 ;
+                    DUP 3 ;
+                    CAR ;
+                    GET ;
+                    IF_NONE { PUSH int 115 ; FAILWITH } {} ;
+                    GET 10 ;
+                    COMPARE ;
+                    GE ;
+                    IF {} { PUSH string "NOT_ENOUGH_INVENTORY" ; FAILWITH } ;
+                    DUP 4 ;
+                    DUP ;
+                    GET 6 ;
+                    DUP ;
+                    DUP 4 ;
+                    CAR ;
+                    DUP ;
+                    DUG 2 ;
+                    GET ;
+                    IF_NONE { PUSH int 118 ; FAILWITH } {} ;
+                    DUP 5 ;
+                    CDR ;
+                    DIG 8 ;
+                    GET 6 ;
+                    DUP 7 ;
+                    CAR ;
+                    GET ;
+                    IF_NONE { PUSH int 118 ; FAILWITH } {} ;
+                    GET 10 ;
+                    SUB ;
+                    ISNAT ;
+                    IF_NONE { PUSH int 118 ; FAILWITH } {} ;
+                    UPDATE 10 ;
+                    SOME ;
+                    SWAP ;
+                    UPDATE ;
+                    UPDATE 6 ;
+                    DUG 3 ;
+                    CONS } ;
+             SWAP ;
+             DROP ;
+             SWAP ;
+             DUP ;
+             GET 5 ;
+             SWAP ;
+             DUP ;
+             DUG 3 ;
+             GET 3 ;
+             MEM ;
+             IF { PUSH string "ID_ALREADY_IN_USE" ; FAILWITH } {} ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             DUP ;
+             GET 5 ;
+             DIG 2 ;
+             PUSH int 0 ;
+             ISNAT ;
+             IF_NONE { PUSH int 125 ; FAILWITH } {} ;
+             SENDER ;
+             PAIR 3 ;
+             SOME ;
+             DIG 3 ;
+             GET 3 ;
+             UPDATE ;
+             UPDATE 5 }
+           { SENDER ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "ADMIN_ACTION_ONLY" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "ID_ALREADY_IN_USE" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             GET 6 ;
+             SWAP ;
+             DUP ;
+             DUG 3 ;
+             CAR ;
+             CDR ;
+             MEM ;
+             IF { PUSH string "ID_ALREADY_IN_USE" ; FAILWITH } {} ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             DUP ;
+             GET 6 ;
+             DIG 2 ;
+             SOME ;
+             DIG 3 ;
+             CAR ;
+             CDR ;
+             UPDATE ;
+             UPDATE 6 ;
+             UNPAIR ;
+             UNPAIR ;
+             SWAP ;
+             PUSH nat 1 ;
+             ADD ;
+             SWAP ;
+             PAIR ;
+             PAIR } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,55 @@
+{ storage (big_map bytes (pair (timestamp %created_at) (address %created_by))) ;
+  parameter
+    (or (bytes %create_doc)
+        (pair %get_doc bytes (contract (pair (timestamp %created_at) (address %created_by))))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "amount_engaged" ; FAILWITH } {} ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             MEM ;
+             IF { PUSH string "document_exists" ; FAILWITH } {} ;
+             SOURCE ;
+             NOW ;
+             PAIR %created_at %created_by ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             NIL operation }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             MEM ;
+             IF {} { PUSH string "document_not_found" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             GET ;
+             IF_NONE { PUSH int 19 ; FAILWITH } {} ;
+             NIL operation ;
+             DIG 2 ;
+             CDR ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

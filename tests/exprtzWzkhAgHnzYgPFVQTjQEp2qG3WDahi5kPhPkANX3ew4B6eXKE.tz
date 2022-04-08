@@ -1,0 +1,145 @@
+{ parameter
+    (or (unit %setLocked)
+        (or (list %appendReceivers (pair (address :to) (nat :value)))
+            (unit %nextBatchTransfer))) ;
+  storage
+    (pair (pair (address %sOriginator) (pair (bool %sLocked) (address %sNBITaddress)))
+          (pair (pair (big_map %sReceivers nat (pair (address :to) (nat :value)))
+                      (nat %sReceiversSize))
+                (pair (nat %sBatchSize) (nat %sNextBatchStart)))) ;
+  code { CAST (pair (or unit (or (list (pair address nat)) unit))
+                    (pair (pair address (pair bool address))
+                          (pair (pair (big_map nat (pair address nat)) nat) (pair nat nat)))) ;
+         NIL operation ;
+         SWAP ;
+         DUP ;
+         CAR ;
+         DIP { CDR ;
+               DUP ;
+               CAR ;
+               DIP { CDR ;
+                     DUP ;
+                     CAR ;
+                     DIP { CDR ; DUP ; CAR ; DIP { CDR } } ;
+                     DUP ;
+                     CAR ;
+                     DIP { CDR } } ;
+               DUP ;
+               CAR ;
+               DIP { CDR ; DUP ; CAR ; DIP { CDR } } } ;
+         DUP 1 ;
+         IF_LEFT
+           { SENDER ;
+             DUP 4 ;
+             COMPARE ;
+             EQ ;
+             IF {} { UNIT ; PUSH string "SenderIsNotOriginator" ; PAIR ; FAILWITH } ;
+             DUP 4 ;
+             IF { UNIT ; PUSH string "DlLocked" ; PAIR ; FAILWITH }
+                { DUP 3 ;
+                  DIP 3 { DROP } ;
+                  DUG 2 ;
+                  PUSH bool True ;
+                  DIP 4 { DROP } ;
+                  DUG 3 ;
+                  DUP 5 ;
+                  DIP 5 { DROP } ;
+                  DUG 4 ;
+                  DUP 6 ;
+                  DIP 6 { DROP } ;
+                  DUG 5 ;
+                  DUP 7 ;
+                  DIP 7 { DROP } ;
+                  DUG 6 ;
+                  DUP 8 ;
+                  DIP 8 { DROP } ;
+                  DUG 7 ;
+                  DUP 9 ;
+                  DIP 9 { DROP } ;
+                  DUG 8 } ;
+             DROP }
+           { IF_LEFT
+               { DUP 4 ;
+                 IF { UNIT ; PUSH string "DlLocked" ; PAIR ; FAILWITH } {} ;
+                 SENDER ;
+                 DUP 4 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { UNIT ; PUSH string "SenderIsNotOriginator" ; PAIR ; FAILWITH } ;
+                 DUP 7 ;
+                 DUP 2 ;
+                 ITER { DUP 8 ;
+                        DUP 2 ;
+                        SOME ;
+                        DUP 4 ;
+                        UPDATE ;
+                        DIP 8 { DROP } ;
+                        DUG 7 ;
+                        PUSH nat 1 ;
+                        SWAP ;
+                        DROP ;
+                        ADD } ;
+                 DUP 1 ;
+                 DIP 8 { DROP } ;
+                 DUG 7 ;
+                 DROP 2 }
+               { DUP 4 ;
+                 IF {} { UNIT ; PUSH string "DlNotLocked" ; PAIR ; FAILWITH } ;
+                 SENDER ;
+                 DUP 4 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { UNIT ; PUSH string "SenderIsNotOriginator" ; PAIR ; FAILWITH } ;
+                 DUP 6 ;
+                 NIL (pair address nat) ;
+                 DUP 11 ;
+                 DUP 1 ;
+                 DUP 12 ;
+                 ADD ;
+                 DUP 1 ;
+                 DUP 3 ;
+                 COMPARE ;
+                 LT ;
+                 LOOP { DUP 4 ;
+                        DUP 3 ;
+                        GET ;
+                        IF_NONE
+                          { DUP 1 ; DIP 2 { DROP } ; DUG 1 }
+                          { DUP 4 ;
+                            DUP 2 ;
+                            CONS ;
+                            DIP 4 { DROP } ;
+                            DUG 3 ;
+                            PUSH nat 1 ;
+                            DUG 2 ;
+                            DIP 2 { ADD } ;
+                            DROP } ;
+                        DUP 1 ;
+                        DUP 3 ;
+                        COMPARE ;
+                        LT } ;
+                 DUP 2 ;
+                 DIP 13 { DROP } ;
+                 DUG 12 ;
+                 DUP 9 ;
+                 CONTRACT %performBatchTransfer (list (pair address nat)) ;
+                 DUP 1 ;
+                 IF_NONE
+                   { UNIT ; PUSH string "ContractLookupFail" ; PAIR ; FAILWITH }
+                   { DUP 1 ;
+                     PUSH mutez 0 ;
+                     DUP 7 ;
+                     TRANSFER_TOKENS ;
+                     DUG 15 ;
+                     DIP 15 { CONS } ;
+                     DROP } ;
+                 DROP 2 ;
+                 DROP 2 ;
+                 DROP 2 } } ;
+         DROP ;
+         DIP { PAIR } ;
+         PAIR ;
+         DIP { PAIR ; DIP { PAIR } ; PAIR } ;
+         PAIR ;
+         SWAP ;
+         PAIR } }

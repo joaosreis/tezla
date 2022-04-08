@@ -1,3 +1,0 @@
-{ storage (map (pair int int) int) ;
-  parameter unit ;
-  code { DUP ; CDR ; SWAP ; CAR ; DROP ; NIL operation ; PAIR } }

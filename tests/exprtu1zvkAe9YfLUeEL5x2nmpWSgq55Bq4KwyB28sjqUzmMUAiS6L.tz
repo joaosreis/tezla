@@ -1,3 +1,0 @@
-{ storage (option chain_id) ;
-  parameter unit ;
-  code { DUP ; CDR ; SWAP ; CAR ; DROP ; NIL operation ; PAIR } }

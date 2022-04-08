@@ -1,0 +1,60 @@
+{ storage (map string int) ;
+  parameter
+    (or (string %createUser)
+        (or (string %deleteUser) (pair %updatePoints (int %points) (string %username)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             MEM ;
+             IF { PUSH string "username already exists" ; FAILWITH } {} ;
+             SWAP ;
+             PUSH (option int) (Some 0) ;
+             DIG 2 ;
+             UPDATE }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.pointsMap.contains(params.username)" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 NONE int ;
+                 DIG 2 ;
+                 UPDATE }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "WrongCondition: self.data.pointsMap.contains(params.username)" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUP 3 ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 19 ; FAILWITH } {} ;
+                 DIG 3 ;
+                 CAR ;
+                 ADD ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE } } ;
+         NIL operation ;
+         PAIR } }

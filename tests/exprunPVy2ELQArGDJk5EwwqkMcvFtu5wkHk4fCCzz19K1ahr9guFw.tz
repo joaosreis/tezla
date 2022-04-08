@@ -1,0 +1,64 @@
+{ storage
+    (pair (pair (address %NFTAddress) (big_map %OracleList string address))
+          (pair (address %factoryAdmin) (key %factoryAdminPublicKey))) ;
+  parameter
+    (or (pair %create
+           (pair (signature %_factoryAdminSignature)
+                 (pair (timestamp %_timestamp) (address %adminAddress)))
+           (pair (key %admin_pk) (pair (string %groupId) (int %minSignerRequire))))
+        (address %setNFTAddres)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 5 ;
+             MEM ;
+             IF { PUSH string "group id exist" ; FAILWITH } {} ;
+             DUP ;
+             CAR ;
+             GET 3 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 6 ;
+             PAIR ;
+             SWAP ;
+             DUP ;
+             GET 5 ;
+             SWAP ;
+             DUP ;
+             DUG 3 ;
+             GET 3 ;
+             PAIR ;
+             PAIR ;
+             PACK ;
+             BLAKE2B ;
+             SWAP ;
+             CAR ;
+             CAR ;
+             DUP 3 ;
+             GET 4 ;
+             CHECK_SIGNATURE ;
+             IF {} { PUSH string "verify hash: Invalid signature" ; FAILWITH } }
+           { SENDER ;
+             DUP 3 ;
+             GET 3 ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.factoryAdmin == sp.sender" ;
+                  FAILWITH } ;
+             SWAP ;
+             UNPAIR ;
+             CDR ;
+             DIG 2 ;
+             PAIR ;
+             PAIR } ;
+         NIL operation ;
+         PAIR } }

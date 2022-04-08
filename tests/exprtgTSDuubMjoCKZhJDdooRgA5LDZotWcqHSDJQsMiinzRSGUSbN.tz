@@ -1,0 +1,3 @@
+{ storage (big_map int int) ;
+  parameter int ;
+  code { UNPAIR ; DUP ; SOME ; SWAP ; UPDATE ; NIL operation ; PAIR } }

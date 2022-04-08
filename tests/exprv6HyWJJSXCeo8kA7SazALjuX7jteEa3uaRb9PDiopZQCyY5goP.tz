@@ -1,0 +1,105 @@
+{ parameter
+    (or (pair %concatenating
+           (pair (string %extension) (string %file_size))
+           (pair (string %name) (string %ssharing)))
+        (pair %concatenating2 (pair (string %b0) (string %b1)) (pair (string %s) (string %sb)))) ;
+  storage
+    (pair (pair (option %extension string) (option %file_size string))
+          (pair (option %name string)
+                (pair (option %sharing string) (option %upload_date string)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             UNPAIR ;
+             SWAP ;
+             CDR ;
+             DUP 3 ;
+             GET 3 ;
+             SOME ;
+             PAIR ;
+             SWAP ;
+             CDR ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             SOME ;
+             PAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             CAR ;
+             DUP 4 ;
+             CAR ;
+             CDR ;
+             SOME ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             CAR ;
+             DUP 3 ;
+             GET 4 ;
+             SOME ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             CDR ;
+             DIG 3 ;
+             GET 4 ;
+             SOME ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR }
+           { SWAP ;
+             UNPAIR ;
+             SWAP ;
+             CDR ;
+             DUP 3 ;
+             GET 3 ;
+             SOME ;
+             PAIR ;
+             SWAP ;
+             CDR ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             SOME ;
+             PAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             CAR ;
+             DUP 4 ;
+             CAR ;
+             CDR ;
+             SOME ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             CAR ;
+             DUP 3 ;
+             GET 4 ;
+             SOME ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             CDR ;
+             DIG 3 ;
+             GET 4 ;
+             SOME ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR } ;
+         NIL operation ;
+         PAIR } }

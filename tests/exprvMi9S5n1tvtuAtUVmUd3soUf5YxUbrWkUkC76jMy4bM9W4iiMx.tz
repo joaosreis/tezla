@@ -1,0 +1,7 @@
+{ parameter unit ;
+  storage unit ;
+  code { PUSH mutez 9223372036854775807 ;
+         PUSH mutez 1 ;
+         ADD ;
+         PUSH string "bye" ;
+         FAILWITH } }

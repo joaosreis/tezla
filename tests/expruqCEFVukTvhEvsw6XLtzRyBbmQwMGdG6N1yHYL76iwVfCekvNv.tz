@@ -1,0 +1,24 @@
+{ parameter string ;
+  storage (list string) ;
+  code { DUP ;
+         CAR ;
+         DIP { CDR ; DUP } ;
+         SWAP ;
+         SIZE ;
+         INT ;
+         EQ ;
+         IF { PUSH nat 1 } { PUSH nat 5000 } ;
+         PUSH nat 1 ;
+         SWAP ;
+         SUB ;
+         ISNAT ;
+         IF_NONE { PUSH nat 999 ; PUSH bool False } { PUSH bool True } ;
+         LOOP { DIP { DUP ; DIP { CONS } } ;
+                PUSH nat 1 ;
+                SWAP ;
+                SUB ;
+                ISNAT ;
+                IF_NONE { PUSH nat 999 ; PUSH bool False } { PUSH bool True } } ;
+         DROP 2 ;
+         NIL operation ;
+         PAIR } }

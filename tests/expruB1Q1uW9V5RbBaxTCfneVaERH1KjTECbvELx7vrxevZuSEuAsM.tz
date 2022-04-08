@@ -1,0 +1,124 @@
+{ parameter
+    (or (or (address %changeAdmin) (list %makeAirdrop address))
+        (list %makeAirdropCallback
+           (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))) ;
+  storage
+    (pair (pair (address %admin) (address %flame_token)) (list %recipients address)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP ; PUSH string "Airdrop: not-admin" ; FAILWITH }
+                    { SWAP ; DUP ; DUG 2 ; CDR ; DIG 2 ; CAR ; CDR ; DIG 2 ; PAIR ; PAIR } ;
+                 NIL operation ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "Airdrop: not-admin" ; FAILWITH } {} ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 SELF ;
+                 ADDRESS ;
+                 CONTRACT %makeAirdropCallback
+                   (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))) ;
+                 IF_NONE
+                   { PUSH string "Airdrop: ill-make-airdrop-callback-entrypoint" ; FAILWITH }
+                   {} ;
+                 NIL (pair address nat) ;
+                 PUSH nat 0 ;
+                 SELF ;
+                 ADDRESS ;
+                 PAIR ;
+                 CONS ;
+                 PAIR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 NIL operation ;
+                 DIG 3 ;
+                 CAR ;
+                 CDR ;
+                 CONTRACT %balance_of
+                   (pair (list %requests (pair (address %owner) (nat %token_id)))
+                         (contract %callback
+                            (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))))) ;
+                 IF_NONE
+                   { PUSH string "Airdrop: ill-flame-token-balance_of-entrypoint" ; FAILWITH }
+                   {} ;
+                 PUSH mutez 0 ;
+                 DIG 4 ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 PAIR } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "Airdrop: not-flame-token-contract" ; FAILWITH } {} ;
+             IF_CONS { SWAP ; DROP ; SOME } { NONE (pair (pair address nat) nat) } ;
+             IF_NONE
+               { PUSH string "Airdrop: empty-balance_of-response-list" ; FAILWITH }
+               {} ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SIZE ;
+             SWAP ;
+             CDR ;
+             EDIV ;
+             IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             MAP { SWAP ; DUP ; DUG 2 ; PUSH nat 0 ; PAIR ; SWAP ; PAIR } ;
+             SWAP ;
+             DROP ;
+             SELF ;
+             ADDRESS ;
+             PAIR ;
+             NIL address ;
+             DIG 2 ;
+             CAR ;
+             PAIR ;
+             DUP ;
+             NIL operation ;
+             DIG 2 ;
+             CAR ;
+             CDR ;
+             CONTRACT %transfer
+               (list (pair (address %from_)
+                           (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+             IF_NONE
+               { PUSH string "Airdrop: ill-flame-token-transfer-entrypoint" ; FAILWITH }
+               {} ;
+             PUSH mutez 0 ;
+             NIL (pair address (list (pair address (pair nat nat)))) ;
+             DIG 5 ;
+             CONS ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             PAIR } } }

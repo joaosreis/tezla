@@ -1,0 +1,327 @@
+{ parameter
+    (or (or (or (lambda %admin_update
+                   (pair (pair (big_map %actions
+                                  string
+                                  (lambda
+                                     (pair (pair bytes address)
+                                           (pair (pair (pair (big_map %data bytes bytes) (big_map %expiry_map bytes timestamp))
+                                                       (pair (big_map %metadata string bytes) (nat %next_tzip12_token_id)))
+                                                 (pair (pair (address %owner)
+                                                             (big_map %records
+                                                                bytes
+                                                                (pair (pair (pair (option %address address) (map %data string bytes))
+                                                                            (pair (option %expiry_key bytes) (map %internal_data string bytes)))
+                                                                      (pair (pair (nat %level) (address %owner)) (option %tzip12_token_id nat)))))
+                                                       (pair (big_map %reverse_records
+                                                                address
+                                                                (pair (pair (map %internal_data string bytes) (option %name bytes)) (address %owner)))
+                                                             (big_map %tzip12_tokens nat bytes)))))
+                                     (pair (list operation)
+                                           (pair (pair (pair (big_map %data bytes bytes) (big_map %expiry_map bytes timestamp))
+                                                       (pair (big_map %metadata string bytes) (nat %next_tzip12_token_id)))
+                                                 (pair (pair (address %owner)
+                                                             (big_map %records
+                                                                bytes
+                                                                (pair (pair (pair (option %address address) (map %data string bytes))
+                                                                            (pair (option %expiry_key bytes) (map %internal_data string bytes)))
+                                                                      (pair (pair (nat %level) (address %owner)) (option %tzip12_token_id nat)))))
+                                                       (pair (big_map %reverse_records
+                                                                address
+                                                                (pair (pair (map %internal_data string bytes) (option %name bytes)) (address %owner)))
+                                                             (big_map %tzip12_tokens nat bytes)))))))
+                               (pair %store
+                                  (pair (pair (big_map %data bytes bytes) (big_map %expiry_map bytes timestamp))
+                                        (pair (big_map %metadata string bytes) (nat %next_tzip12_token_id)))
+                                  (pair (pair (address %owner)
+                                              (big_map %records
+                                                 bytes
+                                                 (pair (pair (pair (option %address address) (map %data string bytes))
+                                                             (pair (option %expiry_key bytes) (map %internal_data string bytes)))
+                                                       (pair (pair (nat %level) (address %owner)) (option %tzip12_token_id nat)))))
+                                        (pair (big_map %reverse_records
+                                                 address
+                                                 (pair (pair (map %internal_data string bytes) (option %name bytes)) (address %owner)))
+                                              (big_map %tzip12_tokens nat bytes)))))
+                         (set %trusted_senders address))
+                   (pair (list operation)
+                         (pair (pair (big_map %actions
+                                        string
+                                        (lambda
+                                           (pair (pair bytes address)
+                                                 (pair (pair (pair (big_map %data bytes bytes) (big_map %expiry_map bytes timestamp))
+                                                             (pair (big_map %metadata string bytes) (nat %next_tzip12_token_id)))
+                                                       (pair (pair (address %owner)
+                                                                   (big_map %records
+                                                                      bytes
+                                                                      (pair (pair (pair (option %address address) (map %data string bytes))
+                                                                                  (pair (option %expiry_key bytes) (map %internal_data string bytes)))
+                                                                            (pair (pair (nat %level) (address %owner)) (option %tzip12_token_id nat)))))
+                                                             (pair (big_map %reverse_records
+                                                                      address
+                                                                      (pair (pair (map %internal_data string bytes) (option %name bytes)) (address %owner)))
+                                                                   (big_map %tzip12_tokens nat bytes)))))
+                                           (pair (list operation)
+                                                 (pair (pair (pair (big_map %data bytes bytes) (big_map %expiry_map bytes timestamp))
+                                                             (pair (big_map %metadata string bytes) (nat %next_tzip12_token_id)))
+                                                       (pair (pair (address %owner)
+                                                                   (big_map %records
+                                                                      bytes
+                                                                      (pair (pair (pair (option %address address) (map %data string bytes))
+                                                                                  (pair (option %expiry_key bytes) (map %internal_data string bytes)))
+                                                                            (pair (pair (nat %level) (address %owner)) (option %tzip12_token_id nat)))))
+                                                             (pair (big_map %reverse_records
+                                                                      address
+                                                                      (pair (pair (map %internal_data string bytes) (option %name bytes)) (address %owner)))
+                                                                   (big_map %tzip12_tokens nat bytes)))))))
+                                     (pair %store
+                                        (pair (pair (big_map %data bytes bytes) (big_map %expiry_map bytes timestamp))
+                                              (pair (big_map %metadata string bytes) (nat %next_tzip12_token_id)))
+                                        (pair (pair (address %owner)
+                                                    (big_map %records
+                                                       bytes
+                                                       (pair (pair (pair (option %address address) (map %data string bytes))
+                                                                   (pair (option %expiry_key bytes) (map %internal_data string bytes)))
+                                                             (pair (pair (nat %level) (address %owner)) (option %tzip12_token_id nat)))))
+                                              (pair (big_map %reverse_records
+                                                       address
+                                                       (pair (pair (map %internal_data string bytes) (option %name bytes)) (address %owner)))
+                                                    (big_map %tzip12_tokens nat bytes)))))
+                               (set %trusted_senders address))))
+                (pair %balance_of
+                   (list %requests (pair (address %owner) (nat %token_id)))
+                   (contract %callback
+                      (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance))))))
+            (or (pair %execute
+                   (string %action_name)
+                   (pair (bytes %payload) (address %original_sender)))
+                (list %transfer
+                   (pair (address %from_)
+                         (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))))
+        (list %update_operators
+           (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+               (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id)))))) ;
+  storage
+    (pair (pair (big_map %actions
+                   string
+                   (lambda
+                      (pair (pair bytes address)
+                            (pair (pair (pair (big_map %data bytes bytes) (big_map %expiry_map bytes timestamp))
+                                        (pair (big_map %metadata string bytes) (nat %next_tzip12_token_id)))
+                                  (pair (pair (address %owner)
+                                              (big_map %records
+                                                 bytes
+                                                 (pair (pair (pair (option %address address) (map %data string bytes))
+                                                             (pair (option %expiry_key bytes) (map %internal_data string bytes)))
+                                                       (pair (pair (nat %level) (address %owner)) (option %tzip12_token_id nat)))))
+                                        (pair (big_map %reverse_records
+                                                 address
+                                                 (pair (pair (map %internal_data string bytes) (option %name bytes)) (address %owner)))
+                                              (big_map %tzip12_tokens nat bytes)))))
+                      (pair (list operation)
+                            (pair (pair (pair (big_map %data bytes bytes) (big_map %expiry_map bytes timestamp))
+                                        (pair (big_map %metadata string bytes) (nat %next_tzip12_token_id)))
+                                  (pair (pair (address %owner)
+                                              (big_map %records
+                                                 bytes
+                                                 (pair (pair (pair (option %address address) (map %data string bytes))
+                                                             (pair (option %expiry_key bytes) (map %internal_data string bytes)))
+                                                       (pair (pair (nat %level) (address %owner)) (option %tzip12_token_id nat)))))
+                                        (pair (big_map %reverse_records
+                                                 address
+                                                 (pair (pair (map %internal_data string bytes) (option %name bytes)) (address %owner)))
+                                              (big_map %tzip12_tokens nat bytes)))))))
+                (pair %store
+                   (pair (pair (big_map %data bytes bytes) (big_map %expiry_map bytes timestamp))
+                         (pair (big_map %metadata string bytes) (nat %next_tzip12_token_id)))
+                   (pair (pair (address %owner)
+                               (big_map %records
+                                  bytes
+                                  (pair (pair (pair (option %address address) (map %data string bytes))
+                                              (pair (option %expiry_key bytes) (map %internal_data string bytes)))
+                                        (pair (pair (nat %level) (address %owner)) (option %tzip12_token_id nat)))))
+                         (pair (big_map %reverse_records
+                                  address
+                                  (pair (pair (map %internal_data string bytes) (option %name bytes)) (address %owner)))
+                               (big_map %tzip12_tokens nat bytes)))))
+          (set %trusted_senders address)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF { SWAP ; EXEC } { DROP 2 ; PUSH string "NOT_AUTHORIZED" ; FAILWITH } }
+                   { SWAP ;
+                     SENDER ;
+                     PAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     ADDRESS ;
+                     DIG 2 ;
+                     CAR ;
+                     PAIR ;
+                     PACK ;
+                     PUSH string "BalanceOf" ;
+                     DIG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     DIG 3 ;
+                     GET ;
+                     IF_NONE
+                       { DROP 3 ; PUSH string "UNKNOWN_ACTION" ; FAILWITH }
+                       { DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         DIG 2 ;
+                         DIG 4 ;
+                         PAIR ;
+                         PAIR ;
+                         EXEC ;
+                         UNPAIR ;
+                         DUP 3 ;
+                         CDR ;
+                         DIG 2 ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     SENDER ;
+                     MEM ;
+                     IF {} { PUSH string "NOT_TRUSTED_SENDER" ; FAILWITH } ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CDR ;
+                     PAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     DIG 2 ;
+                     CAR ;
+                     DIG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     DIG 3 ;
+                     GET ;
+                     IF_NONE
+                       { DROP 3 ; PUSH string "UNKNOWN_ACTION" ; FAILWITH }
+                       { DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         DIG 2 ;
+                         DIG 4 ;
+                         PAIR ;
+                         PAIR ;
+                         EXEC ;
+                         UNPAIR ;
+                         DUP 3 ;
+                         CDR ;
+                         DIG 2 ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } }
+                   { SWAP ;
+                     SENDER ;
+                     PAIR ;
+                     SWAP ;
+                     PACK ;
+                     PUSH string "Transfer" ;
+                     DIG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     DIG 3 ;
+                     GET ;
+                     IF_NONE
+                       { DROP 3 ; PUSH string "UNKNOWN_ACTION" ; FAILWITH }
+                       { DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         DIG 2 ;
+                         DIG 4 ;
+                         PAIR ;
+                         PAIR ;
+                         EXEC ;
+                         UNPAIR ;
+                         DUP 3 ;
+                         CDR ;
+                         DIG 2 ;
+                         DIG 3 ;
+                         CAR ;
+                         CAR ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR } } } }
+           { SWAP ;
+             SENDER ;
+             PAIR ;
+             SWAP ;
+             PACK ;
+             PUSH string "UpdateOperators" ;
+             DIG 2 ;
+             UNPAIR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             DIG 3 ;
+             GET ;
+             IF_NONE
+               { DROP 3 ; PUSH string "UNKNOWN_ACTION" ; FAILWITH }
+               { DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 DIG 2 ;
+                 DIG 4 ;
+                 PAIR ;
+                 PAIR ;
+                 EXEC ;
+                 UNPAIR ;
+                 DUP 3 ;
+                 CDR ;
+                 DIG 2 ;
+                 DIG 3 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } } } }

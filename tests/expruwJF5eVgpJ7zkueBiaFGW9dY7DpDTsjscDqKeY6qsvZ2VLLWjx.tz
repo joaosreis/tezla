@@ -1,0 +1,335 @@
+{ parameter
+    (or (or (or (pair %gameEntryHook (address %player) (list %guess nat)) (unit %nil))
+            (or (bytes %prophecyCallback)
+                (pair %resolveGame (list %sol_prophecy nat) (string %nonce_prophecy))))
+        (or (pair %setupContract
+               (address %oracle)
+               (pair (address %tezcas_contract) (set %owner address)))
+            (pair %setupGame
+               (timestamp %date_end)
+               (pair (bytes %prophecy)
+                     (pair (bytes %released_prophecy)
+                           (pair (bool %ended) (pair (nat %guess_min) (pair (nat %guess_max) (nat %guess_length))))))))) ;
+  storage
+    (pair (pair (pair %contract_infos
+                   (pair (address %oracle) (set %owner address))
+                   (address %tezcas_contract))
+                (pair %game_infos
+                   (pair (pair (timestamp %date_end) (bool %ended))
+                         (pair (nat %guess_length) (nat %guess_max)))
+                   (pair (pair (nat %guess_min) (bytes %prophecy)) (bytes %released_prophecy))))
+          (pair (big_map %games address (pair (list %guess nat) (address %player_addr)))
+                (set %players address))) ;
+  code { NIL operation ;
+         LAMBDA
+           (pair bool string)
+           unit
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             IF { FAILWITH } { DROP ; UNIT } } ;
+         DIG 2 ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { PUSH string "TZC_LOTO_CONTRACT_UNAUTHORIZED" ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     PAIR ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     PUSH string "TZC_LOTO_GAME_ENDED" ;
+                     PUSH bool True ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     COMPARE ;
+                     EQ ;
+                     PAIR ;
+                     DIG 3 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     MEM ;
+                     IF { PUSH string "TZC_LOTO_PLAYER_ALREADY_INGAME" ; FAILWITH }
+                        { SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CDR ;
+                          CDR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          CAR ;
+                          PUSH bool True ;
+                          SWAP ;
+                          UPDATE } ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CDR ;
+                     CDR ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     CDR ;
+                     CAR ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     CAR ;
+                     { DIP 4 { DUP } ; DIG 5 } ;
+                     CDR ;
+                     PAIR ;
+                     SOME ;
+                     DIG 4 ;
+                     CAR ;
+                     UPDATE ;
+                     PAIR ;
+                     DIG 2 ;
+                     CAR ;
+                     PAIR ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     PAIR ;
+                     SWAP ;
+                     CAR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { DROP ; SWAP ; DROP ; SWAP ; DROP ; NIL operation ; PAIR } }
+               { IF_LEFT
+                   { PUSH string "TZC_LOTO_NOT_OWNER" ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     MEM ;
+                     NOT ;
+                     PAIR ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     PUSH string "TZC_LOTO_ORACLE_NOT_AUTHORIZED" ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     PAIR ;
+                     DIG 3 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     DIG 2 ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     PAIR ;
+                     DIG 2 ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { PUSH string "TZC_GAME_NOT_ENDED" ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     NOW ;
+                     COMPARE ;
+                     LE ;
+                     NOT ;
+                     PAIR ;
+                     DIG 3 ;
+                     SWAP ;
+                     EXEC ;
+                     DROP ;
+                     DUP ;
+                     CDR ;
+                     PACK ;
+                     SWAP ;
+                     CAR ;
+                     NIL nat ;
+                     SWAP ;
+                     ITER { CONS } ;
+                     ITER { PACK ; CONCAT } ;
+                     DUP ;
+                     SHA256 ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { PUSH string "TZC_LOTO_WRONG_RESOLVER" ; FAILWITH } {} ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     SWAP ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     PAIR ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     PAIR ;
+                     DIG 2 ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } } }
+           { IF_LEFT
+               { PUSH string "TZC_LOTO_NOT_OWNER" ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 SENDER ;
+                 MEM ;
+                 NOT ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 DIG 2 ;
+                 CAR ;
+                 CDR ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 CDR ;
+                 CAR ;
+                 { DIP 3 { DUP } ; DIG 4 } ;
+                 CDR ;
+                 CDR ;
+                 DIG 4 ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { PUSH string "TZC_LOTO_NOT_OWNER" ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 SENDER ;
+                 MEM ;
+                 NOT ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 CDR ;
+                 CAR ;
+                 { DIP 3 { DUP } ; DIG 4 } ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 { DIP 2 { DUP } ; DIG 3 } ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 { DIP 3 { DUP } ; DIG 4 } ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 PAIR ;
+                 { DIP 3 { DUP } ; DIG 4 } ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 DIG 4 ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 PAIR ;
+                 DIG 2 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } } } }

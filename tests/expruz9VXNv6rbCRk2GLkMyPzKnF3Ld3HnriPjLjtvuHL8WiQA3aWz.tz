@@ -1,0 +1,12 @@
+{ parameter (pair (address %address) (string %caseno)) ;
+  storage (big_map string address) ;
+  code { UNPAIR ;
+         DUP ;
+         DUG 2 ;
+         CAR ;
+         SOME ;
+         DIG 2 ;
+         CDR ;
+         UPDATE ;
+         NIL operation ;
+         PAIR } }

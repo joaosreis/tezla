@@ -1,0 +1,14 @@
+{ storage (big_map string nat) ;
+  parameter (or (big_map %entry_point_1 string nat) (address %entry_point_2)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; DROP ; NIL operation }
+           { CONTRACT %entry_point_1 (big_map string nat) ;
+             IF_NONE { PUSH int 13 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DUP 4 ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

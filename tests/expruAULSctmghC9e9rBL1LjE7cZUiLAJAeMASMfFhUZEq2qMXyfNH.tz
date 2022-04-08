@@ -1,0 +1,78 @@
+{ parameter
+    (or (option %setDelegate key_hash)
+        (or (unit %default) (list %flush (pair nat address)))) ;
+  storage (pair (nat %totalBalance) (big_map %ledger address (pair nat nat))) ;
+  code { DUP ;
+         CAR ;
+         DIP { CDR } ;
+         IF_LEFT
+           { SENDER ;
+             PUSH address "tz1QS8VYYVDjv7iReBzXeheL6x63A1oATTj8" ;
+             COMPARE ;
+             EQ ;
+             IF { SET_DELEGATE ; NIL operation ; SWAP ; CONS } { FAILWITH } }
+           { IF_LEFT
+               { DROP ;
+                 DUP ;
+                 CAR ;
+                 DIP { CDR } ;
+                 BALANCE ;
+                 PUSH mutez 1 ;
+                 EDIV ;
+                 IF_NONE { FAILWITH } { CAR ; ADD ; PAIR ; NIL operation } }
+               { SWAP ;
+                 DUP ;
+                 CAR ;
+                 DIP { CDR } ;
+                 DUP ;
+                 DIP { PUSH nat 0 ;
+                       EDIV ;
+                       IF_NONE
+                         { UNIT ; FAILWITH }
+                         { CAR ;
+                           SWAP ;
+                           DIG 2 ;
+                           MAP { DUP ;
+                                 DUP ;
+                                 CAR ;
+                                 DIP { CDR } ;
+                                 PUSH mutez 1 ;
+                                 MUL ;
+                                 SWAP ;
+                                 CONTRACT unit ;
+                                 IF_NONE
+                                   { FAILWITH }
+                                   { SWAP ;
+                                     UNIT ;
+                                     TRANSFER_TOKENS ;
+                                     DIP { DUP ;
+                                           CAR ;
+                                           DIP { CDR } ;
+                                           SWAP ;
+                                           DUP ;
+                                           DIP { DIP { SWAP ; DUP } ;
+                                                 GET ;
+                                                 IF_NONE
+                                                   { UNIT ; FAILWITH }
+                                                   { DUP ;
+                                                     CAR ;
+                                                     DIP { CDR } ;
+                                                     DUP ;
+                                                     DIP { DIG 4 ;
+                                                           DUP ;
+                                                           DIP { MUL ;
+                                                                 SWAP ;
+                                                                 DIG 3 ;
+                                                                 ADD ;
+                                                                 DUP ;
+                                                                 DIP { COMPARE ; LE ; IF {} { UNIT ; FAILWITH } } } ;
+                                                           DUG 2 } ;
+                                                     PAIR ;
+                                                     SOME } } ;
+                                           UPDATE } } } ;
+                           DIG 2 ;
+                           DROP ;
+                           SWAP } } ;
+                 PAIR ;
+                 SWAP } } ;
+         PAIR } }

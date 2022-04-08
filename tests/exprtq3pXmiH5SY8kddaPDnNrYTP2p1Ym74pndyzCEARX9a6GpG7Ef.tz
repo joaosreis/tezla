@@ -1,0 +1,9 @@
+{ parameter (lambda unit address) ;
+  storage unit ;
+  code { UNPAIR ;
+         UNIT ;
+         EXEC ;
+         SELF_ADDRESS ;
+         { { COMPARE ; EQ ; IF {} { { UNIT ; FAILWITH } } } } ;
+         NIL operation ;
+         PAIR } }

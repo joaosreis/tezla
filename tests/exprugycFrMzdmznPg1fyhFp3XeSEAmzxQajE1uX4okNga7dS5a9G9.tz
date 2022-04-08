@@ -1,0 +1,3 @@
+{ parameter key_hash ;
+  storage nat ;
+  code { CAR ; VOTING_POWER ; NIL operation ; PAIR } }

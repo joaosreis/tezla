@@ -1,0 +1,704 @@
+{ parameter (or (unit %buildCreateAndPlay) (address %sendCreateAndPlay)) ;
+  storage (pair (address %administrator) (big_map %bytesScripts bytes bytes)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ;
+             UNPAIR ;
+             SWAP ;
+             LAMBDA
+               (pair (pair (map %balances address (pair (nat %balance) (nat %locked)))
+                           (pair %newSettlementTransaction
+                              (pair (nat %deliveryQuantity)
+                                    (pair (address %deliveryReceiverAccountNumber)
+                                          (address %deliverySenderAccountNumber)))
+                              (pair (nat %operationId) (pair (string %txHash) (nat %txId)))))
+                     (pair (map %operatorsAuthorizations address (set nat))
+                           (pair (address %sender)
+                                 (pair %settlementTransactionRepository
+                                    (map %operationTypeByOperationId nat nat)
+                                    (map %settlementTransactionById
+                                       nat
+                                       (pair (pair (nat %deliveryQuantity)
+                                                   (pair (address %deliveryReceiverAccountNumber)
+                                                         (address %deliverySenderAccountNumber)))
+                                             (pair (pair (nat %operationId) (nat %status)) (pair (string %txHash) (nat %txId)))))))))
+               (pair (map %newBalances address (pair (nat %balance) (nat %locked)))
+                     (pair %newSettlementRepository
+                        (map %operationTypeByOperationId nat nat)
+                        (map %settlementTransactionById
+                           nat
+                           (pair (pair (nat %deliveryQuantity)
+                                       (pair (address %deliveryReceiverAccountNumber)
+                                             (address %deliverySenderAccountNumber)))
+                                 (pair (pair (nat %operationId) (nat %status)) (pair (string %txHash) (nat %txId)))))))
+               { DUP ;
+                 GET 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 5 ;
+                 MEM ;
+                 IF {} { PUSH string "undefined operator" ; FAILWITH } ;
+                 DUP ;
+                 GET 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 5 ;
+                 GET ;
+                 { IF_NONE { PUSH int 12 ; FAILWITH } {} } ;
+                 PUSH nat 1 ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "only operator with registrar role can lock token" ; FAILWITH } ;
+                 DUP ;
+                 GET 6 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 DUP ;
+                 DUP 4 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 MEM ;
+                 IF {} { PUSH string "Attempt to lock empty balances" ; FAILWITH } ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 INT ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DUP 5 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 GET ;
+                 { IF_NONE { PUSH int 12 ; FAILWITH } {} } ;
+                 CDR ;
+                 DUP 3 ;
+                 DUP 6 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 GET ;
+                 { IF_NONE { PUSH int 11 ; FAILWITH } {} } ;
+                 CAR ;
+                 SUB ;
+                 COMPARE ;
+                 GE ;
+                 IF {}
+                    { PUSH string "Can not lock value : insufficient disposable balance" ;
+                      FAILWITH } ;
+                 DUP ;
+                 DUP ;
+                 DUP 5 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 18 ; FAILWITH } {} } ;
+                 CAR ;
+                 DUP 6 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 DIG 4 ;
+                 DUP 7 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 GET ;
+                 { IF_NONE { PUSH int 18 ; FAILWITH } {} } ;
+                 CDR ;
+                 ADD ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 DIG 3 ;
+                 DUP ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 5 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 PAIR %txHash %txId ;
+                 PUSH nat 2 ;
+                 DUP 6 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 PAIR %operationId %status ;
+                 PAIR ;
+                 DIG 4 ;
+                 DUP ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 6 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 PAIR %deliveryReceiverAccountNumber %deliverySenderAccountNumber ;
+                 DUP 6 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 PAIR %deliveryQuantity ;
+                 PAIR ;
+                 SOME ;
+                 DUP 5 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 UPDATE ;
+                 SWAP ;
+                 PUSH (option nat) (Some 1) ;
+                 DIG 4 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 CAR ;
+                 UPDATE ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR %newBalances %newSettlementRepository } ;
+             SOME ;
+             { IF_NONE { PUSH int 30 ; FAILWITH } {} } ;
+             PACK ;
+             SOME ;
+             PUSH string "callInitiateSubscription" ;
+             PACK ;
+             UPDATE ;
+             LAMBDA
+               (pair (pair (map %balances address (pair (nat %balance) (nat %locked)))
+                           (pair (map %operatorsAuthorizations address (set nat)) (address %owner)))
+                     (pair (address %sender)
+                           (pair (pair %settlementTransactionRepository
+                                    (map %operationTypeByOperationId nat nat)
+                                    (map %settlementTransactionById
+                                       nat
+                                       (pair (pair (nat %deliveryQuantity)
+                                                   (pair (address %deliveryReceiverAccountNumber)
+                                                         (address %deliverySenderAccountNumber)))
+                                             (pair (pair (nat %operationId) (nat %status)) (pair (string %txHash) (nat %txId))))))
+                                 (nat %txId))))
+               (pair (map %newBalances address (pair (nat %balance) (nat %locked)))
+                     (pair %newSettlementTransactionRepository
+                        (map %operationTypeByOperationId nat nat)
+                        (map %settlementTransactionById
+                           nat
+                           (pair (pair (nat %deliveryQuantity)
+                                       (pair (address %deliveryReceiverAccountNumber)
+                                             (address %deliverySenderAccountNumber)))
+                                 (pair (pair (nat %operationId) (nat %status)) (pair (string %txHash) (nat %txId)))))))
+               { DUP ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 MEM ;
+                 IF {} { PUSH string "undefined operator" ; FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 GET ;
+                 { IF_NONE { PUSH int 17 ; FAILWITH } {} } ;
+                 PUSH nat 2 ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "only operator with settler role can settle token" ; FAILWITH } ;
+                 DUP ;
+                 GET 5 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 DUP ;
+                 DUP 3 ;
+                 CDR ;
+                 DUP 5 ;
+                 GET 6 ;
+                 GET ;
+                 { IF_NONE { PUSH int 37 ; FAILWITH } {} } ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 MEM ;
+                 IF {}
+                    { PUSH (option (pair (nat %balance) (nat %locked))) (Some (Pair 0 0)) ;
+                      DUP 3 ;
+                      CDR ;
+                      DUP 5 ;
+                      GET 6 ;
+                      GET ;
+                      { IF_NONE { PUSH int 37 ; FAILWITH } {} } ;
+                      CAR ;
+                      CDR ;
+                      CAR ;
+                      UPDATE } ;
+                 DUP ;
+                 DUP 3 ;
+                 CDR ;
+                 DUP 5 ;
+                 GET 6 ;
+                 GET ;
+                 { IF_NONE { PUSH int 37 ; FAILWITH } {} } ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 44 ; FAILWITH } {} } ;
+                 UNPAIR ;
+                 DUP 5 ;
+                 CDR ;
+                 DUP 7 ;
+                 GET 6 ;
+                 GET ;
+                 { IF_NONE { PUSH int 39 ; FAILWITH } {} } ;
+                 CAR ;
+                 CAR ;
+                 ADD ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 DUP ;
+                 DUP ;
+                 DUP 5 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 45 ; FAILWITH } {} } ;
+                 CDR ;
+                 DUP 5 ;
+                 CDR ;
+                 DUP 7 ;
+                 GET 6 ;
+                 GET ;
+                 { IF_NONE { PUSH int 39 ; FAILWITH } {} } ;
+                 CAR ;
+                 CAR ;
+                 DIG 4 ;
+                 DUP 7 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 GET ;
+                 { IF_NONE { PUSH int 45 ; FAILWITH } {} } ;
+                 CAR ;
+                 SUB ;
+                 ISNAT ;
+                 { IF_NONE { PUSH int 45 ; FAILWITH } {} } ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 DUP ;
+                 DUP ;
+                 DUP 5 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 46 ; FAILWITH } {} } ;
+                 CAR ;
+                 DUP 5 ;
+                 CDR ;
+                 DUP 7 ;
+                 GET 6 ;
+                 GET ;
+                 { IF_NONE { PUSH int 39 ; FAILWITH } {} } ;
+                 CAR ;
+                 CAR ;
+                 DIG 4 ;
+                 DUP 7 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 GET ;
+                 { IF_NONE { PUSH int 46 ; FAILWITH } {} } ;
+                 CDR ;
+                 SUB ;
+                 ISNAT ;
+                 { IF_NONE { PUSH int 46 ; FAILWITH } {} } ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 DUP ;
+                 DIG 4 ;
+                 GET 6 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 47 ; FAILWITH } {} } ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 CAR ;
+                 PUSH nat 3 ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR %newBalances %newSettlementTransactionRepository } ;
+             SOME ;
+             { IF_NONE { PUSH int 35 ; FAILWITH } {} } ;
+             PACK ;
+             SOME ;
+             PUSH string "callConfirmPaymentReceived" ;
+             PACK ;
+             UPDATE ;
+             LAMBDA
+               (pair (pair (map %operatorsAuthorizations address (set nat)) (address %owner))
+                     (pair (address %sender)
+                           (pair (pair %settlementTransactionRepository
+                                    (map %operationTypeByOperationId nat nat)
+                                    (map %settlementTransactionById
+                                       nat
+                                       (pair (pair (nat %deliveryQuantity)
+                                                   (pair (address %deliveryReceiverAccountNumber)
+                                                         (address %deliverySenderAccountNumber)))
+                                             (pair (pair (nat %operationId) (nat %status)) (pair (string %txHash) (nat %txId))))))
+                                 (nat %txId))))
+               (pair (map %operationTypeByOperationId nat nat)
+                     (map %settlementTransactionById
+                        nat
+                        (pair (pair (nat %deliveryQuantity)
+                                    (pair (address %deliveryReceiverAccountNumber)
+                                          (address %deliverySenderAccountNumber)))
+                              (pair (pair (nat %operationId) (nat %status)) (pair (string %txHash) (nat %txId))))))
+               { DUP ;
+                 CAR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 MEM ;
+                 IF {} { PUSH string "undefined operator" ; FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 GET ;
+                 { IF_NONE { PUSH int 17 ; FAILWITH } {} } ;
+                 PUSH nat 2 ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "only operator with settler role can settle token" ; FAILWITH } ;
+                 DUP ;
+                 GET 5 ;
+                 DUP ;
+                 CDR ;
+                 PUSH nat 3 ;
+                 SWAP ;
+                 DUP 4 ;
+                 GET 6 ;
+                 GET ;
+                 { IF_NONE { PUSH int 17 ; FAILWITH } {} } ;
+                 CDR ;
+                 CAR ;
+                 CDR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Cash Not received" ; FAILWITH } ;
+                 UNPAIR ;
+                 SWAP ;
+                 DUP ;
+                 DIG 3 ;
+                 GET 6 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 75 ; FAILWITH } {} } ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 CAR ;
+                 PUSH nat 4 ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR } ;
+             SOME ;
+             { IF_NONE { PUSH int 40 ; FAILWITH } {} } ;
+             PACK ;
+             SOME ;
+             PUSH string "callConfirmPaymentTransferred" ;
+             PACK ;
+             UPDATE ;
+             LAMBDA
+               (pair (pair (address %_operator) (nat %_operatorRole))
+                     (pair (map %_operatorsAuthorizations address (set nat))
+                           (pair (address %_owner) (address %_sender))))
+               (map address (set nat))
+               { DUP ;
+                 GET 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 6 ;
+                 MEM ;
+                 IF {} { PUSH string "undefined operator" ; FAILWITH } ;
+                 DUP ;
+                 GET 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 6 ;
+                 GET ;
+                 { IF_NONE { PUSH int 12 ; FAILWITH } {} } ;
+                 PUSH nat 1 ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "only operator with registrar role can lock token" ; FAILWITH } ;
+                 DUP ;
+                 GET 3 ;
+                 DUP ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 MEM ;
+                 IF {} { PUSH (option (set nat)) (Some {}) ; DUP 3 ; CAR ; CAR ; UPDATE } ;
+                 DUP ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 GET ;
+                 { IF_NONE { PUSH int 23 ; FAILWITH } {} } ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 MEM ;
+                 IF {} { PUSH string "already authorized" ; FAILWITH } ;
+                 DUP ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 26 ; FAILWITH } {} } ;
+                 PUSH bool True ;
+                 DIG 4 ;
+                 CAR ;
+                 CDR ;
+                 UPDATE ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE } ;
+             SOME ;
+             { IF_NONE { PUSH int 45 ; FAILWITH } {} } ;
+             PACK ;
+             SOME ;
+             PUSH string "callAuthorizeOperator" ;
+             PACK ;
+             UPDATE ;
+             LAMBDA
+               (pair (pair (address %_operator) (nat %_operatorRole))
+                     (pair (map %_operatorsAuthorizations address (set nat))
+                           (pair (address %_owner) (address %_sender))))
+               (map address (set nat))
+               { DUP ;
+                 GET 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 6 ;
+                 MEM ;
+                 IF {} { PUSH string "undefined operator" ; FAILWITH } ;
+                 DUP ;
+                 GET 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 6 ;
+                 GET ;
+                 { IF_NONE { PUSH int 12 ; FAILWITH } {} } ;
+                 PUSH nat 1 ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "only operator with registrar role can lock token" ; FAILWITH } ;
+                 DUP ;
+                 GET 3 ;
+                 DUP ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 MEM ;
+                 IF {} { PUSH string "undefined operator" ; FAILWITH } ;
+                 DUP ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 GET ;
+                 { IF_NONE { PUSH int 43 ; FAILWITH } {} } ;
+                 DUP 3 ;
+                 CAR ;
+                 CDR ;
+                 MEM ;
+                 IF {} { PUSH string "undefined operator role" ; FAILWITH } ;
+                 DUP ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 46 ; FAILWITH } {} } ;
+                 PUSH bool False ;
+                 DIG 4 ;
+                 CAR ;
+                 CDR ;
+                 UPDATE ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE } ;
+             SOME ;
+             { IF_NONE { PUSH int 50 ; FAILWITH } {} } ;
+             PACK ;
+             SOME ;
+             PUSH string "callRevokeOperatorAuthorization" ;
+             PACK ;
+             UPDATE ;
+             SWAP ;
+             PAIR ;
+             NIL operation }
+           { CONTRACT %upgrade (map bytes bytes) ;
+             { IF_NONE { PUSH int 68 ; FAILWITH } {} } ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             EMPTY_MAP bytes bytes ;
+             DUP 5 ;
+             CDR ;
+             PUSH string "callInitiateSubscription" ;
+             PACK ;
+             GET ;
+             { IF_NONE { PUSH int 56 ; FAILWITH } {} } ;
+             SOME ;
+             PUSH string "callInitiateSubscription" ;
+             PACK ;
+             UPDATE ;
+             DUP 5 ;
+             CDR ;
+             PUSH string "callConfirmPaymentReceived" ;
+             PACK ;
+             GET ;
+             { IF_NONE { PUSH int 57 ; FAILWITH } {} } ;
+             SOME ;
+             PUSH string "callConfirmPaymentReceived" ;
+             PACK ;
+             UPDATE ;
+             DUP 5 ;
+             CDR ;
+             PUSH string "callConfirmPaymentTransferred" ;
+             PACK ;
+             GET ;
+             { IF_NONE { PUSH int 58 ; FAILWITH } {} } ;
+             SOME ;
+             PUSH string "callConfirmPaymentTransferred" ;
+             PACK ;
+             UPDATE ;
+             DUP 5 ;
+             CDR ;
+             PUSH string "callAuthorizeOperator" ;
+             PACK ;
+             GET ;
+             { IF_NONE { PUSH int 59 ; FAILWITH } {} } ;
+             SOME ;
+             PUSH string "callAuthorizeOperator" ;
+             PACK ;
+             UPDATE ;
+             DUP 5 ;
+             CDR ;
+             PUSH string "callRevokeOperatorAuthorization" ;
+             PACK ;
+             GET ;
+             { IF_NONE { PUSH int 60 ; FAILWITH } {} } ;
+             SOME ;
+             PUSH string "callRevokeOperatorAuthorization" ;
+             PACK ;
+             UPDATE ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

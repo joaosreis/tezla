@@ -1,0 +1,56 @@
+{ storage (pair (int %first) (pair (int %last) (map %saved int int))) ;
+  parameter (or (unit %pop) (int %push)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP ;
+             DUP ;
+             GET 3 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             COMPARE ;
+             LT ;
+             IF {}
+                { PUSH string "WrongCondition: self.data.first < self.data.last" ; FAILWITH } ;
+             DUP ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             NONE int ;
+             DIG 4 ;
+             CAR ;
+             UPDATE ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PUSH int 1 ;
+             ADD ;
+             PAIR }
+           { SWAP ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             PUSH int 1 ;
+             ADD ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             DUP ;
+             DUG 2 ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             DIG 3 ;
+             SOME ;
+             DIG 4 ;
+             GET 3 ;
+             UPDATE ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR } ;
+         NIL operation ;
+         PAIR } }

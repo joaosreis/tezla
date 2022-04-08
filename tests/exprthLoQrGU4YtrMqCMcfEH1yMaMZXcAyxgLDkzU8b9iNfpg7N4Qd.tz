@@ -1,0 +1,162 @@
+{ storage
+    (pair (pair (string %_name) (pair (string %_symbol) (int %_totalSupply)))
+          (pair (big_map %balance address int)
+                (pair (address %manager) (set %registrars address)))) ;
+  parameter
+    (or (or (address %add_registrar) (address %minning))
+        (or (address %remove_registrar)
+            (or (pair %set_admin (int %amount) (address %x))
+                (pair %transfer (address %_from) (pair (address %_to) (int %amount)))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 5 ;
+                 PACK ;
+                 SENDER ;
+                 PACK ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Unauthorized Action. You are not manager." ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 MEM ;
+                 IF { DROP ;
+                      PUSH bool True ;
+                      PACK ;
+                      PUSH bool False ;
+                      PACK ;
+                      COMPARE ;
+                      EQ ;
+                      IF {} { PUSH string "You have already signed" ; FAILWITH } }
+                    { SWAP ; DUP ; GET 3 ; PUSH (option int) (Some 0) ; DIG 3 ; UPDATE ; UPDATE 3 } }
+               { SWAP ;
+                 DUP ;
+                 GET 3 ;
+                 DUP ;
+                 DIG 3 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 40 ; FAILWITH } {} ;
+                 PUSH int 10 ;
+                 ADD ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 3 ;
+                 DUP ;
+                 GET 3 ;
+                 DUP ;
+                 SENDER ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 41 ; FAILWITH } {} ;
+                 PUSH int 10 ;
+                 SWAP ;
+                 SUB ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 UPDATE 3 } }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 5 ;
+                 PACK ;
+                 SENDER ;
+                 PACK ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "Unauthorized Action. You are not manager." ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 GET 3 ;
+                 NONE int ;
+                 DIG 3 ;
+                 UPDATE ;
+                 UPDATE 3 }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     PACK ;
+                     SENDER ;
+                     PACK ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "Unauthorized Action.You are not manager." ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     GET 3 ;
+                     DUP 3 ;
+                     CAR ;
+                     SOME ;
+                     DIG 3 ;
+                     CDR ;
+                     UPDATE ;
+                     UPDATE 3 }
+                   { DUP ;
+                     GET 4 ;
+                     DUP 3 ;
+                     GET 3 ;
+                     DUP 3 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 32 ; FAILWITH } {} ;
+                     COMPARE ;
+                     GE ;
+                     IF { SWAP ;
+                          DUP ;
+                          GET 3 ;
+                          DUP ;
+                          DUP 4 ;
+                          CAR ;
+                          DUP ;
+                          DUG 2 ;
+                          GET ;
+                          IF_NONE { PUSH int 33 ; FAILWITH } {} ;
+                          DUP 5 ;
+                          GET 4 ;
+                          SWAP ;
+                          SUB ;
+                          SOME ;
+                          SWAP ;
+                          UPDATE ;
+                          UPDATE 3 ;
+                          DUP ;
+                          GET 3 ;
+                          DUP ;
+                          DUP 4 ;
+                          GET 3 ;
+                          DUP ;
+                          DUG 2 ;
+                          GET ;
+                          IF_NONE { PUSH int 34 ; FAILWITH } {} ;
+                          DIG 4 ;
+                          GET 4 ;
+                          ADD ;
+                          SOME ;
+                          SWAP ;
+                          UPDATE ;
+                          UPDATE 3 }
+                        { DROP ;
+                          PUSH bool True ;
+                          PACK ;
+                          PUSH bool False ;
+                          PACK ;
+                          COMPARE ;
+                          EQ ;
+                          IF {} { PUSH timestamp "2021-05-03T13:43:19Z" ; FAILWITH } } } } } ;
+         NIL operation ;
+         PAIR } }

@@ -1,0 +1,10 @@
+{ parameter
+    (or (pair %auctionCreate
+           (pair (pair (mutez %b) (int %d)) (pair (mutez %r) (mutez %sb)))
+           (nat %t))
+        (pair %mint
+           (pair (nat %collection_id) (string %resource))
+           (pair (string %sett) (string %signature)))) ;
+  storage (pair (nat %current_auction_id) (nat %current_token_id)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT { DROP ; NIL operation ; PAIR } { DROP ; NIL operation ; PAIR } } }

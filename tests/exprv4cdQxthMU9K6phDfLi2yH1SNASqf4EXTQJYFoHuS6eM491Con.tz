@@ -1,0 +1,30 @@
+{ storage (pair (list %addresses address) (mutez %cap)) ;
+  parameter (or (unit %dummy) (address %send)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { PUSH string "Dummy function!" ; FAILWITH }
+           { SWAP ;
+             UNPAIR ;
+             DIG 2 ;
+             CONS ;
+             PAIR ;
+             DUP ;
+             CDR ;
+             BALANCE ;
+             COMPARE ;
+             GE ;
+             IF { DUP ;
+                  CAR ;
+                  NIL operation ;
+                  SWAP ;
+                  ITER { CONTRACT unit ;
+                         IF_NONE { PUSH int 12 ; FAILWITH } {} ;
+                         PUSH mutez 5000000 ;
+                         UNIT ;
+                         TRANSFER_TOKENS ;
+                         CONS } }
+                { NIL operation } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

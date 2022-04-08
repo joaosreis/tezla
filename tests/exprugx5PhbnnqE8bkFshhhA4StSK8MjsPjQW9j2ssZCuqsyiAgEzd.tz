@@ -1,0 +1,15 @@
+{ parameter unit ;
+  storage unit ;
+  code { CDR ;
+         PUSH address "KT1VaXCCcebhdvhJauFujLC4LVb53ZPjtSfL" ;
+         CONTRACT (ticket int) ;
+         { IF_NONE { PUSH string "no contract (call)" ; FAILWITH } {} } ;
+         PUSH mutez 0 ;
+         PUSH nat 0 ;
+         PUSH int 0 ;
+         TICKET ;
+         TRANSFER_TOKENS ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         PAIR } }

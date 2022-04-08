@@ -1,0 +1,18 @@
+{ parameter
+    (pair (pair %viewParam unit nat int) (contract %viewCallbackTo (ticket int))) ;
+  storage unit ;
+  code { CAST (pair (pair (pair unit nat int) (contract (ticket int))) unit) ;
+         UNPAIR ;
+         UNPAIR ;
+         DIP { DUP 2 } ;
+         SWAP ;
+         DROP ;
+         UNPAIR ;
+         DIP { UNPAIR ; SWAP ; TICKET } ;
+         DROP ;
+         DIP { AMOUNT } ;
+         TRANSFER_TOKENS ;
+         NIL operation ;
+         SWAP ;
+         CONS ;
+         PAIR } }

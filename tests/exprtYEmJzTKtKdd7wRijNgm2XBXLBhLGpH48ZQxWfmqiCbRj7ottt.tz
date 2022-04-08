@@ -1,0 +1,87 @@
+{ parameter
+    (or (pair %register (pair (int %age) (string %date)) (pair (string %gender) (string %name)))
+        (pair %registerdoc (address %address) (string %doc))) ;
+  storage
+    (pair (pair (int %age) (big_map %cont string (list address)))
+          (pair (string %date) (pair (string %gender) (string %name)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             CAR ;
+             DUP 4 ;
+             GET 4 ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             CDR ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             SWAP ;
+             GET 4 ;
+             DUP 3 ;
+             GET 3 ;
+             PAIR ;
+             DIG 2 ;
+             CAR ;
+             CDR ;
+             PAIR ;
+             SWAP ;
+             PAIR }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CDR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             MEM ;
+             IF { SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  UNPAIR ;
+                  UNPAIR ;
+                  SWAP ;
+                  DIG 4 ;
+                  CAR ;
+                  CDR ;
+                  DUP 5 ;
+                  CDR ;
+                  GET ;
+                  { IF_NONE { PUSH int 19 ; FAILWITH } {} } ;
+                  DUP 5 ;
+                  CAR ;
+                  CONS ;
+                  SOME ;
+                  DIG 4 ;
+                  CDR ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR }
+                { SWAP ;
+                  UNPAIR ;
+                  UNPAIR ;
+                  SWAP ;
+                  NIL address ;
+                  DUP 5 ;
+                  CAR ;
+                  CONS ;
+                  SOME ;
+                  DIG 4 ;
+                  CDR ;
+                  UPDATE ;
+                  SWAP ;
+                  PAIR ;
+                  PAIR } } ;
+         NIL operation ;
+         PAIR } }

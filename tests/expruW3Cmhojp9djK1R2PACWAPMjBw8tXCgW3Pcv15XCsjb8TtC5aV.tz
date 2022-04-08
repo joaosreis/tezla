@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (unit :storage) ;
+  code { DROP ; UNIT ; PUSH string "TestUnitArg" ; PAIR ; FAILWITH } }

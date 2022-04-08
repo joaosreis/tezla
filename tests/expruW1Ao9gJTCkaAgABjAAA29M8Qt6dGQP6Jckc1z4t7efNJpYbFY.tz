@@ -1,0 +1,42 @@
+{ parameter (pair (address %spender) (nat %value)) ;
+  storage
+    (pair (big_map %ledger address (pair (map %allowances address nat) (nat %balance)))
+          (nat %totalSupply)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         NEQ ;
+         IF { PUSH string "This contract do not accept token" ; FAILWITH } {} ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         DUP ;
+         PUSH address "tz1i8Pqqi6xqRFxG7SgZXETX4r8DNrKQWx1S" ;
+         COMPARE ;
+         EQ ;
+         IF { DROP 2 }
+            { { DIP 2 { DUP } ; DIG 3 } ;
+              CAR ;
+              PUSH address "tz1i8Pqqi6xqRFxG7SgZXETX4r8DNrKQWx1S" ;
+              GET ;
+              IF_NONE { PUSH string "MAP FIND" ; FAILWITH } {} ;
+              { DIP 3 { DUP } ; DIG 4 } ;
+              CDR ;
+              DIG 4 ;
+              CAR ;
+              { DIP 2 { DUP } ; DIG 3 } ;
+              CDR ;
+              DIG 3 ;
+              CAR ;
+              DIG 5 ;
+              DIG 5 ;
+              SWAP ;
+              SOME ;
+              SWAP ;
+              UPDATE ;
+              PAIR ;
+              SOME ;
+              PUSH address "tz1i8Pqqi6xqRFxG7SgZXETX4r8DNrKQWx1S" ;
+              UPDATE ;
+              PAIR } ;
+         NIL operation ;
+         PAIR } }

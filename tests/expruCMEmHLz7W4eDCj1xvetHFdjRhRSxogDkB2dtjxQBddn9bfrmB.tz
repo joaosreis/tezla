@@ -1,0 +1,3 @@
+{ storage string ;
+  parameter (unit %ep) ;
+  code { DROP ; PUSH string "Hello World" ; NIL operation ; PAIR } }

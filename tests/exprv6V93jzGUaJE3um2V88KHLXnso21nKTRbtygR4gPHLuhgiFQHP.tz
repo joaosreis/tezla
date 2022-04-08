@@ -1,0 +1,8 @@
+{ storage (pair (lambda %logic bytes nat) (nat %value)) ;
+  parameter (or (bytes %calc) (lambda %updateLogic bytes nat)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; DUP ; CAR ; SWAP ; CAR ; DIG 2 ; EXEC ; SWAP ; PAIR }
+           { SWAP ; CDR ; SWAP ; PAIR } ;
+         NIL operation ;
+         PAIR } }

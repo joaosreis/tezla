@@ -1,0 +1,11 @@
+{ storage
+    (pair (pair (map %bets address (pair (mutez %amount) (string %entry)))
+                (list %entries string))
+          (pair (string %name) (string %winner))) ;
+  parameter (or (pair %bet (mutez %amount) (string %entry)) (string %setWinner)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ; UNPAIR ; UNPAIR ; DIG 3 ; SOME ; SENDER ; UPDATE ; PAIR ; PAIR }
+           { SWAP ; UNPAIR ; SWAP ; CAR ; DIG 2 ; SWAP ; PAIR ; SWAP ; PAIR } ;
+         NIL operation ;
+         PAIR } }

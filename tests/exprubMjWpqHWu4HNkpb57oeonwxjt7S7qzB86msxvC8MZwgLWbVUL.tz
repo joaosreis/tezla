@@ -1,0 +1,11 @@
+{ storage (pair (big_map %metada string bytes) (int %x)) ;
+  parameter unit ;
+  code { CDR ;
+         UNPAIR ;
+         SWAP ;
+         PUSH int 1 ;
+         ADD ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

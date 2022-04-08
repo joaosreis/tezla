@@ -1,0 +1,24 @@
+{ parameter (or (or (int %setAge) (pair %setAll string int)) (string %setName)) ;
+  storage (pair (int %age) (string %name)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ; CDR ; SWAP ; PAIR ; NIL operation ; PAIR }
+               { DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 SWAP ;
+                 CDR ;
+                 SWAP ;
+                 CDR ;
+                 SWAP ;
+                 PAIR ;
+                 NIL operation ;
+                 PAIR } }
+           { SWAP ; CAR ; PAIR ; NIL operation ; PAIR } } }

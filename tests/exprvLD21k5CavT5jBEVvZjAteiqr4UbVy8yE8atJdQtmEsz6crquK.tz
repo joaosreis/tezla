@@ -1,0 +1,25 @@
+{ storage (map string int) ;
+  parameter string ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         MEM ;
+         IF { SWAP ;
+              DUP ;
+              DIG 2 ;
+              DUP ;
+              DUG 2 ;
+              GET ;
+              IF_NONE { PUSH int 9 ; FAILWITH } {} ;
+              PUSH int 1 ;
+              ADD ;
+              SOME ;
+              SWAP ;
+              UPDATE }
+            { SWAP ; PUSH (option int) (Some 1) ; DIG 2 ; UPDATE } ;
+         NIL operation ;
+         PAIR } }

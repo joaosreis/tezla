@@ -1,0 +1,149 @@
+{ storage (map string (pair (mutez %balance) (pair (string %name) (nat %phoneNumber)))) ;
+  parameter
+    (or (or (pair %addCustomer
+               (pair (mutez %balance) (string %id))
+               (pair (string %name) (nat %phoneNumber)))
+            (string %removeCustomer))
+        (or (pair %transfer (mutez %amount) (pair (string %idFrom) (string %idTo)))
+            (pair %updateBalance (mutez %amount) (string %id)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DUP ;
+                 CAR ;
+                 CDR ;
+                 PUSH string "" ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {} { PUSH string "WrongCondition: params.id != ''" ; FAILWITH } ;
+                 DUP ;
+                 GET 3 ;
+                 PUSH string "" ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {} { PUSH string "WrongCondition: params.name != ''" ; FAILWITH } ;
+                 DUP ;
+                 GET 4 ;
+                 PUSH nat 0 ;
+                 COMPARE ;
+                 LT ;
+                 IF {} { PUSH string "WrongCondition: params.phoneNumber > 0" ; FAILWITH } ;
+                 DUP ;
+                 GET 4 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 3 ;
+                 GET 3 ;
+                 PAIR %name %phoneNumber ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 PAIR %balance ;
+                 SOME ;
+                 DIG 2 ;
+                 CAR ;
+                 CDR ;
+                 UPDATE }
+               { DUP ;
+                 PUSH string "" ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {} { PUSH string "WrongCondition: params.id != ''" ; FAILWITH } ;
+                 SWAP ;
+                 NONE (pair (mutez %balance) (pair (string %name) (nat %phoneNumber))) ;
+                 DIG 2 ;
+                 UPDATE } }
+           { IF_LEFT
+               { DUP ;
+                 GET 3 ;
+                 PUSH string "" ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {} { PUSH string "WrongCondition: params.idFrom != ''" ; FAILWITH } ;
+                 DUP ;
+                 GET 4 ;
+                 PUSH string "" ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {} { PUSH string "WrongCondition: params.idTo != ''" ; FAILWITH } ;
+                 DUP ;
+                 CAR ;
+                 PUSH mutez 0 ;
+                 COMPARE ;
+                 LT ;
+                 IF {} { PUSH string "WrongCondition: params.amount > sp.tez(0)" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 GET ;
+                 IF_NONE { PUSH int 51 ; FAILWITH } {} ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 COMPARE ;
+                 LE ;
+                 IF {}
+                    { PUSH string
+                           "WrongCondition: params.amount <= self.data.customers[params.idFrom].balance" ;
+                      FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUP 3 ;
+                 GET 3 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 56 ; FAILWITH } {} ;
+                 UNPAIR ;
+                 DUP 5 ;
+                 CAR ;
+                 SWAP ;
+                 SUB ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE ;
+                 DUP ;
+                 DUP 3 ;
+                 GET 4 ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 57 ; FAILWITH } {} ;
+                 UNPAIR ;
+                 DIG 4 ;
+                 CAR ;
+                 ADD ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE }
+               { DUP ;
+                 CDR ;
+                 PUSH string "" ;
+                 COMPARE ;
+                 NEQ ;
+                 IF {} { PUSH string "WrongCondition: params.id != ''" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUP 3 ;
+                 CDR ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE { PUSH int 41 ; FAILWITH } {} ;
+                 CDR ;
+                 DIG 3 ;
+                 CAR ;
+                 PAIR ;
+                 SOME ;
+                 SWAP ;
+                 UPDATE } } ;
+         NIL operation ;
+         PAIR } }

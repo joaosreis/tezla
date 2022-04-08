@@ -1,0 +1,93 @@
+{ storage
+    (pair (pair (address %address) (address %hosp))
+          (pair (int %hospReqQ) (int %vaccineCount))) ;
+  parameter
+    (or (or (int %hospReq) (int %incCount))
+        (or (pair %transferHosp (address %address) (int %amtVaccine))
+            (pair %vaccReq (address %address) (int %amtVaccine)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 UNPAIR ;
+                 CAR ;
+                 SENDER ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 CDR ;
+                 DIG 2 ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 DIG 3 ;
+                 ADD ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } ;
+             NIL operation }
+           { IF_LEFT
+               { DUP ;
+                 CAR ;
+                 CONTRACT %processRequest int ;
+                 IF_NONE { PUSH int 23 ; FAILWITH } {} ;
+                 NIL operation ;
+                 SWAP ;
+                 PUSH mutez 0 ;
+                 DUP 4 ;
+                 CDR ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIG 2 ;
+                 UNPAIR ;
+                 SWAP ;
+                 UNPAIR ;
+                 SWAP ;
+                 DUP 5 ;
+                 CDR ;
+                 SWAP ;
+                 SUB ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CDR ;
+                 DIG 2 ;
+                 CAR ;
+                 COMPARE ;
+                 EQ ;
+                 IF { SWAP ;
+                      UNPAIR ;
+                      CAR ;
+                      PUSH address "KT1RcyuZeu6RcoeWDAUSVgUkrReWE2JrNMZh" ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP ;
+                      CDR ;
+                      PUSH int 0 ;
+                      PAIR ;
+                      SWAP ;
+                      PAIR ;
+                      SWAP }
+                    {} }
+               { DUP ;
+                 CAR ;
+                 CONTRACT %stateReq int ;
+                 IF_NONE { PUSH int 18 ; FAILWITH } {} ;
+                 NIL operation ;
+                 SWAP ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 CDR ;
+                 TRANSFER_TOKENS ;
+                 CONS } } ;
+         PAIR } }

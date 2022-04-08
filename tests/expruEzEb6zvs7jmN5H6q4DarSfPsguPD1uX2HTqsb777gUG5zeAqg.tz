@@ -1,0 +1,248 @@
+{ parameter
+    (or (or (address %playGame)
+            (list %transferPlayGameCallback
+               (pair (address %from_)
+                     (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))
+        (or (address %updateFA2Contract)
+            (list %updateGames
+               (or (pair %add_game
+                      (address %game_address)
+                      (pair %game_instance (pair (bool %enabled) (nat %entry_price)) (bool %staged)))
+                   (or (pair %remove_game
+                          (address %game_address)
+                          (pair %game_instance (pair (bool %enabled) (nat %entry_price)) (bool %staged)))
+                       (pair %upd_game
+                          (address %game_address)
+                          (pair %game_instance (pair (bool %enabled) (nat %entry_price)) (bool %staged)))))))) ;
+  storage
+    (pair (pair (address %colateral)
+                (big_map %games_instances
+                   address
+                   (pair (pair (bool %enabled) (nat %entry_price)) (bool %staged))))
+          (pair (address %main_contract) (set %owner address))) ;
+  code { NIL operation ;
+         SELF_ADDRESS ;
+         LAMBDA
+           (pair address (big_map address (pair (pair bool nat) bool)))
+           unit
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             MEM ;
+             IF { PUSH string "GAME_EXIST" ; FAILWITH } { UNIT } } ;
+         LAMBDA
+           (pair (pair address (big_map address (pair (pair bool nat) bool)))
+                 (pair address (set address)))
+           unit
+           { CDR ;
+             CDR ;
+             SENDER ;
+             MEM ;
+             IF { PUSH string "NOT_OWNER" ; FAILWITH } { UNIT } } ;
+         DIG 4 ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         PUSH string "XTZ_RECEIVED" ;
+         PUSH mutez 0 ;
+         AMOUNT ;
+         COMPARE ;
+         NEQ ;
+         IF { FAILWITH } { DROP } ;
+         IF_LEFT
+           { DIG 2 ;
+             DROP ;
+             DIG 2 ;
+             DROP ;
+             DIG 3 ;
+             DROP ;
+             IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 SWAP ;
+                 PUSH bool False ;
+                 PUSH nat 0 ;
+                 PUSH bool False ;
+                 PAIR ;
+                 PAIR ;
+                 DUG 2 ;
+                 GET ;
+                 IF_NONE
+                   { PUSH string "GAME_NOT_EXIST" ; FAILWITH }
+                   { DUP ;
+                     CAR ;
+                     CAR ;
+                     NOT ;
+                     IF { DROP ; PUSH string "GAME_DISABLED" ; FAILWITH } { SWAP ; DROP } } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CAR ;
+                 CONTRACT %hooks
+                   (pair (list %requests
+                            (pair (address %from_)
+                                  (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+                         (contract %callback
+                            (list (pair (address %from_)
+                                        (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))) ;
+                 IF_NONE { PUSH string "TEZCAS_CONTRACT_NOT_FOUND" ; FAILWITH } {} ;
+                 DIG 3 ;
+                 CONTRACT %transferplaygamecallback
+                   (list (pair (address %from_)
+                               (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+                 IF_NONE
+                   { PUSH string "TEZCAS_CONTRACT_SELF_TRANSFERCALLBACK_NOT_FOUND" ; FAILWITH }
+                   {} ;
+                 SWAP ;
+                 PUSH mutez 0 ;
+                 DIG 2 ;
+                 NIL (pair address (list (pair address (pair nat nat)))) ;
+                 NIL (pair address (pair nat nat)) ;
+                 DIG 5 ;
+                 CAR ;
+                 CDR ;
+                 PUSH nat 0 ;
+                 PAIR ;
+                 { DIP 6 { DUP } ; DIG 7 } ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 CONS ;
+                 SENDER ;
+                 PAIR ;
+                 CONS ;
+                 PAIR ;
+                 TRANSFER_TOKENS ;
+                 SWAP ;
+                 NIL operation ;
+                 DIG 2 ;
+                 CONS ;
+                 PAIR }
+               { DIG 2 ;
+                 DROP ;
+                 PUSH nat 10 ;
+                 SWAP ;
+                 SIZE ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { PUSH string "Welcome to TEZCASCALLBACK" ; FAILWITH } {} ;
+                 NIL operation ;
+                 PAIR } }
+           { DIG 4 ;
+             DROP ;
+             IF_LEFT
+               { DIG 3 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR }
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 SWAP ;
+                 ITER { IF_LEFT
+                          { SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            SWAP ;
+                            DUP ;
+                            DUG 2 ;
+                            CAR ;
+                            MEM ;
+                            NOT ;
+                            IF { PUSH string "GAME_NOT_EXIST" ; FAILWITH } {} ;
+                            DUP ;
+                            DUG 2 ;
+                            CDR ;
+                            CDR ;
+                            { DIP 2 { DUP } ; DIG 3 } ;
+                            CDR ;
+                            CAR ;
+                            CDR ;
+                            { DIP 3 { DUP } ; DIG 4 } ;
+                            CDR ;
+                            CAR ;
+                            CAR ;
+                            PAIR ;
+                            PAIR ;
+                            DIG 2 ;
+                            CAR ;
+                            SWAP ;
+                            SOME ;
+                            SWAP ;
+                            UPDATE }
+                          { IF_LEFT
+                              { SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                CAR ;
+                                PAIR ;
+                                { DIP 4 { DUP } ; DIG 5 } ;
+                                SWAP ;
+                                EXEC ;
+                                DROP ;
+                                CAR ;
+                                NONE (pair (pair bool nat) bool) ;
+                                SWAP ;
+                                UPDATE }
+                              { SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                SWAP ;
+                                DUP ;
+                                DUG 2 ;
+                                CAR ;
+                                PAIR ;
+                                { DIP 4 { DUP } ; DIG 5 } ;
+                                SWAP ;
+                                EXEC ;
+                                DROP ;
+                                DUP ;
+                                DUG 2 ;
+                                CDR ;
+                                SOME ;
+                                DIG 2 ;
+                                CAR ;
+                                UPDATE } } } ;
+                 DIG 2 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 SWAP ;
+                 DIG 2 ;
+                 CAR ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR } } } }

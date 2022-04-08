@@ -1,0 +1,30 @@
+{ storage (pair (map %certified address string) (address %certifier)) ;
+  parameter (pair (address %address) (string %name)) ;
+  code { DUP ;
+         CAR ;
+         SWAP ;
+         CDR ;
+         DUP ;
+         DUG 2 ;
+         CDR ;
+         SENDER ;
+         COMPARE ;
+         EQ ;
+         IF {}
+            { PUSH string "WrongCondition: sp.sender == self.data.certifier" ; FAILWITH } ;
+         SWAP ;
+         DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         DIG 2 ;
+         DUP ;
+         DUG 3 ;
+         CDR ;
+         SOME ;
+         DIG 3 ;
+         CAR ;
+         UPDATE ;
+         PAIR ;
+         NIL operation ;
+         PAIR } }

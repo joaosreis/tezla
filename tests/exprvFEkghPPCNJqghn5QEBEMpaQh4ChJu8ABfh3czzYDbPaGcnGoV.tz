@@ -1,3 +1,0 @@
-{ parameter key_hash ;
-  storage key_hash ;
-  code { CAR ; NIL operation ; PAIR } }

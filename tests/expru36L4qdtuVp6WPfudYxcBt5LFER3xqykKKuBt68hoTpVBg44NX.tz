@@ -1,0 +1,20 @@
+{ storage
+    (pair (address %FA12contract)
+          (pair (big_map %frozen_accounts address timestamp) (address %reserve))) ;
+  parameter nat ;
+  code { UNPAIR ;
+         NIL operation ;
+         DUP 3 ;
+         CAR ;
+         CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+         IF_NONE { PUSH int 18 ; FAILWITH } {} ;
+         PUSH mutez 0 ;
+         DIG 3 ;
+         SENDER ;
+         PAIR %to %value ;
+         DUP 5 ;
+         GET 4 ;
+         PAIR %from ;
+         TRANSFER_TOKENS ;
+         CONS ;
+         PAIR } }

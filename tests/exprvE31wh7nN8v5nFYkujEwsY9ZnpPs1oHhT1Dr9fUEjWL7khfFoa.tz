@@ -1,0 +1,22 @@
+{ parameter unit ;
+  storage address ;
+  code { DROP ;
+         NIL operation ;
+         EMPTY_BIG_MAP string bytes ;
+         EMPTY_BIG_MAP (pair address nat) nat ;
+         PAIR ;
+         PUSH (pair address (map string bytes))
+              (Pair "tz1QozfhaUW4wLnohDo6yiBUmh7cPCSXE9Af" {}) ;
+         PAIR ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         CREATE_CONTRACT
+           { parameter unit ;
+             storage
+               (pair (pair (address %admin) (map %extra string bytes))
+                     (pair (big_map %ledger (pair address nat) nat) (big_map %metadata string bytes))) ;
+             code { PUSH string "ERROR_TEST" ; FAILWITH } } ;
+         SWAP ;
+         DIP { CONS } ;
+         SWAP ;
+         PAIR } }

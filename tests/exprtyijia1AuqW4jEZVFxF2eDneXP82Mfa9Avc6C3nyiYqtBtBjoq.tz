@@ -1,0 +1,19 @@
+{ storage int ;
+  parameter
+    (or (int %process_request)
+        (pair %request_crops_from_supplier (address %address) (int %quantity))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { ADD ; NIL operation }
+           { DUP ;
+             CAR ;
+             CONTRACT %customer_Requirement int ;
+             IF_NONE { PUSH int 9 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             CDR ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

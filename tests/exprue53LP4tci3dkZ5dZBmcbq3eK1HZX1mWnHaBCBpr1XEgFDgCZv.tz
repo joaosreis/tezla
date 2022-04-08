@@ -1,0 +1,121 @@
+{ storage
+    (pair (pair (int %r) (pair %s (int %x) (int %y)))
+          (pair (or %x (or (int %A) (int %B)) (or (int %C) (pair %Toto (int %x) (int %y))))
+                (pair (option %y int) (or %z (int %Left) (int %Right))))) ;
+  parameter
+    (or (or (or (unit %ep1) (unit %ep3)) (or (unit %ep4) (unit %ep5)))
+        (or (or (unit %ep6)
+                (or %ep7 (or (int %A) (int %B)) (or (int %C) (pair %Toto (int %x) (int %y)))))
+            (or (pair %ep8
+                   (or %x (or (int %A) (int %B)) (or (int %C) (pair %Toto (int %x) (int %y))))
+                   (int %y))
+                (or (pair %ep9
+                       (int %other)
+                       (or %z (or (int %A) (int %B)) (or (int %C) (pair %Toto (int %x) (int %y)))))
+                    (unit %options))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DROP ;
+                     DUP ;
+                     GET 3 ;
+                     IF_LEFT
+                       { IF_LEFT
+                           { SWAP ;
+                             PUSH (or (or int int) (or int (pair int int))) (Left (Right -2)) ;
+                             UPDATE 3 ;
+                             UNPAIR ;
+                             CDR ;
+                             DIG 2 ;
+                             PAIR ;
+                             PAIR }
+                           { DROP } }
+                       { DROP } ;
+                     PUSH (or (or int int) (or int (pair int int))) (Right (Left 3)) ;
+                     UPDATE 3 }
+                   { DROP ;
+                     DUP ;
+                     GET 6 ;
+                     IF_LEFT { SWAP ; UNPAIR ; CDR ; DIG 2 ; PAIR ; PAIR } { DROP } } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     IF_LEFT
+                       { IF_LEFT
+                           { DUP 3 ;
+                             GET 6 ;
+                             IF_LEFT
+                               { DROP 3 }
+                               { DIG 2 ; DROP ; DIG 2 ; UNPAIR ; CDR ; DIG 2 ; DIG 3 ; ADD ; PAIR ; PAIR } }
+                           { DROP 2 } }
+                       { DROP 2 } }
+                   { DROP ;
+                     DUP ;
+                     GET 3 ;
+                     IF_LEFT
+                       { DROP ; PUSH bool False }
+                       { IF_LEFT { DROP ; PUSH bool False } { DROP ; PUSH bool True } } ;
+                     IF { UNPAIR ; CDR ; PUSH int 42 ; PAIR ; PAIR } {} } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     CAR ;
+                     DUP 4 ;
+                     GET 3 ;
+                     IF_LEFT
+                       { IF_LEFT
+                           { PUSH string "no toto" ; FAILWITH }
+                           { PUSH string "no toto" ; FAILWITH } }
+                       { DIG 3 ;
+                         DROP ;
+                         DIG 3 ;
+                         DROP ;
+                         IF_LEFT { PUSH string "no toto" ; FAILWITH } {} } ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR }
+                   { UPDATE 3 } }
+               { IF_LEFT
+                   { DUP ;
+                     CAR ;
+                     IF_LEFT
+                       { IF_LEFT
+                           { DROP ; CAR ; UPDATE 3 }
+                           { SWAP ; CDR ; SWAP ; PUSH int 12 ; ADD ; ADD ; SOME ; UPDATE 5 } }
+                       { DROP 2 } }
+                   { IF_LEFT
+                       { DUP ;
+                         CDR ;
+                         IF_LEFT { IF_LEFT { DROP ; CDR ; UPDATE 3 } { DROP 2 } } { DROP 2 } }
+                       { DROP ;
+                         DUP ;
+                         GET 5 ;
+                         IF_NONE
+                           { UNPAIR ;
+                             CDR ;
+                             PUSH int 3 ;
+                             PAIR ;
+                             PAIR ;
+                             PUSH (option int) (Some 12) ;
+                             UPDATE 5 }
+                           { DROP ;
+                             DUP ;
+                             UNPAIR ;
+                             CDR ;
+                             DIG 2 ;
+                             GET 5 ;
+                             IF_NONE { PUSH string "Not a some!" ; FAILWITH } {} ;
+                             PUSH int 44 ;
+                             ADD ;
+                             PAIR ;
+                             PAIR ;
+                             NONE int ;
+                             UPDATE 5 } } } } } ;
+         NIL operation ;
+         PAIR } }

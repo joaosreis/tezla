@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (big_map (pair int int int int int int) unit) ;
+  code { { UNIT ; FAILWITH } } }

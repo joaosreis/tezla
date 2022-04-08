@@ -1,0 +1,19 @@
+{ storage int ;
+  parameter unit ;
+  code { CDR ;
+         PUSH int 1 ;
+         ADD ;
+         DUP ;
+         PUSH int 5 ;
+         COMPARE ;
+         GT ;
+         IF { NIL operation ;
+              SELF_ADDRESS ;
+              CONTRACT unit ;
+              IF_NONE { PUSH int 11 ; FAILWITH } {} ;
+              PUSH mutez 0 ;
+              UNIT ;
+              TRANSFER_TOKENS ;
+              CONS }
+            { NIL operation } ;
+         PAIR } }

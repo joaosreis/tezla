@@ -1,0 +1,19 @@
+{ storage int ;
+  parameter unit ;
+  code { DROP ;
+         PUSH int 0 ;
+         PUSH int 1 ;
+         PUSH bool True ;
+         LOOP { DUP ;
+                DIG 2 ;
+                ADD ;
+                SWAP ;
+                PUSH int 1 ;
+                ADD ;
+                DUP ;
+                PUSH int 10000 ;
+                COMPARE ;
+                GT } ;
+         DROP ;
+         NIL operation ;
+         PAIR } }

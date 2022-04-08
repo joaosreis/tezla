@@ -1,0 +1,431 @@
+{ parameter
+    (or (or (or (pair %balance_of
+                   (list %requests (pair (address %owner) (nat %token_id)))
+                   (contract %callback
+                      (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                (pair %get_reserves (contract %receiver (pair nat nat)) (nat %token_id)))
+            (or (pair %setDexFunction
+                   (lambda %func
+                      (pair (pair (or (or (pair %divestLiquidity
+                                             (pair %pair (address %token_a_address) (address %token_b_address))
+                                             (pair (nat %min_token_a_out) (pair (nat %min_token_b_out) (nat %shares))))
+                                          (pair %initializeExchange
+                                             (pair %pair (address %token_a_address) (address %token_b_address))
+                                             (pair (nat %token_a_in) (nat %token_b_in))))
+                                      (or (pair %investLiquidity
+                                             (pair %pair (address %token_a_address) (address %token_b_address))
+                                             (pair (nat %token_a_in) (pair (nat %token_b_in) (nat %shares))))
+                                          (pair %tokenToTokenPayment
+                                             (pair %pair (address %token_a_address) (address %token_b_address))
+                                             (pair (or %operation (unit %buy) (unit %sell))
+                                                   (pair (nat %amount_in) (pair (nat %min_amount_out) (address %receiver)))))))
+                                  (pair (pair (pair (big_map %ledger (pair address nat) (pair (set %allowances address) (nat %balance)))
+                                                    (big_map %pairs
+                                                       nat
+                                                       (pair (pair (nat %token_a_pool) (nat %token_b_pool)) (nat %total_supply))))
+                                              (pair (nat %pairs_count) (big_map %token_to_id bytes nat)))
+                                        (big_map %tokens nat (pair (address %token_a_address) (address %token_b_address)))))
+                            address)
+                      (pair (list operation)
+                            (pair (pair (pair (big_map %ledger (pair address nat) (pair (set %allowances address) (nat %balance)))
+                                              (big_map %pairs
+                                                 nat
+                                                 (pair (pair (nat %token_a_pool) (nat %token_b_pool)) (nat %total_supply))))
+                                        (pair (nat %pairs_count) (big_map %token_to_id bytes nat)))
+                                  (big_map %tokens nat (pair (address %token_a_address) (address %token_b_address))))))
+                   (nat %index))
+                (pair %setTokenFunction
+                   (lambda %func
+                      (pair (pair (or (or (pair %iBalance_of
+                                             (list %requests (pair (address %owner) (nat %token_id)))
+                                             (contract %callback
+                                                (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                                          (list %iTransfer
+                                             (pair (address %from_)
+                                                   (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))
+                                      (list %iUpdate_operators
+                                         (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                                             (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))))
+                                  (pair (pair (pair (big_map %ledger (pair address nat) (pair (set %allowances address) (nat %balance)))
+                                                    (big_map %pairs
+                                                       nat
+                                                       (pair (pair (nat %token_a_pool) (nat %token_b_pool)) (nat %total_supply))))
+                                              (pair (nat %pairs_count) (big_map %token_to_id bytes nat)))
+                                        (big_map %tokens nat (pair (address %token_a_address) (address %token_b_address)))))
+                            address)
+                      (pair (list operation)
+                            (pair (pair (pair (big_map %ledger (pair address nat) (pair (set %allowances address) (nat %balance)))
+                                              (big_map %pairs
+                                                 nat
+                                                 (pair (pair (nat %token_a_pool) (nat %token_b_pool)) (nat %total_supply))))
+                                        (pair (nat %pairs_count) (big_map %token_to_id bytes nat)))
+                                  (big_map %tokens nat (pair (address %token_a_address) (address %token_b_address))))))
+                   (nat %index))))
+        (or (or (list %transfer
+                   (pair (address %from_)
+                         (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))))
+                (list %update_operators
+                   (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                       (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))))
+            (or %use
+               (or (pair %divestLiquidity
+                      (pair %pair (address %token_a_address) (address %token_b_address))
+                      (pair (nat %min_token_a_out) (pair (nat %min_token_b_out) (nat %shares))))
+                   (pair %initializeExchange
+                      (pair %pair (address %token_a_address) (address %token_b_address))
+                      (pair (nat %token_a_in) (nat %token_b_in))))
+               (or (pair %investLiquidity
+                      (pair %pair (address %token_a_address) (address %token_b_address))
+                      (pair (nat %token_a_in) (pair (nat %token_b_in) (nat %shares))))
+                   (pair %tokenToTokenPayment
+                      (pair %pair (address %token_a_address) (address %token_b_address))
+                      (pair (or %operation (unit %buy) (unit %sell))
+                            (pair (nat %amount_in) (pair (nat %min_amount_out) (address %receiver))))))))) ;
+  storage
+    (pair (pair (big_map %dex_lambdas
+                   nat
+                   (lambda
+                      (pair (pair (or (or (pair %divestLiquidity
+                                             (pair %pair (address %token_a_address) (address %token_b_address))
+                                             (pair (nat %min_token_a_out) (pair (nat %min_token_b_out) (nat %shares))))
+                                          (pair %initializeExchange
+                                             (pair %pair (address %token_a_address) (address %token_b_address))
+                                             (pair (nat %token_a_in) (nat %token_b_in))))
+                                      (or (pair %investLiquidity
+                                             (pair %pair (address %token_a_address) (address %token_b_address))
+                                             (pair (nat %token_a_in) (pair (nat %token_b_in) (nat %shares))))
+                                          (pair %tokenToTokenPayment
+                                             (pair %pair (address %token_a_address) (address %token_b_address))
+                                             (pair (or %operation (unit %buy) (unit %sell))
+                                                   (pair (nat %amount_in) (pair (nat %min_amount_out) (address %receiver)))))))
+                                  (pair (pair (pair (big_map %ledger (pair address nat) (pair (set %allowances address) (nat %balance)))
+                                                    (big_map %pairs
+                                                       nat
+                                                       (pair (pair (nat %token_a_pool) (nat %token_b_pool)) (nat %total_supply))))
+                                              (pair (nat %pairs_count) (big_map %token_to_id bytes nat)))
+                                        (big_map %tokens nat (pair (address %token_a_address) (address %token_b_address)))))
+                            address)
+                      (pair (list operation)
+                            (pair (pair (pair (big_map %ledger (pair address nat) (pair (set %allowances address) (nat %balance)))
+                                              (big_map %pairs
+                                                 nat
+                                                 (pair (pair (nat %token_a_pool) (nat %token_b_pool)) (nat %total_supply))))
+                                        (pair (nat %pairs_count) (big_map %token_to_id bytes nat)))
+                                  (big_map %tokens nat (pair (address %token_a_address) (address %token_b_address)))))))
+                (big_map %metadata string bytes))
+          (pair (pair %storage
+                   (pair (pair (big_map %ledger (pair address nat) (pair (set %allowances address) (nat %balance)))
+                               (big_map %pairs
+                                  nat
+                                  (pair (pair (nat %token_a_pool) (nat %token_b_pool)) (nat %total_supply))))
+                         (pair (nat %pairs_count) (big_map %token_to_id bytes nat)))
+                   (big_map %tokens nat (pair (address %token_a_address) (address %token_b_address))))
+                (big_map %token_lambdas
+                   nat
+                   (lambda
+                      (pair (pair (or (or (pair %iBalance_of
+                                             (list %requests (pair (address %owner) (nat %token_id)))
+                                             (contract %callback
+                                                (list (pair (pair %request (address %owner) (nat %token_id)) (nat %balance)))))
+                                          (list %iTransfer
+                                             (pair (address %from_)
+                                                   (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))))
+                                      (list %iUpdate_operators
+                                         (or (pair %add_operator (address %owner) (pair (address %operator) (nat %token_id)))
+                                             (pair %remove_operator (address %owner) (pair (address %operator) (nat %token_id))))))
+                                  (pair (pair (pair (big_map %ledger (pair address nat) (pair (set %allowances address) (nat %balance)))
+                                                    (big_map %pairs
+                                                       nat
+                                                       (pair (pair (nat %token_a_pool) (nat %token_b_pool)) (nat %total_supply))))
+                                              (pair (nat %pairs_count) (big_map %token_to_id bytes nat)))
+                                        (big_map %tokens nat (pair (address %token_a_address) (address %token_b_address)))))
+                            address)
+                      (pair (list operation)
+                            (pair (pair (pair (big_map %ledger (pair address nat) (pair (set %allowances address) (nat %balance)))
+                                              (big_map %pairs
+                                                 nat
+                                                 (pair (pair (nat %token_a_pool) (nat %token_b_pool)) (nat %total_supply))))
+                                        (pair (nat %pairs_count) (big_map %token_to_id bytes nat)))
+                                  (big_map %tokens nat (pair (address %token_a_address) (address %token_b_address))))))))) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         SELF ;
+         ADDRESS ;
+         SWAP ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DIG 2 ;
+                     PUSH nat 2 ;
+                     PAIR ;
+                     DUG 2 ;
+                     LEFT (list (pair address (list (pair address (pair nat nat))))) ;
+                     LEFT (list (or (pair address (pair address nat)) (pair address (pair address nat)))) ;
+                     DIG 2 ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     GET ;
+                     IF_NONE
+                       { SWAP ; DROP ; SWAP ; DROP ; PUSH string "Dex/function-not-set" ; FAILWITH }
+                       { DIG 3 ; DIG 2 ; DUP ; DUG 3 ; CDR ; CAR ; DIG 4 ; PAIR ; PAIR ; EXEC } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     PAIR ;
+                     DIG 2 ;
+                     CAR ;
+                     PAIR ;
+                     SWAP ;
+                     CAR ;
+                     PAIR }
+                   { SWAP ;
+                     DROP ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     GET ;
+                     IF_NONE { PUSH nat 0 ; PUSH nat 0 ; PUSH nat 0 ; PAIR ; PAIR } {} ;
+                     DIG 2 ;
+                     NIL operation ;
+                     DIG 3 ;
+                     CAR ;
+                     PUSH mutez 0 ;
+                     DIG 4 ;
+                     DUP ;
+                     DUG 5 ;
+                     CAR ;
+                     CDR ;
+                     DIG 5 ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     PAIR } }
+               { SWAP ;
+                 DROP ;
+                 IF_LEFT
+                   { PUSH nat 3 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     COMPARE ;
+                     GT ;
+                     IF { DROP 2 ; PUSH string "Dex/wrong-index" ; FAILWITH }
+                        { DUP ;
+                          DUG 2 ;
+                          CAR ;
+                          DIG 2 ;
+                          CDR ;
+                          DIG 2 ;
+                          DUP ;
+                          DUG 3 ;
+                          CAR ;
+                          CAR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          GET ;
+                          IF_NONE
+                            { DIG 2 ;
+                              DUP ;
+                              DUG 3 ;
+                              CDR ;
+                              DIG 3 ;
+                              DUP ;
+                              DUG 4 ;
+                              CAR ;
+                              CDR ;
+                              DIG 4 ;
+                              CAR ;
+                              CAR ;
+                              DIG 4 ;
+                              DIG 4 ;
+                              SWAP ;
+                              SOME ;
+                              SWAP ;
+                              UPDATE ;
+                              PAIR ;
+                              PAIR }
+                            { DROP 3 ; PUSH string "Dex/function-set" ; FAILWITH } } ;
+                     NIL operation ;
+                     PAIR }
+                   { PUSH nat 2 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     COMPARE ;
+                     GT ;
+                     IF { DROP 2 ; PUSH string "Dex/wrong-index" ; FAILWITH }
+                        { DUP ;
+                          DUG 2 ;
+                          CAR ;
+                          DIG 2 ;
+                          CDR ;
+                          DIG 2 ;
+                          DUP ;
+                          DUG 3 ;
+                          CDR ;
+                          CDR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          GET ;
+                          IF_NONE
+                            { DIG 2 ;
+                              DUP ;
+                              DUG 3 ;
+                              CDR ;
+                              CDR ;
+                              DUG 2 ;
+                              SWAP ;
+                              SOME ;
+                              SWAP ;
+                              UPDATE ;
+                              SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              CDR ;
+                              CAR ;
+                              PAIR ;
+                              SWAP ;
+                              CAR ;
+                              PAIR }
+                            { DROP 3 ; PUSH string "Dex/function-set" ; FAILWITH } } ;
+                     NIL operation ;
+                     PAIR } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { DIG 2 ;
+                     PUSH nat 0 ;
+                     PAIR ;
+                     DUG 2 ;
+                     RIGHT (pair (list (pair address nat)) (contract (list (pair (pair address nat) nat)))) ;
+                     LEFT (list (or (pair address (pair address nat)) (pair address (pair address nat)))) ;
+                     DIG 2 ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     GET ;
+                     IF_NONE
+                       { SWAP ; DROP ; SWAP ; DROP ; PUSH string "Dex/function-not-set" ; FAILWITH }
+                       { DIG 3 ; DIG 2 ; DUP ; DUG 3 ; CDR ; CAR ; DIG 4 ; PAIR ; PAIR ; EXEC } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     PAIR ;
+                     DIG 2 ;
+                     CAR ;
+                     PAIR ;
+                     SWAP ;
+                     CAR ;
+                     PAIR }
+                   { DIG 2 ;
+                     PUSH nat 1 ;
+                     PAIR ;
+                     DUG 2 ;
+                     RIGHT
+                       (or (pair (list (pair address nat)) (contract (list (pair (pair address nat) nat))))
+                           (list (pair address (list (pair address (pair nat nat)))))) ;
+                     DIG 2 ;
+                     DUP ;
+                     CDR ;
+                     SWAP ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     GET ;
+                     IF_NONE
+                       { SWAP ; DROP ; SWAP ; DROP ; PUSH string "Dex/function-not-set" ; FAILWITH }
+                       { DIG 3 ; DIG 2 ; DUP ; DUG 3 ; CDR ; CAR ; DIG 4 ; PAIR ; PAIR ; EXEC } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     PAIR ;
+                     DIG 2 ;
+                     CAR ;
+                     PAIR ;
+                     SWAP ;
+                     CAR ;
+                     PAIR } }
+               { DIG 2 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 IF_LEFT
+                   { IF_LEFT { DROP ; PUSH nat 3 } { DROP ; PUSH nat 0 } }
+                   { IF_LEFT { DROP ; PUSH nat 2 } { DROP ; PUSH nat 1 } } ;
+                 GET ;
+                 IF_NONE
+                   { DROP 2 ; PUSH string "Dex/function-not-set" ; FAILWITH }
+                   { DIG 2 ; DIG 3 ; DUP ; DUG 4 ; CDR ; CAR ; DIG 3 ; PAIR ; PAIR ; EXEC } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 PAIR ;
+                 DIG 2 ;
+                 CAR ;
+                 PAIR ;
+                 SWAP ;
+                 CAR ;
+                 PAIR } } } }

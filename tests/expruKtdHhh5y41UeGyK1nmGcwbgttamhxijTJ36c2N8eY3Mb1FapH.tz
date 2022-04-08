@@ -1,0 +1,476 @@
+{ storage
+    (pair (pair (nat %counter) (pair (address %dutch_factory) (address %english_factory)))
+          (pair (pair (map %instances_map
+                         nat
+                         (pair (pair (string %asset_name) (string %auction_type))
+                               (pair (address %contract_address) (pair (bool %is_available) (address %owner)))))
+                      (address %owner))
+                (pair (address %sealed_bid_factory) (address %vickrey_factory)))) ;
+  parameter
+    (or (or (nat %configureInstance)
+            (or (pair %createInstance
+                   (nat %asset_id)
+                   (pair (string %asset_name) (string %auction_type)))
+                (pair %destroyInstance (nat %asset_id) (address %owner))))
+        (or (or (pair %registerInstance (nat %asset_id) (address %contract_address))
+                (pair %saveFactoryAddresses
+                   (pair (address %dutch_factory) (address %english_factory))
+                   (pair (address %sealed_bid_factory) (address %vickrey_factory))))
+            (or (nat %startedAuction)
+                (pair %transferOwnership (nat %asset_id) (address %new_owner))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 SWAP ;
+                 GET ;
+                 IF_NONE { PUSH int 73 ; FAILWITH } {} ;
+                 GET 3 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {}
+                    { PUSH string
+                           "WrongCondition: sp.sender == self.data.instances_map[params.asset_id].contract_address" ;
+                      FAILWITH } ;
+                 NIL operation }
+               { IF_LEFT
+                   { DUP ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     PUSH nat 0 ;
+                     DUP 3 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { SWAP ;
+                          DROP ;
+                          DUP 3 ;
+                          CAR ;
+                          CAR ;
+                          SWAP ;
+                          DIG 3 ;
+                          UNPAIR ;
+                          UNPAIR ;
+                          PUSH nat 1 ;
+                          ADD ;
+                          PAIR ;
+                          PAIR ;
+                          DUG 3 }
+                        { DROP ;
+                          SENDER ;
+                          DUP 4 ;
+                          CDR ;
+                          CAR ;
+                          CAR ;
+                          DUP 3 ;
+                          GET ;
+                          IF_NONE { PUSH int 39 ; FAILWITH } {} ;
+                          GET 6 ;
+                          COMPARE ;
+                          EQ ;
+                          IF {}
+                             { PUSH string
+                                    "WrongCondition: self.data.instances_map[asset_id.value].owner == sp.sender" ;
+                               FAILWITH } ;
+                          DUP 3 ;
+                          CDR ;
+                          CAR ;
+                          CAR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          GET ;
+                          IF_NONE { PUSH int 40 ; FAILWITH } {} ;
+                          GET 5 ;
+                          IF {}
+                             { PUSH string "cannot auction as the asset is unavailable" ; FAILWITH } ;
+                          DUP 3 ;
+                          CDR ;
+                          CAR ;
+                          CAR ;
+                          SWAP ;
+                          DUP ;
+                          DUG 2 ;
+                          GET ;
+                          IF_NONE { PUSH int 41 ; FAILWITH } {} ;
+                          CAR ;
+                          CAR } ;
+                     DIG 3 ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SENDER ;
+                     PUSH bool True ;
+                     PAIR %is_available %owner ;
+                     SELF_ADDRESS ;
+                     PAIR %contract_address ;
+                     DUP 8 ;
+                     GET 4 ;
+                     DIG 6 ;
+                     PAIR %asset_name %auction_type ;
+                     PAIR ;
+                     SOME ;
+                     DUP 6 ;
+                     UPDATE ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     DUG 2 ;
+                     PUSH string "english" ;
+                     DUP 3 ;
+                     GET 4 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { PUSH bool True }
+                        { PUSH string "dutch" ; DUP 3 ; GET 4 ; COMPARE ; EQ } ;
+                     IF { PUSH bool True }
+                        { PUSH string "sealed bid" ; DUP 3 ; GET 4 ; COMPARE ; EQ } ;
+                     IF {} { PUSH string "incorrect auction_type" ; FAILWITH } ;
+                     PUSH string "dutch" ;
+                     DUP 3 ;
+                     GET 4 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { NIL operation ;
+                          DUP 4 ;
+                          CAR ;
+                          CDR ;
+                          CAR ;
+                          CONTRACT %createDutchAuctionInstance nat ;
+                          IF_NONE { PUSH int 52 ; FAILWITH } {} ;
+                          PUSH mutez 0 ;
+                          DUP 4 ;
+                          TRANSFER_TOKENS ;
+                          CONS }
+                        { NIL operation } ;
+                     PUSH string "english" ;
+                     DUP 4 ;
+                     GET 4 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { DUP 4 ;
+                          CAR ;
+                          CDR ;
+                          CDR ;
+                          CONTRACT %createEnglishAuctionInstance nat ;
+                          IF_NONE { PUSH int 55 ; FAILWITH } {} ;
+                          PUSH mutez 0 ;
+                          DUP 4 ;
+                          TRANSFER_TOKENS ;
+                          CONS }
+                        {} ;
+                     PUSH string "sealed bid" ;
+                     DUP 4 ;
+                     GET 4 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { DUP 4 ;
+                          GET 5 ;
+                          CONTRACT %createSealedBidAuctionInstance nat ;
+                          IF_NONE { PUSH int 58 ; FAILWITH } {} ;
+                          PUSH mutez 0 ;
+                          DUP 4 ;
+                          TRANSFER_TOKENS ;
+                          CONS }
+                        {} ;
+                     PUSH string "vickrey" ;
+                     DIG 3 ;
+                     GET 4 ;
+                     COMPARE ;
+                     EQ ;
+                     IF { DUP 3 ;
+                          GET 6 ;
+                          CONTRACT %createVickreyAuctionInstance nat ;
+                          IF_NONE { PUSH int 61 ; FAILWITH } {} ;
+                          PUSH mutez 0 ;
+                          DIG 3 ;
+                          TRANSFER_TOKENS ;
+                          CONS }
+                        { SWAP ; DROP } }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 82 ; FAILWITH } {} ;
+                     GET 3 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: sp.sender == self.data.instances_map[params.asset_id].contract_address" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     DUP ;
+                     DUP 6 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 83 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     PUSH bool True ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     DUP ;
+                     DUP 6 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 84 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 8 ;
+                     CDR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF { PUSH bool True }
+                        { SWAP ; DUP ; DUG 2 ; CAR ; CDR ; CAR ; SENDER ; COMPARE ; EQ } ;
+                     IF { PUSH bool True }
+                        { SWAP ; DUP ; DUG 2 ; GET 5 ; SENDER ; COMPARE ; EQ } ;
+                     IF { PUSH bool True }
+                        { SWAP ; DUP ; DUG 2 ; GET 6 ; SENDER ; COMPARE ; EQ } ;
+                     IF {} { PUSH string "only factories can register instances" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     DUP ;
+                     DUP 6 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 68 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     DIG 7 ;
+                     CDR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.owner" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     CAR ;
+                     DUP 3 ;
+                     CAR ;
+                     CDR ;
+                     DUP 4 ;
+                     CAR ;
+                     CAR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     CAR ;
+                     DUP 3 ;
+                     GET 3 ;
+                     DIG 3 ;
+                     GET 4 ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 77 ; FAILWITH } {} ;
+                     GET 3 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: sp.sender == self.data.instances_map[params.asset_id].contract_address" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     DUP ;
+                     DIG 5 ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 78 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CDR ;
+                     PUSH bool False ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 88 ; FAILWITH } {} ;
+                     GET 6 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: sp.sender == self.data.instances_map[params.asset_id].owner" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 89 ; FAILWITH } {} ;
+                     GET 5 ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: self.data.instances_map[params.asset_id].is_available" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     DUP ;
+                     DUP 6 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 91 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 8 ;
+                     CDR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } } ;
+             NIL operation } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

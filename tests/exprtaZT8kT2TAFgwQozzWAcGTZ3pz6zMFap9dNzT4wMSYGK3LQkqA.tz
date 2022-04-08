@@ -1,0 +1,14 @@
+{ parameter string ;
+  storage (map string nat) ;
+  code { DUP ;
+         DIP { CDR ; DUP } ;
+         CAR ;
+         DUP ;
+         DIP { GET ;
+               IF_NONE { PUSH string "Ineligible candidate" ; FAILWITH } {} ;
+               PUSH nat 1 ;
+               ADD ;
+               SOME } ;
+         UPDATE ;
+         NIL operation ;
+         PAIR } }

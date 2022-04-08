@@ -1,0 +1,51 @@
+{ parameter
+    (or (pair %get
+           string
+           (contract (pair (string %currency_pair) (pair (timestamp %last_update) (nat %rate)))))
+        (pair %update (string %currency_pair) (pair (timestamp %last_update) (nat %rate)))) ;
+  storage (big_map string (pair timestamp nat)) ;
+  code { DUP ;
+         CDR ;
+         SWAP ;
+         CAR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             GET ;
+             IF_NONE { PUSH string "NO_CURRENCY_PAIR_FOUND" ; FAILWITH } {} ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             PUSH mutez 0 ;
+             DIG 2 ;
+             DIG 3 ;
+             CAR ;
+             PAIR ;
+             TRANSFER_TOKENS ;
+             SWAP ;
+             NIL operation ;
+             DIG 2 ;
+             CONS ;
+             PAIR }
+           { DUP ;
+             DUG 2 ;
+             CDR ;
+             CDR ;
+             DIG 2 ;
+             DUP ;
+             DUG 3 ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             SOME ;
+             DIG 2 ;
+             CAR ;
+             UPDATE ;
+             NIL operation ;
+             PAIR } } }

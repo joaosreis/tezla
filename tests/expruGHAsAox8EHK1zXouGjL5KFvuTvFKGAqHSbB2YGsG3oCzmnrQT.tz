@@ -1,3 +1,0 @@
-{ parameter (pair nat (pair string (big_map address (pair nat (map address nat))))) ;
-  storage unit ;
-  code { DROP ; UNIT ; NIL operation ; PAIR } }

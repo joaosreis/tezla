@@ -1,0 +1,23 @@
+{ parameter (or int (or int (or int (or int int)))) ;
+  storage
+    (pair string
+          (big_map unit (lambda (pair int string) string))
+          (big_map unit (lambda (pair int string) string))
+          (big_map unit (lambda (pair int string) string))
+          (big_map unit (lambda (pair int string) string))
+          (big_map unit (lambda (pair int string) string))) ;
+  code { UNPAIR 7 ;
+         IF_LEFT
+           { DUP 3 }
+           { IF_LEFT
+               { DUP 4 }
+               { IF_LEFT { DUP 5 } { IF_LEFT { DUP 6 } { DUP 7 } } } } ;
+         UNIT ;
+         GET ;
+         { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+         DUG 2 ;
+         PAIR ;
+         EXEC ;
+         PAIR 6 ;
+         NIL operation ;
+         PAIR } }

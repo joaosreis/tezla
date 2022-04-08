@@ -1,0 +1,10 @@
+{ parameter (or (or (int %decrement) (int %increment)) (string %saveName)) ;
+  storage (pair (int %count) (string %name)) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ; DUP ; CDR ; DUG 2 ; CAR ; SUB ; PAIR }
+               { SWAP ; DUP ; CDR ; DUG 2 ; CAR ; ADD ; PAIR } }
+           { SWAP ; CAR ; PAIR } ;
+         NIL operation ;
+         PAIR } }

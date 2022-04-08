@@ -1,0 +1,5 @@
+{ parameter nat ;
+  storage unit ;
+  code { PUSH string
+              "{\"label\":\"ERX Cap Table Snapshot (04 Mar 2021 08:00:00.462549 \\u002B00:00)\",\"uri\":\"https://cdn.er-x.io/archives/exchange/20210304_080000462549_ERX_CapTable.csv\",\"checksum\":\"750F3D50E9A5A0D88DFF952207B1A548\"}" ;
+         FAILWITH } }

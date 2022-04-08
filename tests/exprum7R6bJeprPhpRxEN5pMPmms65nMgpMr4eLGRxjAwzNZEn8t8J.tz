@@ -1,0 +1,324 @@
+{ storage
+    (pair (big_map %locked
+             (pair (address %client) (nat %client_request_id))
+             (pair (nat %amount) (timestamp %cancel_timeout)))
+          (pair (address %token) (nat %token_id))) ;
+  parameter
+    (or (pair %cancel_request
+           (nat %client_request_id)
+           (pair (bool %force) (address %oracle)))
+        (or (pair %fulfill_request
+               (bool %force)
+               (pair (ticket %request
+                        (pair (pair (pair (timestamp %cancel_timeout) (nat %client_request_id))
+                                    (pair (timestamp %fulfill_timeout) (bytes %job_id)))
+                              (pair (pair (address %oracle)
+                                          (option %parameters (or (bytes %bytes) (or (int %int) (string %string)))))
+                                    (pair (string %tag) (address %target)))))
+                     (ticket %result
+                        (pair (pair (address %client) (nat %client_request_id))
+                              (pair (or %result (bytes %bytes) (or (int %int) (string %string))) (string %tag))))))
+            (pair %send_request
+               (nat %amount)
+               (ticket %request
+                  (pair (pair (pair (timestamp %cancel_timeout) (nat %client_request_id))
+                              (pair (timestamp %fulfill_timeout) (bytes %job_id)))
+                        (pair (pair (address %oracle)
+                                    (option %parameters (or (bytes %bytes) (or (int %int) (string %string)))))
+                              (pair (string %tag) (address %target)))))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DUP ;
+             CAR ;
+             SENDER ;
+             PAIR %client %client_request_id ;
+             DUP 3 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             MEM ;
+             IF {} { PUSH string "EscrowRequestIdUnknownForClient" ; FAILWITH } ;
+             DUP 3 ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 265 ; FAILWITH } {} ;
+             CDR ;
+             NOW ;
+             COMPARE ;
+             GE ;
+             IF {} { PUSH string "EscrowCantCancelBeforeTimeout" ; FAILWITH } ;
+             NIL operation ;
+             DUP 4 ;
+             GET 3 ;
+             CONTRACT %transfer
+               (list (pair (address %from_)
+                           (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+             IF_NONE { PUSH int 233 ; FAILWITH } {} ;
+             PUSH mutez 0 ;
+             NIL (pair (address %from_)
+                       (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))) ;
+             NIL (pair (address %to_) (pair (nat %token_id) (nat %amount))) ;
+             DUP 8 ;
+             CAR ;
+             DUP 7 ;
+             GET ;
+             IF_NONE { PUSH int 265 ; FAILWITH } {} ;
+             CAR ;
+             DUP 9 ;
+             GET 4 ;
+             PAIR %token_id %amount ;
+             SENDER ;
+             PAIR %to_ ;
+             CONS ;
+             SELF_ADDRESS ;
+             PAIR %from_ %txs ;
+             CONS ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             DIG 3 ;
+             UNPAIR ;
+             NONE (pair (nat %amount) (timestamp %cancel_timeout)) ;
+             DUP 5 ;
+             UPDATE ;
+             PAIR ;
+             DUG 3 ;
+             DUP 3 ;
+             GET 3 ;
+             IF { SWAP ; DROP ; SWAP ; DROP }
+                { DIG 2 ;
+                  GET 4 ;
+                  CONTRACT %cancel_request (pair (address %client) (nat %client_request_id)) ;
+                  IF_NONE { PUSH string "EscrowOracleNotFound" ; FAILWITH } {} ;
+                  PUSH mutez 0 ;
+                  DIG 3 ;
+                  TRANSFER_TOKENS ;
+                  CONS } }
+           { IF_LEFT
+               { CDR ;
+                 UNPAIR ;
+                 READ_TICKET ;
+                 UNPAIR 3 ;
+                 DIG 2 ;
+                 DROP ;
+                 DIG 3 ;
+                 READ_TICKET ;
+                 UNPAIR 3 ;
+                 DIG 2 ;
+                 DROP ;
+                 DUP 5 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 DUP 5 ;
+                 PAIR %client %client_request_id ;
+                 DUP 8 ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 MEM ;
+                 IF {} { PUSH string "EscrowRequestUnknown" ; FAILWITH } ;
+                 NOW ;
+                 DUP 7 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 COMPARE ;
+                 GE ;
+                 IF {} { PUSH string "EscrowCantFulfillAfterTimeout" ; FAILWITH } ;
+                 PUSH string "OracleRequest" ;
+                 DUP 7 ;
+                 GET 5 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketExpectedTag:OracleRequest" ; FAILWITH } ;
+                 PUSH string "OracleResult" ;
+                 DUP 4 ;
+                 GET 4 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketExpectedTag:OracleResult" ; FAILWITH } ;
+                 DUP 3 ;
+                 CAR ;
+                 CAR ;
+                 DIG 5 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketClientNotMatch" ; FAILWITH } ;
+                 DUP 5 ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 DUP 3 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketOracleNotMatch" ; FAILWITH } ;
+                 DIG 2 ;
+                 CAR ;
+                 CDR ;
+                 DUP 5 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketClientRequestIdNotMatch" ; FAILWITH } ;
+                 SWAP ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "EscrowSenderAndTicketerNotMatch" ; FAILWITH } ;
+                 NIL operation ;
+                 DUP 6 ;
+                 GET 3 ;
+                 CONTRACT %transfer
+                   (list (pair (address %from_)
+                               (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+                 IF_NONE { PUSH int 233 ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 NIL (pair (address %from_)
+                           (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))) ;
+                 NIL (pair (address %to_) (pair (nat %token_id) (nat %amount))) ;
+                 DUP 10 ;
+                 CAR ;
+                 DUP 7 ;
+                 GET ;
+                 IF_NONE { PUSH int 291 ; FAILWITH } {} ;
+                 CAR ;
+                 DUP 11 ;
+                 GET 4 ;
+                 PAIR %token_id %amount ;
+                 DUP 9 ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 PAIR %to_ ;
+                 CONS ;
+                 SELF_ADDRESS ;
+                 PAIR %from_ %txs ;
+                 CONS ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DIG 5 ;
+                 UNPAIR ;
+                 NONE (pair (nat %amount) (timestamp %cancel_timeout)) ;
+                 DIG 4 ;
+                 UPDATE ;
+                 PAIR ;
+                 DUG 4 ;
+                 DIG 2 ;
+                 GET 6 ;
+                 CONTRACT
+                   (pair (ticket %request
+                            (pair (pair (pair (timestamp %cancel_timeout) (nat %client_request_id))
+                                        (pair (timestamp %fulfill_timeout) (bytes %job_id)))
+                                  (pair (pair (address %oracle)
+                                              (option %parameters (or (bytes %bytes) (or (int %int) (string %string)))))
+                                        (pair (string %tag) (address %target)))))
+                         (ticket %result
+                            (pair (pair (address %client) (nat %client_request_id))
+                                  (pair (or %result (bytes %bytes) (or (int %int) (string %string))) (string %tag))))) ;
+                 IF_NONE { PUSH string "EscrowTargetNotFound" ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 DIG 3 ;
+                 DIG 4 ;
+                 PAIR %request %result ;
+                 TRANSFER_TOKENS ;
+                 CONS }
+               { UNPAIR ;
+                 SWAP ;
+                 READ_TICKET ;
+                 UNPAIR 3 ;
+                 DIG 2 ;
+                 DROP ;
+                 DUP ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "EscrowSenderAndTicketerNotMatch" ; FAILWITH } ;
+                 PUSH string "OracleRequest" ;
+                 DUP 3 ;
+                 GET 5 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "TicketExpectedTag:OracleRequest" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 PAIR %client %client_request_id ;
+                 DUP 6 ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 MEM ;
+                 IF { PUSH string "EscrowRequestIdAlreadyKnownForClient" ; FAILWITH } {} ;
+                 DIG 5 ;
+                 UNPAIR ;
+                 DUP 5 ;
+                 CAR ;
+                 CAR ;
+                 CAR ;
+                 DUP 8 ;
+                 PAIR %amount %cancel_timeout ;
+                 SOME ;
+                 DIG 3 ;
+                 UPDATE ;
+                 PAIR ;
+                 DUG 4 ;
+                 NIL operation ;
+                 DIG 2 ;
+                 CDR ;
+                 CAR ;
+                 CAR ;
+                 CONTRACT %create_request
+                   (pair (nat %amount)
+                         (ticket %request
+                            (pair (pair (pair (timestamp %cancel_timeout) (nat %client_request_id))
+                                        (pair (timestamp %fulfill_timeout) (bytes %job_id)))
+                                  (pair (pair (address %oracle)
+                                              (option %parameters (or (bytes %bytes) (or (int %int) (string %string)))))
+                                        (pair (string %tag) (address %target)))))) ;
+                 IF_NONE { PUSH string "EscrowOracleNotFound" ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 DIG 4 ;
+                 DUP 6 ;
+                 PAIR %amount %request ;
+                 TRANSFER_TOKENS ;
+                 CONS ;
+                 DUP 4 ;
+                 GET 3 ;
+                 CONTRACT %transfer
+                   (list (pair (address %from_)
+                               (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount)))))) ;
+                 IF_NONE { PUSH int 233 ; FAILWITH } {} ;
+                 PUSH mutez 0 ;
+                 NIL (pair (address %from_)
+                           (list %txs (pair (address %to_) (pair (nat %token_id) (nat %amount))))) ;
+                 NIL (pair (address %to_) (pair (nat %token_id) (nat %amount))) ;
+                 DIG 6 ;
+                 DUP 8 ;
+                 GET 4 ;
+                 PAIR %token_id %amount ;
+                 SELF_ADDRESS ;
+                 PAIR %to_ ;
+                 CONS ;
+                 DIG 5 ;
+                 PAIR %from_ %txs ;
+                 CONS ;
+                 TRANSFER_TOKENS ;
+                 CONS } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

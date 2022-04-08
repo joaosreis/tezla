@@ -1,0 +1,139 @@
+{ parameter
+    (or (pair %listInstrument (address %address) (pair (string %isin) (string %name)))
+        (string %unlistInstrument)) ;
+  storage
+    (pair (pair (address %eventSinkContractAddress) (address %registrarAddress))
+          (pair (map %tokensByIsinCode
+                   string
+                   (pair (address %address) (pair (string %isin) (string %name))))
+                (map %tokensByName
+                   string
+                   (pair (address %address) (pair (string %isin) (string %name)))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 4 ;
+             MEM ;
+             IF { PUSH string "Token with this name already exists" ; FAILWITH } {} ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             MEM ;
+             IF { PUSH string "Token with this isin already exists" ; FAILWITH } {} ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             DIG 3 ;
+             DUP ;
+             SOME ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             GET 3 ;
+             UPDATE ;
+             SWAP ;
+             DIG 3 ;
+             DUP ;
+             SOME ;
+             SWAP ;
+             DUP ;
+             DUG 5 ;
+             GET 4 ;
+             UPDATE ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             CONTRACT %InstrumentListed
+               (pair (address %address) (pair (string %isin) (string %name))) ;
+             { IF_NONE { PUSH string "test error" ; FAILWITH } { DROP } } ;
+             NIL operation ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             CONTRACT %InstrumentListed
+               (pair (address %address) (pair (string %isin) (string %name))) ;
+             { IF_NONE { PUSH int 62 ; FAILWITH } {} } ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SOURCE ;
+             PACK ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             PACK ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "Source is not registrar" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 3 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             MEM ;
+             IF {} { PUSH string "No Token with this isin exists" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             CONTRACT %InstrumentUnlisted
+               (pair (address %address) (pair (string %isin) (string %name))) ;
+             { IF_NONE { PUSH string "test error" ; FAILWITH } { DROP } } ;
+             NIL operation ;
+             DUP 3 ;
+             CAR ;
+             CAR ;
+             CONTRACT %InstrumentUnlisted
+               (pair (address %address) (pair (string %isin) (string %name))) ;
+             { IF_NONE { PUSH int 62 ; FAILWITH } {} } ;
+             PUSH mutez 0 ;
+             DUP 5 ;
+             GET 3 ;
+             DUP 5 ;
+             GET ;
+             { IF_NONE { PUSH int 34 ; FAILWITH } {} } ;
+             TRANSFER_TOKENS ;
+             CONS ;
+             DUP 3 ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             NONE (pair (address %address) (pair (string %isin) (string %name))) ;
+             DIG 6 ;
+             GET 3 ;
+             DUP 7 ;
+             GET ;
+             { IF_NONE { PUSH int 34 ; FAILWITH } {} } ;
+             GET 4 ;
+             UPDATE ;
+             SWAP ;
+             NONE (pair (address %address) (pair (string %isin) (string %name))) ;
+             DIG 5 ;
+             UPDATE ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SWAP } ;
+         PAIR } }

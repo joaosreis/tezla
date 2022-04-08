@@ -1,0 +1,28 @@
+{ parameter
+    (or (or (option %oven_delegate key_hash) (unit %oven_deposit))
+        (pair %oven_withdraw mutez (contract unit))) ;
+  storage address ;
+  code { UNPAIR ;
+         SWAP ;
+         DUP ;
+         DUG 2 ;
+         SENDER ;
+         COMPARE ;
+         NEQ ;
+         IF { DROP 2 ; PUSH nat 1 ; FAILWITH }
+            { IF_LEFT
+                { IF_LEFT
+                    { SWAP ; NIL operation ; DIG 2 ; SET_DELEGATE ; CONS ; PAIR }
+                    { DROP ; NIL operation ; PAIR } }
+                { SWAP ;
+                  NIL operation ;
+                  DIG 2 ;
+                  DUP ;
+                  DUG 3 ;
+                  CDR ;
+                  DIG 3 ;
+                  CAR ;
+                  UNIT ;
+                  TRANSFER_TOKENS ;
+                  CONS ;
+                  PAIR } } } }

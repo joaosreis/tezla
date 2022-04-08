@@ -1,3 +1,0 @@
-{ storage string ;
-  parameter unit ;
-  code { PUSH string "hello" ; NIL operation ; PAIR ; DIP { DROP } } }

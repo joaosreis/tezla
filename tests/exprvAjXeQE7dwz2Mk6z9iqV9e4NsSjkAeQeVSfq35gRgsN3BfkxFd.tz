@@ -1,0 +1,14 @@
+{ storage nat ;
+  parameter (or (unit %getMutez) (unit %incCounter)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DROP 2 ;
+             PUSH mutez 0 ;
+             AMOUNT ;
+             COMPARE ;
+             GE ;
+             IF {} { PUSH string "WrongCondition: sp.amount >= sp.tez(0)" ; FAILWITH } ;
+             LEVEL }
+           { DROP ; PUSH nat 1 ; ADD } ;
+         NIL operation ;
+         PAIR } }

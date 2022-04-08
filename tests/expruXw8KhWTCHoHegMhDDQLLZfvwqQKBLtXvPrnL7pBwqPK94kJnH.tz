@@ -1,0 +1,9 @@
+{ storage int ;
+  parameter (pair (int %x) (int %y)) ;
+  code { UNPAIR ;
+         PUSH string ") that has been bought already" ;
+         PUSH string "ss" ;
+         PUSH string "contains pixel(" ;
+         CONCAT ;
+         CONCAT ;
+         FAILWITH } }

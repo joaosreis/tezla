@@ -1,0 +1,15 @@
+{ parameter
+    (or (or (pair %addition int int) (pair %division int int))
+        (or (pair %multiplication int int) (pair %substraction int int))) ;
+  storage int ;
+  code { CAR ;
+         IF_LEFT
+           { IF_LEFT
+               { UNPAIR ; ADD }
+               { UNPAIR ;
+                 EDIV ;
+                 IF_NONE { PUSH string "DIV by 0" ; FAILWITH } {} ;
+                 CAR } }
+           { IF_LEFT { UNPAIR ; MUL } { UNPAIR ; SUB } } ;
+         NIL operation ;
+         PAIR } }

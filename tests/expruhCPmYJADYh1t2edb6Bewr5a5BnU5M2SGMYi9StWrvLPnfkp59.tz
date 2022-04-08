@@ -1,0 +1,42 @@
+{ storage (map string (pair (string %gender) (pair (string %name) (int %score)))) ;
+  parameter
+    (or (pair %addUser (string %email) (pair (string %gender) (string %name)))
+        (pair %updateScore (string %email) (int %score))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             PUSH int 0 ;
+             DUP 3 ;
+             GET 4 ;
+             PAIR %name %score ;
+             DUP 3 ;
+             GET 3 ;
+             PAIR %gender ;
+             SOME ;
+             DIG 2 ;
+             CAR ;
+             UPDATE }
+           { SWAP ;
+             DUP ;
+             DUP 3 ;
+             CAR ;
+             DUP ;
+             DUG 2 ;
+             GET ;
+             IF_NONE { PUSH int 19 ; FAILWITH } {} ;
+             UNPAIR ;
+             SWAP ;
+             UNPAIR ;
+             SWAP ;
+             DIG 5 ;
+             CDR ;
+             ADD ;
+             SWAP ;
+             PAIR ;
+             SWAP ;
+             PAIR ;
+             SOME ;
+             SWAP ;
+             UPDATE } ;
+         NIL operation ;
+         PAIR } }

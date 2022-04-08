@@ -1,0 +1,53 @@
+{ parameter (or (pair %reassign address (option (list nat))) (unit %transfer)) ;
+  storage unit ;
+  code { LAMBDA (pair address unit) (map nat nat) { DROP ; EMPTY_MAP nat nat } ;
+         SWAP ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { { { DUP ; CAR ; DIP { CDR } } } ;
+             { DIP 3 { DUP } ; DIG 4 } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             PAIR ;
+             LAMBDA
+               (pair (pair address (lambda (pair address unit) (map nat nat))) (pair unit nat))
+               unit
+               { { { DUP ; CAR ; DIP { CDR } } } ;
+                 { { DUP ; CAR ; DIP { CDR } } } ;
+                 DIG 2 ;
+                 CAR ;
+                 DUP ;
+                 DIG 2 ;
+                 PAIR ;
+                 DIG 2 ;
+                 SWAP ;
+                 EXEC ;
+                 DROP } ;
+             SWAP ;
+             APPLY ;
+             DIG 2 ;
+             IF_NONE
+               { { DIP 2 { DUP } ; DIG 3 } ;
+                 DIG 2 ;
+                 PAIR ;
+                 DIG 3 ;
+                 SWAP ;
+                 EXEC ;
+                 DIG 2 ;
+                 SWAP ;
+                 ITER { CAR ; SWAP ; PAIR ; SWAP ; DUP ; DUG 2 ; SWAP ; EXEC } ;
+                 SWAP ;
+                 DROP }
+               { DIG 2 ;
+                 DROP ;
+                 DIG 3 ;
+                 DROP ;
+                 DIG 2 ;
+                 SWAP ;
+                 ITER { SWAP ; PAIR ; SWAP ; DUP ; DUG 2 ; SWAP ; EXEC } ;
+                 SWAP ;
+                 DROP } ;
+             NIL operation ;
+             PAIR }
+           { DROP ; SWAP ; DROP ; NIL operation ; PAIR } } }

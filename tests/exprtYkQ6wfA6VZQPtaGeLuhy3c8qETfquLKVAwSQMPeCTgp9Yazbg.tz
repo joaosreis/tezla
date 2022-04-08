@@ -1,0 +1,33 @@
+{ parameter (or (bytes %loadLambda) (unit %runLambda)) ;
+  storage
+    (pair (address %losOwner)
+          (or %losStatus (address %originationCompleted) (bytes %originationOngoing))) ;
+  code { CAST (pair (or bytes unit) (pair address (or address bytes))) ;
+         DUP ;
+         CAR ;
+         DIP { CDR ;
+               DUP ;
+               CDR ;
+               DIP { CAR } ;
+               IF_LEFT
+                 { FAILWITH }
+                 { SWAP ;
+                   DUP ;
+                   SENDER ;
+                   COMPARE ;
+                   EQ ;
+                   IF { SWAP } { PUSH string "sender is not originator owner" ; FAILWITH } } } ;
+         IF_LEFT
+           { CONCAT ; RIGHT address ; NIL operation }
+           { DROP ;
+             UNPACK (lambda (list operation) (pair address (list operation))) ;
+             IF_NONE { PUSH string "failed to unpack" ; FAILWITH } {} ;
+             NIL operation ;
+             EXEC ;
+             DUP ;
+             CAR ;
+             DIP { CDR } ;
+             LEFT bytes ;
+             SWAP } ;
+         DIP { SWAP ; PAIR } ;
+         PAIR } }

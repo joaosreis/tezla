@@ -1,0 +1,16 @@
+{ parameter string ;
+  storage bytes ;
+  code { DROP ;
+         SENDER ;
+         PACK ;
+         SOURCE ;
+         PACK ;
+         NOW ;
+         PACK ;
+         SWAP ;
+         DIG 2 ;
+         CONCAT ;
+         CONCAT ;
+         PACK ;
+         NIL operation ;
+         PAIR } }

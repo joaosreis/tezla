@@ -1,0 +1,54 @@
+{ storage (pair (address %admin) (address %auction)) ;
+  parameter
+    (or (address %update_operator) (pair %withdraw (address %address) (nat %amount))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+             CONTRACT %update_operators
+               (list (or (pair %add_operator (address %operator) (address %owner))
+                         (pair %remove_operator (address %operator) (address %owner)))) ;
+             IF_NONE { PUSH int 830 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             NIL (or (pair %add_operator (address %operator) (address %owner))
+                     (pair %remove_operator (address %operator) (address %owner))) ;
+             SELF_ADDRESS ;
+             DUP 6 ;
+             CDR ;
+             PAIR %operator %owner ;
+             LEFT %add_operator %remove_operator (pair (address %operator) (address %owner)) ;
+             CONS ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {}
+                { PUSH string "WrongCondition: sp.sender == self.data.auction" ; FAILWITH } ;
+             DUP ;
+             CAR ;
+             CONTRACT %burn (pair (address %address) (nat %amount)) ;
+             IF_NONE { PUSH int 838 ; FAILWITH } {} ;
+             NIL operation ;
+             SWAP ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             CDR ;
+             SELF_ADDRESS ;
+             PAIR %address %amount ;
+             TRANSFER_TOKENS ;
+             CONS } ;
+         PAIR } }

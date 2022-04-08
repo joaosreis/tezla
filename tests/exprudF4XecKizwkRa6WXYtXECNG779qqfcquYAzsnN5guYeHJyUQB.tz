@@ -1,0 +1,6 @@
+{ parameter unit ;
+  storage
+    (map (or (or (nat %myNat) (pair %myPair (pair (nat %id) (bool %is_admin)) (string %name)))
+             (pair %myPair2 (nat %id) (bool %is_admin)))
+         nat) ;
+  code { CDR ; NIL operation ; PAIR } }

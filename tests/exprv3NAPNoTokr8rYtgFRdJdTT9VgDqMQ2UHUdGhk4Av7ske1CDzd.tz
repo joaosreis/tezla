@@ -1,0 +1,3 @@
+{ parameter unit ;
+  storage (pair (string %last_completed_migration) (address %owner)) ;
+  code { CDR ; NIL operation ; PAIR } }

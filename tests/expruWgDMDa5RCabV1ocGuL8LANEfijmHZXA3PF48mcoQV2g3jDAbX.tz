@@ -1,7 +1,0 @@
-{ parameter unit ;
-  storage bool ;
-  code { CDR ;
-         { IF {} { { UNIT ; FAILWITH } } } ;
-         PUSH bool False ;
-         NIL operation ;
-         PAIR } }

@@ -1,0 +1,21 @@
+{ storage
+    (pair (pair %assets
+             (pair (big_map %ledger (pair address nat) nat)
+                   (big_map %operators
+                      (pair (address %operator) (pair (address %owner) (nat %token_id)))
+                      unit))
+             (pair (big_map %token_metadata nat (pair (nat %token_id) (map %token_info string bytes)))
+                   (big_map %token_total_supply nat nat)))
+          (pair (big_map %metadata string bytes)
+                (pair %settings (address %admin) (bool %paused)))) ;
+  parameter
+    (or (or (bool %pause) (address %set_admin))
+        (or (unit %transfer) (big_map %update_metadata string bytes))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ; DUP ; GET 4 ; DIG 2 ; UPDATE 2 ; UPDATE 4 }
+               { SWAP ; DUP ; GET 4 ; DIG 2 ; UPDATE 1 ; UPDATE 4 } }
+           { IF_LEFT { DROP } { UPDATE 3 } } ;
+         NIL operation ;
+         PAIR } }

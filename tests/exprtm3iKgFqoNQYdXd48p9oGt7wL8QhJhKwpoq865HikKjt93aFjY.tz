@@ -1,0 +1,16 @@
+{ storage (option (pair timestamp timestamp timestamp bytes bytes bytes)) ;
+  parameter unit ;
+  code { DROP ;
+         PUSH timestamp "1970-01-01T00:00:42Z" ;
+         PACK ;
+         PUSH timestamp "42" ;
+         PACK ;
+         PUSH timestamp 42 ;
+         PACK ;
+         PUSH timestamp "1970-01-01T00:00:42Z" ;
+         PUSH timestamp "42" ;
+         PUSH timestamp 42 ;
+         PAIR 6 ;
+         SOME ;
+         NIL operation ;
+         PAIR } }

@@ -1,5 +1,0 @@
-{ storage
-    (pair (pair (pair (pair (option %b0 bytes) (int %l0)) (int %l1)) (option %s0 string))
-          (bytes %xxxx)) ;
-  parameter unit ;
-  code { CDR ; NIL operation ; PAIR } }

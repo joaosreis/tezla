@@ -1,0 +1,970 @@
+{ parameter
+    (or (or (unit %cancelTimelock) (or (unit %endVoting) (unit %executeTimelock)))
+        (or (or (pair %propose
+                   (string %title)
+                   (pair (string %descriptionLink)
+                         (pair (string %descriptionHash) (lambda %proposalLambda unit (list operation)))))
+                (pair %setParameters
+                   (nat %escrowAmount)
+                   (pair (nat %voteDelayBlocks)
+                         (pair (nat %voteLengthBlocks)
+                               (pair (nat %minYayVotesPercentForEscrowReturn)
+                                     (pair (nat %blocksInTimelockForExecution)
+                                           (pair (nat %blocksInTimelockForCancellation)
+                                                 (pair (nat %percentageForSuperMajority) (pair %quorumCap (nat %lower) (nat %upper))))))))))
+            (or (nat %vote)
+                (pair %voteCallback (address %address) (pair (nat %level) (nat %result)))))) ;
+  storage
+    (pair (pair (pair (address %communityFundAddress)
+                      (pair %governanceParameters
+                         (nat %escrowAmount)
+                         (pair (nat %voteDelayBlocks)
+                               (pair (nat %voteLengthBlocks)
+                                     (pair (nat %minYayVotesPercentForEscrowReturn)
+                                           (pair (nat %blocksInTimelockForExecution)
+                                                 (pair (nat %blocksInTimelockForCancellation)
+                                                       (pair (nat %percentageForSuperMajority) (pair %quorumCap (nat %lower) (nat %upper))))))))))
+                (pair (big_map %metadata string bytes)
+                      (pair (nat %nextProposalId)
+                            (big_map %outcomes
+                               nat
+                               (pair (nat %outcome)
+                                     (pair %poll
+                                        (nat %id)
+                                        (pair (pair %proposal
+                                                 (string %title)
+                                                 (pair (string %descriptionLink)
+                                                       (pair (string %descriptionHash) (lambda %proposalLambda unit (list operation)))))
+                                              (pair (nat %votingStartBlock)
+                                                    (pair (nat %votingEndBlock)
+                                                          (pair (nat %yayVotes)
+                                                                (pair (nat %nayVotes)
+                                                                      (pair (nat %abstainVotes)
+                                                                            (pair (nat %totalVotes)
+                                                                                  (pair (map %voters address (pair (nat %voteValue) (pair (nat %level) (nat %votes))))
+                                                                                        (pair (address %author)
+                                                                                              (pair (nat %escrowAmount)
+                                                                                                    (pair (nat %quorum) (pair %quorumCap (nat %lower) (nat %upper)))))))))))))))))))
+          (pair (pair (option %poll
+                         (pair (nat %id)
+                               (pair (pair %proposal
+                                        (string %title)
+                                        (pair (string %descriptionLink)
+                                              (pair (string %descriptionHash) (lambda %proposalLambda unit (list operation)))))
+                                     (pair (nat %votingStartBlock)
+                                           (pair (nat %votingEndBlock)
+                                                 (pair (nat %yayVotes)
+                                                       (pair (nat %nayVotes)
+                                                             (pair (nat %abstainVotes)
+                                                                   (pair (nat %totalVotes)
+                                                                         (pair (map %voters address (pair (nat %voteValue) (pair (nat %level) (nat %votes))))
+                                                                               (pair (address %author)
+                                                                                     (pair (nat %escrowAmount)
+                                                                                           (pair (nat %quorum) (pair %quorumCap (nat %lower) (nat %upper)))))))))))))))
+                      (pair (nat %quorum) (nat %state)))
+                (pair (option %timelockItem
+                         (pair (nat %id)
+                               (pair (pair %proposal
+                                        (string %title)
+                                        (pair (string %descriptionLink)
+                                              (pair (string %descriptionHash) (lambda %proposalLambda unit (list operation)))))
+                                     (pair (nat %endBlock) (pair (nat %cancelBlock) (address %author))))))
+                      (pair (address %tokenContractAddress)
+                            (option %votingState (pair (nat %voteValue) (pair (address %address) (nat %level)))))))) ;
+  code { { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { IF_LEFT
+               { DROP ;
+                 DUP ;
+                 GET 5 ;
+                 { IF_NONE { PUSH string "NO_ITEM_IN_TIMELOCK" ; FAILWITH } { DROP } } ;
+                 DUP ;
+                 GET 5 ;
+                 { IF_NONE { PUSH int 580 ; FAILWITH } {} } ;
+                 GET 7 ;
+                 LEVEL ;
+                 COMPARE ;
+                 GE ;
+                 IF {} { PUSH string "TOO_SOON" ; FAILWITH } ;
+                 DUP ;
+                 GET 5 ;
+                 { IF_NONE { PUSH int 580 ; FAILWITH } {} } ;
+                 CAR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 CDR ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET ;
+                 { IF_NONE { PUSH int 584 ; FAILWITH } {} } ;
+                 DIG 2 ;
+                 { { DUP ; CAR ; DIP { CDR } } } ;
+                 { { DUP ; CAR ; DIP { CDR } } } ;
+                 SWAP ;
+                 { { DUP ; CAR ; DIP { CDR } } } ;
+                 SWAP ;
+                 { { DUP ; CAR ; DIP { CDR } } } ;
+                 SWAP ;
+                 DIG 5 ;
+                 CDR ;
+                 PUSH nat 3 ;
+                 PAIR %outcome %poll ;
+                 SOME ;
+                 DIG 6 ;
+                 UPDATE ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 { { DUP ; CAR ; DIP { CDR } } } ;
+                 SWAP ;
+                 CDR ;
+                 NONE (pair (nat %id)
+                            (pair (pair %proposal
+                                     (string %title)
+                                     (pair (string %descriptionLink)
+                                           (pair (string %descriptionHash) (lambda %proposalLambda unit (list operation)))))
+                                  (pair (nat %endBlock) (pair (nat %cancelBlock) (address %author))))) ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 NIL operation }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE { PUSH string "NO_POLL" ; FAILWITH } { DROP } } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     { IF_NONE {} { PUSH string "ITEM_IN_TIMELOCK" ; FAILWITH } } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE { PUSH int 367 ; FAILWITH } {} } ;
+                     DUP ;
+                     GET 7 ;
+                     LEVEL ;
+                     COMPARE ;
+                     GT ;
+                     IF {} { PUSH string "VOTING_NOT_FINISHED" ; FAILWITH } ;
+                     DUP ;
+                     GET 19 ;
+                     PUSH nat 100 ;
+                     { DIP 4 { DUP } ; DIG 5 } ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     DIG 3 ;
+                     DUP ;
+                     GET 11 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 5 ;
+                     GET 9 ;
+                     ADD ;
+                     MUL ;
+                     EDIV ;
+                     { IF_NONE { PUSH int 372 ; FAILWITH } { CAR } } ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     GET 9 ;
+                     COMPARE ;
+                     LE ;
+                     IF { DROP ; { DIP 2 { DUP } ; DIG 3 } ; CAR ; CAR ; CAR } {} ;
+                     NIL operation ;
+                     { DIP 4 { DUP } ; DIG 5 } ;
+                     GET 7 ;
+                     CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+                     { IF_NONE { PUSH int 381 ; FAILWITH } {} } ;
+                     PUSH mutez 0 ;
+                     { DIP 6 { DUP } ; DIG 7 } ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     { DIP 4 { DUP } ; DIG 5 } ;
+                     PAIR %to %value ;
+                     SELF_ADDRESS ;
+                     PAIR %from ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     PUSH nat 100 ;
+                     { DIP 5 { DUP } ; DIG 6 } ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     DIG 4 ;
+                     DUP ;
+                     GET 11 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 6 ;
+                     GET 9 ;
+                     ADD ;
+                     MUL ;
+                     EDIV ;
+                     { IF_NONE { PUSH int 373 ; FAILWITH } { CAR } } ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     GET 9 ;
+                     COMPARE ;
+                     GE ;
+                     IF { { DIP 4 { DUP } ; DIG 5 } ;
+                          CDR ;
+                          CAR ;
+                          CDR ;
+                          CAR ;
+                          { DIP 3 { DUP } ; DIG 4 } ;
+                          GET 15 ;
+                          COMPARE ;
+                          GE }
+                        { PUSH bool False } ;
+                     IF { { DIP 4 { DUP } ; DIG 5 } ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          CDR ;
+                          { DIP 5 { DUP } ; DIG 6 } ;
+                          GET 19 ;
+                          { DIP 8 { DUP } ; DIG 9 } ;
+                          CAR ;
+                          CAR ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          CAR ;
+                          LEVEL ;
+                          ADD ;
+                          PAIR %cancelBlock %author ;
+                          DIG 8 ;
+                          CAR ;
+                          CAR ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          CDR ;
+                          CAR ;
+                          LEVEL ;
+                          ADD ;
+                          PAIR %endBlock ;
+                          { DIP 6 { DUP } ; DIG 7 } ;
+                          GET 3 ;
+                          PAIR %proposal ;
+                          { DIP 6 { DUP } ; DIG 7 } ;
+                          CAR ;
+                          PAIR %id ;
+                          SOME ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { DIP 7 { DUP } ; DIG 8 } ;
+                          PUSH nat 1 ;
+                          PAIR %outcome %poll ;
+                          SOME ;
+                          { DIP 8 { DUP } ; DIG 9 } ;
+                          CAR ;
+                          UPDATE ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          PAIR ;
+                          DUG 4 }
+                        { DIG 4 ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { DIP 7 { DUP } ; DIG 8 } ;
+                          PUSH nat 0 ;
+                          PAIR %outcome %poll ;
+                          SOME ;
+                          { DIP 8 { DUP } ; DIG 9 } ;
+                          CAR ;
+                          UPDATE ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          PAIR ;
+                          DUG 4 } ;
+                     DIG 4 ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     CDR ;
+                     NONE (pair (nat %id)
+                                (pair (pair %proposal
+                                         (string %title)
+                                         (pair (string %descriptionLink)
+                                               (pair (string %descriptionHash) (lambda %proposalLambda unit (list operation)))))
+                                      (pair (nat %votingStartBlock)
+                                            (pair (nat %votingEndBlock)
+                                                  (pair (nat %yayVotes)
+                                                        (pair (nat %nayVotes)
+                                                              (pair (nat %abstainVotes)
+                                                                    (pair (nat %totalVotes)
+                                                                          (pair (map %voters address (pair (nat %voteValue) (pair (nat %level) (nat %votes))))
+                                                                                (pair (address %author)
+                                                                                      (pair (nat %escrowAmount)
+                                                                                            (pair (nat %quorum) (pair %quorumCap (nat %lower) (nat %upper)))))))))))))) ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     DUG 4 ;
+                     PUSH nat 100 ;
+                     PUSH nat 80 ;
+                     { DIP 4 { DUP } ; DIG 5 } ;
+                     GET 23 ;
+                     MUL ;
+                     EDIV ;
+                     { IF_NONE { PUSH int 420 ; FAILWITH } { CAR } } ;
+                     PUSH nat 100 ;
+                     PUSH nat 20 ;
+                     { DIP 5 { DUP } ; DIG 6 } ;
+                     GET 15 ;
+                     MUL ;
+                     EDIV ;
+                     { IF_NONE { PUSH int 421 ; FAILWITH } { CAR } } ;
+                     ADD ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     GET 25 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     COMPARE ;
+                     LT ;
+                     IF { DROP ; { DIP 2 { DUP } ; DIG 3 } ; GET 25 } {} ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     GET 26 ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     COMPARE ;
+                     GT ;
+                     IF { DROP ; SWAP ; DROP ; DIG 2 ; DROP ; SWAP ; GET 26 }
+                        { DIG 2 ; DROP ; DIG 2 ; DROP ; DIG 2 ; DROP } ;
+                     DIG 2 ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     CDR ;
+                     DIG 4 ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP }
+                   { DROP ;
+                     DUP ;
+                     GET 5 ;
+                     { IF_NONE { PUSH string "NO_ITEM_IN_TIMELOCK" ; FAILWITH } { DROP } } ;
+                     DUP ;
+                     GET 5 ;
+                     { IF_NONE { PUSH int 580 ; FAILWITH } {} } ;
+                     GET 8 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_AUTHOR" ; FAILWITH } ;
+                     DUP ;
+                     GET 5 ;
+                     { IF_NONE { PUSH int 580 ; FAILWITH } {} } ;
+                     GET 5 ;
+                     LEVEL ;
+                     COMPARE ;
+                     GT ;
+                     IF {} { PUSH string "TOO_SOON" ; FAILWITH } ;
+                     DUP ;
+                     GET 5 ;
+                     { IF_NONE { PUSH int 580 ; FAILWITH } {} } ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     NIL operation ;
+                     SWAP ;
+                     UNIT ;
+                     EXEC ;
+                     ITER { CONS } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 5 ;
+                     { IF_NONE { PUSH int 580 ; FAILWITH } {} } ;
+                     CAR ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     { IF_NONE { PUSH int 562 ; FAILWITH } {} } ;
+                     DIG 3 ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     DIG 5 ;
+                     CDR ;
+                     PUSH nat 2 ;
+                     PAIR %outcome %poll ;
+                     SOME ;
+                     DIG 6 ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     CDR ;
+                     NONE (pair (nat %id)
+                                (pair (pair %proposal
+                                         (string %title)
+                                         (pair (string %descriptionLink)
+                                               (pair (string %descriptionHash) (lambda %proposalLambda unit (list operation)))))
+                                      (pair (nat %endBlock) (pair (nat %cancelBlock) (address %author))))) ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE {} { PUSH string "POLL_UNDERWAY" ; FAILWITH } } ;
+                     NIL operation ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     GET 7 ;
+                     CONTRACT %transfer (pair (address %from) (pair (address %to) (nat %value))) ;
+                     { IF_NONE { PUSH int 320 ; FAILWITH } {} } ;
+                     PUSH mutez 0 ;
+                     { DIP 4 { DUP } ; DIG 5 } ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     SELF_ADDRESS ;
+                     PAIR %to %value ;
+                     SENDER ;
+                     PAIR %from ;
+                     TRANSFER_TOKENS ;
+                     CONS ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     CDR ;
+                     DIG 5 ;
+                     DUP ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 7 ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     PAIR %quorum %quorumCap ;
+                     { DIP 6 { DUP } ; DIG 7 } ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CAR ;
+                     PAIR %escrowAmount ;
+                     SENDER ;
+                     PAIR %author ;
+                     EMPTY_MAP address (pair (nat %voteValue) (pair (nat %level) (nat %votes))) ;
+                     PAIR %voters ;
+                     PUSH nat 0 ;
+                     PAIR %totalVotes ;
+                     PUSH nat 0 ;
+                     PAIR %abstainVotes ;
+                     PUSH nat 0 ;
+                     PAIR %nayVotes ;
+                     PUSH nat 0 ;
+                     PAIR %yayVotes ;
+                     DIG 6 ;
+                     DUP ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 8 ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     LEVEL ;
+                     ADD ;
+                     ADD ;
+                     PAIR %votingEndBlock ;
+                     { DIP 6 { DUP } ; DIG 7 } ;
+                     CAR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     LEVEL ;
+                     ADD ;
+                     PAIR %votingStartBlock ;
+                     DIG 5 ;
+                     PAIR %proposal ;
+                     DIG 5 ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     CAR ;
+                     PAIR %id ;
+                     SOME ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     PUSH nat 1 ;
+                     ADD ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP }
+                   { SELF_ADDRESS ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_DAO" ; FAILWITH } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     CAR ;
+                     DIG 3 ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     PAIR ;
+                     NIL operation } }
+               { IF_LEFT
+                   { PUSH nat 0 ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "BAD_STATE" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE { PUSH string "NO_POLL" ; FAILWITH } { DROP } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     CAR ;
+                     PUSH nat 1 ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     DUP ;
+                     DUG 2 ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     CAR ;
+                     DIG 5 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE { PUSH int 367 ; FAILWITH } {} } ;
+                     GET 5 ;
+                     SENDER ;
+                     PAIR %address %level ;
+                     DIG 5 ;
+                     PAIR %voteValue ;
+                     SOME ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     DUP ;
+                     GET 7 ;
+                     CONTRACT %getPriorBalance
+                       (pair (pair (address %address) (nat %level))
+                             (contract (pair (address %address) (pair (nat %level) (nat %result))))) ;
+                     { IF_NONE { PUSH int 459 ; FAILWITH } {} } ;
+                     NIL operation ;
+                     SWAP ;
+                     PUSH mutez 0 ;
+                     SELF %voteCallback ;
+                     { DIP 4 { DUP } ; DIG 5 } ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE { PUSH int 367 ; FAILWITH } {} } ;
+                     GET 5 ;
+                     SENDER ;
+                     PAIR %address %level ;
+                     PAIR ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { PUSH nat 1 ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     CDR ;
+                     CAR ;
+                     CDR ;
+                     CDR ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "BAD_STATE" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 7 ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "NOT_TOKEN_CONTRACT" ; FAILWITH } ;
+                     DUP ;
+                     CAR ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     GET 8 ;
+                     { IF_NONE { PUSH int 496 ; FAILWITH } {} } ;
+                     GET 3 ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "UNKNOWN" ; FAILWITH } ;
+                     DUP ;
+                     GET 3 ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     GET 8 ;
+                     { IF_NONE { PUSH int 496 ; FAILWITH } {} } ;
+                     GET 4 ;
+                     COMPARE ;
+                     EQ ;
+                     IF {} { PUSH string "UNKNOWN" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE { PUSH int 367 ; FAILWITH } {} } ;
+                     GET 17 ;
+                     { DIP 2 { DUP } ; DIG 3 } ;
+                     GET 8 ;
+                     { IF_NONE { PUSH int 496 ; FAILWITH } {} } ;
+                     GET 3 ;
+                     MEM ;
+                     IF { PUSH string "ALREADY_VOTED" ; FAILWITH } {} ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE { PUSH int 367 ; FAILWITH } { DROP } } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE { PUSH int 367 ; FAILWITH } {} } ;
+                     GET 7 ;
+                     LEVEL ;
+                     COMPARE ;
+                     LE ;
+                     IF {} { PUSH string "VOTING_FINISHED" ; FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CDR ;
+                     CAR ;
+                     CAR ;
+                     { IF_NONE { PUSH int 367 ; FAILWITH } {} } ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     { DIP 10 { DUP } ; DIG 11 } ;
+                     GET 4 ;
+                     LEVEL ;
+                     PAIR %level %votes ;
+                     { DIP 12 { DUP } ; DIG 13 } ;
+                     GET 8 ;
+                     { IF_NONE { PUSH int 496 ; FAILWITH } {} } ;
+                     CAR ;
+                     PAIR %voteValue ;
+                     SOME ;
+                     { DIP 12 { DUP } ; DIG 13 } ;
+                     GET 8 ;
+                     { IF_NONE { PUSH int 496 ; FAILWITH } {} } ;
+                     GET 3 ;
+                     UPDATE ;
+                     PAIR ;
+                     SWAP ;
+                     { DIP 9 { DUP } ; DIG 10 } ;
+                     GET 4 ;
+                     ADD ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     PUSH nat 0 ;
+                     { DIP 3 { DUP } ; DIG 4 } ;
+                     GET 8 ;
+                     { IF_NONE { PUSH int 496 ; FAILWITH } {} } ;
+                     CAR ;
+                     COMPARE ;
+                     EQ ;
+                     IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          SWAP ;
+                          { { DUP ; CAR ; DIP { CDR } } } ;
+                          DIG 6 ;
+                          GET 4 ;
+                          ADD ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR }
+                        { PUSH nat 1 ;
+                          { DIP 3 { DUP } ; DIG 4 } ;
+                          GET 8 ;
+                          { IF_NONE { PUSH int 496 ; FAILWITH } {} } ;
+                          CAR ;
+                          COMPARE ;
+                          EQ ;
+                          IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                               SWAP ;
+                               { { DUP ; CAR ; DIP { CDR } } } ;
+                               SWAP ;
+                               { { DUP ; CAR ; DIP { CDR } } } ;
+                               SWAP ;
+                               { { DUP ; CAR ; DIP { CDR } } } ;
+                               SWAP ;
+                               { { DUP ; CAR ; DIP { CDR } } } ;
+                               SWAP ;
+                               { { DUP ; CAR ; DIP { CDR } } } ;
+                               DIG 7 ;
+                               GET 4 ;
+                               ADD ;
+                               PAIR ;
+                               SWAP ;
+                               PAIR ;
+                               SWAP ;
+                               PAIR ;
+                               SWAP ;
+                               PAIR ;
+                               SWAP ;
+                               PAIR ;
+                               SWAP ;
+                               PAIR }
+                             { PUSH nat 2 ;
+                               { DIP 3 { DUP } ; DIG 4 } ;
+                               GET 8 ;
+                               { IF_NONE { PUSH int 496 ; FAILWITH } {} } ;
+                               CAR ;
+                               COMPARE ;
+                               EQ ;
+                               IF { { { DUP ; CAR ; DIP { CDR } } } ;
+                                    SWAP ;
+                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                    SWAP ;
+                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                    SWAP ;
+                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                    SWAP ;
+                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                    SWAP ;
+                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                    SWAP ;
+                                    { { DUP ; CAR ; DIP { CDR } } } ;
+                                    DIG 8 ;
+                                    GET 4 ;
+                                    ADD ;
+                                    PAIR ;
+                                    SWAP ;
+                                    PAIR ;
+                                    SWAP ;
+                                    PAIR ;
+                                    SWAP ;
+                                    PAIR ;
+                                    SWAP ;
+                                    PAIR ;
+                                    SWAP ;
+                                    PAIR ;
+                                    SWAP ;
+                                    PAIR }
+                                  { PUSH string "BAD_VOTE_VALUE" ; FAILWITH } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     CDR ;
+                     DIG 3 ;
+                     SOME ;
+                     SWAP ;
+                     CAR ;
+                     PUSH nat 0 ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     { { DUP ; CAR ; DIP { CDR } } } ;
+                     SWAP ;
+                     CAR ;
+                     NONE (pair (nat %voteValue) (pair (address %address) (nat %level))) ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation } } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

@@ -1,0 +1,8 @@
+{ parameter (or (pair %reassign address (option (list nat))) (unit %transfer)) ;
+  storage unit ;
+  code { LAMBDA unit nat { DROP ; PUSH nat 1 } ;
+         SWAP ;
+         { { DUP ; CAR ; DIP { CDR } } } ;
+         IF_LEFT
+           { DROP ; DUP ; DIG 2 ; SWAP ; EXEC ; DROP ; NIL operation ; PAIR }
+           { DROP ; DUP ; DIG 2 ; SWAP ; EXEC ; DROP ; NIL operation ; PAIR } } }

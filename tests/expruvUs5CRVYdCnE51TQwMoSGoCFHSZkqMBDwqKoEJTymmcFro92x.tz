@@ -1,0 +1,3 @@
+{ parameter int ;
+  storage (pair (int %bet) (map %players address int)) ;
+  code { CAR ; EMPTY_MAP address int ; SWAP ; PAIR ; NIL operation ; PAIR } }

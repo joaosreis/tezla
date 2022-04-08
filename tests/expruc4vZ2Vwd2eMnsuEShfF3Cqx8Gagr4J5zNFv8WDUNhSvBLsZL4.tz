@@ -1,0 +1,20 @@
+{ parameter unit ;
+  storage unit ;
+  code { PUSH int 42 ;
+         PUSH mutez 0 ;
+         NONE key_hash ;
+         PAIR ;
+         PAIR ;
+         { UNPAIR ; UNPAIR } ;
+         CREATE_CONTRACT
+           { parameter unit ;
+             storage int ;
+             code { PUSH int 1 ; SWAP ; CDR ; ADD ; NIL operation ; PAIR } } ;
+         SWAP ;
+         DROP ;
+         SWAP ;
+         CDR ;
+         NIL operation ;
+         DIG 2 ;
+         CONS ;
+         PAIR } }

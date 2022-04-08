@@ -1,0 +1,268 @@
+{ parameter
+    (or (pair %cancel_request (bool %force) (nat %requestId))
+        (or (pair %send_request
+               (address %callbackAddress)
+               (pair (int %cancelTimeout)
+                     (pair (string %jobId)
+                           (pair (address %oracleAddress)
+                                 (pair (map %parameters string (or (bytes %bytes) (or (int %int) (string %string))))
+                                       (nat %payment))))))
+            (pair %set_value
+               (address %clientAddress)
+               (pair (address %oracleAddress)
+                     (pair (map %parameters string (or (bytes %bytes) (or (int %int) (string %string))))
+                           (nat %requestId)))))) ;
+  storage
+    (pair (pair (address %adminAddress)
+                (pair (address %escrowAddress) (option %latestResponse int)))
+          (pair (nat %nextRequestId)
+                (pair (big_map %pendingRequests nat address) (address %tokenAddress)))) ;
+  code { CAST (pair (or (pair bool nat)
+                        (or (pair address
+                                  (pair int (pair string (pair address (pair (map string (or bytes (or int string))) nat)))))
+                            (pair address (pair address (pair (map string (or bytes (or int string))) nat)))))
+                    (pair (pair address (pair address (option int)))
+                          (pair nat (pair (big_map nat address) address)))) ;
+         LAMBDA
+           (pair (pair (pair address int)
+                       (pair string (pair address (map string (or bytes (or int string))))))
+                 (pair (pair address (pair address (option int)))
+                       (pair nat (pair (big_map nat address) address))))
+           (pair (list operation)
+                 (pair bytes
+                       (pair (pair address (pair address (option int)))
+                             (pair nat (pair (big_map nat address) address)))))
+           { NIL operation ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP ;
+             GET 3 ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             DUP ;
+             GET 5 ;
+             DUP 6 ;
+             CAR ;
+             GET 5 ;
+             SOME ;
+             DIG 4 ;
+             GET 3 ;
+             UPDATE ;
+             UPDATE 5 ;
+             DUP ;
+             GET 3 ;
+             PUSH nat 1 ;
+             ADD ;
+             UPDATE 3 ;
+             SWAP ;
+             DIG 3 ;
+             DUP ;
+             CAR ;
+             GET 6 ;
+             SWAP ;
+             DUP ;
+             CAR ;
+             GET 5 ;
+             SWAP ;
+             DUP ;
+             DUG 6 ;
+             CAR ;
+             GET 3 ;
+             DUP 4 ;
+             SELF_ADDRESS ;
+             NOW ;
+             PUSH int 60 ;
+             DUP 11 ;
+             CAR ;
+             CAR ;
+             CDR ;
+             MUL ;
+             ADD ;
+             DUP 10 ;
+             CAR ;
+             CAR ;
+             CAR ;
+             PAIR 7 ;
+             SWAP ;
+             DROP ;
+             DIG 3 ;
+             DROP ;
+             PACK ;
+             DIG 2 ;
+             PAIR 3 } ;
+         SWAP ;
+         UNPAIR ;
+         IF_LEFT
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             CAR ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF {} { PUSH string "CLIENT_RequesterNotAdmin" ; FAILWITH } ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 5 ;
+             NONE address ;
+             DUP 3 ;
+             CDR ;
+             GET_AND_UPDATE ;
+             DROP ;
+             DIG 3 ;
+             DROP ;
+             DIG 2 ;
+             SWAP ;
+             UPDATE 5 ;
+             SWAP ;
+             NIL operation ;
+             DUP 3 ;
+             CAR ;
+             GET 3 ;
+             CONTRACT %cancel_request (pair bool nat) ;
+             { IF_NONE { PUSH string "CLIENT_InvalidEscrowInterface" ; FAILWITH } {} } ;
+             PUSH mutez 0 ;
+             DIG 3 ;
+             TRANSFER_TOKENS ;
+             CONS }
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CAR ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "CLIENT_RequesterNotAdmin" ; FAILWITH } ;
+                 DUP 3 ;
+                 DUG 2 ;
+                 DUP ;
+                 GET 9 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 4 ;
+                 GET 7 ;
+                 PAIR ;
+                 DUP 4 ;
+                 GET 5 ;
+                 PAIR ;
+                 DIG 3 ;
+                 DUP ;
+                 GET 3 ;
+                 SWAP ;
+                 DUP ;
+                 DUG 5 ;
+                 CAR ;
+                 PAIR ;
+                 PAIR ;
+                 PAIR ;
+                 EXEC ;
+                 DUP ;
+                 GET 4 ;
+                 DUG 2 ;
+                 DUP ;
+                 CAR ;
+                 NIL operation ;
+                 SWAP ;
+                 ITER { CONS } ;
+                 DUP ;
+                 DUP 5 ;
+                 GET 6 ;
+                 CONTRACT %transfer_and_call (pair nat (pair address (pair bytes address))) ;
+                 { IF_NONE { PUSH string "CLIENT_InvalidTokenInterface" ; FAILWITH } {} } ;
+                 PUSH mutez 0 ;
+                 DUP 7 ;
+                 CAR ;
+                 GET 3 ;
+                 DUP 6 ;
+                 GET 3 ;
+                 DUP 9 ;
+                 CAR ;
+                 GET 3 ;
+                 CONTRACT %on_token_transfer (pair nat (pair bytes (pair address nat))) ;
+                 { IF_NONE { PUSH string "CLIENT_InvalidEscrowInterface" ; FAILWITH } {} } ;
+                 ADDRESS ;
+                 DUP 9 ;
+                 GET 10 ;
+                 PAIR 4 ;
+                 DIG 4 ;
+                 DROP ;
+                 DIG 4 ;
+                 DROP ;
+                 DIG 4 ;
+                 DROP ;
+                 DIG 5 ;
+                 DROP ;
+                 TRANSFER_TOKENS ;
+                 CONS }
+               { DIG 2 ;
+                 DROP ;
+                 DUP ;
+                 CAR ;
+                 SELF_ADDRESS ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "CLIENT_WrongClientAddress" ; FAILWITH } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 5 ;
+                 NONE address ;
+                 DUP 3 ;
+                 GET 6 ;
+                 GET_AND_UPDATE ;
+                 DIG 3 ;
+                 DIG 2 ;
+                 UPDATE 5 ;
+                 DUP ;
+                 DUG 3 ;
+                 CAR ;
+                 GET 3 ;
+                 SENDER ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "CLIENT_SenderNotEscrow" ; FAILWITH } ;
+                 { IF_NONE { PUSH string "CLIENT_RequestUnknown" ; FAILWITH } {} } ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 GET 3 ;
+                 COMPARE ;
+                 EQ ;
+                 IF {} { PUSH string "CLIENT_OracleNotMatch" ; FAILWITH } ;
+                 DUP ;
+                 GET 5 ;
+                 PUSH string "price" ;
+                 MEM ;
+                 IF {}
+                    { PUSH string "CLIENT_UnknownParameterKeyInOracleResponse" ; FAILWITH } ;
+                 SWAP ;
+                 UNPAIR ;
+                 UNPAIR ;
+                 SWAP ;
+                 CAR ;
+                 DIG 3 ;
+                 GET 5 ;
+                 PUSH string "price" ;
+                 GET ;
+                 { IF_NONE { PUSH int 147 ; FAILWITH } {} } ;
+                 IF_LEFT
+                   { PUSH int 21 ; FAILWITH }
+                   { IF_LEFT {} { PUSH int 21 ; FAILWITH } } ;
+                 SOME ;
+                 SWAP ;
+                 PAIR ;
+                 SWAP ;
+                 PAIR ;
+                 PAIR ;
+                 NIL operation } } ;
+         NIL operation ;
+         SWAP ;
+         ITER { CONS } ;
+         PAIR } }

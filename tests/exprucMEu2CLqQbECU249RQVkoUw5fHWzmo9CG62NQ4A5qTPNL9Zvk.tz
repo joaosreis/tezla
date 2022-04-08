@@ -1,0 +1,87 @@
+{ parameter
+    (or (or (or (unit %get_tickets) (unit %reset))
+            (or (address %update_admin) (nat %update_ticket_amount)))
+        (address %update_ticketer)) ;
+  storage
+    (pair (big_map %participants address timestamp)
+          (pair (nat %tickets_amount) (pair (address %ticketer) (address %admin)))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { DROP ;
+                     DUP ;
+                     CAR ;
+                     SENDER ;
+                     MEM ;
+                     IF { DROP ; PUSH string "ALREADY_RECEIVED" ; FAILWITH }
+                        { DUP ;
+                          GET 5 ;
+                          CONTRACT %add_tickets
+                            (pair (address %user) (pair (string %ticket_type) (nat %ticket_amount))) ;
+                          IF_NONE { PUSH string "UNKNOWN_STORAGE_CONTRACT" ; FAILWITH } {} ;
+                          SENDER ;
+                          PUSH string "airdrop" ;
+                          DUP 4 ;
+                          GET 3 ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PAIR ;
+                          SWAP ;
+                          PUSH mutez 0 ;
+                          DIG 2 ;
+                          TRANSFER_TOKENS ;
+                          SWAP ;
+                          DUP ;
+                          CAR ;
+                          NOW ;
+                          SOME ;
+                          SENDER ;
+                          UPDATE ;
+                          UPDATE 1 ;
+                          NIL operation ;
+                          DIG 2 ;
+                          CONS ;
+                          PAIR } }
+                   { DROP ;
+                     DUP ;
+                     GET 6 ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP ; PUSH string "NOT_AN_ADMIN" ; FAILWITH }
+                        { EMPTY_BIG_MAP address timestamp ; UPDATE 1 } ;
+                     NIL operation ;
+                     PAIR } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 6 ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "NOT_AN_ADMIN" ; FAILWITH } { UPDATE 6 } ;
+                     NIL operation ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 6 ;
+                     SENDER ;
+                     COMPARE ;
+                     NEQ ;
+                     IF { DROP 2 ; PUSH string "NOT_AN_ADMIN" ; FAILWITH } { UPDATE 3 } ;
+                     NIL operation ;
+                     PAIR } } }
+           { SWAP ;
+             DUP ;
+             DUG 2 ;
+             GET 6 ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { DROP 2 ; PUSH string "NOT_AN_ADMIN" ; FAILWITH } { UPDATE 5 } ;
+             NIL operation ;
+             PAIR } } }

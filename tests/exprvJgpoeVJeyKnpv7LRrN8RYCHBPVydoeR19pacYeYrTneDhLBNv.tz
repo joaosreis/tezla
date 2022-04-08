@@ -1,0 +1,11 @@
+{ storage address ;
+  parameter (unit %start) ;
+  code { CDR ;
+         DUP ;
+         SENDER ;
+         COMPARE ;
+         EQ ;
+         IF {}
+            { PUSH string "WrongCondition: sp.sender == self.data.admin" ; FAILWITH } ;
+         NIL operation ;
+         PAIR } }

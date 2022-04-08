@@ -1,0 +1,3 @@
+{ storage (option bytes) ;
+  parameter (unit %ep) ;
+  code { DROP ; PUSH bytes 0x00 ; SHA3 ; SOME ; NIL operation ; PAIR } }

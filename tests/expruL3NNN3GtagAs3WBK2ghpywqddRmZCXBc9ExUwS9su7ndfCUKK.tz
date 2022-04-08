@@ -1,0 +1,45 @@
+{ parameter (or (or (address %changeOwner) (int %participate)) (int %setUpGame)) ;
+  storage (pair (pair (int %bet) (address %owner)) (map %players address int)) ;
+  code { NIL operation ;
+         SWAP ;
+         UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CAR ;
+                 CDR ;
+                 SENDER ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP ; PUSH string "You are not Owner" ; FAILWITH }
+                    { SWAP ; DUP ; DUG 2 ; CDR ; SWAP ; DIG 2 ; CAR ; CAR ; PAIR ; PAIR } ;
+                 SWAP ;
+                 PAIR }
+               { DIG 2 ;
+                 DROP ;
+                 SWAP ;
+                 DUP ;
+                 DUG 2 ;
+                 CDR ;
+                 DUP ;
+                 SENDER ;
+                 GET ;
+                 IF_NONE
+                   { SWAP ; SOME ; SENDER ; UPDATE }
+                   { DROP ; SWAP ; DROP ; PUSH string "You are already registered" ; FAILWITH } ;
+                 SWAP ;
+                 CAR ;
+                 PAIR ;
+                 NIL operation ;
+                 PAIR } }
+           { EMPTY_MAP address int ;
+             DIG 2 ;
+             CAR ;
+             CDR ;
+             DIG 2 ;
+             PAIR ;
+             PAIR ;
+             SWAP ;
+             PAIR } } }

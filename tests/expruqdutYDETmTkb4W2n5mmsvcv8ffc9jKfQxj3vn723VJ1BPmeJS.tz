@@ -1,0 +1,13 @@
+{ parameter (or (sapling_transaction 8) (sapling_state 8)) ;
+  storage (option (sapling_transaction 8)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DIP { DROP } ; SOME }
+           { DIP { { IF_NONE { { UNIT ; FAILWITH } } {} } } ;
+             SWAP ;
+             SAPLING_VERIFY_UPDATE ;
+             { IF_NONE { { UNIT ; FAILWITH } } {} } ;
+             DROP ;
+             NONE (sapling_transaction 8) } ;
+         NIL operation ;
+         PAIR } }

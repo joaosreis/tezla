@@ -1,0 +1,10 @@
+{ parameter (pair int unit) ;
+  storage unit ;
+  code { DROP ;
+         PUSH @p.@@@@ int 1 ;
+         PUSH @p.b int 2 ;
+         PAIR %@ %@ ;
+         DROP ;
+         UNIT ;
+         NIL operation ;
+         PAIR 2 } }

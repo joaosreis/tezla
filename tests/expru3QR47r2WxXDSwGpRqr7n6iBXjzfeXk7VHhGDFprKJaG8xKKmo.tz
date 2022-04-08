@@ -1,0 +1,503 @@
+{ storage
+    (pair (pair (address %administrator)
+                (big_map %balances address (pair (map %approvals address nat) (nat %balance))))
+          (pair (bool %paused) (nat %totalSupply))) ;
+  parameter
+    (or (or (or (pair %approve (address %spender) (nat %value))
+                (pair %burn (address %address) (nat %value)))
+            (or (pair %getAdministrator unit (contract address))
+                (or (pair %getAllowance (pair (address %owner) (address %spender)) (contract nat))
+                    (pair %getBalance address (contract nat)))))
+        (or (or (pair %getTotalSupply unit (contract nat))
+                (pair %mint (address %address) (nat %value)))
+            (or (address %setAdministrator)
+                (or (bool %setPause)
+                    (pair %transfer (address %from_) (pair (address %to_) (nat %value))))))) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 3 ;
+                     IF { PUSH string "WrongCondition: ~ self.data.paused" ; FAILWITH } {} ;
+                     PUSH nat 0 ;
+                     DUP 3 ;
+                     CAR ;
+                     CDR ;
+                     SENDER ;
+                     GET ;
+                     IF_NONE { PUSH int 26 ; FAILWITH } {} ;
+                     CAR ;
+                     DUP 3 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH nat 0 } {} ;
+                     COMPARE ;
+                     EQ ;
+                     IF { PUSH bool True } { DUP ; CDR ; PUSH nat 0 ; COMPARE ; EQ } ;
+                     IF {} { PUSH string "UnsafeAllowanceChange" ; FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     SENDER ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 28 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     DUP 7 ;
+                     CDR ;
+                     SOME ;
+                     DIG 7 ;
+                     CAR ;
+                     UPDATE ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                          FAILWITH } ;
+                     DUP ;
+                     CDR ;
+                     DUP 3 ;
+                     CAR ;
+                     CDR ;
+                     DUP 3 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 68 ; FAILWITH } {} ;
+                     CDR ;
+                     COMPARE ;
+                     GE ;
+                     IF {}
+                        { PUSH string
+                               "WrongCondition: self.data.balances[params.address].balance >= params.value" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUP 5 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 69 ; FAILWITH } {} ;
+                     CAR ;
+                     DUP 6 ;
+                     CDR ;
+                     DIG 7 ;
+                     CAR ;
+                     CDR ;
+                     DUP 8 ;
+                     CAR ;
+                     GET ;
+                     IF_NONE { PUSH int 69 ; FAILWITH } {} ;
+                     CDR ;
+                     SUB ;
+                     ISNAT ;
+                     IF_NONE { PUSH int 69 ; FAILWITH } {} ;
+                     SWAP ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     PAIR ;
+                     DUP ;
+                     DUG 2 ;
+                     UNPAIR ;
+                     SWAP ;
+                     CAR ;
+                     DIG 2 ;
+                     CDR ;
+                     DIG 3 ;
+                     GET 4 ;
+                     SUB ;
+                     ISNAT ;
+                     IF_NONE { PUSH int 70 ; FAILWITH } {} ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR } ;
+                 NIL operation }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     NIL operation ;
+                     DIG 2 ;
+                     CDR ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         GET ;
+                         IF_NONE { PUSH int 40 ; FAILWITH } {} ;
+                         CAR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         GET ;
+                         IF_NONE { PUSH int 40 ; FAILWITH } {} ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CDR ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         GET ;
+                         IF_NONE { PUSH int 36 ; FAILWITH } {} ;
+                         CDR ;
+                         NIL operation ;
+                         DIG 2 ;
+                         CDR ;
+                         PUSH mutez 0 ;
+                         DIG 3 ;
+                         TRANSFER_TOKENS ;
+                         CONS } } } }
+           { IF_LEFT
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     GET 4 ;
+                     NIL operation ;
+                     DIG 2 ;
+                     CDR ;
+                     PUSH mutez 0 ;
+                     DIG 3 ;
+                     TRANSFER_TOKENS ;
+                     CONS }
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CDR ;
+                     SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     MEM ;
+                     IF {}
+                        { SWAP ;
+                          UNPAIR ;
+                          UNPAIR ;
+                          SWAP ;
+                          PUSH (option (pair (map %approvals address nat) (nat %balance))) (Some (Pair {} 0)) ;
+                          DUP 5 ;
+                          CAR ;
+                          UPDATE ;
+                          SWAP ;
+                          PAIR ;
+                          PAIR ;
+                          SWAP } ;
+                     SWAP ;
+                     UNPAIR ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP ;
+                     DUP 5 ;
+                     CAR ;
+                     DUP ;
+                     DUG 2 ;
+                     GET ;
+                     IF_NONE { PUSH int 61 ; FAILWITH } {} ;
+                     UNPAIR ;
+                     SWAP ;
+                     DUP 7 ;
+                     CDR ;
+                     ADD ;
+                     SWAP ;
+                     PAIR ;
+                     SOME ;
+                     SWAP ;
+                     UPDATE ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     UNPAIR ;
+                     SWAP ;
+                     DIG 3 ;
+                     CDR ;
+                     ADD ;
+                     SWAP ;
+                     PAIR ;
+                     SWAP ;
+                     PAIR ;
+                     NIL operation } }
+               { IF_LEFT
+                   { SWAP ;
+                     DUP ;
+                     DUG 2 ;
+                     CAR ;
+                     CAR ;
+                     SENDER ;
+                     COMPARE ;
+                     EQ ;
+                     IF {}
+                        { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                          FAILWITH } ;
+                     SWAP ;
+                     UNPAIR ;
+                     CDR ;
+                     DIG 2 ;
+                     PAIR ;
+                     PAIR }
+                   { IF_LEFT
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF {}
+                            { PUSH string "WrongCondition: sp.sender == self.data.administrator" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         UNPAIR ;
+                         SWAP ;
+                         CDR ;
+                         DIG 2 ;
+                         PAIR ;
+                         SWAP ;
+                         PAIR }
+                       { SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         EQ ;
+                         IF { PUSH bool True }
+                            { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              GET 3 ;
+                              IF { PUSH bool False }
+                                 { DUP ;
+                                   CAR ;
+                                   SENDER ;
+                                   COMPARE ;
+                                   EQ ;
+                                   IF { PUSH bool True }
+                                      { DUP ;
+                                        GET 4 ;
+                                        DUP 3 ;
+                                        CAR ;
+                                        CDR ;
+                                        DUP 3 ;
+                                        CAR ;
+                                        GET ;
+                                        IF_NONE { PUSH int 11 ; FAILWITH } {} ;
+                                        CAR ;
+                                        SENDER ;
+                                        GET ;
+                                        IF_NONE { PUSH int 11 ; FAILWITH } {} ;
+                                        COMPARE ;
+                                        GE } } } ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: (sp.sender == self.data.administrator) | ((~ self.data.paused) & ((params.from_ == sp.sender) | (self.data.balances[params.from_].approvals[sp.sender] >= params.value)))" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         CAR ;
+                         CDR ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         GET 3 ;
+                         MEM ;
+                         IF {}
+                            { SWAP ;
+                              UNPAIR ;
+                              UNPAIR ;
+                              SWAP ;
+                              PUSH (option (pair (map %approvals address nat) (nat %balance))) (Some (Pair {} 0)) ;
+                              DUP 5 ;
+                              GET 3 ;
+                              UPDATE ;
+                              SWAP ;
+                              PAIR ;
+                              PAIR ;
+                              SWAP } ;
+                         DUP ;
+                         GET 4 ;
+                         DUP 3 ;
+                         CAR ;
+                         CDR ;
+                         DUP 3 ;
+                         CAR ;
+                         GET ;
+                         IF_NONE { PUSH int 16 ; FAILWITH } {} ;
+                         CDR ;
+                         COMPARE ;
+                         GE ;
+                         IF {}
+                            { PUSH string
+                                   "WrongCondition: self.data.balances[params.from_].balance >= params.value" ;
+                              FAILWITH } ;
+                         SWAP ;
+                         DUP ;
+                         DUG 2 ;
+                         UNPAIR ;
+                         UNPAIR ;
+                         SWAP ;
+                         DUP ;
+                         DUP 5 ;
+                         CAR ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE { PUSH int 17 ; FAILWITH } {} ;
+                         CAR ;
+                         DUP 6 ;
+                         GET 4 ;
+                         DIG 7 ;
+                         CAR ;
+                         CDR ;
+                         DUP 8 ;
+                         CAR ;
+                         GET ;
+                         IF_NONE { PUSH int 17 ; FAILWITH } {} ;
+                         CDR ;
+                         SUB ;
+                         ISNAT ;
+                         IF_NONE { PUSH int 17 ; FAILWITH } {} ;
+                         SWAP ;
+                         PAIR ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         DUP ;
+                         DUP 5 ;
+                         GET 3 ;
+                         DUP ;
+                         DUG 2 ;
+                         GET ;
+                         IF_NONE { PUSH int 18 ; FAILWITH } {} ;
+                         UNPAIR ;
+                         SWAP ;
+                         DUP 7 ;
+                         GET 4 ;
+                         ADD ;
+                         SWAP ;
+                         PAIR ;
+                         SOME ;
+                         SWAP ;
+                         UPDATE ;
+                         SWAP ;
+                         PAIR ;
+                         PAIR ;
+                         SWAP ;
+                         DUP ;
+                         CAR ;
+                         SENDER ;
+                         COMPARE ;
+                         NEQ ;
+                         IF { SWAP ; DUP ; DUG 2 ; CAR ; CAR ; SENDER ; COMPARE ; NEQ }
+                            { PUSH bool False } ;
+                         IF { SWAP ;
+                              DUP ;
+                              DUG 2 ;
+                              UNPAIR ;
+                              UNPAIR ;
+                              SWAP ;
+                              DUP ;
+                              DUP 5 ;
+                              CAR ;
+                              DUP ;
+                              DUG 2 ;
+                              GET ;
+                              IF_NONE { PUSH int 20 ; FAILWITH } {} ;
+                              UNPAIR ;
+                              DUP 7 ;
+                              GET 4 ;
+                              DIG 8 ;
+                              CAR ;
+                              CDR ;
+                              DIG 8 ;
+                              CAR ;
+                              GET ;
+                              IF_NONE { PUSH int 20 ; FAILWITH } {} ;
+                              CAR ;
+                              SENDER ;
+                              GET ;
+                              IF_NONE { PUSH int 20 ; FAILWITH } {} ;
+                              SUB ;
+                              ISNAT ;
+                              IF_NONE { PUSH int 20 ; FAILWITH } {} ;
+                              SOME ;
+                              SENDER ;
+                              UPDATE ;
+                              PAIR ;
+                              SOME ;
+                              SWAP ;
+                              UPDATE ;
+                              SWAP ;
+                              PAIR ;
+                              PAIR }
+                            { DROP } } } ;
+                 NIL operation } } ;
+         PAIR } }
