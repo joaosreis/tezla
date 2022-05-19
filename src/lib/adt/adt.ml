@@ -121,11 +121,7 @@ and expr_t =
   | E_unlift_or_right of var
   | E_hd of var
   | E_tl of var
-  | E_size_list of var
-  | E_size_set of var
-  | E_size_map of var
-  | E_size_string of var
-  | E_size_bytes of var
+  | E_size of var
   | E_isnat of var
   | E_int_of_nat of var
   | E_chain_id
@@ -307,7 +303,39 @@ module Expr = Make_common (struct
     | E_append (v_1, v_2) -> [%string "append(%{v_1#Var}, %{v_2#Var})"]
     | E_special_empty_list _ -> "{  }"
     | E_special_empty_map _ -> "{  }"
-    | _ -> (*TODO: *) assert false
+    | E_total_voting_power -> "TOTAL_VOTING_POWER"
+    | E_self_address -> "SELF_address"
+    | E_level -> "LEVEL"
+    | E_size v -> [%string "SIZE %{v#Var}"]
+    | E_create_account_operation (v_1, v_2, v_3, v_4) ->
+        [%string
+          "CREATE_ACCOUNT_operation %{v_1#Var} %{v_2#Var} %{v_3#Var} %{v_4#Var}"]
+    | E_create_account_address (v_1, v_2, v_3, v_4) ->
+        [%string
+          "CREATE_ACCOUNT_address %{v_1#Var} %{v_2#Var} %{v_3#Var} %{v_4#Var}"]
+    | E_voting_power v -> [%string "VOTING_POWER %{v#Var}"]
+    | E_keccak v -> [%string "KECCAK %{v#Var}"]
+    | E_sha3 v -> [%string "SHA3 %{v#Var}"]
+    | E_pairing_check v -> [%string "PAIRING_CHECK %{v#Var}"]
+    | E_sapling_verify_update (v_1, v_2) ->
+        [%string "SApling_verify_update %{v_1#Var} %{v_2#Var}"]
+    | E_sapling_empty_state n -> [%string "SAPLING_EMPTY_STATE %{n#Bigint}"]
+    | E_ticket (v_1, v_2) -> [%string "TICKET %{v_1#Var} %{v_2#Var}"]
+    | E_read_ticket_pair v -> [%string "READ_TICKET_pair %{v#Var}"]
+    | E_read_ticket_ticket v -> [%string "READ_TICKET_ticket %{v#Var}"]
+    | E_split_ticket (v_1, v_2) ->
+        [%string "SPLIT_TICKET %{v_1#Var} %{v_2#Var}"]
+    | E_join_ticket v -> [%string "JOIN_TICKET %{v#Var}"]
+    | E_open_chest (v_1, v_2, v_3) ->
+        [%string "OPEN_CHEST %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
+    | E_get_and_update_val (v_1, v_2, v_3) ->
+        [%string "GET_AND_UPDATE_val %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
+    | E_get_and_update_map (v_1, v_2, v_3) ->
+        [%string "GET_AND_UPDATE_map %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
+    | E_dup_n (n, v) -> [%string "DUP %{n#Bigint} %{v#Var}"]
+    | E_get_n (n, v) -> [%string "GET_N %{n#Bigint} %{v#Var}"]
+    | E_update_n (n, v_1, v_2) ->
+        [%string "UPDATE_N %{n#Bigint} %{v_1#Var} %{v_2#Var}"]
 end)
 
 module Stmt = struct

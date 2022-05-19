@@ -409,27 +409,27 @@ and inst_to_stmt counter env i =
         (s, env')
     | I_size_list ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size_list v in
+        let e = Tezla_adt.E_size v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_size_set ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size_set v in
+        let e = Tezla_adt.E_size v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_size_map ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size_map v in
+        let e = Tezla_adt.E_size v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_size_string ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size_string v in
+        let e = Tezla_adt.E_size v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_size_bytes ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size_bytes v in
+        let e = Tezla_adt.E_size v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_empty_set t ->

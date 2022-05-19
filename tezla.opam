@@ -36,6 +36,6 @@ build: [
 ]
 dev-repo: "git+https://github.com/joaosreis/tezla.git"
 pin-depends: [
-    ["michelson-adt.dev" "git+https://github.com/releaselab/michelson-adt.git"]
-    ["michelson-parser.dev" "git+https://github.com/releaselab/michelson-parser.git"]
+    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt.git"]
+    ["michelson-parser.dev" "git+https://github.com/joaosreis/michelson-parser.git"]
 ]

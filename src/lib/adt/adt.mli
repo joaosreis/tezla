@@ -87,11 +87,7 @@ and expr_t =
   | E_unlift_or_right of var
   | E_hd of var
   | E_tl of var
-  | E_size_list of var
-  | E_size_set of var
-  | E_size_map of var
-  | E_size_string of var
-  | E_size_bytes of var
+  | E_size of var
   | E_isnat of var
   | E_int_of_nat of var
   | E_chain_id

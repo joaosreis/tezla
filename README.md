@@ -5,6 +5,9 @@
 An intermediate representation of Michelson smart contracts designed to ease
 static analysis of smart contracts.
 
+You can read more about it on
+[this paper](https://drops.dagstuhl.de/opus/volltexte/2020/13417/pdf/OASIcs-FMBC-2020-4.pdf).
+
 ## Install instructions
 
 ### Using dune
@@ -17,10 +20,10 @@ dune install
 ```
 
 ### Using opam
+
 ```bash
 opam install https://github.com/joaosreis/tezla.git
 ```
-
 
 ---
 

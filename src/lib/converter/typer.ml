@@ -118,11 +118,7 @@ let type_expr e =
       | Map (k, v) -> ct (Pair (k, v))
       | _ -> assert false)
   | E_tl v -> force v.var_type
-  | E_size_bytes _ -> ct Nat
-  | E_size_string _ -> ct Nat
-  | E_size_list _ -> ct Nat
-  | E_size_set _ -> ct Nat
-  | E_size_map _ -> ct Nat
+  | E_size _ -> ct Nat
   | E_isnat _ -> ct (Option (ct Nat))
   | E_int_of_nat _ -> ct Int
   | E_lambda (t_1, t_2, _, _) -> ct (Lambda (convert_typ t_1, convert_typ t_2))
