@@ -23,9 +23,9 @@ type data_t =
   | D_list of data list
   | D_map of (data * data) list
   | D_instruction of var * stmt
-[@@deriving ord, sexp]
+[@@deriving sexp]
 
-and data = (Edo_adt.Adt.typ * data_t) node [@@deriving ord, sexp]
+and data = (Edo_adt.Adt.typ * data_t) node [@@deriving sexp]
 
 and expr_t =
   | E_var of var
@@ -55,6 +55,7 @@ and expr_t =
   | E_operation of operation
   | E_unit
   | E_pair of var * var
+  | E_pair_n of var list
   | E_left of var * adt_typ
   | E_right of var * adt_typ
   | E_some of var
@@ -91,7 +92,7 @@ and expr_t =
   | E_isnat of var
   | E_int_of_nat of var
   | E_chain_id
-  | E_lambda of adt_typ * adt_typ * var * stmt
+  | E_lambda of adt_typ * var * stmt
   | E_exec of var * var
   | E_dup of var
   | E_nil of adt_typ
@@ -124,9 +125,9 @@ and expr_t =
   | E_dup_n of Bigint.t * var
   | E_get_n of Bigint.t * var
   | E_update_n of Bigint.t * var * var
-[@@deriving ord, sexp]
+[@@deriving sexp]
 
-and expr = expr_t node [@@deriving ord, sexp]
+and expr = expr_t node [@@deriving sexp]
 
 and stmt_t =
   | S_seq of stmt * stmt
@@ -146,10 +147,10 @@ and stmt_t =
   | S_iter of var * stmt
   | S_failwith of var
   | S_return of var
-[@@deriving ord, sexp]
+[@@deriving sexp]
 
-and stmt = stmt_t node [@@deriving ord, sexp]
-and program = adt_typ * adt_typ * stmt [@@deriving ord, sexp]
+and stmt = stmt_t node [@@deriving sexp]
+and program = adt_typ * adt_typ * stmt [@@deriving sexp]
 
 module type Common = sig
   type t'
@@ -159,7 +160,6 @@ module type Common = sig
   val to_string : t -> string
 
   include Sexpable.S with type t := t
-  include Comparable.S with type t := t
 end
 
 module Data : Common with type t' = adt_typ * data_t and type t = data

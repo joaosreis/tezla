@@ -1,6 +1,6 @@
 open! Core
 
-type t = { var_name : string; var_type : Edo_adt.Typ.t Lazy.t }
+type t = { var_name : string; var_type : Edo_adt.Typ.t }
 
 include Comparable.S with type t := t
 include Sexpable.S with type t := t

@@ -1,7 +1,10 @@
 open! Core
 
 module T = struct
-  type t = { var_name : string; var_type : Edo_adt.Typ.t Lazy.t }
+  type t = {
+    var_name : string;
+    var_type : Edo_adt.Typ.t; [@compare fun _ _ -> 0]
+  }
   [@@deriving ord, sexp]
 end
 

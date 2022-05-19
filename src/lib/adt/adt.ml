@@ -3,11 +3,11 @@ module Var = Var
 module Operation = Operation
 module Node = Common_adt.Node
 
-type var = Var.t [@@deriving ord, sexp]
-type adt_typ = Edo_adt.Adt.typ [@@deriving ord, sexp]
-type ttyp = Edo_adt.Typ.t [@@deriving ord, sexp]
-type operation = Operation.t [@@deriving ord, sexp]
-type 'a node = 'a Node.t [@@deriving ord, sexp]
+type var = Var.t [@@deriving sexp]
+type adt_typ = Edo_adt.Adt.typ [@@deriving sexp]
+type ttyp = Edo_adt.Typ.t [@@deriving sexp]
+type operation = Operation.t [@@deriving sexp]
+type 'a node = 'a Node.t [@@deriving sexp]
 
 module Id () = struct
   let create_id_counter () = ref (-1)
@@ -26,17 +26,15 @@ module type Common = sig
   val to_string : t -> string
 
   include Sexpable.S with type t := t
-  include Comparable.S with type t := t
 end
 
 module Make_common (T : sig
   type t'
-  type t = t' node [@@deriving ord, sexp]
+  type t = t' node [@@deriving sexp]
 
   val to_string : t -> string
 end) : Common with type t' = T.t' and type t = T.t = struct
   include T
-  include Comparable.Make (T)
   include Id ()
 
   let create = Node.create (next_id ())
@@ -57,9 +55,9 @@ type data_t =
   | D_list of data list
   | D_map of (data * data) list
   | D_instruction of var * stmt
-[@@deriving ord, sexp]
+[@@deriving sexp]
 
-and data = (adt_typ * data_t) node [@@deriving ord, sexp]
+and data = (adt_typ * data_t) node [@@deriving sexp]
 
 and expr_t =
   | E_var of var
@@ -89,6 +87,7 @@ and expr_t =
   | E_operation of operation
   | E_unit
   | E_pair of var * var
+  | E_pair_n of var list
   | E_left of var * adt_typ
   | E_right of var * adt_typ
   | E_some of var
@@ -125,7 +124,7 @@ and expr_t =
   | E_isnat of var
   | E_int_of_nat of var
   | E_chain_id
-  | E_lambda of adt_typ * adt_typ * var * stmt
+  | E_lambda of adt_typ * var * stmt
   | E_exec of var * var
   | E_dup of var
   | E_nil of adt_typ
@@ -158,9 +157,9 @@ and expr_t =
   | E_dup_n of Bigint.t * var
   | E_get_n of Bigint.t * var
   | E_update_n of Bigint.t * var * var
-[@@deriving ord, sexp]
+[@@deriving sexp]
 
-and expr = expr_t node [@@deriving ord, sexp]
+and expr = expr_t node [@@deriving sexp]
 
 and stmt_t =
   | S_seq of stmt * stmt
@@ -182,12 +181,12 @@ and stmt_t =
   | S_return of var
 [@@deriving ord, sexp]
 
-and stmt = stmt_t node [@@deriving ord, sexp]
-and program = adt_typ * adt_typ * stmt [@@deriving ord, sexp]
+and stmt = stmt_t node [@@deriving sexp]
+and program = adt_typ * adt_typ * stmt [@@deriving sexp]
 
 module Data = Make_common (struct
   type t' = adt_typ * data_t
-  type t = data [@@deriving ord, sexp]
+  type t = data [@@deriving sexp]
 
   let rec to_string d =
     match snd d.Node.value with
@@ -212,7 +211,7 @@ end)
 
 module Expr = Make_common (struct
   type t' = expr_t
-  type t = expr [@@deriving ord, sexp]
+  type t = expr [@@deriving sexp]
 
   let to_string e =
     let typ_to_string t =
@@ -282,9 +281,9 @@ module Expr = Make_common (struct
     | E_isnat e -> [%string "ISNAT %{e#Var}"]
     | E_int_of_nat e -> [%string "INT %{e#Var}"]
     | E_chain_id -> "CHAIN_ID"
-    | E_lambda (t_1, t_2, v, _) ->
+    | E_lambda (r, v, _) ->
         [%string
-          "LAMBDA %{typ_to_string  t_1} %{typ_to_string t_2} (%{v#Var} => { \
+          "LAMBDA %{v.var_type#Edo_adt.Typ} %{typ_to_string r} (%{v#Var} => { \
            ... })"]
     | E_exec (v_1, v_2) -> [%string "EXEC %{v_1#Var} %{v_2#Var}"]
     | E_contract_of_address (t, v) ->
@@ -336,12 +335,13 @@ module Expr = Make_common (struct
     | E_get_n (n, v) -> [%string "GET_N %{n#Bigint} %{v#Var}"]
     | E_update_n (n, v_1, v_2) ->
         [%string "UPDATE_N %{n#Bigint} %{v_1#Var} %{v_2#Var}"]
+    | E_pair_n v_l -> [%string "PAIR %{List.to_string ~f:Var.to_string v_l}"]
 end)
 
 module Stmt = struct
   module T = struct
     type t' = stmt_t
-    type t = stmt [@@deriving ord, sexp]
+    type t = stmt [@@deriving sexp]
 
     let to_string s = Int.to_string s.Node.id
   end

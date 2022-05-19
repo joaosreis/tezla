@@ -160,7 +160,7 @@ let rec assert_type t (d : Edo_adt.Typed_adt.data) =
   | _ -> false
 
 let rec convert_data counter =
-  let rec convert_data { Node.value = t, d; _ } =
+  let rec convert_data { Node.value = t, d; location; _ } =
     let d =
       match d with
       | Edo_adt.Typed_adt.D_int n -> Tezla_adt.D_int n
@@ -182,7 +182,11 @@ let rec convert_data counter =
       | D_instruction i ->
           let param =
             let var_name = next_var counter in
-            let var_type = lazy (Typer.convert_typ t) in
+            let var_type =
+              match Typer.convert_typ t with
+              | Lambda (t, _), [] -> t
+              | _ -> assert false
+            in
             Tezla_adt.Var.{ var_name; var_type }
           in
           let env = Env.push param Env.empty_env in
@@ -190,14 +194,12 @@ let rec convert_data counter =
           D_instruction (param, i)
       | _ -> assert false
     in
-    create_data (t, d)
+    create_data (t, d) ~location
   in
   convert_data
 
-and inst_to_stmt counter env i =
+and inst_to_stmt counter env { value = i, annots; location; _ } =
   let inst_to_stmt = inst_to_stmt counter in
-  let i', annots = i.Node.value in
-  let loc = i.location in
   let loop_n f =
     let rec loop acc n =
       if Bigint.(n = zero) then acc else loop (f acc n) Bigint.(n - one)
@@ -207,9 +209,9 @@ and inst_to_stmt counter env i =
   let next_var () = next_var counter in
   let create_assign ?var_name e =
     let var_name = match var_name with None -> next_var () | Some v -> v in
-    let e = create_expr e in
-    let v = Tezla_adt.Var.{ var_name; var_type = lazy (Typer.type_expr e) } in
-    (v, create_stmt (S_assign (v, e)))
+    let e = create_expr ~location e in
+    let v = Tezla_adt.Var.{ var_name; var_type = Typer.type_expr e } in
+    (v, create_stmt ~location (S_assign (v, e)))
   in
   let create_assign_annot_1 e =
     let open Annot in
@@ -230,7 +232,7 @@ and inst_to_stmt counter env i =
     | _ -> create_assign e
   in
   try
-    match i' with
+    match i with
     | Michelson_adt.I_failwith ->
         let x, _ = pop env in
         (create_stmt (S_failwith x), Failed)
@@ -468,7 +470,7 @@ and inst_to_stmt counter env i =
         let assign_tl = create_stmt (S_assign (c, e_tl)) in
         let body_result, env_after_loop = pop env_after_body in
         let acc, initial_acc_assign =
-          create_assign (E_special_empty_list (force body_result.var_type))
+          create_assign (E_special_empty_list body_result.var_type)
         in
         let e_append = create_expr (E_append (acc, body_result)) in
         let assign_append = create_stmt (S_assign (acc, e_append)) in
@@ -496,10 +498,9 @@ and inst_to_stmt counter env i =
         let assign_tl = create_stmt (S_assign (c, e_tl)) in
         let body_result, env_after_loop = pop env_after_body in
         let acc, initial_acc_assign =
-          match force c.var_type |> fst with
+          match c.var_type |> fst with
           | Map (t, _) ->
-              create_assign
-                (E_special_empty_map (t, force body_result.var_type))
+              create_assign (E_special_empty_map (t, body_result.var_type))
           | _ -> assert false
         in
         let e_append = create_expr (E_append (acc, body_result)) in
@@ -562,7 +563,7 @@ and inst_to_stmt counter env i =
     | I_lambda (t_1, t_2, i) ->
         let param =
           let var_name = next_var () in
-          let var_type = lazy (Typer.convert_typ t_1) in
+          let var_type = Typer.convert_typ t_1 in
           Tezla_adt.Var.{ var_name; var_type }
         in
         let b, lambda_env = inst_to_stmt (push param empty_env) i in
@@ -573,7 +574,7 @@ and inst_to_stmt counter env i =
               let r = peek lambda_env in
               create_stmt (S_seq (b, create_stmt (S_return r)))
         in
-        let e = Tezla_adt.E_lambda (t_1, t_2, param, b) in
+        let e = Tezla_adt.E_lambda (t_2, param, b) in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env)
     | I_exec ->
@@ -972,16 +973,16 @@ and inst_to_stmt counter env i =
         in
         unpair_n n (create_stmt S_skip, env)
     | I_pair_n n ->
-        let rec pair_n i s env =
-          let x_1, env = pop env in
-          let x_2, env = pop env in
-          let v, s' = create_assign_annot_1 (Tezla_adt.E_pair (x_1, x_2)) in
-          let s = create_stmt (S_seq (s, s')) in
-          let env = push v env in
-          if Bigint.(i = of_int 2) then (s, env)
-          else pair_n Bigint.(i - one) s env
+        let rec pair_n i v_l env =
+          let x, env = pop env in
+          if Bigint.(i = of_int 2) then (x :: v_l, env)
+          else pair_n Bigint.(i - one) (x :: v_l) env
         in
-        pair_n n (create_stmt S_skip) env
+        let x, env = pop env in
+        let v_l, env = pair_n n [ x ] env in
+        let v, s = create_assign_annot_1 (Tezla_adt.E_pair_n (List.rev v_l)) in
+        let env = push v env in
+        (s, env)
     | I_get_n n ->
         let x, env = pop env in
         let e = Tezla_adt.E_get_n (n, x) in
@@ -998,25 +999,23 @@ and inst_to_stmt counter env i =
   | Functional_stack.Unsufficient_length ->
       failwith
         (Printf.sprintf "Unsufficent_length: %s\n"
-           (Common_adt.Loc.to_string loc))
+           (Common_adt.Loc.to_string location))
   | Assert_failure (f, lin, col) ->
       failwith
         (Printf.sprintf "Assert failure on %s:%d:%d\nMichelson file, %s\n" f lin
            col
-           (Common_adt.Loc.to_string loc))
+           (Common_adt.Loc.to_string location))
   | Invalid_argument s ->
       failwith
         (Printf.sprintf "Invalid arguement: %s\nMichelson file, %s\n" s
-           (Common_adt.Loc.to_string loc))
+           (Common_adt.Loc.to_string location))
 
 and convert_program counter Edo_adt.Typed_adt.{ param; code; storage } =
   (* let code = inst_strip_location code in *)
   let param_storage =
     let var_name = "parameter_storage" in
     let var_type =
-      lazy
-        ( Edo_adt.Typ.Pair (Typer.convert_typ param, Typer.convert_typ storage),
-          [] )
+      (Edo_adt.Typ.Pair (Typer.convert_typ param, Typer.convert_typ storage), [])
     in
     Tezla_adt.Var.{ var_name; var_type }
   in
