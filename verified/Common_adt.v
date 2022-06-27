@@ -1,4 +1,5 @@
 From Coq Require Import Strings.String.
+From Coq Require Import ZArith.
 
 Module Annot.
 
@@ -8,3 +9,9 @@ Module Annot.
   | A_field : string -> t.
 
 End Annot.
+
+Module Node.
+
+  Record t (A: Type) : Type := create { id : Z; value : A; }.
+
+End Node.
