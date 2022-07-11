@@ -11,7 +11,7 @@ let type_expr e =
   let open Typ in
   let ct t = (t, []) in
   match e.Node.value with
-  | E_abs _ | E_shiftL (_, _) | E_shiftR (_, _) -> ct Nat
+  | E_abs _ | E_lsl (_, _) | E_lsr (_, _) -> ct Nat
   | E_unit -> ct Unit
   | E_now -> ct Timestamp
   | E_self | E_amount | E_balance -> ct Mutez
@@ -26,63 +26,52 @@ let type_expr e =
       | t -> failwith ("car: expected pair but got " ^ t'_to_string t))
   | E_cdr v -> (
       match v.var_type |> fst with Pair (_, t) -> t | _ -> assert false)
-  | E_neg _ | E_compare (_, _) -> ct Int
-  | E_and (v_1, v_2) -> (
-      match (v_1.var_type |> fst, v_2.var_type |> fst) with
-      | Bool, Bool -> ct Bool
-      | Nat, Nat | Int, Nat -> ct Nat
-      | _ -> assert false)
-  | E_or (v_1, v_2) -> (
-      match (v_1.var_type |> fst, v_2.var_type |> fst) with
-      | Bool, Bool -> ct Bool
-      | Nat, Nat -> ct Nat
-      | _ -> assert false)
-  | E_xor (v_1, v_2) -> (
-      match (v_1.var_type |> fst, v_2.var_type |> fst) with
-      | Bool, Bool -> ct Bool
-      | Nat, Nat -> ct Nat
-      | _ -> assert false)
-  | E_eq _ | E_neq _ | E_lt _ | E_gt _ | E_leq _ | E_geq _ | E_not _
-  | E_mem (_, _) ->
+  | E_neg_nat _ | E_neg_int _ | E_compare (_, _) -> ct Int
+  | E_neg_bls12_381_g1 _ -> ct Bls12_381_g1
+  | E_neg_bls12_381_g2 _ -> ct Bls12_381_g2
+  | E_neg_bls12_381_fr _ -> ct Bls12_381_fr
+  | E_and_bool (_, _) -> ct Bool
+  | E_and_nat (_, _) -> ct Nat
+  | E_and_int_nat (_, _) -> ct Nat
+  | E_or_bool (_, _) -> ct Bool
+  | E_or_nat (_, _) -> ct Nat
+  | E_xor_bool (_, _) -> ct Bool
+  | E_xor_nat (_, _) -> ct Nat
+  | E_eq _ | E_neq _ | E_lt _ | E_gt _ | E_leq _ | E_geq _ | E_not_bool _
+  | E_mem_set (_, _)
+  | E_mem_map (_, _)
+  | E_mem_big_map (_, _) ->
       ct Bool
-  | E_add (v_1, v_2) -> (
-      match (v_1.var_type |> fst, v_2.var_type |> fst) with
-      | Nat, Nat -> ct Nat
-      | Nat, Int | Int, Nat | Int, Int -> ct Int
-      | Timestamp, Int | Int, Timestamp -> ct Timestamp
-      | Mutez, Mutez -> ct Mutez
-      | Bls12_381_g1, Bls12_381_g1 -> ct Bls12_381_g1
-      | Bls12_381_g2, Bls12_381_g2 -> ct Bls12_381_g2
-      | Bls12_381_fr, Bls12_381_fr -> ct Bls12_381_fr
-      | _ -> assert false)
-  | E_sub (v_1, v_2) -> (
-      match (v_1.var_type |> fst, v_2.var_type |> fst) with
-      | Nat, Nat | Nat, Int | Int, Nat | Int, Int | Timestamp, Timestamp ->
-          ct Int
-      | Timestamp, Int -> ct Timestamp
-      | Mutez, Mutez -> ct Mutez
-      | _ -> assert false)
-  | E_mul (v_1, v_2) -> (
-      match (v_1.var_type |> fst, v_2.var_type |> fst) with
-      | Nat, Nat -> ct Nat
-      | Nat, Int | Int, Nat | Int, Int -> ct Int
-      | Mutez, Nat | Nat, Mutez -> ct Mutez
-      | Bls12_381_g1, Bls12_381_fr -> ct Bls12_381_g1
-      | Bls12_381_g2, Bls12_381_fr -> ct Bls12_381_g2
-      | Bls12_381_fr, Bls12_381_fr -> ct Bls12_381_fr
-      | Nat, Bls12_381_fr -> ct Bls12_381_fr
-      | Int, Bls12_381_fr -> ct Bls12_381_fr
-      | Bls12_381_fr, Nat -> ct Bls12_381_fr
-      | Bls12_381_fr, Int -> ct Bls12_381_fr
-      | _ -> assert false)
-  | E_div (v_1, v_2) -> (
-      match (v_1.var_type |> fst, v_2.var_type |> fst) with
-      | Nat, Nat -> ct (Option (ct (Pair (ct Nat, ct Nat))))
-      | Nat, Int | Int, Nat | Int, Int ->
-          ct (Option (ct (Pair (ct Int, ct Nat))))
-      | Mutez, Nat -> ct (Option (ct (Pair (ct Mutez, ct Mutez))))
-      | Mutez, Mutez -> ct (Option (ct (Pair (ct Nat, ct Mutez))))
-      | _ -> assert false)
+  | E_not_nat _ -> ct Int
+  | E_not_int _ -> ct Int
+  | E_add_nat (_, _) -> ct Nat
+  | E_add_nat_int (_, _) -> ct Int
+  | E_add_int (_, _) -> ct Int
+  | E_add_timestamp_int (_, _) -> ct Int
+  | E_add_mutez (_, _) -> ct Mutez
+  | E_add_bls12_381_g1 (_, _) -> ct Bls12_381_g1
+  | E_add_bls12_381_g2 (_, _) -> ct Bls12_381_g2
+  | E_add_bls12_381_fr (_, _) -> ct Bls12_381_fr
+  | E_sub_int (_, _) -> ct Int
+  | E_sub_mutez (_, _) -> ct Mutez
+  | E_sub_nat (_, _) -> ct Int
+  | E_sub_nat_int (_, _) -> ct Int
+  | E_sub_timestamp_int (_, _) -> ct Timestamp
+  | E_sub_timestamp (_, _) -> ct Int
+  | E_mul_nat (_, _) -> ct Nat
+  | E_mul_nat_int (_, _) -> ct Int
+  | E_mul_int (_, _) -> ct Int
+  | E_mul_mutez_nat (_, _) -> ct Mutez
+  | E_mul_bls12_381_g1_bls12_381_fr (_, _) -> ct Bls12_381_g1
+  | E_mul_bls12_381_g2_bls12_381_fr (_, _) -> ct Bls12_381_g2
+  | E_mul_bls12_381_fr_bls12_381_fr (_, _) -> ct Bls12_381_fr
+  | E_mul_nat_bls12_381_fr (_, _) -> ct Bls12_381_fr
+  | E_mul_int_bls12_381_fr (_, _) -> ct Bls12_381_fr
+  | E_ediv_int (_, _) -> ct (Option (ct (Pair (ct Int, ct Nat))))
+  | E_ediv_mutez (_, _) -> ct (Option (ct (Pair (ct Nat, ct Mutez))))
+  | E_ediv_nat (_, _) -> ct (Option (ct (Pair (ct Nat, ct Nat))))
+  | E_ediv_nat_int (_, _) -> ct (Option (ct (Pair (ct Int, ct Nat))))
+  | E_ediv_mutez_nat (_, _) -> ct (Option (ct (Pair (ct Mutez, ct Mutez))))
   | E_cons (_, v) -> v.var_type
   | E_operation _ -> ct Operation
   | E_pair (v_1, v_2) -> ct (Pair (v_1.var_type, v_2.var_type))
@@ -90,15 +79,19 @@ let type_expr e =
   | E_right (v, t) -> ct (Or (convert_typ t, v.var_type))
   | E_some v -> ct (Option v.var_type)
   | E_none t -> ct (Option (convert_typ t))
-  | E_get (_, v) -> (
+  | E_get_map (_, v) | E_get_big_map (_, v) -> (
       match v.var_type |> fst with
       | Map (_, t) | Big_map (_, t) -> ct (Option t)
       | _ -> assert false)
-  | E_update (_, _, v) -> v.var_type
-  | E_concat (v, _) -> v.var_type
-  | E_concat_list v -> (
-      match v.var_type |> fst with List t -> t | _ -> assert false)
-  | E_slice (_, _, v) -> ct (Option v.var_type)
+  | E_update_set (_, _, v) | E_update_map (_, _, v) | E_update_big_map (_, _, v)
+    ->
+      v.var_type
+  | E_concat_bytes _ -> ct Bytes
+  | E_concat_string _ -> ct String
+  | E_concat_list_string _ -> ct (List (ct String))
+  | E_concat_list_bytes _ -> ct (List (ct Bytes))
+  | E_slice_bytes (_, _, _) -> ct (Option (ct Bytes))
+  | E_slice_string (_, _, _) -> ct (Option (ct String))
   | E_pack _ -> ct Bytes
   | E_unpack (t, _) -> ct (Option (convert_typ t))
   | E_contract_of_address (t, _) -> ct (Option (ct (Contract (convert_typ t))))
@@ -120,7 +113,11 @@ let type_expr e =
       | Map (k, v) -> ct (Pair (k, v))
       | _ -> assert false)
   | E_tl v -> v.var_type
-  | E_size _ -> ct Nat
+  | E_size_bytes _ -> ct Nat
+  | E_size_string _ -> ct Nat
+  | E_size_list _ -> ct Nat
+  | E_size_set _ -> ct Nat
+  | E_size_map _ -> ct Nat
   | E_isnat _ -> ct (Option (ct Nat))
   | E_int_of_nat _ -> ct Int
   | E_lambda (r, param, _) -> ct (Lambda (param.var_type, convert_typ r))
@@ -136,11 +133,10 @@ let type_expr e =
       match l.var_type |> fst with
       | Lambda ((Pair (_, b), _), c) -> ct (Lambda (b, c))
       | _ -> assert false)
-  | E_append (v, _) -> v.var_type
+  | E_list_append (v, _) -> v.var_type
   | E_total_voting_power -> ct Nat
   | E_self_address -> ct Address
   | E_level -> ct Nat
-  | E_create_account_operation (_, _, _, _) -> ct Operation
   | E_create_account_address (_, _, _, _) -> ct Address
   | E_voting_power _ -> ct Nat
   | E_keccak _ -> ct Bytes
