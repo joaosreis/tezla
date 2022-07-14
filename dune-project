@@ -1,5 +1,7 @@
 (lang dune 2.8)
 
+(using coq 0.3)
+
 (name tezla)
 
 (generate_opam_files true)
@@ -35,4 +37,5 @@
    (>= v0.15))
   bignum
   michelson-adt
-  michelson-parser))
+  michelson-parser
+  coq))

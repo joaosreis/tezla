@@ -309,8 +309,8 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
             (env, []) n
         in
         (create_stmt (S_drop l), env')
-    | I_dig n -> (create_stmt S_dig, dig env n)
-    | I_dug n -> (create_stmt S_dug, dug env n)
+    | I_dig n -> (create_stmt (S_dig n), dig env n)
+    | I_dug n -> (create_stmt (S_dug n), dug env n)
     | I_swap ->
         let env' = swap env in
         (create_stmt S_swap, env')
@@ -411,27 +411,27 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         (s, env')
     | I_size_list ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size v in
+        let e = Tezla_adt.E_size_list v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_size_set ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size v in
+        let e = Tezla_adt.E_size_set v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_size_map ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size v in
+        let e = Tezla_adt.E_size_map v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_size_string ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size v in
+        let e = Tezla_adt.E_size_string v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_size_bytes ->
         let v, env' = pop env in
-        let e = Tezla_adt.E_size v in
+        let e = Tezla_adt.E_size_bytes v in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
     | I_empty_set t ->
@@ -472,7 +472,7 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         let acc, initial_acc_assign =
           create_assign (E_special_empty_list body_result.var_type)
         in
-        let e_append = create_expr (E_append (acc, body_result)) in
+        let e_append = create_expr (E_list_append (acc, body_result)) in
         let assign_append = create_stmt (S_assign (acc, e_append)) in
         let body =
           create_stmt
@@ -484,7 +484,7 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         in
         let s =
           create_stmt
-            (S_seq (initial_acc_assign, create_stmt (S_map (c, body))))
+            (S_seq (initial_acc_assign, create_stmt (S_map_list (c, body))))
         in
         (s, push acc env_after_loop)
     | I_map_map b ->
@@ -503,7 +503,7 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
               create_assign (E_special_empty_map (t, body_result.var_type))
           | _ -> assert false
         in
-        let e_append = create_expr (E_append (acc, body_result)) in
+        let e_append = create_expr (E_list_append (acc, body_result)) in
         let assign_append = create_stmt (S_assign (acc, e_append)) in
         let body =
           create_stmt
@@ -515,10 +515,10 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         in
         let s =
           create_stmt
-            (S_seq (initial_acc_assign, create_stmt (S_map (c, body))))
+            (S_seq (initial_acc_assign, create_stmt (S_map_map (c, body))))
         in
         (s, push acc env_after_loop)
-    | I_iter_set b | I_iter_list b | I_iter_map b ->
+    | (I_iter_set b | I_iter_list b | I_iter_map b) as i ->
         (*
            ITER c {
              v := hd c;
@@ -539,25 +539,49 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         let body =
           create_stmt (S_seq (assign_hd, create_stmt (S_seq (body, assign_tl))))
         in
-        let s = create_stmt (S_iter (c, body)) in
+        let s =
+          create_stmt
+            (match i with
+            | I_iter_set _ -> S_iter_set (c, body)
+            | I_iter_list _ -> S_iter_list (c, body)
+            | I_iter_map _ -> S_iter_map (c, body)
+            | _ -> assert false)
+        in
         (s, env')
-    | I_mem_set | I_mem_map | I_mem_big_map ->
+    | (I_mem_set | I_mem_map | I_mem_big_map) as i ->
         let elt, env' = pop env in
-        let set, env' = pop env' in
-        let e = Tezla_adt.E_mem (elt, set) in
+        let collection, env' = pop env' in
+        let e =
+          match i with
+          | I_mem_set -> Tezla_adt.E_mem_set (elt, collection)
+          | I_mem_map -> Tezla_adt.E_mem_map (elt, collection)
+          | I_mem_big_map -> Tezla_adt.E_mem_big_map (elt, collection)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
-    | I_get_map | I_get_big_map ->
+    | (I_get_map | I_get_big_map) as i ->
         let key, env' = pop env in
         let map, env' = pop env' in
-        let e = Tezla_adt.E_get (key, map) in
+        let e =
+          match i with
+          | I_get_map -> Tezla_adt.E_get_map (key, map)
+          | I_get_big_map -> Tezla_adt.E_get_big_map (key, map)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
-    | I_update_set | I_update_map | I_update_big_map ->
+    | (I_update_set | I_update_map | I_update_big_map) as i ->
         let key, env' = pop env in
         let value, env' = pop env' in
         let map, env' = pop env' in
-        let e = Tezla_adt.E_update (key, value, map) in
+        let e =
+          match i with
+          | I_update_set -> Tezla_adt.E_update_set (key, value, map)
+          | I_update_map -> Tezla_adt.E_update_map (key, value, map)
+          | I_update_big_map -> Tezla_adt.E_update_big_map (key, value, map)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_lambda (t_1, t_2, i) ->
@@ -593,26 +617,41 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         let env' = List.fold_left ~f:(fun acc x -> push x acc) ~init:env' xl in
         (s, env')
     | I_cast _ -> (create_stmt S_skip, env)
-    | I_concat_string | I_concat_bytes ->
+    | (I_concat_string | I_concat_bytes) as i ->
         let v, env' = pop env in
         let e, env' =
           let s_2, env' = pop env' in
-          (Tezla_adt.E_concat (v, s_2), env')
+          let e =
+            match i with
+            | I_concat_string -> Tezla_adt.E_concat_string (v, s_2)
+            | I_concat_bytes -> Tezla_adt.E_concat_bytes (v, s_2)
+            | _ -> assert false
+          in
+          (e, env')
         in
 
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
-    | I_concat_list_string | I_concat_list_bytes ->
+    | (I_concat_list_string | I_concat_list_bytes) as i ->
         let v, env' = pop env in
-        let e, env' = (Tezla_adt.E_concat_list v, env') in
-
+        let e =
+          match i with
+          | I_concat_list_string -> Tezla_adt.E_concat_list_string v
+          | I_concat_list_bytes -> Tezla_adt.E_concat_list_bytes v
+          | _ -> assert false
+        in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
-    | I_slice_string | I_slice_bytes ->
+    | (I_slice_string | I_slice_bytes) as i ->
         let offset, env' = pop env in
         let length, env' = pop env' in
         let x, env' = pop env' in
-        let e = Tezla_adt.E_slice (offset, length, x) in
+        let e =
+          match i with
+          | I_slice_string -> Tezla_adt.E_slice_string (offset, length, x)
+          | I_slice_bytes -> Tezla_adt.E_slice_bytes (offset, length, x)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_pack ->
@@ -625,34 +664,82 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         let e = Tezla_adt.E_unpack (t, v) in
         let v', assign = create_assign_annot_1 e in
         (assign, push v' env')
-    | I_add_nat | I_add_nat_int | I_add_int | I_add_timestamp_int | I_add_mutez
-    | I_add_bls12_381_g1 | I_add_bls12_381_g2 | I_add_bls12_381_fr ->
+    | ( I_add_nat | I_add_nat_int | I_add_int | I_add_timestamp_int
+      | I_add_mutez | I_add_bls12_381_g1 | I_add_bls12_381_g2
+      | I_add_bls12_381_fr ) as i ->
         let v_1, env' = pop env in
         let v_2, env' = pop env' in
-        let e = Tezla_adt.E_add (v_1, v_2) in
+        let e =
+          let open Tezla_adt in
+          match i with
+          | I_add_nat -> E_add_nat (v_1, v_2)
+          | I_add_nat_int -> E_add_nat_int (v_1, v_2)
+          | I_add_int -> E_add_int (v_1, v_2)
+          | I_add_timestamp_int -> E_add_timestamp_int (v_1, v_2)
+          | I_add_mutez -> E_add_mutez (v_1, v_2)
+          | I_add_bls12_381_g1 -> E_add_bls12_381_g1 (v_1, v_2)
+          | I_add_bls12_381_g2 -> E_add_bls12_381_g2 (v_1, v_2)
+          | I_add_bls12_381_fr -> E_add_bls12_381_fr (v_1, v_2)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
-    | I_sub_nat | I_sub_nat_int | I_sub_int | I_sub_timestamp_int
-    | I_sub_timestamp | I_sub_mutez ->
+    | ( I_sub_nat | I_sub_nat_int | I_sub_int | I_sub_timestamp_int
+      | I_sub_timestamp | I_sub_mutez ) as i ->
         let v_1, env' = pop env in
         let v_2, env' = pop env' in
-        let e = Tezla_adt.E_sub (v_1, v_2) in
+        let e =
+          let open Tezla_adt in
+          match i with
+          | I_sub_nat -> E_sub_nat (v_1, v_2)
+          | I_sub_nat_int -> E_sub_nat_int (v_1, v_2)
+          | I_sub_int -> E_sub_int (v_1, v_2)
+          | I_sub_timestamp_int -> E_sub_timestamp_int (v_1, v_2)
+          | I_sub_timestamp -> E_sub_timestamp (v_1, v_2)
+          | I_sub_mutez -> E_sub_mutez (v_1, v_2)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
-    | I_mul_nat | I_mul_nat_int | I_mul_int | I_mul_mutez_nat
-    | I_mul_bls12_381_g1_bls12_381_fr | I_mul_bls12_381_g2_bls12_381_fr
-    | I_mul_bls12_381_fr_bls12_381_fr | I_mul_nat_bls12_381_fr
-    | I_mul_int_bls12_381_fr ->
+    | ( I_mul_nat | I_mul_nat_int | I_mul_int | I_mul_mutez_nat
+      | I_mul_bls12_381_g1_bls12_381_fr | I_mul_bls12_381_g2_bls12_381_fr
+      | I_mul_bls12_381_fr_bls12_381_fr | I_mul_nat_bls12_381_fr
+      | I_mul_int_bls12_381_fr ) as i ->
         let t_1, env' = pop env in
         let t_2, env' = pop env' in
-        let e = Tezla_adt.E_mul (t_1, t_2) in
+        let e =
+          let open Tezla_adt in
+          match i with
+          | I_mul_nat -> E_mul_nat (t_1, t_2)
+          | I_mul_nat_int -> E_mul_nat_int (t_1, t_2)
+          | I_mul_int -> E_mul_int (t_1, t_2)
+          | I_mul_mutez_nat -> E_mul_mutez_nat (t_1, t_2)
+          | I_mul_bls12_381_g1_bls12_381_fr ->
+              E_mul_bls12_381_g1_bls12_381_fr (t_1, t_2)
+          | I_mul_bls12_381_g2_bls12_381_fr ->
+              E_mul_bls12_381_g2_bls12_381_fr (t_1, t_2)
+          | I_mul_bls12_381_fr_bls12_381_fr ->
+              E_mul_bls12_381_fr_bls12_381_fr (t_1, t_2)
+          | I_mul_nat_bls12_381_fr -> E_mul_nat_bls12_381_fr (t_1, t_2)
+          | I_mul_int_bls12_381_fr -> E_mul_int_bls12_381_fr (t_1, t_2)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
-    | I_ediv_nat | I_ediv_nat_int | I_ediv_int | I_ediv_mutez_nat | I_ediv_mutez
-      ->
+    | ( I_ediv_nat | I_ediv_nat_int | I_ediv_int | I_ediv_mutez_nat
+      | I_ediv_mutez ) as i ->
         let v_1, env' = pop env in
         let v_2, env' = pop env' in
-        let e = Tezla_adt.E_div (v_1, v_2) in
+        let e =
+          let open Tezla_adt in
+          match i with
+          | I_ediv_nat -> E_ediv_nat (v_1, v_2)
+          | I_ediv_nat_int -> E_ediv_nat_int (v_1, v_2)
+          | I_ediv_int -> E_ediv_int (v_1, v_2)
+          | I_ediv_mutez_nat -> E_ediv_mutez_nat (v_1, v_2)
+          | I_ediv_mutez -> E_ediv_mutez (v_1, v_2)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_abs ->
@@ -660,45 +747,80 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         let e = Tezla_adt.E_abs x in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
-    | I_neg_nat | I_neg_int | I_neg_bls12_381_g1 | I_neg_bls12_381_g2
-    | I_neg_bls12_381_fr ->
+    | ( I_neg_nat | I_neg_int | I_neg_bls12_381_g1 | I_neg_bls12_381_g2
+      | I_neg_bls12_381_fr ) as i ->
         let x, env' = pop env in
-        let e = Tezla_adt.E_neg x in
+        let e =
+          let open Tezla_adt in
+          match i with
+          | I_neg_nat -> E_neg_nat x
+          | I_neg_int -> E_neg_int x
+          | I_neg_bls12_381_g1 -> E_neg_bls12_381_g1 x
+          | I_neg_bls12_381_g2 -> E_neg_bls12_381_g2 x
+          | I_neg_bls12_381_fr -> E_neg_bls12_381_fr x
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_lsl ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let e = Tezla_adt.E_shiftL (x_1, x_2) in
+        let e = Tezla_adt.E_lsl (x_1, x_2) in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_lsr ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let e = Tezla_adt.E_shiftR (x_1, x_2) in
+        let e = Tezla_adt.E_lsr (x_1, x_2) in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
-    | I_or_bool | I_or_nat ->
+    | (I_or_bool | I_or_nat) as i ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let e = Tezla_adt.E_or (x_1, x_2) in
+        let e =
+          let open Tezla_adt in
+          match i with
+          | I_or_bool -> E_or_bool (x_1, x_2)
+          | I_or_nat -> E_or_nat (x_1, x_2)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_and_bool | I_and_nat | I_and_int_nat ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let e = Tezla_adt.E_and (x_1, x_2) in
+        let e =
+          let open Tezla_adt in
+          match i with
+          | I_and_bool -> E_and_bool (x_1, x_2)
+          | I_and_nat -> E_and_nat (x_1, x_2)
+          | I_and_int_nat -> E_and_int_nat (x_1, x_2)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
-    | I_xor_bool | I_xor_nat ->
+    | (I_xor_bool | I_xor_nat) as i ->
         let x_1, env' = pop env in
         let x_2, env' = pop env' in
-        let e = Tezla_adt.E_xor (x_1, x_2) in
+        let e =
+          let open Tezla_adt in
+          match i with
+          | I_xor_bool -> E_xor_bool (x_1, x_2)
+          | I_xor_nat -> E_xor_nat (x_1, x_2)
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
-    | I_not_bool | I_not_nat | I_not_int ->
+    | (I_not_bool | I_not_nat | I_not_int) as i ->
         let x, env' = pop env in
-        let e = Tezla_adt.E_not x in
+        let e =
+          let open Tezla_adt in
+          match i with
+          | I_not_bool -> E_not_bool x
+          | I_not_nat -> E_not_nat x
+          | I_not_int -> E_not_int x
+          | _ -> assert false
+        in
         let v, assign = create_assign_annot_1 e in
         (assign, push v env')
     | I_compare ->
@@ -859,7 +981,10 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         let x_2, env = pop env in
         let x_3, env = pop env in
         let x_4, env = pop env in
-        let e_1 = Tezla_adt.E_create_account_operation (x_1, x_2, x_3, x_4) in
+        let e_1 =
+          Tezla_adt.E_operation
+            (Tezla_adt.Operation.O_create_account (x_1, x_2, x_3, x_4))
+        in
         let e_2 = Tezla_adt.E_create_account_address (x_1, x_2, x_3, x_4) in
         let v_1, assign_1 = create_assign_annot_1 e_1 in
         let v_2, assign_2 = create_assign_annot_1 e_2 in

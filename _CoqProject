@@ -1,0 +1,8 @@
+-Q src/verified Tezla
+
+src/verified/Adt.v
+src/verified/Common_adt.v
+src/verified/Edo_adt.v
+src/verified/Semantics.v
+src/verified/Typ.v
+src/verified/Var.v

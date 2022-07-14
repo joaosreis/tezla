@@ -33,17 +33,51 @@ and expr_t =
   | E_car of var
   | E_cdr of var
   | E_abs of var
-  | E_neg of var
-  | E_not of var
-  | E_add of var * var
-  | E_sub of var * var
-  | E_mul of var * var
-  | E_div of var * var
-  | E_shiftL of var * var
-  | E_shiftR of var * var
-  | E_and of var * var
-  | E_or of var * var
-  | E_xor of var * var
+  | E_neg_nat of var
+  | E_neg_int of var
+  | E_neg_bls12_381_g1 of var
+  | E_neg_bls12_381_g2 of var
+  | E_neg_bls12_381_fr of var
+  | E_not_bool of var
+  | E_not_nat of var
+  | E_not_int of var
+  | E_add_nat of var * var
+  | E_add_nat_int of var * var
+  | E_add_int of var * var
+  | E_add_timestamp_int of var * var
+  | E_add_mutez of var * var
+  | E_add_bls12_381_g1 of var * var
+  | E_add_bls12_381_g2 of var * var
+  | E_add_bls12_381_fr of var * var
+  | E_sub_nat of var * var
+  | E_sub_nat_int of var * var
+  | E_sub_int of var * var
+  | E_sub_timestamp_int of var * var
+  | E_sub_timestamp of var * var
+  | E_sub_mutez of var * var
+  | E_mul_nat of var * var
+  | E_mul_nat_int of var * var
+  | E_mul_int of var * var
+  | E_mul_mutez_nat of var * var
+  | E_mul_bls12_381_g1_bls12_381_fr of var * var
+  | E_mul_bls12_381_g2_bls12_381_fr of var * var
+  | E_mul_bls12_381_fr_bls12_381_fr of var * var
+  | E_mul_nat_bls12_381_fr of var * var
+  | E_mul_int_bls12_381_fr of var * var
+  | E_ediv_nat of var * var
+  | E_ediv_nat_int of var * var
+  | E_ediv_int of var * var
+  | E_ediv_mutez_nat of var * var
+  | E_ediv_mutez of var * var
+  | E_lsl of var * var
+  | E_lsr of var * var
+  | E_and_bool of var * var
+  | E_and_nat of var * var
+  | E_and_int_nat of var * var
+  | E_or_bool of var * var
+  | E_or_nat of var * var
+  | E_xor_bool of var * var
+  | E_xor_nat of var * var
   | E_eq of var
   | E_neq of var
   | E_lt of var
@@ -60,12 +94,20 @@ and expr_t =
   | E_right of var * adt_typ
   | E_some of var
   | E_none of adt_typ
-  | E_mem of var * var
-  | E_get of var * var
-  | E_update of var * var * var
-  | E_concat of var * var
-  | E_concat_list of var
-  | E_slice of var * var * var
+  | E_mem_set of var * var
+  | E_mem_map of var * var
+  | E_mem_big_map of var * var
+  | E_get_map of var * var
+  | E_get_big_map of var * var
+  | E_update_set of var * var * var
+  | E_update_map of var * var * var
+  | E_update_big_map of var * var * var
+  | E_concat_string of var * var
+  | E_concat_bytes of var * var
+  | E_concat_list_string of var
+  | E_concat_list_bytes of var
+  | E_slice_string of var * var * var
+  | E_slice_bytes of var * var * var
   | E_pack of var
   | E_unpack of adt_typ * var
   | E_self
@@ -88,7 +130,11 @@ and expr_t =
   | E_unlift_or_right of var
   | E_hd of var
   | E_tl of var
-  | E_size of var
+  | E_size_list of var
+  | E_size_set of var
+  | E_size_map of var
+  | E_size_string of var
+  | E_size_bytes of var
   | E_isnat of var
   | E_int_of_nat of var
   | E_chain_id
@@ -100,10 +146,9 @@ and expr_t =
   | E_empty_map of adt_typ * adt_typ
   | E_empty_big_map of adt_typ * adt_typ
   | E_apply of var * var
-  | E_append of var * var
+  | E_list_append of var * var
   | E_special_empty_list of ttyp
   | E_special_empty_map of ttyp * ttyp
-  | E_create_account_operation of var * var * var * var
   | E_create_account_address of var * var * var * var
   | E_voting_power of var
   | E_keccak of var
@@ -135,16 +180,19 @@ and stmt_t =
   | S_skip
   | S_drop of var list
   | S_swap
-  | S_dig
-  | S_dug
+  | S_dig of Bigint.t
+  | S_dug of Bigint.t
   | S_if of var * stmt * stmt
   | S_if_none of var * stmt * stmt
   | S_if_left of var * stmt * stmt
   | S_if_cons of var * stmt * stmt
   | S_loop of var * stmt
   | S_loop_left of var * stmt
-  | S_map of var * stmt
-  | S_iter of var * stmt
+  | S_map_list of var * stmt
+  | S_map_map of var * stmt
+  | S_iter_set of var * stmt
+  | S_iter_list of var * stmt
+  | S_iter_map of var * stmt
   | S_failwith of var
   | S_return of var
 [@@deriving sexp]
