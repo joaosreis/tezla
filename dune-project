@@ -37,4 +37,5 @@
    (>= v0.15))
   bignum
   michelson-adt
-  michelson-parser))
+  michelson-parser
+  coq))

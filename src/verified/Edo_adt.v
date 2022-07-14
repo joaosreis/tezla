@@ -51,43 +51,44 @@ Module Adt.
 End Adt.
 
 Module Typ.
+  Inductive comparable_type : Set :=
+  | Unit : comparable_type
+  | Never : comparable_type
+  | Bool : comparable_type
+  | Int : comparable_type
+  | Nat : comparable_type
+  | String : comparable_type
+  | Chain_id : comparable_type
+  | Bytes : comparable_type
+  | Mutez : comparable_type
+  | Key_hash : comparable_type
+  | Key : comparable_type
+  | Signature : comparable_type
+  | Timestamp : comparable_type
+  | Address : comparable_type
+  | COption : comparable_type -> comparable_type 
+  | COr : comparable_type -> comparable_type -> comparable_type
+  | CPair : comparable_type -> comparable_type -> comparable_type.
 
-  Inductive t' : Type :=
-  | Unit : t'
-  | Never : t'
-  | Bool : t'
-  | Int : t'
-  | Nat : t'
-  | String : t'
-  | Chain_id : t'
-  | Bytes : t'
-  | Mutez : t'
-  | Key_hash : t'
-  | Key : t'
-  | Signature : t'
-  | Timestamp : t'
-  | Address : t'
-  | Option : t -> t'
-  | List : t -> t'
-  | SSet : t -> t'
-  | Operation : t'
-  | Contract : t -> t'
-  | Ticket : t -> t'
-  | Pair : t -> t -> t'
-  | Or : t -> t -> t'
-  | Lambda : t -> t -> t'
-  | Map : t -> t -> t'
-  | Big_map : t -> t -> t'
-  | Bls12_381_g1 : t'
-  | Bls12_381_g2 : t'
-  | Bls12_381_fr : t'
-  | Sapling_transaction : Z -> t'
-  | Sapling_state : Z -> t'
-  | Chest : t'
-  | Chest_key : t'
-
-  with t : Type :=
-    self : t' -> list Annot.t -> t.
+  Inductive t : Set :=  
+  | Comparable : comparable_type -> t
+  | List : t -> t
+  | SSet : t -> t
+  | Operation : t
+  | Contract : t -> t
+  | Ticket : t -> t
+  | Pair : t -> t -> t
+  | Or : t -> t -> t
+  | Lambda : t -> t -> t
+  | Map : t -> t -> t
+  | Big_map : t -> t -> t
+  | Bls12_381_g1 : t
+  | Bls12_381_g2 : t
+  | Bls12_381_fr : t
+  | Sapling_transaction : Z -> t
+  | Sapling_state : Z -> t
+  | Chest : t
+  | Chest_key : t.
 
 End Typ.
 

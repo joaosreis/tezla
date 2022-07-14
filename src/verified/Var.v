@@ -1,10 +1,6 @@
 From Coq Require Import Strings.String.
-From Tezla Require Import Edo_adt.
 
-Record t := {
-    var_name : string;
-    var_type : Typ.t;
-  }.
+From Tezla Require Import Typ.
 
-Definition to_string (t: t) : string :=
-  var_name t.
+Inductive t (A : Typ.t) : Type :=
+| var (s : String.string) : t A.

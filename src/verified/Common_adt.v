@@ -11,7 +11,5 @@ Module Annot.
 End Annot.
 
 Module Node.
-
   Record t (A: Type) : Type := create { id : Z; value : A; }.
-
 End Node.
