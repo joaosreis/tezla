@@ -84,9 +84,7 @@ let%test "dup 3" =
   List.equal Int.equal (dup [ 1; 2; 3 ] Bigint.(one)) [ 3; 1; 2; 3 ]
 
 let map f = List.map ~f
-
 let%test "map" = List.equal Int.equal (map (( + ) 1) [ 1; 2; 3 ]) [ 2; 3; 4 ]
-
 let map2 f = List.map2_exn ~f
 
 let%test "map2" =
