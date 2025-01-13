@@ -1,5 +1,5 @@
 
 pin-depends: [
-    ["michelson-adt" "git+https://github.com/joaosreis/michelson-adt#19d004550caa89b7e4279e5630da2583e434dc62"]
-    ["michelson-parser" "git+https://github.com/joaosreis/michelson-parser.git#cd2b3208363f1a62de8198ddc2f83dada9cd6fc9"]
+    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#3ca3bfd6ddc138a7da6ed468339e5457b265a64f"]
+    ["michelson-parser.dev" "git+https://github.com/joaosreis/michelson-parser#ba9f95bb1d9df4848a067c905a827f58dc62212c"]
 ]
