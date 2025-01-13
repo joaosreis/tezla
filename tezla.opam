@@ -37,6 +37,6 @@ build: [
 dev-repo: "git+https://github.com/joaosreis/tezla.git"
 
 pin-depends: [
-    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#14d8856fbb06b08933122f63fdfcdf8c283333bd"]
-    ["michelson-parser.dev" "git+https://github.com/joaosreis/michelson-parser#00e70d58ec216085f7c5b71c43c299963f548aa1"]
+    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#fb3205966e8328944f3981ec77d5e265c29e5984"]
+    ["michelson-parser.dev" "git+https://github.com/joaosreis/michelson-parser#edf10448474991e56f6a8e4aace84e2498afd586"]
 ]
