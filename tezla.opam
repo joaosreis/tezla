@@ -13,8 +13,8 @@ depends: [
   "alcotest" {with-test}
   "qcheck" {with-test}
   "qcheck-alcotest" {with-test}
-  "core_unix" {with-test & >= "v0.15"}
-  "core" {>= "v0.15"}
+  "core_unix" {with-test & >= "v0.15" & < "v0.16"}
+  "core" {>= "v0.15" & < "v0.16"}
   "bignum"
   "michelson-adt"
   "michelson-parser"
@@ -37,6 +37,6 @@ build: [
 dev-repo: "git+https://github.com/joaosreis/tezla.git"
 
 pin-depends: [
-    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#3ca3bfd6ddc138a7da6ed468339e5457b265a64f"]
-    ["michelson-parser.dev" "git+https://github.com/joaosreis/michelson-parser#ba9f95bb1d9df4848a067c905a827f58dc62212c"]
+    ["michelson-adt.dev" "git+https://github.com/joaosreis/michelson-adt#14d8856fbb06b08933122f63fdfcdf8c283333bd"]
+    ["michelson-parser.dev" "git+https://github.com/joaosreis/michelson-parser#00e70d58ec216085f7c5b71c43c299963f548aa1"]
 ]
