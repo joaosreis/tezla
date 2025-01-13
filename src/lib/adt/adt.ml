@@ -3,11 +3,11 @@ module Var = Var
 module Operation = Operation
 module Node = Common_adt.Node
 
-type var = Var.t [@@deriving sexp]
-type adt_typ = Edo_adt.Adt.typ [@@deriving sexp]
-type ttyp = Edo_adt.Typ.t [@@deriving sexp]
-type operation = Operation.t [@@deriving sexp]
-type 'a node = 'a Node.t [@@deriving sexp]
+type var = Var.t [@@deriving sexp, ord]
+type adt_typ = Edo_adt.Adt.typ [@@deriving sexp, ord]
+type ttyp = Edo_adt.Typ.t [@@deriving sexp, ord]
+type operation = Operation.t [@@deriving sexp, ord]
+type 'a node = 'a Node.t [@@deriving sexp, ord]
 
 module Id () = struct
   let create_id_counter () = ref (-1)
