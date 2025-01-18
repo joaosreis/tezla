@@ -25,7 +25,9 @@
           ## - or force ocamlfind to be a certain version:
           # ocamlfind = "1.9.2";
         };
-        scope = on.buildOpamProject { } package ./. query;
+        scope =
+          on.buildOpamProject { resolveArgs.with-test = true; } package ./.
+          query;
         overlay = final: prev:
           {
             # Your overrides go here
