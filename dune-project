@@ -30,12 +30,12 @@
   (core_unix
    (and
     :with-test
-    (>= v0.15)
-    (< v0.16)))
+    (>= v0.14)
+    (< v0.15)))
   (core
    (and
-    (>= v0.15)
-    (< v0.16)))
+    (>= v0.14)
+    (< v0.15)))
   bignum
   michelson-adt
   michelson-parser))
