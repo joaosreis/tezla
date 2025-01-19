@@ -28,9 +28,12 @@
         scope =
           on.buildOpamProject { resolveArgs.with-test = true; } package ./.
           query;
-        overlay = final: prev:
-          {
+        overlay = final: prev: {
             # Your overrides go here
+          ocaml-lsp-server = prev.ocaml-lsp-server.overrideAttrs {
+            nativeBuildInputs = prev.ocaml-lsp-server.nativeBuildInputs
+              ++ [ prev.cppo ];
+          };
           };
         scope' = scope.overrideScope overlay;
         # The main package containing the executable
