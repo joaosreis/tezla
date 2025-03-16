@@ -18,6 +18,7 @@ depends: [
   "bignum"
   "michelson-adt"
   "michelson-parser"
+  "tezla-adt"
   "odoc" {with-doc}
 ]
 build: [

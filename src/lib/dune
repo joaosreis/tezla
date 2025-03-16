@@ -1,5 +1,0 @@
-(library
- (name tezla)
- (public_name tezla)
- (libraries adt converter functional_stack interpreter)
- (synopsis "Michelson front end for Softcheck."))

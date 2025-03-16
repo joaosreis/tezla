@@ -1,5 +1,5 @@
 open! Core
-open Adt
+open Tezla_adt.Adt
 open Edo_adt
 open Common_adt
 

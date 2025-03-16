@@ -1,4 +1,4 @@
-type elem = Adt.var
+type elem = Tezla_adt.Adt.var
 type env = Failed | Stack of elem Functional_stack.t
 
 val next_var : int ref -> string

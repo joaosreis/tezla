@@ -1,6 +1,6 @@
 module S = Functional_stack
 
-type elem = Adt.var
+type elem = Tezla_adt.Adt.var
 type env = Failed | Stack of elem Functional_stack.t
 
 let empty_env = Stack S.empty

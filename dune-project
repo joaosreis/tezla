@@ -13,12 +13,12 @@
 
 (license MIT)
 
-(authors "Jo\195\163o Santos Reis <joaosreis@outlook.pt>")
+(authors "João Santos Reis <joaosreis@outlook.pt>")
 
-(maintainers "Jo\195\163o Santos Reis <joaosreis@outlook.pt>")
+(maintainers "João Santos Reis <joaosreis@outlook.pt>")
 
 (package
- (name tezla)
+ (name tezla-converter)
  (synopsis "An intermediate representation of the Michelson language")
  (depends
   (dune :build)
@@ -38,4 +38,27 @@
     (< v0.15)))
   bignum
   michelson-adt
-  michelson-parser))
+  michelson-parser
+  tezla-adt))
+
+(package
+ (name tezla-adt)
+ (synopsis "An intermediate representation of the Michelson language")
+ (depends
+  (dune :build)
+  (bisect_ppx :with-test)
+  ppx_inline_test
+  (alcotest :with-test)
+  (qcheck :with-test)
+  (qcheck-alcotest :with-test)
+  (core_unix
+   (and
+    :with-test
+    (>= v0.14)
+    (< v0.15)))
+  (core
+   (and
+    (>= v0.14)
+    (< v0.15)))
+  bignum
+  michelson-adt))

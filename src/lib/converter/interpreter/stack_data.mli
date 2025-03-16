@@ -1,4 +1,4 @@
-open Adt
+open Tezla_adt.Adt
 
 type t_key_hash = Key_hash of string
 
@@ -124,7 +124,7 @@ and _ typ =
 type e_typ = E_T : 'a typ -> e_typ
 
 val typ_from_adt_typ : Edo_adt.Adt.typ -> e_typ
-val from_adt_data : 'a typ -> Adt.data -> 'a t
+val from_adt_data : 'a typ -> Tezla_adt.Adt.data -> 'a t
 val equal : 'a t -> 'a t -> bool
 val cast : 'a typ -> 'b t -> 'a t
 val cast_map_key : 'a typ -> (_, 'b) t_map -> ('a, 'b) t_map

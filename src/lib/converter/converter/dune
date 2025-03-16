@@ -1,0 +1,6 @@
+(library
+ (name tezla_converter)
+ (public_name tezla-converter)
+ (libraries core tezla_adt functional_stack)
+ (preprocess
+  (pps ppx_inline_test ppx_jane)))

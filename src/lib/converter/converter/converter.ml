@@ -1,7 +1,7 @@
 open! Core
 open Env
 module Michelson_adt = Edo_adt.Typed_adt
-module Tezla_adt = Adt
+module Tezla_adt = Tezla_adt.Adt
 open Common_adt
 
 let create_stmt = Tezla_adt.Stmt.create

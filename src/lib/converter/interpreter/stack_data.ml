@@ -18,10 +18,10 @@ type t_bytes = Bytes of bytes
 type t_chain_id = Chain_id of bytes
 type t_int = Int of Bigint.t
 type t_key = Key of string
-type (_, _) t_lambda = Lambda of Adt.stmt
+type (_, _) t_lambda = Lambda of Tezla_adt.Adt.stmt
 type t_mutez = Mutez of Int64.t
 type t_nat = Nat of Bigint.t
-type t_operation = Operation of Adt.operation
+type t_operation = Operation of Tezla_adt.Adt.operation
 type t_signature = Signature of string
 type t_string = String of string
 type t_timestamp = Timestamp of Bigint.t
@@ -188,7 +188,7 @@ let rec typ_from_adt_typ t =
   | T_sapling_transaction n -> E_T (Sapling_transaction_t n)
   | T_sapling_state n -> E_T (Sapling_state_t n)
 
-let rec from_adt_data : type a. a typ -> Adt.data -> a t =
+let rec from_adt_data : type a. a typ -> Tezla_adt.Adt.data -> a t =
  fun t d ->
   match (t, snd d.value) with
   | Address_t, D_string s -> SD_address (Address s)
@@ -351,7 +351,7 @@ let rec from_adt_data : type a. a typ -> Adt.data -> a t =
       | D_instruction (_, _) ) ) ->
       raise Type_error
 
-and list_from_adt_data : type a. a typ -> Adt.data list -> a t_list =
+and list_from_adt_data : type a. a typ -> Tezla_adt.Adt.data list -> a t_list =
  fun t -> function
   | [] -> L_nil
   | d :: tl ->
@@ -359,7 +359,7 @@ and list_from_adt_data : type a. a typ -> Adt.data list -> a t_list =
       let tl' = list_from_adt_data t tl in
       L_cons (d', tl')
 
-and set_from_adt_data : type a. a typ -> Adt.data list -> a t_set =
+and set_from_adt_data : type a. a typ -> Tezla_adt.Adt.data list -> a t_set =
  fun t -> function
   | [] -> Set_nil
   | d :: tl ->
@@ -368,7 +368,11 @@ and set_from_adt_data : type a. a typ -> Adt.data list -> a t_set =
       Set_cons (d', tl')
 
 and map_from_adt_data :
-    type k v. k typ -> v typ -> (Adt.data * Adt.data) list -> (k, v) t_map =
+    type k v.
+    k typ ->
+    v typ ->
+    (Tezla_adt.Adt.data * Tezla_adt.Adt.data) list ->
+    (k, v) t_map =
  fun t_k t_v d_l ->
   match d_l with
   | [] -> Map_nil
@@ -379,7 +383,11 @@ and map_from_adt_data :
       Map_cons ((d_k', d_v'), tl')
 
 and big_map_from_adt_data :
-    type k v. k typ -> v typ -> (Adt.data * Adt.data) list -> (k, v) t_big_map =
+    type k v.
+    k typ ->
+    v typ ->
+    (Tezla_adt.Adt.data * Tezla_adt.Adt.data) list ->
+    (k, v) t_big_map =
  fun t_k t_v d_l ->
   match d_l with
   | [] -> Big_map_nil
@@ -535,7 +543,7 @@ let rec to_string : type a. a t -> string = function
   | SD_mutez (Mutez n) -> Int64.to_string n
   | SD_pair (Pair (d_1, d_2)) ->
       [%string "(%{to_string d_1}, %{to_string d_2})"]
-  | SD_operation (Operation o) -> Adt.Operation.to_string o
+  | SD_operation (Operation o) -> Tezla_adt.Adt.Operation.to_string o
   | SD_or (Or_left d) -> [%string "Left %{to_string d}"]
   | SD_or (Or_right d) -> [%string "Right %{to_string d}"]
   | SD_contract _ -> "contract"

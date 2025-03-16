@@ -9,7 +9,7 @@ let () =
       let adt = Edo_parser.Parser.parse_file (dir ^ filename) in
       let adt = Edo_parser.Parser.convert (dir ^ filename) adt in
       let adt = Edo_adt.Typer.type_program adt in
-      let _ = Tezla.Converter.convert_program (ref (-1)) adt in
+      let _ = Tezla_converter.Converter.convert_program (ref (-1)) adt in
       check pass "Ok" () ()
     in
 

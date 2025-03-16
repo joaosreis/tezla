@@ -1,6 +1,6 @@
 (library
  (name functional_stack)
- (public_name tezla.functional_stack)
+ (public_name tezla-converter.functional_stack)
  (modules functional_stack)
  (libraries core bignum)
  (preprocess
