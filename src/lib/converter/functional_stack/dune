@@ -5,13 +5,3 @@
  (libraries containers zarith)
  (preprocess
   (pps ppx_inline_test)))
-
-(test
- (name test)
- (modules test)
- (libraries
-  containers
-  tezla-converter.functional_stack
-  alcotest
-  qcheck
-  qcheck-alcotest))
