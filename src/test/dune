@@ -3,7 +3,7 @@
  (libraries
   michelson-parser.edo
   tezla_adt
-  tezla_converter
+  tezla-converter
   alcotest
   containers)
  (modes byte))
