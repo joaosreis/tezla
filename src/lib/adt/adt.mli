@@ -1,4 +1,4 @@
-open Core
+open! Containers
 module Var = Var
 module Operation = Operation
 module Node : module type of Common_adt.Node
@@ -10,7 +10,7 @@ type operation = Operation.t
 type 'a node = 'a Node.t
 
 type data_t =
-  | D_int of Bigint.t
+  | D_int of Z.t
   | D_string of string
   | D_bytes of Bytes.t
   | D_unit
@@ -23,9 +23,8 @@ type data_t =
   | D_list of data list
   | D_map of (data * data) list
   | D_instruction of var * stmt
-[@@deriving sexp]
 
-and data = (Edo_adt.Adt.typ * data_t) node [@@deriving sexp]
+and data = (Edo_adt.Adt.typ * data_t) node
 
 and expr_t =
   | E_var of var
@@ -156,7 +155,7 @@ and expr_t =
   | E_total_voting_power
   | E_pairing_check of var
   | E_sapling_verify_update of var * var
-  | E_sapling_empty_state of Bigint.t
+  | E_sapling_empty_state of Z.t
   | E_ticket of var * var
   | E_read_ticket_pair of var
   | E_read_ticket_ticket of var
@@ -167,12 +166,11 @@ and expr_t =
   | E_open_chest of var * var * var
   | E_get_and_update_val of var * var * var
   | E_get_and_update_map of var * var * var
-  | E_dup_n of Bigint.t * var
-  | E_get_n of Bigint.t * var
-  | E_update_n of Bigint.t * var * var
-[@@deriving sexp]
+  | E_dup_n of Z.t * var
+  | E_get_n of Z.t * var
+  | E_update_n of Z.t * var * var
 
-and expr = expr_t node [@@deriving sexp]
+and expr = expr_t node
 
 and stmt_t =
   | S_seq of stmt * stmt
@@ -180,8 +178,8 @@ and stmt_t =
   | S_skip
   | S_drop of var list
   | S_swap
-  | S_dig of Bigint.t
-  | S_dug of Bigint.t
+  | S_dig of Z.t
+  | S_dug of Z.t
   | S_if of var * stmt * stmt
   | S_if_none of var * stmt * stmt
   | S_if_left of var * stmt * stmt
@@ -195,10 +193,9 @@ and stmt_t =
   | S_iter_map of var * stmt
   | S_failwith of var
   | S_return of var
-[@@deriving sexp]
 
-and stmt = stmt_t node [@@deriving sexp]
-and program = adt_typ * adt_typ * stmt [@@deriving sexp]
+and stmt = stmt_t node
+and program = adt_typ * adt_typ * stmt
 
 module type Common = sig
   type t'
@@ -206,8 +203,6 @@ module type Common = sig
 
   val create : ?location:Common_adt.Loc.t -> t' -> t
   val to_string : t -> string
-
-  include Sexpable.S with type t := t
 end
 
 module Data : Common with type t' = adt_typ * data_t and type t = data

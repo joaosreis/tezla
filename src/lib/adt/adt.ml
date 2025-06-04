@@ -1,13 +1,13 @@
-open! Core
+open! Containers
 module Var = Var
 module Operation = Operation
 module Node = Common_adt.Node
 
-type var = Var.t [@@deriving sexp]
-type adt_typ = Edo_adt.Adt.typ [@@deriving sexp]
-type ttyp = Edo_adt.Typ.t [@@deriving sexp]
-type operation = Operation.t [@@deriving sexp]
-type 'a node = 'a Node.t [@@deriving sexp]
+type var = Var.t [@@deriving ord]
+type adt_typ = Edo_adt.Adt.typ [@@deriving ord]
+type ttyp = Edo_adt.Typ.t [@@deriving ord]
+type operation = Operation.t [@@deriving ord]
+type 'a node = 'a Node.t [@@deriving ord]
 
 module Id () = struct
   let create_id_counter () = ref (-1)
@@ -24,13 +24,11 @@ module type Common = sig
 
   val create : ?location:Common_adt.Loc.t -> t' -> t
   val to_string : t -> string
-
-  include Sexpable.S with type t := t
 end
 
 module Make_common (T : sig
   type t'
-  type t = t' node [@@deriving sexp]
+  type t = t' node
 
   val to_string : t -> string
 end) : Common with type t' = T.t' and type t = T.t = struct
@@ -42,7 +40,7 @@ end) : Common with type t' = T.t' and type t = T.t = struct
 end
 
 type data_t =
-  | D_int of Bigint.t
+  | D_int of Z.t
   | D_string of string
   | D_bytes of Bytes.t
   | D_unit
@@ -55,9 +53,8 @@ type data_t =
   | D_list of data list
   | D_map of (data * data) list
   | D_instruction of var * stmt
-[@@deriving sexp]
 
-and data = (adt_typ * data_t) node [@@deriving sexp]
+and data = (adt_typ * data_t) node
 
 and expr_t =
   | E_var of var
@@ -188,7 +185,7 @@ and expr_t =
   | E_total_voting_power
   | E_pairing_check of var
   | E_sapling_verify_update of var * var
-  | E_sapling_empty_state of Bigint.t
+  | E_sapling_empty_state of Z.t
   | E_ticket of var * var
   | E_read_ticket_pair of var
   | E_read_ticket_ticket of var
@@ -199,12 +196,11 @@ and expr_t =
   | E_open_chest of var * var * var
   | E_get_and_update_val of var * var * var
   | E_get_and_update_map of var * var * var
-  | E_dup_n of Bigint.t * var
-  | E_get_n of Bigint.t * var
-  | E_update_n of Bigint.t * var * var
-[@@deriving sexp]
+  | E_dup_n of Z.t * var
+  | E_get_n of Z.t * var
+  | E_update_n of Z.t * var * var
 
-and expr = expr_t node [@@deriving sexp]
+and expr = expr_t node
 
 and stmt_t =
   | S_seq of stmt * stmt
@@ -212,8 +208,8 @@ and stmt_t =
   | S_skip
   | S_drop of var list
   | S_swap
-  | S_dig of Bigint.t
-  | S_dug of Bigint.t
+  | S_dig of Z.t
+  | S_dug of Z.t
   | S_if of var * stmt * stmt
   | S_if_none of var * stmt * stmt
   | S_if_left of var * stmt * stmt
@@ -227,18 +223,18 @@ and stmt_t =
   | S_iter_map of var * stmt
   | S_failwith of var
   | S_return of var
-[@@deriving ord, sexp]
+[@@deriving ord]
 
-and stmt = stmt_t node [@@deriving sexp]
-and program = adt_typ * adt_typ * stmt [@@deriving sexp]
+and stmt = stmt_t node
+and program = adt_typ * adt_typ * stmt
 
 module Data = Make_common (struct
   type t' = adt_typ * data_t
-  type t = data [@@deriving sexp]
+  type t = data
 
   let rec to_string d =
     match snd d.Node.value with
-    | D_int d -> Bigint.to_string d
+    | D_int d -> Z.to_string d
     | D_string s -> s
     | D_bytes b -> [%string "%{b#Bytes}"]
     | D_left d -> [%string "Left %{to_string d}"]
@@ -248,22 +244,21 @@ module Data = Make_common (struct
     | D_unit -> "Unit"
     | D_bool b -> ( match b with true -> "True" | false -> "False")
     | D_pair (d_1, d_2) -> [%string "(Pair %{to_string d_1} %{to_string d_2})"]
-    | D_list d -> List.to_string ~f:to_string d
+    | D_list d -> List.to_string to_string d
     | D_map d ->
         List.to_string
-          ~f:(fun (d_1, d_2) ->
-            [%string "Elt %{to_string d_1} %{to_string d_2}"])
+          (fun (d_1, d_2) -> [%string "Elt %{to_string d_1} %{to_string d_2}"])
           d
     | D_instruction _ -> "{ ... }"
 end)
 
 module Expr = Make_common (struct
   type t' = expr_t
-  type t = expr [@@deriving sexp]
+  type t = expr
 
   let to_string e =
     let typ_to_string t =
-      Edo_adt.Pp.pp_typ Format.str_formatter t;
+      Edo_adt.Adt.Typ.pp Format.str_formatter t;
       Format.flush_str_formatter ()
     in
     match e.Node.value with
@@ -429,7 +424,7 @@ module Expr = Make_common (struct
     | E_pairing_check v -> [%string "PAIRING_CHECK %{v#Var}"]
     | E_sapling_verify_update (v_1, v_2) ->
         [%string "SApling_verify_update %{v_1#Var} %{v_2#Var}"]
-    | E_sapling_empty_state n -> [%string "SAPLING_EMPTY_STATE %{n#Bigint}"]
+    | E_sapling_empty_state n -> [%string "SAPLING_EMPTY_STATE %{n#Z}"]
     | E_ticket (v_1, v_2) -> [%string "TICKET %{v_1#Var} %{v_2#Var}"]
     | E_read_ticket_pair v -> [%string "READ_TICKET_pair %{v#Var}"]
     | E_read_ticket_ticket v -> [%string "READ_TICKET_ticket %{v#Var}"]
@@ -442,17 +437,17 @@ module Expr = Make_common (struct
         [%string "GET_AND_UPDATE_val %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
     | E_get_and_update_map (v_1, v_2, v_3) ->
         [%string "GET_AND_UPDATE_map %{v_1#Var} %{v_2#Var} %{v_3#Var}"]
-    | E_dup_n (n, v) -> [%string "DUP %{n#Bigint} %{v#Var}"]
-    | E_get_n (n, v) -> [%string "GET_N %{n#Bigint} %{v#Var}"]
+    | E_dup_n (n, v) -> [%string "DUP %{n#Z} %{v#Var}"]
+    | E_get_n (n, v) -> [%string "GET_N %{n#Z} %{v#Var}"]
     | E_update_n (n, v_1, v_2) ->
-        [%string "UPDATE_N %{n#Bigint} %{v_1#Var} %{v_2#Var}"]
-    | E_pair_n v_l -> [%string "PAIR %{List.to_string ~f:Var.to_string v_l}"]
+        [%string "UPDATE_N %{n#Z} %{v_1#Var} %{v_2#Var}"]
+    | E_pair_n v_l -> [%string "PAIR %{List.to_string Var.to_string v_l}"]
 end)
 
 module Stmt = struct
   module T = struct
     type t' = stmt_t
-    type t = stmt [@@deriving sexp]
+    type t = stmt
 
     let to_string s = Int.to_string s.Node.id
   end

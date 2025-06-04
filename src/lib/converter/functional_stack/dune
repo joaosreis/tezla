@@ -2,11 +2,11 @@
  (name functional_stack)
  (public_name tezla-converter.functional_stack)
  (modules functional_stack)
- (libraries core bignum)
+ (libraries containers zarith)
  (preprocess
   (pps ppx_inline_test)))
 
 (test
  (name test)
  (modules test)
- (libraries core functional_stack alcotest qcheck qcheck-alcotest))
+ (libraries containers functional_stack alcotest qcheck qcheck-alcotest))

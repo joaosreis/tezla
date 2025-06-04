@@ -1,4 +1,4 @@
-open! Core
+open! Containers
 open Tezla_adt.Adt
 open Edo_adt
 open Common_adt
@@ -144,7 +144,7 @@ let type_expr e =
   | E_pairing_check _ -> ct Bool
   | E_sapling_verify_update (t, s) -> (
       match (t.var_type |> fst, s.var_type |> fst) with
-      | Sapling_transaction n, Sapling_state n' when Bigint.(n = n') ->
+      | Sapling_transaction n, Sapling_state n' when Z.(equal n n') ->
           ct (Option (ct (Pair (ct Int, ct (Sapling_state n)))))
       | _ -> assert false)
   | E_sapling_empty_state n -> ct (Sapling_state n)
@@ -192,22 +192,22 @@ let type_expr e =
   | E_dup_n (_, v) -> v.var_type
   | E_get_n (n, v) ->
       let rec get_n n t =
-        if Bigint.(n = zero) then t
+        if Z.(equal n zero) then t
         else
           match fst t with
           | Pair (l, r) ->
-              if Bigint.(n = one) then l else get_n Bigint.(n - one - one) r
+              if Z.(equal n one) then l else get_n Z.(n - one - one) r
           | _ -> assert false
       in
       get_n n v.var_type
   | E_update_n (n, k, v) ->
       let rec update_n n t_1 t_2 =
-        if Bigint.(n = zero) then t_1
+        if Z.(equal n zero) then t_1
         else
           match fst t_2 with
           | Pair (l, r) ->
-              if Bigint.(n = one) then (Pair (t_1, r), [])
-              else (Pair (l, update_n Bigint.(n - one - one) t_1 r), [])
+              if Z.(equal n one) then (Pair (t_1, r), [])
+              else (Pair (l, update_n Z.(n - one - one) t_1 r), [])
           | _ -> assert false
       in
       update_n n k.var_type v.var_type
@@ -215,7 +215,8 @@ let type_expr e =
       match List.rev v_l with
       | [ v_2; v_1 ] -> ct (Pair (v_1.var_type, v_2.var_type))
       | v_2 :: v_1 :: t ->
-          List.fold_left t
-            ~init:(ct (Pair (v_1.var_type, v_2.var_type)))
-            ~f:(fun acc v -> ct (Pair (v.var_type, acc)))
+          List.fold_left
+            (fun acc v -> ct (Pair (v.Var.var_type, acc)))
+            (ct (Pair (v_1.var_type, v_2.var_type)))
+            t
       | _ -> assert false)

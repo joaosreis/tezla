@@ -1,8 +1,8 @@
-open Core
+open Containers
 
 let () =
   let dir = "../../../../tests/" in
-  let files = Sys_unix.readdir dir in
+  let files = Sys.readdir dir in
   let open Alcotest in
   let create_test filename =
     let convert_f () =
@@ -15,6 +15,6 @@ let () =
 
     test_case filename `Quick convert_f
   in
-  let tests = Array.map files ~f:create_test in
+  let tests = Array.map create_test files in
   let tests = Array.to_list tests in
   run "Tezla converter" [ ("convert", tests) ]

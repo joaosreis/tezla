@@ -1,18 +1,13 @@
-open Core
+open! Containers
 
-type var = Var.t [@@deriving ord, sexp]
+type var = Var.t [@@deriving ord]
 
-module T = struct
-  type t =
-    | O_create_contract of Edo_adt.Typed_adt.program * var * var * var
-    | O_transfer_tokens of var * var * var
-    | O_set_delegate of var
-    | O_create_account of var * var * var * var
-  [@@deriving ord, sexp]
-end
-
-include T
-include Comparable.Make (T)
+type t =
+  | O_create_contract of Edo_adt.Typed_adt.program * var * var * var
+  | O_transfer_tokens of var * var * var
+  | O_set_delegate of var
+  | O_create_account of var * var * var * var
+[@@deriving ord]
 
 let to_string = function
   | O_create_account (v_1, v_2, v_3, v_4) ->

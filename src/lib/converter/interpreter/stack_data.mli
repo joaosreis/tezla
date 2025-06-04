@@ -13,20 +13,20 @@ and 'a t_contract =
 type t_bool = Bool of bool
 type t_bytes = Bytes of bytes
 type t_chain_id = Chain_id of bytes
-type t_int = Int of Bigint.t
+type t_int = Int of Z.t
 type t_key = Key of string
 type (_, _) t_lambda = Lambda of stmt
 type t_mutez = Mutez of Int64.t
-type t_nat = Nat of Bigint.t
+type t_nat = Nat of Z.t
 type t_operation = Operation of operation
 type t_signature = Signature of string
 type t_string = String of string
-type t_timestamp = Timestamp of Bigint.t
+type t_timestamp = Timestamp of Z.t
 type t_unit = Unit
 type t_never = Never
-type t_bls12_381_g1 = Bls12_381_g1 of Bigint.t
-type t_bls12_381_g2 = Bls12_381_g2 of Bigint.t
-type t_bls12_381_fr = Bls12_381_fr of Bigint.t
+type t_bls12_381_g1 = Bls12_381_g1 of Z.t
+type t_bls12_381_g2 = Bls12_381_g2 of Z.t
+type t_bls12_381_fr = Bls12_381_fr of Z.t
 type t_chest = Chest
 type t_chest_key = Chest_key
 type t_sapling_state = Sapling_state
@@ -118,8 +118,8 @@ and _ typ =
   | Chest_t : t_chest typ
   | Chest_key_t : t_chest_key typ
   | Ticket_t : 'a typ -> 'a t_ticket typ
-  | Sapling_state_t : Bigint.t -> t_sapling_state typ
-  | Sapling_transaction_t : Bigint.t -> t_sapling_transaction typ
+  | Sapling_state_t : Z.t -> t_sapling_state typ
+  | Sapling_transaction_t : Z.t -> t_sapling_transaction typ
 
 type e_typ = E_T : 'a typ -> e_typ
 

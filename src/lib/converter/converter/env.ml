@@ -45,14 +45,14 @@ let dug env n =
   Stack (S.dug s n)
 
 let dip env n =
-  if Bigint.(n = zero) then ([], env)
+  if Z.(n = zero) then ([], env)
   else
     let rec aux (acc, env') n' =
-      if Bigint.(n' = zero) then (acc, env')
+      if Z.(n' = zero) then (acc, env')
       else
         let x, env'' = pop env' in
         let acc' = x :: acc in
-        aux (acc', env'') Bigint.(n' - one)
+        aux (acc', env'') Z.(n' - one)
     in
     aux ([], env) n
 

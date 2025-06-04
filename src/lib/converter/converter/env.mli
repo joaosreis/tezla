@@ -9,8 +9,8 @@ val pop : env -> elem * env
 val drop : env -> env
 val peek : env -> elem
 val swap : env -> env
-val dig : env -> Bigint.t -> env
-val dug : env -> Bigint.t -> env
-val dip : env -> Bigint.t -> elem list * env
-val dup : env -> Bigint.t -> env
+val dig : env -> Z.t -> env
+val dug : env -> Z.t -> env
+val dip : env -> Z.t -> elem list * env
+val dup : env -> Z.t -> env
 val length : env -> int

@@ -27,19 +27,19 @@
   (alcotest :with-test)
   (qcheck :with-test)
   (qcheck-alcotest :with-test)
-  (core_unix
+  (containers
    (and
-    :with-test
-    (>= v0.14)
-    (< v0.15)))
-  (core
+    (>= 3.0)
+    (< 4.0)))
+  (zarith
    (and
-    (>= v0.14)
-    (< v0.15)))
-  bignum
+    (>= 1.0)
+    (< 2.0)))
   michelson-adt
   michelson-parser
-  tezla-adt))
+  tezla-adt
+  logs
+  ppx_here))
 
 (package
  (name tezla-adt)
@@ -51,14 +51,13 @@
   (alcotest :with-test)
   (qcheck :with-test)
   (qcheck-alcotest :with-test)
-  (core_unix
+  (containers
    (and
-    :with-test
-    (>= v0.14)
-    (< v0.15)))
-  (core
+    (>= 3.0)
+    (< 4.0)))
+  (zarith
    (and
-    (>= v0.14)
-    (< v0.15)))
-  bignum
-  michelson-adt))
+    (>= 1.0)
+    (< 2.0)))
+  michelson-adt
+  ppx_string))

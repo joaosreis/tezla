@@ -1,4 +1,4 @@
-open Core
+open Containers
 
 type 'a t = 'a list
 
@@ -16,78 +16,69 @@ let swap = function
   | [] -> raise Unsufficient_length
 
 let dig s n =
-  if Bigint.(n = zero) then s
-  else if Bigint.(n = one) then swap s
-  else if Bigint.(of_int (List.length s) <= n) then raise Unsufficient_length
+  if Z.(equal n zero) then s
+  else if Z.(equal n one) then swap s
+  else if Z.(leq ~$(List.length s) n) then raise Unsufficient_length
   else
     let rec aux (l_h, l_t) =
-      if Bigint.(of_int (List.length l_h) = n) then
-        (List.hd_exn l_t :: l_h) @ List.tl_exn l_t
-      else aux (l_h @ [ List.hd_exn l_t ], List.tl_exn l_t)
+      if Z.(equal ~$(List.length l_h) n) then (List.hd l_t :: l_h) @ List.tl l_t
+      else aux (l_h @ [ List.hd l_t ], List.tl l_t)
     in
     aux ([], s)
 
 let%test "dig invalid length" =
   try
-    let _ = dig [ 1; 2 ] Bigint.(of_int 2) in
+    let _ = dig [ 1; 2 ] Z.(of_int 2) in
     false
   with Unsufficient_length -> true
 
-let%test "dig 0" =
-  List.equal Int.equal (dig [ 1; 2; 3 ] Bigint.zero) [ 1; 2; 3 ]
-
-let%test "dig 1" = List.equal Int.equal (dig [ 1; 2; 3 ] Bigint.one) [ 2; 1; 3 ]
+let%test "dig 0" = List.equal Int.equal (dig [ 1; 2; 3 ] Z.zero) [ 1; 2; 3 ]
+let%test "dig 1" = List.equal Int.equal (dig [ 1; 2; 3 ] Z.one) [ 2; 1; 3 ]
 
 let%test "dig 2" =
-  List.equal Int.equal (dig [ 1; 2; 3 ] Bigint.(of_int 2)) [ 3; 1; 2 ]
+  List.equal Int.equal (dig [ 1; 2; 3 ] Z.(of_int 2)) [ 3; 1; 2 ]
 
 let dug s n =
-  if Bigint.(n = of_int 0) then s
-  else if Bigint.(n = of_int 1) then swap s
-  else if Bigint.(of_int (List.length s) <= n) then raise Unsufficient_length
+  if Z.(equal n zero) then s
+  else if Z.(equal n one) then swap s
+  else if Z.(leq ~$(List.length s) n) then raise Unsufficient_length
   else
-    let h = List.hd_exn s in
+    let h = List.hd s in
     let rec aux (l_h, l_t) =
-      if Bigint.(of_int (List.length l_h) = n) then l_h @ (h :: l_t)
-      else aux (l_h @ [ List.hd_exn l_t ], List.tl_exn l_t)
+      if Z.(equal ~$(List.length l_h) n) then l_h @ (h :: l_t)
+      else aux (l_h @ [ List.hd l_t ], List.tl l_t)
     in
-    aux ([], List.tl_exn s)
+    aux ([], List.tl s)
 
 let%test "dug invalid length" =
   try
-    let _ = dug [ 1; 2 ] Bigint.(of_int 2) in
+    let _ = dug [ 1; 2 ] Z.(of_int 2) in
     false
   with Unsufficient_length -> true
 
-let%test "dug 0" = List.equal Int.equal (dug [ 1 ] Bigint.zero) [ 1 ]
-let%test "dug 1" = List.equal Int.equal (dug [ 1; 2; 3 ] Bigint.one) [ 2; 1; 3 ]
+let%test "dug 0" = List.equal Int.equal (dug [ 1 ] Z.zero) [ 1 ]
+let%test "dug 1" = List.equal Int.equal (dug [ 1; 2; 3 ] Z.one) [ 2; 1; 3 ]
 
 let%test "dug 2" =
-  List.equal Int.equal (dug [ 1; 2; 3 ] Bigint.(of_int 2)) [ 2; 3; 1 ]
+  List.equal Int.equal (dug [ 1; 2; 3 ] Z.(of_int 2)) [ 2; 3; 1 ]
 
 let dup s n =
-  if Bigint.(of_int (List.length s) < n) then raise Unsufficient_length
+  if Z.(lt ~$(List.length s) n) then raise Unsufficient_length
   else
     let rec aux i s =
-      if Bigint.(i = one) then peek s else aux Bigint.(i - one) (drop s)
+      if Z.(equal i one) then peek s else aux Z.(i - one) (drop s)
     in
     let x = aux n s in
     push x s
 
-let%test "dup 1" =
-  List.equal Int.equal (dup [ 1; 2; 3 ] Bigint.(one)) [ 1; 1; 2; 3 ]
-
-let%test "dup 2" =
-  List.equal Int.equal (dup [ 1; 2; 3 ] Bigint.(one)) [ 2; 1; 2; 3 ]
-
-let%test "dup 3" =
-  List.equal Int.equal (dup [ 1; 2; 3 ] Bigint.(one)) [ 3; 1; 2; 3 ]
-
-let map f = List.map ~f
+let%test "dup 1" = List.equal Int.equal (dup [ 1; 2; 3 ] Z.(one)) [ 1; 1; 2; 3 ]
+let%test "dup 2" = List.equal Int.equal (dup [ 1; 2; 3 ] Z.(one)) [ 2; 1; 2; 3 ]
+let%test "dup 3" = List.equal Int.equal (dup [ 1; 2; 3 ] Z.(one)) [ 3; 1; 2; 3 ]
+let map f = List.map f
 let%test "map" = List.equal Int.equal (map (( + ) 1) [ 1; 2; 3 ]) [ 2; 3; 4 ]
-let map2 f = List.map2_exn ~f
+let map2 f = List.map2 f
 
 let%test "map2" =
   List.equal Int.equal (map2 ( + ) [ 1; 2; 3 ] [ 2; 3; 4 ]) [ 3; 5; 7 ]
 
-let find f = List.find ~f
+let find = List.find_opt

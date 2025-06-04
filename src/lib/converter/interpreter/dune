@@ -1,6 +1,6 @@
 (library
  (name interpreter)
  (public_name tezla-converter.interpreter)
- (libraries core bignum tezla_adt functional_stack)
+ (libraries containers zarith tezla_adt functional_stack)
  (preprocess
-  (pps ppx_jane ppx_sexp_conv ppx_string)))
+  (pps ppx_sexp_conv ppx_string)))

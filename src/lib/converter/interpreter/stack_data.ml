@@ -1,4 +1,4 @@
-open! Core
+open! Containers
 
 exception Type_error
 exception Non_pushable_type
@@ -16,20 +16,20 @@ and 'a t_contract =
 type t_bool = Bool of bool
 type t_bytes = Bytes of bytes
 type t_chain_id = Chain_id of bytes
-type t_int = Int of Bigint.t
+type t_int = Int of Z.t
 type t_key = Key of string
 type (_, _) t_lambda = Lambda of Tezla_adt.Adt.stmt
 type t_mutez = Mutez of Int64.t
-type t_nat = Nat of Bigint.t
+type t_nat = Nat of Z.t
 type t_operation = Operation of Tezla_adt.Adt.operation
 type t_signature = Signature of string
 type t_string = String of string
-type t_timestamp = Timestamp of Bigint.t
+type t_timestamp = Timestamp of Z.t
 type t_unit = Unit
 type t_never = Never
-type t_bls12_381_g1 = Bls12_381_g1 of Bigint.t
-type t_bls12_381_g2 = Bls12_381_g2 of Bigint.t
-type t_bls12_381_fr = Bls12_381_fr of Bigint.t
+type t_bls12_381_g1 = Bls12_381_g1 of Z.t
+type t_bls12_381_g2 = Bls12_381_g2 of Z.t
+type t_bls12_381_fr = Bls12_381_fr of Z.t
 type t_chest = Chest
 type t_chest_key = Chest_key
 type t_sapling_state = Sapling_state
@@ -121,8 +121,8 @@ and _ typ =
   | Chest_t : t_chest typ
   | Chest_key_t : t_chest_key typ
   | Ticket_t : 'a typ -> 'a t_ticket typ
-  | Sapling_state_t : Bigint.t -> t_sapling_state typ
-  | Sapling_transaction_t : Bigint.t -> t_sapling_transaction typ
+  | Sapling_state_t : Z.t -> t_sapling_state typ
+  | Sapling_transaction_t : Z.t -> t_sapling_transaction typ
 
 type e_typ = E_T : 'a typ -> e_typ
 
@@ -209,7 +209,7 @@ let rec from_adt_data : type a. a typ -> Tezla_adt.Adt.data -> a t =
   | Big_map_t (t_k, t_v), D_map l ->
       let m = big_map_from_adt_data t_k t_v l in
       SD_big_map m
-  | Mutez_t, D_int n -> SD_mutez (Mutez (Bigint.to_int64_exn n))
+  | Mutez_t, D_int n -> SD_mutez (Mutez (Z.to_int64 n))
   | Nat_t, D_int n -> SD_nat (Nat n)
   | Option_t _, D_none -> SD_option O_none
   | Option_t t, D_some d ->
@@ -233,7 +233,7 @@ let rec from_adt_data : type a. a typ -> Tezla_adt.Adt.data -> a t =
   | Timestamp_t, D_int n -> SD_timestamp (Timestamp n)
   | Timestamp_t, D_string _s ->
       (* TODO: timestamp string to num *)
-      SD_timestamp (Timestamp Bigint.zero)
+      SD_timestamp (Timestamp Z.zero)
   | Unit_t, D_unit -> SD_unit
   | Bls12_381_g1_t, D_int n -> SD_bls12_381_g1 (Bls12_381_g1 n)
   | Bls12_381_g2_t, D_int n -> SD_bls12_381_g2 (Bls12_381_g2 n)
@@ -367,8 +367,7 @@ and set_from_adt_data : type a. a typ -> Tezla_adt.Adt.data list -> a t_set =
       let tl' = set_from_adt_data t tl in
       Set_cons (d', tl')
 
-and map_from_adt_data :
-    type k v.
+and map_from_adt_data : type k v.
     k typ ->
     v typ ->
     (Tezla_adt.Adt.data * Tezla_adt.Adt.data) list ->
@@ -382,8 +381,7 @@ and map_from_adt_data :
       let tl' = map_from_adt_data t_k t_v tl in
       Map_cons ((d_k', d_v'), tl')
 
-and big_map_from_adt_data :
-    type k v.
+and big_map_from_adt_data : type k v.
     k typ ->
     v typ ->
     (Tezla_adt.Adt.data * Tezla_adt.Adt.data) list ->
@@ -416,7 +414,7 @@ let rec equal : type a. a t -> a t -> bool =
   | SD_int (Int n_1), SD_int (Int n_2)
   | SD_nat (Nat n_1), SD_nat (Nat n_2)
   | SD_timestamp (Timestamp n_1), SD_timestamp (Timestamp n_2) ->
-      Bigint.equal n_1 n_2
+      Z.equal n_1 n_2
   | SD_mutez (Mutez n_1), SD_mutez (Mutez n_2) -> Int64.equal n_1 n_2
   | SD_option d_1, SD_option d_2 -> (
       match (d_1, d_2) with
@@ -484,8 +482,8 @@ let rec cast : type a b. a typ -> b t -> a t =
   | Unit_t, SD_unit -> d
   | _ -> raise Cast_error
 
-and cast_big_map :
-    type a b c d. a typ -> b typ -> (c, d) t_big_map -> (a, b) t_big_map =
+and cast_big_map : type a b c d.
+    a typ -> b typ -> (c, d) t_big_map -> (a, b) t_big_map =
  fun t_k t_v -> function
   | Big_map_nil -> Big_map_nil
   | Big_map_cons ((k, v), tl) ->
@@ -536,7 +534,7 @@ let rec to_string : type a. a t -> string = function
   | SD_bls12_381_g1 (Bls12_381_g1 n)
   | SD_bls12_381_g2 (Bls12_381_g2 n)
   | SD_bls12_381_fr (Bls12_381_fr n) ->
-      Bigint.to_string n
+      Z.to_string n
   | SD_chain_id (Chain_id b) | SD_bytes (Bytes b) -> Bytes.to_string b
   | SD_option O_none -> "None"
   | SD_option (O_some d) -> [%string "Some %{to_string d}"]

@@ -1,8 +1,7 @@
-open! Core
+open! Containers
 
-type t = { var_name : string; var_type : Edo_adt.Typ.t }
+type t = { var_name : string; var_type : Edo_adt.Typ.t } [@@deriving eq, ord]
 
-include Comparable.S with type t := t
-include Sexpable.S with type t := t
+include Set.OrderedType with type t := t
 
 val to_string : t -> string

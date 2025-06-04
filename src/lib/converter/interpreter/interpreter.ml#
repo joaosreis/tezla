@@ -1,4 +1,4 @@
-open Core
+open Containers
 open Adt
 open Stack_data
 module Stack_data = Stack_data
@@ -26,15 +26,15 @@ type ('param, 'storage) context = {
 type comp = Eq | Lt | Gt
 
 let bigint_of_comp = function
-  | Eq -> Bigint.zero
-  | Gt -> Bigint.one
-  | Lt -> Bigint.of_int (-1)
+  | Eq -> Z.zero
+  | Gt -> Z.one
+  | Lt -> Z.of_int (-1)
 
 let rec compare : type a b. a t -> b t -> comp =
  fun d_1 d_2 ->
   match (d_1, d_2) with
   | SD_int (Int n_1), SD_int (Int n_2) | SD_nat (Nat n_1), SD_nat (Nat n_2) ->
-      Bigint.(if n_1 > n_2 then Gt else if n_1 < n_2 then Lt else Eq)
+      Z.(if n_1 > n_2 then Gt else if n_1 < n_2 then Lt else Eq)
   | SD_mutez (Mutez n_1), SD_mutez (Mutez n_2) ->
       Int64.(if n_1 > n_2 then Gt else if n_1 < n_2 then Lt else Eq)
   | SD_string (String s_1), SD_string (String s_2) ->
@@ -96,18 +96,18 @@ let rec expr ctx env e =
   | E_abs v -> (
       let (E d) = find v in
       match d with
-      | SD_int (Int n) -> Ok (E (SD_nat (Nat Bigint.(abs n))))
+      | SD_int (Int n) -> Ok (E (SD_nat (Nat Z.(abs n))))
       | _ -> raise Type_error)
   | E_neg v -> (
       let (E d) = find v in
       match d with
-      | SD_int (Int n) | SD_nat (Nat n) -> Ok (E (SD_int (Int Bigint.(neg n))))
+      | SD_int (Int n) | SD_nat (Nat n) -> Ok (E (SD_int (Int Z.(neg n))))
       | _ -> raise Type_error)
   | E_not v -> (
       let (E d) = find v in
       match d with
       | SD_bool (Bool b) -> Ok (E (SD_bool (Bool (not b))))
-      | SD_int (Int n) | SD_nat (Nat n) -> Ok (E (SD_int (Int Bigint.(lnot n))))
+      | SD_int (Int n) | SD_nat (Nat n) -> Ok (E (SD_int (Int Z.(lnot n))))
       | _ -> raise Type_error)
   | E_add (v_1, v_2) ->
       let (E d_1) = find v_1 in
@@ -115,14 +115,14 @@ let rec expr ctx env e =
       let res =
         match (d_1, d_2) with
         | SD_nat (Nat n_1), SD_nat (Nat n_2) ->
-            E (SD_nat (Nat Bigint.(n_1 + n_2)))
+            E (SD_nat (Nat Z.(n_1 + n_2)))
         | SD_nat (Nat n_1), SD_int (Int n_2)
         | SD_int (Int n_1), SD_nat (Nat n_2)
         | SD_int (Int n_1), SD_int (Int n_2) ->
-            E (SD_int (Int Bigint.(n_1 + n_2)))
+            E (SD_int (Int Z.(n_1 + n_2)))
         | SD_timestamp (Timestamp n_1), SD_int (Int n_2)
         | SD_int (Int n_1), SD_timestamp (Timestamp n_2) ->
-            E (SD_timestamp (Timestamp Bigint.(n_1 + n_2)))
+            E (SD_timestamp (Timestamp Z.(n_1 + n_2)))
         | SD_mutez (Mutez n_1), SD_mutez (Mutez n_2) ->
             if Int64.(n_1 > max_value - n_2) then
               raise (Runtime_error "mutez overflow")
@@ -139,11 +139,11 @@ let rec expr ctx env e =
         | SD_nat (Nat n_1), SD_int (Int n_2)
         | SD_int (Int n_1), SD_nat (Nat n_2)
         | SD_int (Int n_1), SD_int (Int n_2) ->
-            E (SD_int (Int Bigint.(n_1 - n_2)))
+            E (SD_int (Int Z.(n_1 - n_2)))
         | SD_timestamp (Timestamp n_1), SD_int (Int n_2) ->
-            E (SD_timestamp (Timestamp Bigint.(n_1 - n_2)))
+            E (SD_timestamp (Timestamp Z.(n_1 - n_2)))
         | SD_timestamp (Timestamp n_1), SD_timestamp (Timestamp n_2) ->
-            E (SD_timestamp (Timestamp Bigint.(n_1 - n_2)))
+            E (SD_timestamp (Timestamp Z.(n_1 - n_2)))
         | SD_mutez (Mutez n_1), SD_mutez (Mutez n_2) ->
             let res = Int64.(n_1 - n_2) in
             if Int64.(res < zero) then raise (Runtime_error "negative mutez")
@@ -157,25 +157,25 @@ let rec expr ctx env e =
       let res =
         match (d_1, d_2) with
         | SD_nat (Nat n_1), SD_nat (Nat n_2) ->
-            E (SD_nat (Nat Bigint.(n_1 * n_2)))
+            E (SD_nat (Nat Z.(n_1 * n_2)))
         | SD_nat (Nat n_1), SD_int (Int n_2)
         | SD_int (Int n_1), SD_nat (Nat n_2)
         | SD_int (Int n_1), SD_int (Int n_2) ->
-            E (SD_int (Int Bigint.(n_1 * n_2)))
+            E (SD_int (Int Z.(n_1 * n_2)))
         | SD_mutez (Mutez n_1), SD_nat (Nat n_2) ->
-            let n_1 = Bigint.of_int64 n_1 in
-            let res = Bigint.(n_1 * n_2) in
-            let max_int64 = Bigint.of_int64 Int64.max_value in
-            if Bigint.(res > max_int64) then
+            let n_1 = Z.of_int64 n_1 in
+            let res = Z.(n_1 * n_2) in
+            let max_int64 = Z.of_int64 Int64.max_value in
+            if Z.(res > max_int64) then
               raise (Runtime_error "mutez overflow")
-            else E (SD_mutez (Mutez (Bigint.to_int64_exn res)))
+            else E (SD_mutez (Mutez (Z.to_int64_exn res)))
         | SD_nat (Nat n_1), SD_mutez (Mutez n_2) ->
-            let n_2 = Bigint.of_int64 n_2 in
-            let res = Bigint.(n_1 * n_2) in
-            let max_int64 = Bigint.of_int64 Int64.max_value in
-            if Bigint.(res > max_int64) then
+            let n_2 = Z.of_int64 n_2 in
+            let res = Z.(n_1 * n_2) in
+            let max_int64 = Z.of_int64 Int64.max_value in
+            if Z.(res > max_int64) then
               raise (Runtime_error "mutez overflow")
-            else E (SD_mutez (Mutez (Bigint.to_int64_exn res)))
+            else E (SD_mutez (Mutez (Z.to_int64_exn res)))
         | _ -> raise Type_error
       in
       Ok res
@@ -183,10 +183,10 @@ let rec expr ctx env e =
       let (E d_1) = find v_1 in
       let (E d_2) = find v_2 in
       let div n_1 n_2 =
-        if Bigint.(n_2 = zero) then None
+        if Z.(n_2 = zero) then None
         else
-          let q = Bigint.(n_1 / n_2) in
-          let r = Bigint.(n_1 - (n_1 / n_2)) in
+          let q = Z.(n_1 / n_2) in
+          let r = Z.(n_1 - (n_1 / n_2)) in
           Some (q, r)
       in
       let res =
@@ -210,24 +210,24 @@ let rec expr ctx env e =
                      (O_some (SD_pair (Pair (SD_int (Int q), SD_nat (Nat r))))))
             )
         | SD_mutez (Mutez n_1), SD_nat (Nat n_2) -> (
-            let n_1 = Bigint.of_int64 n_1 in
+            let n_1 = Z.of_int64 n_1 in
             match div n_1 n_2 with
             | None -> E (SD_option O_none)
             | Some (q, r) ->
-                let q = Bigint.to_int64_exn q in
-                let r = Bigint.to_int64_exn r in
+                let q = Z.to_int64_exn q in
+                let r = Z.to_int64_exn r in
                 E
                   (SD_option
                      (O_some
                         (SD_pair (Pair (SD_mutez (Mutez q), SD_mutez (Mutez r))))))
             )
         | SD_mutez (Mutez n_1), SD_mutez (Mutez n_2) -> (
-            let n_1 = Bigint.of_int64 n_1 in
-            let n_2 = Bigint.of_int64 n_2 in
+            let n_1 = Z.of_int64 n_1 in
+            let n_2 = Z.of_int64 n_2 in
             match div n_1 n_2 with
             | None -> E (SD_option O_none)
             | Some (q, r) ->
-                let r = Bigint.to_int64_exn r in
+                let r = Z.to_int64_exn r in
                 E
                   (SD_option
                      (O_some
@@ -240,10 +240,10 @@ let rec expr ctx env e =
       let (E d_2) = find v_2 in
       match (d_1, d_2) with
       | SD_nat (Nat n_1), SD_nat (Nat n_2) ->
-          if Bigint.(n_2 > of_int 256) then Failed
+          if Z.(n_2 > of_int 256) then Failed
           else
-            let n_2 = Bigint.to_int_exn n_2 in
-            let res = Bigint.(shift_left n_1 n_2) in
+            let n_2 = Z.to_int_exn n_2 in
+            let res = Z.(shift_left n_1 n_2) in
             Ok (E (SD_nat (Nat res)))
       | _ -> raise Type_error)
   | E_shiftR (v_1, v_2) -> (
@@ -251,10 +251,10 @@ let rec expr ctx env e =
       let (E d_2) = find v_2 in
       match (d_1, d_2) with
       | SD_nat (Nat n_1), SD_nat (Nat n_2) ->
-          if Bigint.(n_2 > of_int 256) then Failed
+          if Z.(n_2 > of_int 256) then Failed
           else
-            let n_2 = Bigint.to_int_exn n_2 in
-            let res = Bigint.(shift_right n_1 n_2) in
+            let n_2 = Z.to_int_exn n_2 in
+            let res = Z.(shift_right n_1 n_2) in
             Ok (E (SD_nat (Nat res)))
       | _ -> raise Type_error)
   | E_and (v_1, v_2) ->
@@ -266,7 +266,7 @@ let rec expr ctx env e =
             E (SD_bool (Bool (b_1 && b_2)))
         | SD_nat (Nat n_1), SD_nat (Nat n_2)
         | SD_int (Int n_1), SD_nat (Nat n_2) ->
-            E (SD_nat (Nat Bigint.(n_1 land n_2)))
+            E (SD_nat (Nat Z.(n_1 land n_2)))
         | _ -> raise Type_error
       in
       Ok res
@@ -278,7 +278,7 @@ let rec expr ctx env e =
         | SD_bool (Bool b_1), SD_bool (Bool b_2) ->
             E (SD_bool (Bool (b_1 || b_2)))
         | SD_nat (Nat n_1), SD_nat (Nat n_2) ->
-            E (SD_nat (Nat Bigint.(n_1 lor n_2)))
+            E (SD_nat (Nat Z.(n_1 lor n_2)))
         | _ -> raise Type_error
       in
       Ok res
@@ -290,39 +290,39 @@ let rec expr ctx env e =
         | SD_bool (Bool b_1), SD_bool (Bool b_2) ->
             E (SD_bool (Bool Bool.(b_1 <> b_2)))
         | SD_nat (Nat n_1), SD_nat (Nat n_2) ->
-            E (SD_nat (Nat Bigint.(n_1 lxor n_2)))
+            E (SD_nat (Nat Z.(n_1 lxor n_2)))
         | _ -> raise Type_error
       in
       Ok res
   | E_eq v -> (
       let (E d) = find v in
       match d with
-      | SD_int (Int n) -> Ok (E (SD_bool (Bool Bigint.(n = zero))))
+      | SD_int (Int n) -> Ok (E (SD_bool (Bool Z.(n = zero))))
       | _ -> raise Type_error)
   | E_neq v -> (
       let (E d) = find v in
       match d with
-      | SD_int (Int n) -> Ok (E (SD_bool (Bool Bigint.(n <> zero))))
+      | SD_int (Int n) -> Ok (E (SD_bool (Bool Z.(n <> zero))))
       | _ -> raise Type_error)
   | E_lt v -> (
       let (E d) = find v in
       match d with
-      | SD_int (Int n) -> Ok (E (SD_bool (Bool Bigint.(n < zero))))
+      | SD_int (Int n) -> Ok (E (SD_bool (Bool Z.(n < zero))))
       | _ -> raise Type_error)
   | E_gt v -> (
       let (E d) = find v in
       match d with
-      | SD_int (Int n) -> Ok (E (SD_bool (Bool Bigint.(n > zero))))
+      | SD_int (Int n) -> Ok (E (SD_bool (Bool Z.(n > zero))))
       | _ -> raise Type_error)
   | E_leq v -> (
       let (E d) = find v in
       match d with
-      | SD_int (Int n) -> Ok (E (SD_bool (Bool Bigint.(n <= zero))))
+      | SD_int (Int n) -> Ok (E (SD_bool (Bool Z.(n <= zero))))
       | _ -> raise Type_error)
   | E_geq v -> (
       let (E d) = find v in
       match d with
-      | SD_int (Int n) -> Ok (E (SD_bool (Bool Bigint.(n >= zero))))
+      | SD_int (Int n) -> Ok (E (SD_bool (Bool Z.(n >= zero))))
       | _ -> raise Type_error)
   | E_compare (v_1, v_2) ->
       let (E d_1) = find v_1 in
@@ -523,8 +523,8 @@ let rec expr ctx env e =
       let (E d_3) = find v_3 in
       let (SD_nat (Nat n_1)) = cast Nat_t d_1 in
       let (SD_nat (Nat n_2)) = cast Nat_t d_2 in
-      let n_1 = Bigint.to_int_exn n_1 in
-      let n_2 = Bigint.to_int_exn n_2 in
+      let n_1 = Z.to_int_exn n_1 in
+      let n_2 = Z.to_int_exn n_2 in
       match v_3.var_type with
       | T_string ->
           let (SD_string (String s)) = cast String_t d_3 in
@@ -568,7 +568,7 @@ let rec expr ctx env e =
   | E_isnat v ->
       let (E d) = find v in
       let (SD_int (Int d)) = cast Int_t d in
-      if Bigint.(d < zero) then Ok (E (SD_option O_none))
+      if Z.(d < zero) then Ok (E (SD_option O_none))
       else Ok (E (SD_option (O_some (SD_nat (Nat d)))))
   | E_int_of_nat v ->
       let (E d) = find v in

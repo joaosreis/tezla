@@ -5,6 +5,5 @@
   tezla_adt
   tezla_converter
   alcotest
-  core
-  core_unix.sys_unix)
+  containers)
  (modes byte))

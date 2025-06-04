@@ -1,4 +1,4 @@
-open! Core
+open! Containers
 open Env
 module Michelson_adt = Edo_adt.Typed_adt
 module Tezla_adt = Tezla_adt.Adt
@@ -8,25 +8,37 @@ let create_stmt = Tezla_adt.Stmt.create
 let create_expr = Tezla_adt.Expr.create
 let create_data = Tezla_adt.Data.create
 
+let fold_left2 f acc l1 l2 =
+  try `Ok (List.fold_left2 f acc l1 l2)
+  with Invalid_argument _ -> `Unequal_lengths
+
+let pp_pos ppf { Lexing.pos_fname; pos_lnum; pos_bol; pos_cnum } =
+  Format.fprintf ppf "%s:%d:%d" pos_fname pos_lnum (pos_cnum - pos_bol)
+
+let debug ?pos msg =
+  match pos with
+  | None -> Logs.debug @@ fun m -> m "%s" msg
+  | Some pos -> Logs.debug @@ fun m -> m "%a: %s" pp_pos pos msg
+
 let join_loop env_before env_after body =
   match (env_before, env_after) with
   | Stack env_before, Stack env_after -> (
       match
-        List.fold2 ~init:body
-          ~f:(fun acc before after ->
+        fold_left2
+          (fun acc before after ->
             if not (Tezla_adt.Var.equal before after) then
               let e_after = create_expr (E_var after) in
               let assign = create_stmt (S_assign (before, e_after)) in
               create_stmt (S_seq (acc, assign))
             else acc)
-          env_before env_after
+          body env_before env_after
       with
-      | List.Or_unequal_lengths.Ok l -> l
-      | List.Or_unequal_lengths.Unequal_lengths ->
-          Debug.amf [%here] "unexpected loop body stack";
+      | `Ok l -> l
+      | `Unequal_lengths ->
+          debug ~pos:[%here] "unexpected loop body stack";
           assert false)
   | _ ->
-      Debug.amf [%here] "should not have reached here";
+      debug ~pos:[%here] "should not have reached here";
       assert false
 
 let join env_t env_f s =
@@ -34,14 +46,16 @@ let join env_t env_f s =
   | Failed, env | env, Failed -> (env, s)
   | Stack env_t, Stack env_f -> (
       match
-        List.fold2 env_t env_f ~init:s ~f:(fun acc v_t v_f ->
+        fold_left2
+          (fun acc v_t v_f ->
             let e_var = create_expr (E_var v_t) in
             let assign = create_stmt (S_assign (v_f, e_var)) in
             create_stmt (S_seq (acc, assign)))
+          s env_t env_f
       with
-      | List.Or_unequal_lengths.Ok s -> (Stack env_t, s)
-      | List.Or_unequal_lengths.Unequal_lengths ->
-          Debug.amf [%here] "unexpected if body stack";
+      | `Ok s -> (Stack env_t, s)
+      | `Unequal_lengths ->
+          debug ~pos:[%here] "unexpected if body stack";
           assert false)
 
 let unlift_option_t t =
@@ -49,7 +63,10 @@ let unlift_option_t t =
   match fst t with
   | Option t -> t
   | _ ->
-      let () = Debug.eprintf "Expected: option 'a but got %s\n" (to_string t) in
+      let () =
+        Logs.msg Logs.Debug (fun m ->
+            m "Expected: option 'a but got %s\n" (to_string t))
+      in
       assert false
 
 let car_t t =
@@ -58,7 +75,8 @@ let car_t t =
   | Pair (t, _) -> t
   | _ ->
       let () =
-        Debug.eprintf "Expected: pair 'a 'b but got %s\n" (to_string t)
+        Logs.debug (fun m ->
+            m "Expected: pair 'a 'b but got %s\n" (to_string t))
       in
       assert false
 
@@ -68,7 +86,8 @@ let cdr_t t =
   | Pair (_, t) -> t
   | _ ->
       let () =
-        Debug.eprintf "Expected: pair 'a 'b but got %s\n" (to_string t)
+        Logs.debug @@ fun m ->
+        m "Expected: pair 'a 'b but got %s\n" (to_string t)
       in
       assert false
 
@@ -77,7 +96,9 @@ let unlift_left_t t =
   match fst t with
   | Or (t, _) -> t
   | _ ->
-      let () = Debug.eprintf "Expected: or 'a 'b but got %s\n" (to_string t) in
+      let () =
+        Logs.debug @@ fun m -> m "Expected: or 'a 'b but got %s\n" (to_string t)
+      in
       assert false
 
 let unlift_right_t t =
@@ -85,7 +106,9 @@ let unlift_right_t t =
   match fst t with
   | Or (_, t) -> t
   | _ ->
-      let () = Debug.eprintf "Expected: or 'a 'b but got %s\n" (to_string t) in
+      let () =
+        Logs.debug @@ fun m -> m "Expected: or 'a 'b but got %s\n" (to_string t)
+      in
       assert false
 
 let list_elem_t t =
@@ -93,7 +116,9 @@ let list_elem_t t =
   match fst t with
   | List t -> t
   | _ ->
-      let () = Debug.eprintf "Expected: list 'a but got %s\n" (to_string t) in
+      let () =
+        Logs.debug @@ fun m -> m "Expected: list 'a but got %s\n" (to_string t)
+      in
       assert false
 
 let map_iter_elem_t t =
@@ -104,8 +129,8 @@ let map_iter_elem_t t =
   | Map (k, v) | Big_map (k, v) -> (Pair (k, v), [])
   | _ ->
       let () =
-        Debug.eprintf "Expected: list 'a or set 'a or map 'a 'b but got %s"
-          (to_string t)
+        Logs.debug @@ fun m ->
+        m "Expected: list 'a or set 'a or map 'a 'b but got %s" (to_string t)
       in
       assert false
 
@@ -115,7 +140,8 @@ let lambda_t t =
   | Lambda (_, t) -> t
   | _ ->
       let () =
-        Debug.eprintf "Expected: lambda 'a 'b but got %s\n" (to_string t)
+        Logs.debug @@ fun m ->
+        m "Expected: lambda 'a 'b but got %s\n" (to_string t)
       in
       assert false
 
@@ -141,7 +167,7 @@ let rec assert_type t (d : Edo_adt.Typed_adt.data) =
       true
   | T_sapling_transaction n, _, Sapling_transaction n'
   | T_sapling_state n, _, Sapling_state n'
-    when Bigint.(n = n') ->
+    when Z.(equal n n') ->
       true
   | T_pair _, D_pair (d_1, d_2), Pair (t_1, t_2) ->
       assert_type t_1 d_1 && assert_type t_2 d_2
@@ -150,12 +176,12 @@ let rec assert_type t (d : Edo_adt.Typed_adt.data) =
   | T_option _, D_some d', Option t' ->
       assert_type t' d'
   | T_list _, D_list l, List t' | T_set _, D_list l, Set t' ->
-      if List.length l = 0 then true else List.for_all ~f:(assert_type t') l
+      if List.length l = 0 then true else List.for_all (assert_type t') l
   | T_map _, D_map l, Map (k, v) | T_big_map _, D_map l, Big_map (k, v) ->
       let assert_type_map k v (d_k, d_v) =
         assert_type k d_k && assert_type v d_v
       in
-      List.for_all ~f:(assert_type_map k v) l
+      List.for_all (assert_type_map k v) l
   | T_lambda _, D_instruction _, Lambda _ -> true
   | _ -> false
 
@@ -173,11 +199,11 @@ let rec convert_data counter =
       | D_left d -> D_left (convert_data d)
       | D_right d -> D_right (convert_data d)
       | D_some d -> D_some (convert_data d)
-      | D_list d_l -> D_list (List.map ~f:convert_data d_l)
+      | D_list d_l -> D_list (List.map convert_data d_l)
       | D_map d_l ->
           D_map
             (List.map
-               ~f:(fun (d_1, d_2) -> (convert_data d_1, convert_data d_2))
+               (fun (d_1, d_2) -> (convert_data d_1, convert_data d_2))
                d_l)
       | D_instruction i ->
           let param =
@@ -202,7 +228,7 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
   let inst_to_stmt = inst_to_stmt counter in
   let loop_n f =
     let rec loop acc n =
-      if Bigint.(n = zero) then acc else loop (f acc n) Bigint.(n - one)
+      if Z.(equal n zero) then acc else loop (f acc n) Z.(n - one)
     in
     loop
   in
@@ -215,18 +241,14 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
   in
   let create_assign_annot_1 e =
     let open Annot in
-    let annots =
-      List.filter ~f:(function A_var _ -> true | _ -> false) annots
-    in
+    let annots = List.filter (function A_var _ -> true | _ -> false) annots in
     match annots with
     | A_var var_name :: _ -> create_assign ~var_name e
     | _ -> create_assign e
   in
   let create_assign_annot_2 e =
     let open Annot in
-    let annots =
-      List.filter ~f:(function A_var _ -> true | _ -> false) annots
-    in
+    let annots = List.filter (function A_var _ -> true | _ -> false) annots in
     match annots with
     | _ :: A_var var_name :: _ -> create_assign ~var_name e
     | _ -> create_assign e
@@ -242,10 +264,10 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
         | h :: tl ->
             let s_h, env_h = inst_to_stmt env h in
             List.fold_left
-              ~f:(fun (s, env) i ->
+              (fun (s, env) i ->
                 let s', env' = inst_to_stmt env i in
                 (create_stmt (S_seq (s, s')), env'))
-              ~init:(s_h, env_h) tl)
+              (s_h, env_h) tl)
     | I_if (i_t, i_f) ->
         let c, env = pop env in
         let s_t, env_t = inst_to_stmt env i_t in
@@ -614,7 +636,7 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
     | I_dip_n (n, i) ->
         let xl, env' = dip env n in
         let s, env' = inst_to_stmt env' i in
-        let env' = List.fold_left ~f:(fun acc x -> push x acc) ~init:env' xl in
+        let env' = List.fold_left (fun acc x -> push x acc) env' xl in
         (s, env')
     | I_cast _ -> (create_stmt S_skip, env)
     | (I_concat_string | I_concat_bytes) as i ->
@@ -1087,12 +1109,12 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
           let s =
             create_stmt (S_seq (s, create_stmt (S_seq (assign_1, assign_2))))
           in
-          if Bigint.(n = of_int 2) then
+          if Z.(equal n ~$2) then
             let env = push v_1 (push v_2 env) in
             (s, env)
           else
             let env = push v_2 env in
-            let s, env = unpair_n Bigint.(n - one) (s, env) in
+            let s, env = unpair_n Z.(n - one) (s, env) in
             let env = push v_1 env in
             (s, env)
         in
@@ -1100,8 +1122,8 @@ and inst_to_stmt counter env { value = i, annots; location; _ } =
     | I_pair_n n ->
         let rec pair_n i v_l env =
           let x, env = pop env in
-          if Bigint.(i = of_int 2) then (x :: v_l, env)
-          else pair_n Bigint.(i - one) (x :: v_l) env
+          if Z.(equal i ~$2) then (x :: v_l, env)
+          else pair_n Z.(i - one) (x :: v_l) env
         in
         let x, env = pop env in
         let v_l, env = pair_n n [ x ] env in
