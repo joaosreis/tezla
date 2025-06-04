@@ -9,4 +9,9 @@
 (test
  (name test)
  (modules test)
- (libraries containers functional_stack alcotest qcheck qcheck-alcotest))
+ (libraries
+  containers
+  tezla-converter.functional_stack
+  alcotest
+  qcheck
+  qcheck-alcotest))
